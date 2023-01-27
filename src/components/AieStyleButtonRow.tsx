@@ -1,5 +1,5 @@
 import * as React from 'react';
-import './EditorV3.css';
+import './AieStyleButton.css';
 import { AieStyleButton } from './AieStyleButton';
 
 interface AieStyleButtonRowProps {
