@@ -4,7 +4,6 @@ import { getCaretPosition } from '../functions/getCaretPosition';
 import { getHTMLfromV2Text } from '../functions/getHTMLfromV2Text';
 import { getV2TextStyle } from '../functions/getV2TextStyle';
 import { AieStyleMap, EditorV3Align } from '../functions/interface';
-import { AieStyleButtonRow } from './AieStyleButtonRow';
 import './EditorV3.css';
 
 interface EditorV3Props {
@@ -30,21 +29,12 @@ export const EditorV3 = ({
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
-  const [currentText, setCurrentText] = useState<string>('');
   const [currentStyleName, setCurrentStyleName] = useState<string>('');
   const [currentStyle, setCurrentStyle] = useState<React.CSSProperties>({});
   useEffect(() => {
     const { newText, styleName } = getV2TextStyle(text);
-    setCurrentText(newText);
     setCurrentStyleName(styleName);
-    drawInnerHtml(
-      divRef,
-      setCurrentText,
-      getCaretPosition,
-      textAlignment,
-      decimalAlignPercent,
-      newText,
-    );
+    drawInnerHtml(divRef, getCaretPosition, textAlignment, decimalAlignPercent, newText);
   }, [decimalAlignPercent, text, textAlignment]);
 
   const returnData = useCallback(
@@ -60,55 +50,19 @@ export const EditorV3 = ({
   // Work out backgroup colour and border
   const [inFocus, setInFocus] = useState<boolean>(false);
   const includeStyle = useMemo((): CSSProperties => {
-    const j =
-      textAlignment === EditorV3Align.left.valueOf()
-        ? 'start'
-        : textAlignment === EditorV3Align.center.valueOf()
-        ? 'center'
-        : textAlignment === EditorV3Align.right.valueOf()
-        ? 'end'
-        : undefined;
     return {
-      background: inFocus ? 'white' : 'inherit',
-      border: inFocus ? '1px solid grey' : '1px solid transparent',
       display: textAlignment === EditorV3Align.decimal.valueOf() ? 'block' : 'flex',
       flexDirection: 'row',
-      justifyContent: j,
+      justifyContent:
+        textAlignment === EditorV3Align.left.valueOf()
+          ? 'start'
+          : textAlignment === EditorV3Align.center.valueOf()
+          ? 'center'
+          : textAlignment === EditorV3Align.right.valueOf()
+          ? 'end'
+          : undefined,
     };
-  }, [inFocus, textAlignment]);
-
-  // // Work out justification
-  // const [just, setJust] = useState<React.CSSProperties>({});
-  // useEffect(() => {
-  //   switch (textAlignment) {
-  //     case EditorV3Align.right:
-  //       setJust({
-  //         display: 'flex',
-  //         flexDirection: 'row',
-  //         justifyContent: 'end',
-  //       });
-  //       break;
-  //     case EditorV3Align.center:
-  //       setJust({
-  //         display: 'flex',
-  //         flexDirection: 'row',
-  //         justifyContent: 'center',
-  //       });
-  //       break;
-  //     case EditorV3Align.decimal:
-  //       setJust({
-  //         display: 'block',
-  //       });
-  //       break;
-  //     case EditorV3Align.left:
-  //     default:
-  //       setJust({
-  //         display: 'flex',
-  //         flexDirection: 'row',
-  //         justifyContent: 'start',
-  //       });
-  //   }
-  // }, [textAlignment]);
+  }, [textAlignment]);
 
   const handleFocus = useCallback(() => {
     setInFocus(true);
@@ -129,7 +83,6 @@ export const EditorV3 = ({
         if (range.collapsed) {
           drawInnerHtml(
             divRef,
-            setCurrentText,
             getCaretPosition,
             textAlignment,
             decimalAlignPercent,
@@ -149,16 +102,12 @@ export const EditorV3 = ({
     // if (divRef.current) console.log(getCaretPosition(divRef.current));
   }
 
-  const handleBlur = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (e: React.FocusEvent<HTMLDivElement>) => {
-      setInFocus(false);
-      if (typeof setText === 'function') {
-        returnData({ text: getHTMLfromV2Text(currentText, currentStyleName, currentStyle) });
-      }
-    },
-    [currentStyle, currentStyleName, currentText, returnData, setText],
-  );
+  const handleBlur = useCallback(() => {
+    setInFocus(false);
+    if (typeof setText === 'function') {
+      returnData({ text: getHTMLfromV2Text(divRef, currentStyleName, currentStyle) });
+    }
+  }, [currentStyle, currentStyleName, returnData, setText]);
 
   useEffect(() => {
     if (customStyleMap === undefined) return;
@@ -173,7 +122,7 @@ export const EditorV3 = ({
 
   return (
     <div
-      className='aiev2-outer'
+      className={`aiev2-outer ${inFocus ? 'editing' : ''}`}
       id={id}
       style={style}
     >
@@ -201,21 +150,6 @@ export const EditorV3 = ({
           onFocus={handleFocus}
         ></div>
       </div>
-      {typeof setText === 'function' && inFocus && (
-        <div className='aie-button-position center'>
-          <div className='aie-button-holder'>
-            <AieStyleButtonRow
-              id={`${id}-stylebuttons`}
-              styleList={Object.keys(customStyleMap || {})}
-              currentStyle={currentStyleName}
-              applyStyleFunction={(ret: string) => {
-                const newStyle = ret === currentStyleName ? '' : ret;
-                setCurrentStyleName(newStyle);
-              }}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };

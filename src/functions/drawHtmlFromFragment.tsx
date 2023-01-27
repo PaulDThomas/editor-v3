@@ -22,6 +22,7 @@ export function drawHtmlFromFragment(
     const prePoint = document.createElement('span');
     prePoint.className = 'aiev2-span aiev2-span-point';
     prePoint.style.textAlign = 'right';
+    prePoint.style.left = '0';
     prePoint.style.right = `${100 - (decimalAlignPercent ?? 60)}%`;
     line.append(prePoint);
 
@@ -30,6 +31,7 @@ export function drawHtmlFromFragment(
     postPoint.className = 'aiev2-span aiev2-span-point';
     postPoint.style.textAlign = 'left';
     postPoint.style.left = `${decimalAlignPercent ?? 60}%`;
+    postPoint.style.right = '0';
     line.append(postPoint);
 
     // Add spans with text if there is no decimal

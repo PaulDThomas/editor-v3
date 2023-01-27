@@ -3,20 +3,18 @@ import { EditorV3Align } from './interface';
 
 export function drawInnerHtml(
   divRef: React.MutableRefObject<HTMLDivElement | null>,
-  setCurrentText: React.Dispatch<React.SetStateAction<string>>,
   getCaretPosition: (element: HTMLDivElement) => { start: number; end: number },
   textAlignment: EditorV3Align,
   decimalAlignPercent: number,
   initialText?: string,
   e?: React.KeyboardEvent<HTMLDivElement>,
   range?: Range,
-) {
+): string {
   if (divRef.current) {
     // Decode any HTML here too... we are going to set textContent so this is safe
     let fullText = (initialText !== undefined ? initialText : divRef.current.textContent ?? '')
       .replace(/[\u202F|\u00A0]/g, ' ')
       .trim();
-    setCurrentText(fullText);
     // Get cursor position
     const caretPosn = getCaretPosition(divRef.current);
     let decimal = fullText.match(/\./)?.index;
@@ -110,4 +108,5 @@ export function drawInnerHtml(
     e.stopPropagation();
     e.preventDefault();
   }
+  return divRef.current?.innerHTML ?? '';
 }

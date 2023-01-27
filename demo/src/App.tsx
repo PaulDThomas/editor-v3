@@ -3,7 +3,9 @@ import { EditorV3 } from '../../src/components/EditorV3';
 import { EditorV3Align } from '../../src/functions/interface';
 
 export const App = (): JSX.Element => {
-  const [text, setText] = useState<string>('12.34');
+  const [text, setText] = useState<string>(
+    '<div classname="aie-text" data-inline-style-ranges=\'[{"length":9,"offset":0,"style":""}]\'><div class="aiev2-decimal-line" style="height: 21px;"><span class="aiev2-span aiev2-span-point" style="text-align: right; right: 40%;"><span>d12</span></span><span class="aiev2-span aiev2-span-point" style="text-align: left; left: 60%;"><span>.34d</span></span></div></div>',
+  );
   const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.left);
   const [decPct, setDecPct] = useState<number>(60);
 
