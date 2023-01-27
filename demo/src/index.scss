@@ -33,7 +33,7 @@ code {
   height: 95vh;
   opacity: 1;
   overflow: auto;
-  background-color: white;
+  background-color: antiquewhite;
 }
 
 div.row {
@@ -53,20 +53,20 @@ span.label {
 
 span.content {
   vertical-align: center;
-  height: 30px;
-  width: 240px;
+  min-height: 30px;
+  width: calc(100% - 155px);
 }
 
 select {
   height: 30px;
-  border-radius: 4px;
+  border-radius: 6px;
   width: 240px;
   border: 1px solid black;
 }
 
 input {
   height: 28px;
-  border-radius: 4px;
+  border-radius: 6px;
   width: 230px;
   border: 1px solid black;
   padding: 0 4;

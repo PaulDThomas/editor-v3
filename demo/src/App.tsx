@@ -20,12 +20,15 @@ export const App = (): JSX.Element => {
                 setText={setText}
                 textAlignment={align}
                 decimalAlignPercent={decPct}
+                style={{
+                  width: '240px',
+                }}
               />
             </span>
           </div>
           <div className='row'>
             <span className='label'>Alignment</span>
-            <span>
+            <span className='content'>
               <select
                 value={align}
                 onChange={(e) => {
@@ -46,7 +49,7 @@ export const App = (): JSX.Element => {
           </div>
           <div className='row'>
             <span className='label'>Decimal percent</span>
-            <span>
+            <span className='content'>
               <input
                 type={'number'}
                 value={decPct}
@@ -55,6 +58,10 @@ export const App = (): JSX.Element => {
                 }}
               />
             </span>
+          </div>
+          <div className='row'>
+            <span className='label'>Text</span>
+            <span className='content'>{text}</span>
           </div>
         </div>
       </div>
