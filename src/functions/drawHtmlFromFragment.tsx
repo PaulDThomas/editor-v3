@@ -1,0 +1,66 @@
+import { EditorV3Align } from './interface';
+
+export function drawHtmlFromFragment(
+  textAlignment: EditorV3Align,
+  decimalAlignPercent: number,
+  decimal: number | undefined,
+  fixedBoundaries: {
+    type: string;
+    start: number;
+    end?: number | undefined;
+    span?: Node | HTMLSpanElement | undefined;
+  }[],
+): DocumentFragment {
+  const fragment = new DocumentFragment();
+
+  if (textAlignment === EditorV3Align.decimal) {
+    const line = document.createElement('div');
+    line.className = 'aiev2-decimal-line';
+    fragment.append(line);
+
+    // Set up space before decimal
+    const prePoint = document.createElement('span');
+    prePoint.className = 'aiev2-span aiev2-span-point';
+    prePoint.style.textAlign = 'right';
+    prePoint.style.right = `${100 - (decimalAlignPercent ?? 60)}%`;
+    line.append(prePoint);
+
+    // Set up space after (and including) decimal
+    const postPoint = document.createElement('span');
+    postPoint.className = 'aiev2-span aiev2-span-point';
+    postPoint.style.textAlign = 'left';
+    postPoint.style.left = `${decimalAlignPercent ?? 60}%`;
+    line.append(postPoint);
+
+    // Add spans with text if there is no decimal
+    if (decimal === null || decimal === undefined) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      prePoint.append(...fixedBoundaries.filter((b) => b.span !== undefined).map((b) => b.span!));
+    } else {
+      const cut = fixedBoundaries.findIndex((b) => b.type === 'decimal');
+      prePoint.append(
+        ...fixedBoundaries
+          .slice(0, cut)
+          .filter((b) => b.span !== undefined)
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          .map((b) => b.span!),
+      );
+      postPoint.append(
+        ...fixedBoundaries
+          .slice(cut)
+          .filter((b) => b.span !== undefined)
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          .map((b) => b.span!),
+      );
+    }
+  } else {
+    // Create single span with text
+    const innerSpan = document.createElement('span');
+    innerSpan.className = 'aiev2-span';
+    innerSpan.style.textAlign = textAlignment.toString() ?? 'left';
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    innerSpan.append(...fixedBoundaries.filter((b) => b.span !== undefined).map((b) => b.span!));
+    fragment.append(innerSpan);
+  }
+  return fragment;
+}
