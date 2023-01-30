@@ -10,6 +10,8 @@ export const App = (): JSX.Element => {
   const [json, setJson] = useState<string>('');
   const [text, setText] = useState<string>('');
   const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.left);
+  const [editable, setEditable] = useState<boolean>(true);
+  const [allowNewLine, setAllowNewLine] = useState<boolean>(true);
   const [decPct, setDecPct] = useState<number>(60);
 
   return (
@@ -27,12 +29,47 @@ export const App = (): JSX.Element => {
                 setJson={setJson}
                 textAlignment={align}
                 decimalAlignPercent={decPct}
+                allowNewLine={allowNewLine}
+                editable={editable}
                 style={{
                   width: '240px',
                 }}
               />
             </span>
           </div>
+
+          <hr />
+
+          <div className='row'>
+            <span className='label'>Allow new line</span>
+            <span className='content'>
+              <select
+                value={allowNewLine ? 'true' : 'false'}
+                onChange={(e) => {
+                  setAllowNewLine(e.currentTarget.value === 'true');
+                }}
+              >
+                <option value={'true'}>true</option>
+                <option value={'false'}>false</option>
+              </select>
+            </span>
+          </div>
+
+          <div className='row'>
+            <span className='label'>Editable</span>
+            <span className='content'>
+              <select
+                value={editable ? 'true' : 'false'}
+                onChange={(e) => {
+                  setEditable(e.currentTarget.value === 'true');
+                }}
+              >
+                <option value={'true'}>true</option>
+                <option value={'false'}>false</option>
+              </select>
+            </span>
+          </div>
+
           <div className='row'>
             <span className='label'>Alignment</span>
             <span className='content'>
@@ -67,6 +104,7 @@ export const App = (): JSX.Element => {
               />
             </span>
           </div>
+
           <div className='row'>
             <span className='label'>Text</span>
             <span className='content'>{text}</span>
