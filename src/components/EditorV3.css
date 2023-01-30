@@ -1,4 +1,4 @@
-.aiev2-outer {
+.aiev3 {
   position: relative;
   width: 100%;
   height: 100%;
@@ -7,14 +7,16 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
-.aiev2-outer.editing {
+.aiev3.editing {
   border: 1px solid black;
   background-color: white;
 }
 
-.aiev2-editing {
+.aiev3-editing {
   overflow: visible;
   overflow-wrap: normal;
   outline: 0;
@@ -24,7 +26,7 @@
   margin: -1px;
 }
 
-.aiev2-decimal-line {
+.aiev3-decimal-line {
   position: relative;
   overflow: visible;
   width: 100%;
@@ -32,12 +34,12 @@
   min-height: 1.2rem;
 }
 
-.aiev2-span {
+.aiev3-span {
   white-space: nowrap;
   display: inline-block;
 }
 
-.aiev2-span-point {
+.aiev3-span-point {
   position: absolute;
   top: 1;
 }

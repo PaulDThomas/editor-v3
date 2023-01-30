@@ -1,5 +1,5 @@
 import { drawHtmlFromFragment } from './drawHtmlFromFragment';
-import { EditorV3Align } from './interface';
+import { EditorV3Align, iTextBoundary } from './interface';
 
 export function drawInnerHtml(
   divRef: React.MutableRefObject<HTMLDivElement | null>,
@@ -28,7 +28,7 @@ export function drawInnerHtml(
         fullText = fullText.replace(/\./, '');
       }
       // The non-space has been deleted
-      else if (e !== undefined && e.key === 'Delete' && fullText?.match(/[\u200B]/) === null) {
+      else if (e.key === 'Delete' && fullText?.match(/[\u200B]/) === null) {
         fullText = fullText.substring(0, caretPosn.end) + fullText.substring(caretPosn.end + 1);
       }
       // The non-space has been deleted
@@ -40,12 +40,7 @@ export function drawInnerHtml(
     const emptyNode = document.createTextNode('\u200B');
 
     // Get all boundaries in fullText
-    const boundaries: {
-      type: string;
-      start: number;
-      end?: number;
-      span?: HTMLSpanElement | Node;
-    }[] = [
+    const boundaries: iTextBoundary[] = [
       { type: 'start', start: 0, end: caretPosn.end },
       { type: 'caret', start: caretPosn.end, end: caretPosn.end },
       { type: 'afterCaret', start: caretPosn.end, end: fullText.length },
@@ -89,10 +84,10 @@ export function drawInnerHtml(
 
     // Update height after being added to divRef for decimal lines
     (
-      Array.from(divRef.current.getElementsByClassName('aiev2-decimal-line')) as HTMLDivElement[]
+      Array.from(divRef.current.getElementsByClassName('aiev3-decimal-line')) as HTMLDivElement[]
     ).forEach((el) => {
       el.style.height = `${Math.max(
-        ...(Array.from(el.getElementsByClassName('aiev2-span')) as HTMLSpanElement[]).map(
+        ...(Array.from(el.getElementsByClassName('aiev3-span')) as HTMLSpanElement[]).map(
           (el) => el.clientHeight,
         ),
       )}px`;

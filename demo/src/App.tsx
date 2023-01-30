@@ -3,9 +3,12 @@ import { EditorV3 } from '../../src/components/EditorV3';
 import { EditorV3Align } from '../../src/functions/interface';
 
 export const App = (): JSX.Element => {
-  const [text, setText] = useState<string>(
-    '<div classname="aie-text" data-inline-style-ranges=\'[{"length":9,"offset":0,"style":""}]\'><div class="aiev2-decimal-line" style="height: 21px;"><span class="aiev2-span aiev2-span-point" style="text-align: right; right: 40%;"><span>d12</span></span><span class="aiev2-span aiev2-span-point" style="text-align: left; left: 60%;"><span>.34d</span></span></div></div>',
+  const [input, setHtml] = useState<string>(
+    // '<div classname="aie-text" data-inline-style-ranges=\'[{"length":9,"offset":0,"style":""}]\'><div class="aiev3-decimal-line" style="height: 21px;"><span class="aiev3-span aiev3-span-point" style="text-align: right; right: 40%;"><span>d12</span></span><span class="aiev3-span aiev3-span-point" style="text-align: left; left: 60%;"><span>.34d</span></span></div></div>',
+    '12.34',
   );
+  const [json, setJson] = useState<string>('');
+  const [text, setText] = useState<string>('');
   const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.left);
   const [decPct, setDecPct] = useState<number>(60);
 
@@ -18,8 +21,10 @@ export const App = (): JSX.Element => {
             <span className='content'>
               <EditorV3
                 id={'e1'}
-                text={text}
+                input={input}
+                setHtml={setHtml}
                 setText={setText}
+                setJson={setJson}
                 textAlignment={align}
                 decimalAlignPercent={decPct}
                 style={{
@@ -49,6 +54,7 @@ export const App = (): JSX.Element => {
               </select>
             </span>
           </div>
+
           <div className='row'>
             <span className='label'>Decimal percent</span>
             <span className='content'>
@@ -64,6 +70,14 @@ export const App = (): JSX.Element => {
           <div className='row'>
             <span className='label'>Text</span>
             <span className='content'>{text}</span>
+          </div>
+          <div className='row'>
+            <span className='label'>JSON</span>
+            <span className='content'>{json}</span>
+          </div>
+          <div className='row'>
+            <span className='label'>HTML</span>
+            <span className='content'>{input}</span>
           </div>
         </div>
       </div>

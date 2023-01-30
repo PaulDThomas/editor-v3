@@ -1,15 +1,18 @@
 import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { drawInnerHtml } from '../functions/drawInnerHtml';
 import { getCaretPosition } from '../functions/getCaretPosition';
-import { getHTMLfromV2Text } from '../functions/getHTMLfromV2Text';
-import { getV2TextStyle } from '../functions/getV2TextStyle';
+import { getCurrentData } from '../functions/getCurrentData';
+import { getV3Html } from '../functions/getV3Html';
 import { AieStyleMap, EditorV3Align } from '../functions/interface';
 import './EditorV3.css';
 
 interface EditorV3Props {
   id: string;
-  text: string;
+  input: string;
+  editable?: boolean;
+  setHtml?: (ret: string) => void;
   setText?: (ret: string) => void;
+  setJson?: (ret: string) => void;
   customStyleMap?: AieStyleMap;
   allowNewLine?: boolean;
   textAlignment?: EditorV3Align;
@@ -19,8 +22,11 @@ interface EditorV3Props {
 
 export const EditorV3 = ({
   id,
-  text,
+  input,
+  editable = true,
   setText,
+  setHtml,
+  setJson,
   customStyleMap,
   allowNewLine = false,
   textAlignment = EditorV3Align.left,
@@ -30,22 +36,23 @@ export const EditorV3 = ({
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
   const [currentStyleName, setCurrentStyleName] = useState<string>('');
-  const [currentStyle, setCurrentStyle] = useState<React.CSSProperties>({});
+
+  // General return function
+  const returnData = useCallback(
+    (ret: { text: string; html: string; json: string }) => {
+      setHtml && setHtml(ret.html);
+      setJson && setJson(ret.json);
+      setText && setText(ret.text);
+    },
+    [setHtml, setJson, setText],
+  );
+
   useEffect(() => {
-    const { newText, styleName } = getV2TextStyle(text);
+    const { newText, styleName } = getV3Html(input);
     setCurrentStyleName(styleName);
     drawInnerHtml(divRef, getCaretPosition, textAlignment, decimalAlignPercent, newText);
-  }, [decimalAlignPercent, text, textAlignment]);
-
-  const returnData = useCallback(
-    (ret: { text?: string }) => {
-      // Do nothing if there is nothing to do
-      if (typeof setText !== 'function') return;
-      // Update via parent function
-      setText(ret.text ?? text ?? '');
-    },
-    [setText, text],
-  );
+    returnData(getCurrentData(divRef));
+  }, [decimalAlignPercent, input, returnData, textAlignment]);
 
   // Work out backgroup colour and border
   const [inFocus, setInFocus] = useState<boolean>(false);
@@ -104,42 +111,39 @@ export const EditorV3 = ({
 
   const handleBlur = useCallback(() => {
     setInFocus(false);
-    if (typeof setText === 'function') {
-      returnData({ text: getHTMLfromV2Text(divRef, currentStyleName, currentStyle) });
-    }
-  }, [currentStyle, currentStyleName, returnData, setText]);
+    returnData(getCurrentData(divRef));
+  }, [returnData]);
 
-  useEffect(() => {
+  const currentStyle = useMemo(() => {
     if (customStyleMap === undefined) return;
     const ix = Object.keys(customStyleMap).findIndex((c) => c === currentStyleName);
     if (ix === -1) {
-      setCurrentStyle({});
-      return;
+      return {};
     } else {
-      setCurrentStyle(customStyleMap[currentStyleName].css);
+      return customStyleMap[currentStyleName].style;
     }
   }, [currentStyleName, customStyleMap]);
 
   return (
     <div
-      className={`aiev2-outer ${inFocus ? 'editing' : ''}`}
+      className={`aiev3 ${inFocus ? 'editing' : ''}`}
       id={id}
       style={style}
+      onFocusCapture={handleFocus}
+      onBlur={handleBlur}
     >
       <div
         id={`${id}-line0-holder`}
-        className='aiev2-line'
+        className='aiev3-line'
         style={{
           ...includeStyle,
           ...currentStyle,
         }}
-        onFocusCapture={handleFocus}
-        onBlur={handleBlur}
       >
         <div
           id={`${id}-line0-editable`}
-          className='aiev2-editing'
-          contentEditable={typeof setText === 'function'}
+          className='aiev3-editing'
+          contentEditable={editable && typeof setHtml === 'function'}
           suppressContentEditableWarning
           spellCheck={false}
           ref={divRef}

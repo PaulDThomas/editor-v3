@@ -1,4 +1,4 @@
-export function getV2TextStyle(text: string): { newText: string; styleName: string } {
+export function getV3Html(text: string): { newText: string; styleName: string } {
   // Do nothing if there is nothing to do
   if (!text.includes('classname')) return { newText: text, styleName: '' };
   // Create element so you can read the things

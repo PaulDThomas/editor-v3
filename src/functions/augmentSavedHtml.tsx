@@ -13,19 +13,19 @@ export function drawHtmlFromFragment(
 
   if (textAlignment === 'decimal') {
     const line = document.createElement('div');
-    line.className = 'aiev2-decimal-line';
+    line.className = 'aiev3-decimal-line';
     fragment.append(line);
 
     // Set up space before decimal
     const prePoint = document.createElement('span');
-    prePoint.className = 'aiev2-span aiev2-span-point';
+    prePoint.className = 'aiev3-span aiev3-span-point';
     prePoint.style.textAlign = 'right';
     prePoint.style.right = `${100 - (decimalAlignPercent ?? 60)}%`;
     line.append(prePoint);
 
     // Set up space after (and including) decimal
     const postPoint = document.createElement('span');
-    postPoint.className = 'aiev2-span aiev2-span-point';
+    postPoint.className = 'aiev3-span aiev3-span-point';
     postPoint.style.textAlign = 'left';
     postPoint.style.left = `${decimalAlignPercent ?? 60}%`;
     line.append(postPoint);
@@ -54,7 +54,7 @@ export function drawHtmlFromFragment(
   } else {
     // Create single span with text
     const innerSpan = document.createElement('span');
-    innerSpan.className = 'aiev2-span';
+    innerSpan.className = 'aiev3-span';
     innerSpan.style.textAlign = textAlignment ?? 'left';
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     innerSpan.append(...fixedBoundaries.filter((b) => b.span !== undefined).map((b) => b.span!));

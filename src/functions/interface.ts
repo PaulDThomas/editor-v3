@@ -3,6 +3,13 @@ export interface iColourStyles {
   [styleName: string]: React.CSSProperties;
 }
 
+export interface iTextBoundary {
+  type: string;
+  start: number;
+  end?: number;
+  span?: HTMLSpanElement | Node;
+}
+
 export interface iStyleBlock {
   start: number;
   end: number;
@@ -23,7 +30,7 @@ export enum EditorV3Align {
 }
 
 export interface AieStyleMap {
-  [styleName: string]: { css: React.CSSProperties; aieExclude: string[] };
+  [styleName: string]: { style: React.CSSProperties };
 }
 export interface AieStyleExcludeMap {
   [styleName: string]: string[];
