@@ -99,7 +99,7 @@ export const App = (): JSX.Element => {
                 type={'number'}
                 value={decPct}
                 onChange={(e) => {
-                  setDecPct(parseInt(e.currentTarget.value));
+                  setDecPct(e.currentTarget.value ? parseInt(e.currentTarget.value) : 0);
                 }}
               />
             </span>
