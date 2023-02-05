@@ -27,7 +27,7 @@ export const EditorV3 = ({
   setText,
   setHtml,
   setJson,
-  customStyleMap,
+  // customStyleMap,
   allowNewLine = false,
   textAlignment = EditorV3Align.left,
   decimalAlignPercent = 60,
@@ -35,28 +35,30 @@ export const EditorV3 = ({
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
-  const [currentStyleName, setCurrentStyleName] = useState<string>('');
+  // const [currentStyleName, setCurrentStyleName] = useState<string>('');
 
   // General return function
   const returnData = useCallback(
-    (ret: { text: string; html: string; json: string }) => {
-      setHtml && setHtml(ret.html);
-      setJson && setJson(ret.json);
-      setText && setText(ret.text);
+    (ret: { text: string; html: string; json: string }, force?: boolean) => {
+      if (force || (ret.text !== input && ret.html !== input && ret.json !== input)) {
+        setText && setText(ret.text);
+        setHtml && setHtml(ret.html);
+        setJson && setJson(ret.json);
+      }
     },
-    [setHtml, setJson, setText],
+    [input, setHtml, setJson, setText],
   );
 
   useEffect(() => {
-    const { newText, styleName } = getV3Html(input);
-    setCurrentStyleName(styleName);
+    const { newText } = getV3Html(input);
+    // setCurrentStyleName(styleName);
     drawInnerHtml(divRef, getCaretPosition, textAlignment, decimalAlignPercent, newText);
-    returnData(getCurrentData(divRef));
+    returnData(getCurrentData(divRef), true);
   }, [decimalAlignPercent, input, returnData, textAlignment]);
 
   // Work out backgroup colour and border
   const [inFocus, setInFocus] = useState<boolean>(false);
-  const includeStyle = useMemo((): CSSProperties => {
+  const alignStyle = useMemo((): CSSProperties => {
     return {
       display: textAlignment === EditorV3Align.decimal.valueOf() ? 'block' : 'flex',
       flexDirection: 'row',
@@ -76,6 +78,7 @@ export const EditorV3 = ({
   }, []);
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    // const sel: Selection | null = window.getSelection();
     if (e.key === 'Enter' && !allowNewLine) {
       e.stopPropagation();
       e.preventDefault();
@@ -105,8 +108,8 @@ export const EditorV3 = ({
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function handleSelect(e: React.SyntheticEvent<HTMLDivElement>) {
-    // console.log("Key select");
-    // if (divRef.current) console.log(getCaretPosition(divRef.current));
+    // divRef.current &&
+    //   console.log(`Handle select: ${JSON.stringify(getCaretPosition(divRef.current))}`);
   }
 
   const handleBlur = useCallback(() => {
@@ -114,30 +117,28 @@ export const EditorV3 = ({
     returnData(getCurrentData(divRef));
   }, [returnData]);
 
-  const currentStyle = useMemo(() => {
-    if (customStyleMap === undefined) return;
-    const ix = Object.keys(customStyleMap).findIndex((c) => c === currentStyleName);
-    if (ix === -1) {
-      return {};
-    } else {
-      return customStyleMap[currentStyleName].style;
+  const widthStyle = useMemo(() => {
+    const s = { ...style };
+    // Remove padding/border width
+    if (s.width) {
+      s.width = `calc(${s.width} - 10px)`;
     }
-  }, [currentStyleName, customStyleMap]);
+    return s;
+  }, [style]);
 
   return (
     <div
       className={`aiev3 ${inFocus ? 'editing' : ''}`}
       id={id}
-      style={style}
+      style={widthStyle}
       onFocusCapture={handleFocus}
       onBlur={handleBlur}
     >
       <div
-        id={`${id}-line0-holder`}
+        id={`${id}-lines-holder`}
         className='aiev3-line'
         style={{
-          ...includeStyle,
-          ...currentStyle,
+          ...alignStyle,
         }}
       >
         <div
