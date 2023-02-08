@@ -1,4 +1,4 @@
-import { iColourStyles } from './interface';
+import { EditorV3Styles } from '../classes/interface';
 import { ColouredLine } from './ColouredLine';
 import { getHtmlString } from './getHtmlString';
 
@@ -32,7 +32,7 @@ export class ColouredText {
   constructor(arg: ColouredLine[]);
   constructor(arg: string[]);
   constructor(arg: string);
-  constructor(arg: string | string[] | ColouredLine[], styles?: iColourStyles) {
+  constructor(arg: string | string[] | ColouredLine[], styles?: EditorV3Styles) {
     // this.colouredText = colouredText;
     this.lines = [];
     if (typeof arg === 'string') {

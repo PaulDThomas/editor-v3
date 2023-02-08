@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { EditorV3Align } from '../../src/classes/interface';
 import { EditorV3 } from '../../src/components/EditorV3';
-import { EditorV3Align } from '../../src/functions/interface';
 
 export const App = (): JSX.Element => {
   const [input, setHtml] = useState<string>(

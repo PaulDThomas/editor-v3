@@ -22,15 +22,8 @@ export interface iColouredLine {
   styleBlocks?: iStyleBlock[];
 }
 
-export enum EditorV3Align {
-  'left' = 'left',
-  'center' = 'center',
-  'decimal' = 'decimal',
-  'right' = 'right',
-}
-
 export interface AieStyleMap {
-  [styleName: string]: { style: React.CSSProperties };
+  [styleName: string]: { css: React.CSSProperties; aieExclude: string[] };
 }
 export interface AieStyleExcludeMap {
   [styleName: string]: string[];

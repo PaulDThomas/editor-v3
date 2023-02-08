@@ -1,12 +1,13 @@
-import { iColouredLine, iColourStyles, iStyleBlock } from './interface';
+import { iColouredLine, iStyleBlock } from './interface';
 import { explodeLine } from './explodeLine';
 import { getHtmlString } from './getHtmlString';
 import { implodeLine } from './implodeLine';
+import { EditorV3Styles } from '../classes/interface';
 
 export class ColouredLine {
   // Variables
   text: string;
-  styles: iColourStyles;
+  styles: EditorV3Styles;
   styleBlocks: iStyleBlock[];
 
   // Read only variables
@@ -39,9 +40,9 @@ export class ColouredLine {
 
   // Constructor
   constructor(arg: iColouredLine);
-  constructor(arg: string, styles?: iColourStyles);
-  constructor(arg: string, styles?: iColourStyles, styleBlocks?: iStyleBlock[]);
-  constructor(arg: string | iColouredLine, styles?: iColourStyles, styleBlocks?: iStyleBlock[]) {
+  constructor(arg: string, styles?: EditorV3Styles);
+  constructor(arg: string, styles?: EditorV3Styles, styleBlocks?: iStyleBlock[]);
+  constructor(arg: string | iColouredLine, styles?: EditorV3Styles, styleBlocks?: iStyleBlock[]) {
     if (typeof arg === 'string') {
       this.text = arg;
       this.styles = styles ?? {};

@@ -1,5 +1,5 @@
-import { drawHtmlLineFragment } from './drawHtmlLineFragment';
-import { EditorV3Align } from './interface';
+import { EditorV3Align } from '../classes/interface';
+import { drawHtmlLineFragment } from '../classes/drawHtmlLineFragment';
 import { setCaretPosition } from './setCaretPosition';
 
 export function drawInnerHtml(
@@ -13,9 +13,13 @@ export function drawInnerHtml(
 ): string {
   if (divRef.current) {
     // Decode any HTML here too... we are going to set textContent so this is safe
-    let fullText = (initialText !== undefined ? initialText : divRef.current.textContent ?? '')
+    let fullText = (
+      initialText !== undefined
+        ? initialText
+        : [...divRef.current.children].map((div) => div.textContent ?? '').join('\n')
+    )
       .replace(/[\u202F|\u00A0]/g, ' ')
-      .trim();
+      .replace(/\u200B/g, '');
     // Get cursor position
     const caretPosn = getCaretPosition(divRef.current);
     let decimal = fullText.match(/\./)?.index;
@@ -35,9 +39,11 @@ export function drawInnerHtml(
     }
 
     // Get document fragment from text
-    const fragment = drawHtmlLineFragment(textAlignment, decimalAlignPercent, fullText);
     divRef.current.innerHTML = '';
-    divRef.current.appendChild(fragment);
+    fullText
+      .split('\n')
+      .map((t) => drawHtmlLineFragment(textAlignment, decimalAlignPercent, t))
+      .forEach((f) => divRef.current?.appendChild(f));
 
     // Update height after being added to divRef for decimal lines
     (

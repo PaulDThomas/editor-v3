@@ -40,12 +40,12 @@ export function drawHtmlLineFragment(
       prePoint.textContent = fullText;
     }
   } else {
-    // Create single span with text
-    const innerSpan = document.createElement('span');
-    innerSpan.className = 'aiev3-span';
-    innerSpan.style.textAlign = textAlignment.toString() ?? 'left';
-    innerSpan.textContent = fullText;
-    fragment.append(innerSpan);
+    // Create single div with text
+    const innerDiv = document.createElement('div');
+    innerDiv.className = 'aiev3-line';
+    innerDiv.style.textAlign = textAlignment.toString() ?? 'left';
+    innerDiv.textContent = fullText;
+    fragment.append(innerDiv);
   }
   return fragment;
 }

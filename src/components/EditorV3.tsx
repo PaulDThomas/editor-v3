@@ -1,9 +1,10 @@
 import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { EditorV3Content } from '../classes/EditorV3Content';
+import { EditorV3Align, EditorV3Styles } from '../classes/interface';
 import { drawInnerHtml } from '../functions/drawInnerHtml';
 import { getCaretPosition } from '../functions/getCaretPosition';
 import { getCurrentData } from '../functions/getCurrentData';
-import { getV3Html } from '../functions/getV3Html';
-import { AieStyleMap, EditorV3Align } from '../functions/interface';
+import { updateInnerHtml } from '../functions/updateInnerHtml';
 import './EditorV3.css';
 
 interface EditorV3Props {
@@ -13,7 +14,7 @@ interface EditorV3Props {
   setHtml?: (ret: string) => void;
   setText?: (ret: string) => void;
   setJson?: (ret: string) => void;
-  customStyleMap?: AieStyleMap;
+  customStyleMap?: EditorV3Styles;
   allowNewLine?: boolean;
   textAlignment?: EditorV3Align;
   decimalAlignPercent?: number;
@@ -27,7 +28,7 @@ export const EditorV3 = ({
   setText,
   setHtml,
   setJson,
-  // customStyleMap,
+  customStyleMap,
   allowNewLine = false,
   textAlignment = EditorV3Align.left,
   decimalAlignPercent = 60,
@@ -50,29 +51,16 @@ export const EditorV3 = ({
   );
 
   useEffect(() => {
-    const { newText } = getV3Html(input);
-    // setCurrentStyleName(styleName);
-    drawInnerHtml(divRef, getCaretPosition, textAlignment, decimalAlignPercent, newText);
-    returnData(getCurrentData(divRef), true);
-  }, [decimalAlignPercent, input, returnData, textAlignment]);
+    const newInnerHtmls = new EditorV3Content(input, {
+      textAlignment,
+      decimalAlignPercent,
+      styles: customStyleMap,
+    });
+    divRef.current && updateInnerHtml(divRef.current, newInnerHtmls);
+  }, [customStyleMap, decimalAlignPercent, input, returnData, textAlignment]);
 
   // Work out backgroup colour and border
   const [inFocus, setInFocus] = useState<boolean>(false);
-  const alignStyle = useMemo((): CSSProperties => {
-    return {
-      display: textAlignment === EditorV3Align.decimal.valueOf() ? 'block' : 'flex',
-      flexDirection: 'row',
-      justifyContent:
-        textAlignment === EditorV3Align.left.valueOf()
-          ? 'start'
-          : textAlignment === EditorV3Align.center.valueOf()
-          ? 'center'
-          : textAlignment === EditorV3Align.right.valueOf()
-          ? 'end'
-          : undefined,
-    };
-  }, [textAlignment]);
-
   const handleFocus = useCallback(() => {
     setInFocus(true);
   }, []);
@@ -135,26 +123,18 @@ export const EditorV3 = ({
       onBlur={handleBlur}
     >
       <div
-        id={`${id}-lines-holder`}
-        className='aiev3-line'
-        style={{
-          ...alignStyle,
-        }}
-      >
-        <div
-          id={`${id}-line0-editable`}
-          className='aiev3-editing'
-          contentEditable={editable && typeof setHtml === 'function'}
-          suppressContentEditableWarning
-          spellCheck={false}
-          ref={divRef}
-          onKeyUpCapture={handleKeyUp}
-          onSelectCapture={handleSelect}
-          onKeyDownCapture={handleKeyDown}
-          onBlurCapture={handleBlur}
-          onFocus={handleFocus}
-        ></div>
-      </div>
+        id={`${id}-editable`}
+        className='aiev3-editing'
+        contentEditable={editable && typeof setHtml === 'function'}
+        suppressContentEditableWarning
+        spellCheck={false}
+        ref={divRef}
+        onKeyUpCapture={handleKeyUp}
+        onSelectCapture={handleSelect}
+        onKeyDownCapture={handleKeyDown}
+        onBlurCapture={handleBlur}
+        onFocus={handleFocus}
+      ></div>
     </div>
   );
 };
