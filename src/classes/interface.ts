@@ -1,3 +1,6 @@
+import { EditorV3Line } from './EditorV3Line';
+import { EditorV3TextBlock } from './EditoryV3TextBlock';
+
 export enum EditorV3Align {
   'left' = 'left',
   'center' = 'center',
@@ -5,32 +8,29 @@ export enum EditorV3Align {
   'right' = 'right',
 }
 
-export interface EditorV3Line {
+export interface EditorV3LineProps {
   textBlocks: EditorV3TextBlock[];
 }
 
-export interface EditorV3Props {
+export interface EditorV3ContentProps {
   textAlignment?: EditorV3Align;
   decimalAlignPercent?: number;
   caret?: EditorV3Position;
   styles?: EditorV3Styles;
 }
 
-export interface EditorV3Import extends EditorV3Props {
+export interface EditorV3Import extends EditorV3ContentProps {
   lines: EditorV3Line[];
 }
 
 export interface EditorV3Position {
-  line: number;
-  block: number;
-  character: number;
+  startLine: number;
+  startChar: number;
+  endLine: number;
+  endChar: number;
+  isCollapsed: boolean;
 }
 
 export interface EditorV3Styles {
   [styleName: string]: React.CSSProperties;
-}
-
-export interface EditorV3TextBlock {
-  text: string;
-  style?: string;
 }

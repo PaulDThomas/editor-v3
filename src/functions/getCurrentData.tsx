@@ -8,7 +8,7 @@ export function getCurrentData(
   const currentContent = new EditorV3Content(divRef.current?.innerHTML ?? '');
   return {
     html: divRef.current?.innerHTML ?? '',
-    text: currentContent.text(),
+    text: currentContent.text,
     json: JSON.stringify(currentContent),
   };
 }

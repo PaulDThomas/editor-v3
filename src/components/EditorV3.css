@@ -7,8 +7,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-left: 4px;
-  padding-right: 4px;
+  padding: 2px 4px;
 }
 
 .aiev3.editing {
@@ -25,19 +24,48 @@
   margin: -1px;
 }
 
-.aiev3-decimal-line {
+.aiev3-line {
+  min-height: 1.2rem;
+  width: 100%;
+}
+
+.aiev3-line.decimal {
   position: relative;
   overflow: visible;
-  width: 100%;
-  height: 100%;
-  min-height: 1.2rem;
+}
+
+.aiev3-line.left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.aiev3-line.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.aiev3-line.right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .aiev3-span {
   display: inline-block;
+  min-width: 4px;
 }
 
 .aiev3-span-point {
   position: absolute;
-  top: 1;
+  top: 0;
+}
+
+.aiev3-span-point.lhs {
+  text-align: right;
+}
+
+.aiev3-span-point.rhs {
+  text-align: left;
 }
