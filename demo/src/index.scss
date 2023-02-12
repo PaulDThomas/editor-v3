@@ -47,8 +47,9 @@ span.label {
   font-size: 16px;
   margin-top: 8px;
   margin-bottom: 6px;
-  height: 16px;
+  min-height: 16px;
   width: 150px;
+  overflow: hidden;
 }
 
 span.content {
@@ -71,4 +72,24 @@ input {
   border: 1px solid black;
   padding: 0 4;
   margin: 0;
+}
+
+.debug .lhs {
+  background-color: rgba(0, 255, 0, 0.2);
+}
+
+.debug .rhs {
+  background-color: rgba(255, 0, 0, 0.2);
+}
+
+.debug .left {
+  background-color: rgba(255, 255, 0, 0.2);
+}
+
+.debug .center {
+  background-color: rgba(0, 255, 255, 0.2);
+}
+
+.debug .right {
+  background-color: rgba(255, 0, 255, 0.2);
 }
