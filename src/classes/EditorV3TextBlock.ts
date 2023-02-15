@@ -15,15 +15,56 @@ export class EditorV3TextBlock {
 
     return span;
   }
+  get jsonString(): string {
+    return JSON.stringify(this);
+  }
 
   // Overloads
-  constructor(arg: string | HTMLSpanElement | Text, style?: string) {
-    this.text = arg instanceof HTMLSpanElement || arg instanceof Text ? arg.textContent ?? '' : arg;
-    this.style =
-      style ??
-      (arg instanceof HTMLSpanElement && arg.dataset.styleName !== undefined
-        ? arg.dataset.styleName
-        : undefined);
+  constructor(
+    arg: HTMLSpanElement | Text | EditorV3TextBlock | { text: string; style?: string } | string,
+    style?: string,
+  ) {
+    // Initial
+    this.text = '';
+
+    // Text
+    if (typeof arg === 'string') {
+      if (arg.match(/^<span.*<\/span>$/)) {
+        const div = document.createElement('template');
+        div.innerHTML = arg;
+        this.text = div.content.children[0].textContent ?? '';
+        this.style = (div.content.children[0] as HTMLSpanElement).dataset?.styleName;
+      } else {
+        try {
+          const jsonInput = JSON.parse(arg);
+          if (jsonInput.text) {
+            this.text = jsonInput.text;
+          } else {
+            throw 'No text';
+          }
+          if (jsonInput.style) this.style = jsonInput.style;
+        } catch {
+          this.text = arg;
+        }
+      }
+    }
+    // Span element
+    else if (arg instanceof HTMLSpanElement) {
+      this.text = arg.textContent ?? '';
+      this.style = arg.dataset.styleName;
+    }
+    // Text node
+    else if (arg instanceof Text) {
+      this.text = arg.textContent ?? '';
+    }
+    // Must be object
+    else {
+      this.text = arg.text;
+      this.style = arg.style;
+    }
+
+    // Always take style if provided
+    if (style) this.style = style;
 
     // Fix characters
     this.text = this.text

@@ -1,5 +1,5 @@
 import { EditorV3Line } from './EditorV3Line';
-import { EditorV3TextBlock } from './EditoryV3TextBlock';
+import { EditorV3TextBlock } from './EditorV3TextBlock';
 
 export enum EditorV3Align {
   'left' = 'left',
@@ -20,7 +20,13 @@ export interface EditorV3ContentProps {
 }
 
 export interface EditorV3Import extends EditorV3ContentProps {
-  lines: EditorV3Line[];
+  lines:
+    | {
+        textBlocks: { text: string; style?: string }[];
+        textAlignment?: EditorV3Line;
+        decimalAlignPercen?: number;
+      }[]
+    | EditorV3Line[];
 }
 
 export interface EditorV3Position {
