@@ -1,10 +1,11 @@
 import { EditorV3Line } from './EditorV3Line';
 import { EditorV3Align, EditorV3Import } from './interface';
+import { readV3DivElement } from './readV3DivElement';
 
 export const readV3Html = (
   text: string,
-  textAlignment: EditorV3Align,
-  decimalAlignPercent: number,
+  textAlignment?: EditorV3Align,
+  decimalAlignPercent?: number,
 ): EditorV3Import => {
   const ret: EditorV3Import = {
     lines: [],
@@ -17,8 +18,30 @@ export const readV3Html = (
 
     // Loop through children in fragment
     [...frag.childNodes].forEach((el) => {
-      ret.lines.push(new EditorV3Line(el.textContent ?? '', textAlignment, decimalAlignPercent));
+      const div = el as HTMLDivElement;
+      // Read style node
+      if (div.classList.contains('style-info')) {
+        ret.styles = JSON.parse(div.dataset.style ?? '');
+      }
+      // Read line nodes
+      else ret.lines.push(readV3DivElement(div));
     });
+
+    // Get alignment from second classname
+    const firstLine =
+      [...frag.children].filter((el) => !el.classList.contains('style-info')).length > 0
+        ? [...frag.children].filter((el) => !el.classList.contains('style-info'))[0]
+        : (null as HTMLDivElement | null);
+    if (firstLine) {
+      if (firstLine.classList.length > 1) {
+        ret.textAlignment = firstLine.classList[1].toString() as EditorV3Align;
+      }
+      if (ret.textAlignment === EditorV3Align.decimal && firstLine.children.length === 2) {
+        ret.decimalAlignPercent = parseFloat(
+          (firstLine.children[0] as HTMLSpanElement).style.minWidth,
+        );
+      }
+    }
   }
   // Everything else is just text
   else {

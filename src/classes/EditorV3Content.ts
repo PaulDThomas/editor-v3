@@ -42,15 +42,32 @@ export class EditorV3Content {
 
   public lines: EditorV3Line[] = [];
 
+  private _styleNode(): HTMLDivElement {
+    const sn = document.createElement('div');
+    sn.className = 'aiev3-line style-info';
+    sn.dataset.style = JSON.stringify(this._styles);
+    return sn;
+  }
+
   // Read only attributes
   get el(): DocumentFragment {
     const ret = new DocumentFragment();
+    if (Object.keys(this._styles).length > 0) ret.append(this._styleNode());
     this.lines.forEach((l) => ret.append(l.el));
     return ret;
   }
 
   get text(): string {
     return this.lines.map((l) => l.textBlocks.map((b) => b.text).join('')).join('\n');
+  }
+
+  get jsonString(): string {
+    return JSON.stringify({
+      lines: this.lines,
+      textAlignment: this.textAlignment,
+      decimalAlignPercent: this.decimalAlignPercent,
+      styles: this.styles,
+    });
   }
 
   constructor(input: string, props?: EditorV3ContentProps) {
@@ -70,7 +87,6 @@ export class EditorV3Content {
       // Establish input as string
       const inputString = input as string;
       // Read in v3 HTML/text
-      // console.log('Processing input as text/V3 HTML');
       const r = readV3Html(inputString, this._textAlignment, this._decimalAlignPercent);
       this.copyFrom(r, props);
       return;
@@ -81,7 +97,11 @@ export class EditorV3Content {
     this._textAlignment = props?.textAlignment ?? read.textAlignment ?? EditorV3Align.left;
     this._decimalAlignPercent = props?.decimalAlignPercent ?? read.decimalAlignPercent ?? 60;
     this._styles = props?.styles ?? read.styles ?? {};
-    this.lines = read.lines;
+    this.lines = read.lines.map((l) =>
+      l instanceof EditorV3Line
+        ? l
+        : new EditorV3Line(JSON.stringify(l), this._textAlignment, this._decimalAlignPercent),
+    );
   }
 
   private upToPos(line: number, char: number): EditorV3Line[] {
@@ -115,13 +135,12 @@ export class EditorV3Content {
   // Split line in two
   public splitLine(pos: EditorV3Position) {
     // Check it is possible
-    if (this.lines.length > pos.startLine && (pos.isCollapsed || pos.endLine === null)) {
+    if (this.lines.length > pos.startLine && pos.isCollapsed) {
       // Split existing line, and get new one
       const newLine = this.lines[pos.startLine].splitLine(pos.startChar);
       // Add new one in
       if (newLine) this.lines.splice(pos.startLine + 1, 0, newLine);
-    } else if (pos.endChar && pos.endLine) {
-      console.log(`Need to delete lots: ${JSON.stringify(pos)}`);
+    } else if (this.lines.length > pos.startLine) {
       const newLines = [
         ...this.upToPos(pos.startLine, pos.startChar),
         ...this.fromPos(pos.endLine, pos.endChar),
