@@ -20,13 +20,11 @@ export interface EditorV3ContentProps {
 }
 
 export interface EditorV3Import extends EditorV3ContentProps {
-  lines:
-    | {
-        textBlocks: { text: string; style?: string }[];
-        textAlignment?: EditorV3Line;
-        decimalAlignPercen?: number;
-      }[]
-    | EditorV3Line[];
+  lines: {
+    textBlocks: { text: string; style?: string }[] | EditorV3TextBlock[];
+    textAlignment?: EditorV3Line | string;
+    decimalAlignPercen?: number;
+  }[];
 }
 
 export interface EditorV3Position {
