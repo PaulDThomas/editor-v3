@@ -107,8 +107,7 @@ describe('Check basic EditorV3Line', () => {
 
     expect(testLine.el.outerHTML).toEqual(
       '<div class="aiev3-line right">' +
-        '<span>12.34</span>' +
-        '<span>&nbsp;wut?&nbsp;</span>' +
+        '<span>12.34&nbsp;wut?&nbsp;</span>' +
         '<span class="editorv3style-shiny" data-style-name="shiny">5678</span>' +
         '</div>',
     );
@@ -140,7 +139,7 @@ describe('Check basic EditorV3Line', () => {
 describe('Check EditorV3Line functions', () => {
   test('upToPos', async () => {
     const line = new EditorV3Line('0123.456');
-    expect(line.upToPos(0)).toEqual([{ text: '' }]);
+    expect(line.upToPos(0)).toEqual([]);
     expect(line.upToPos(4)).toEqual([{ text: '0123' }]);
     expect(line.upToPos(7)).toEqual([{ text: '0123.45' }]);
     expect(line.upToPos(8)).toEqual([{ text: '0123.456' }]);
@@ -150,10 +149,15 @@ describe('Check EditorV3Line functions', () => {
       new EditorV3TextBlock('hello', 'world'),
       new EditorV3TextBlock(' slow'),
     ]);
-    expect(line2.upToPos(0)).toEqual([{ text: '', style: 'world' }]);
+    expect(line2.upToPos(0)).toEqual([]);
+    expect(line2.upToPos(1)).toEqual([{ text: 'h', style: 'world' }]);
+    expect(line2.upToPos(2)).toEqual([{ text: 'he', style: 'world' }]);
+    expect(line2.upToPos(3)).toEqual([{ text: 'hel', style: 'world' }]);
     expect(line2.upToPos(4)).toEqual([{ text: 'hell', style: 'world' }]);
     expect(line2.upToPos(5)).toEqual([{ text: 'hello', style: 'world' }]);
     expect(line2.upToPos(6)).toEqual([{ text: 'hello', style: 'world' }, { text: ' ' }]);
+    expect(line2.upToPos(7)).toEqual([{ text: 'hello', style: 'world' }, { text: ' s' }]);
+    expect(line2.upToPos(8)).toEqual([{ text: 'hello', style: 'world' }, { text: ' sl' }]);
     expect(line2.upToPos(9)).toEqual([{ text: 'hello', style: 'world' }, { text: ' slo' }]);
     expect(line2.upToPos(10)).toEqual([{ text: 'hello', style: 'world' }, { text: ' slow' }]);
     expect(line2.upToPos(11)).toEqual([{ text: 'hello', style: 'world' }, { text: ' slow' }]);
@@ -171,17 +175,47 @@ describe('Check EditorV3Line functions', () => {
       new EditorV3TextBlock(' slow'),
     ]);
     expect(line2.fromPos(0)).toEqual([{ text: 'hello', style: 'world' }, { text: ' slow' }]);
+    expect(line2.fromPos(1)).toEqual([{ text: 'ello', style: 'world' }, { text: ' slow' }]);
+    expect(line2.fromPos(2)).toEqual([{ text: 'llo', style: 'world' }, { text: ' slow' }]);
+    expect(line2.fromPos(3)).toEqual([{ text: 'lo', style: 'world' }, { text: ' slow' }]);
     expect(line2.fromPos(4)).toEqual([{ text: 'o', style: 'world' }, { text: ' slow' }]);
     expect(line2.fromPos(5)).toEqual([{ text: ' slow' }]);
+    expect(line2.fromPos(6)).toEqual([{ text: 'slow' }]);
+    expect(line2.fromPos(7)).toEqual([{ text: 'low' }]);
+    expect(line2.fromPos(8)).toEqual([{ text: 'ow' }]);
     expect(line2.fromPos(9)).toEqual([{ text: 'w' }]);
     expect(line2.fromPos(10)).toEqual([]);
+  });
+
+  test('subBlocks', () => {
+    const line2 = new EditorV3Line([
+      new EditorV3TextBlock('hello', 'world'),
+      new EditorV3TextBlock(' slow'),
+    ]);
+    expect(line2.subBlocks(1, 1)).toEqual([]);
+    expect(line2.subBlocks(1, 2)).toEqual([{ text: 'e', style: 'world' }]);
+    expect(line2.subBlocks(1, 3)).toEqual([{ text: 'el', style: 'world' }]);
+    expect(line2.subBlocks(1, 4)).toEqual([{ text: 'ell', style: 'world' }]);
+    expect(line2.subBlocks(1, 5)).toEqual([{ text: 'ello', style: 'world' }]);
+    expect(line2.subBlocks(1, 6)).toEqual([{ text: 'ello', style: 'world' }, { text: ' ' }]);
+    expect(line2.subBlocks(1, 7)).toEqual([{ text: 'ello', style: 'world' }, { text: ' s' }]);
+    expect(line2.subBlocks(1, 8)).toEqual([{ text: 'ello', style: 'world' }, { text: ' sl' }]);
+    expect(line2.subBlocks(1, 9)).toEqual([{ text: 'ello', style: 'world' }, { text: ' slo' }]);
+    expect(line2.subBlocks(2, 9)).toEqual([{ text: 'llo', style: 'world' }, { text: ' slo' }]);
+    expect(line2.subBlocks(3, 9)).toEqual([{ text: 'lo', style: 'world' }, { text: ' slo' }]);
+    expect(line2.subBlocks(4, 9)).toEqual([{ text: 'o', style: 'world' }, { text: ' slo' }]);
+    expect(line2.subBlocks(5, 9)).toEqual([{ text: ' slo' }]);
+    expect(line2.subBlocks(6, 9)).toEqual([{ text: 'slo' }]);
+    expect(line2.subBlocks(7, 9)).toEqual([{ text: 'lo' }]);
+    expect(line2.subBlocks(8, 9)).toEqual([{ text: 'o' }]);
+    expect(line2.subBlocks(9, 9)).toEqual([]);
   });
 
   test('splitLine', async () => {
     const line1 = new EditorV3Line('0123.456');
     const split1 = line1.splitLine(0);
     expect(split1?.textBlocks).toEqual([{ text: '0123.456' }]);
-    expect(line1.textBlocks).toEqual([{ text: '' }]);
+    expect(line1.textBlocks).toEqual([]);
 
     const line2 = new EditorV3Line('0123.456');
     const split2 = line2.splitLine(4);
@@ -216,89 +250,39 @@ describe('Check EditorV3Line functions', () => {
     line2.deleteCharacter(41);
     expect(line2.textBlocks).toEqual([{ text: 'hell', style: 'world' }, { text: 'slow' }]);
     line2.deleteCharacter(0);
-    expect(line2.textBlocks).toEqual([
-      { text: '', style: 'world' },
-      { text: 'ell', style: 'world' },
-      { text: 'slow' },
-    ]);
+    expect(line2.textBlocks).toEqual([{ text: 'ell', style: 'world' }, { text: 'slow' }]);
     line2.deleteCharacter(6);
-    expect(line2.textBlocks).toEqual([
-      { text: '', style: 'world' },
-      { text: 'ell', style: 'world' },
-      { text: 'slo' },
-    ]);
+    expect(line2.textBlocks).toEqual([{ text: 'ell', style: 'world' }, { text: 'slo' }]);
     line2.deleteCharacter(6);
-    expect(line2.textBlocks).toEqual([
-      { text: '', style: 'world' },
-      { text: 'ell', style: 'world' },
-      { text: 'slo' },
-    ]);
+    expect(line2.textBlocks).toEqual([{ text: 'ell', style: 'world' }, { text: 'slo' }]);
   });
 
-  //   const styles: iColourStyles = {
-  //     red: { color: 'red' },
-  //     blue: { color: 'blue' },
-  //     green: { color: 'green' },
-  //   };
-  //   const tT1 = new ColouredLine('test one', styles);
-  //   test('Returns text', async () => {
-  //     expect(tT1.text).toEqual('test one');
-  //     expect(tT1.htmlString).toEqual(
-  //       '<div class="aie-line"><span class="aie-block">test&nbsp;one</span></div>',
-  //     );
-  //   });
-  //   const styleBlocks: iStyleBlock[] = [
-  //     { start: 1, end: 2, styleName: 'red' },
-  //     { start: 2, end: 3, styleName: 'green' },
-  //     { start: 3, end: 4, styleName: 'blue' },
-  //   ];
-  //   const tT2 = new ColouredLine('test two', styles, styleBlocks);
-  //   test('Returns coloured', async () => {
-  //     expect(tT2.text).toEqual('test two');
-  //     expect(tT2.htmlString).toEqual(
-  //       `
-  // <div class="aie-line">
-  //   <span class="aie-block">t</span>
-  //   <span class="aie-block" data-style="red" style="color: red;">e</span>
-  //   <span class="aie-block" data-style="green" style="color: green;">s</span>
-  //   <span class="aie-block" data-style="blue" style="color: blue;">t</span>
-  //   <span class="aie-block">&nbsp;two</span>
-  // </div>
-  //     `.replace(getMultiSpace, '$1$3'),
-  //     );
-  //   });
-  //   test('Apply style', async () => {
-  //     tT1.applyStyle('red', 4, 8);
-  //     expect(tT1.htmlString).toEqual(
-  //       `
-  // <div class="aie-line">
-  //   <span class="aie-block">test</span>
-  //   <span class="aie-block" data-style="red" style="color: red;">&nbsp;one</span>
-  // </div>
-  //     `.replace(getMultiSpace, '$1$3'),
-  //     );
-  //   });
-  //   test('Remove style', async () => {
-  //     tT1.removeStyle(6, 7);
-  //     expect(tT1.htmlString).toEqual(
-  //       `
-  // <div class="aie-line">
-  //   <span class="aie-block">test</span>
-  //   <span class="aie-block" data-style="red" style="color: red;">&nbsp;o</span>
-  //   <span class="aie-block">n</span>
-  //   <span class="aie-block" data-style="red" style="color: red;">e</span>
-  // </div>
-  //     `.replace(getMultiSpace, '$1$3'),
-  //     );
-  //   });
-  //   test('Apply bad style', async () => {
-  //     tT1.applyStyle('pink', 4, 8);
-  //     expect(tT1.htmlString).toEqual(
-  //       `
-  // <div class="aie-line">
-  //   <span class="aie-block">test&nbsp;one</span>
-  // </div>
-  //     `.replace(getMultiSpace, '$1$3'),
-  //     );
-  //   });
+  test('applyStyle & removeStyle', async () => {
+    const line2 = new EditorV3Line([
+      new EditorV3TextBlock('hello', 'world'),
+      new EditorV3TextBlock(' slow'),
+    ]);
+    line2.applyStyle('drive', 3, 6);
+    expect(line2.textBlocks).toEqual([
+      { text: 'hel', style: 'world' },
+      { text: 'lo ', style: 'drive' },
+      { text: 'slow' },
+    ]);
+    line2.applyStyle('world', 3, 4);
+    expect(line2.textBlocks).toEqual([
+      { text: 'hell', style: 'world' },
+      { text: 'o ', style: 'drive' },
+      { text: 'slow' },
+    ]);
+    line2.applyStyle('caps', 0, 0);
+    expect(line2.textBlocks).toEqual([
+      { text: 'hell', style: 'world' },
+      { text: 'o ', style: 'drive' },
+      { text: 'slow' },
+    ]);
+    line2.removeStyle(3, 7);
+    expect(line2.textBlocks).toEqual([{ text: 'hel', style: 'world' }, { text: 'lo slow' }]);
+    line2.removeStyle(1, 1);
+    expect(line2.textBlocks).toEqual([{ text: 'hel', style: 'world' }, { text: 'lo slow' }]);
+  });
 });

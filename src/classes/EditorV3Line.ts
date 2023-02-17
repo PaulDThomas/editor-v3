@@ -88,47 +88,59 @@ export class EditorV3Line {
     // Always take these if provided
     if (decimalAlignPercent) this.decimalAlignPercent = decimalAlignPercent;
     if (textAlignment) this.textAlignment = textAlignment;
+
+    // Fix and problems
+    this._mergeBlocks();
   }
 
   public upToPos(pos: number): EditorV3TextBlock[] {
-    const ret: EditorV3TextBlock[] = [];
-    let _counted = 0;
-    for (let _i = 0; _i < this.textBlocks.length; _i++) {
-      if (_counted + this.textBlocks[_i].text.length < pos) {
-        _counted += this.textBlocks[_i].text.length;
-        ret.push(this.textBlocks[_i]);
-      } else if (_counted + this.textBlocks[_i].text.length >= pos) {
-        ret.push(
-          new EditorV3TextBlock(
-            this.textBlocks[_i].text.slice(0, pos - _counted),
-            this.textBlocks[_i].style,
-          ),
-        );
-        break;
-      }
-    }
-    return ret;
+    return this.subBlocks(0, pos);
   }
 
   public fromPos(pos: number): EditorV3TextBlock[] {
+    return this.subBlocks(pos);
+  }
+
+  public subBlocks(startPos: number, endPos?: number): EditorV3TextBlock[] {
     const ret: EditorV3TextBlock[] = [];
     let _counted = 0;
     for (let _i = 0; _i < this.textBlocks.length; _i++) {
-      if (_counted + this.textBlocks[_i].text.length < pos) {
-        _counted += this.textBlocks[_i].text.length;
-      } else if (_counted > pos) {
-        ret.push(this.textBlocks[_i]);
-        _counted += this.textBlocks[_i].text.length;
-      } else if (_counted + this.textBlocks[_i].text.length >= pos) {
-        if (this.textBlocks[_i].text.slice(pos - _counted) !== '')
-          ret.push(
-            new EditorV3TextBlock(
-              this.textBlocks[_i].text.slice(pos - _counted),
-              this.textBlocks[_i].style,
-            ),
-          );
-        _counted += this.textBlocks[_i].text.length;
+      // Block containing startPos
+      if (
+        _counted <= startPos &&
+        _counted + this.textBlocks[_i].text.length >= startPos &&
+        this.textBlocks[_i].text.slice(startPos - _counted, (endPos ?? Infinity) - _counted) !== ''
+      ) {
+        ret.push(
+          new EditorV3TextBlock(
+            this.textBlocks[_i].text.slice(startPos - _counted, (endPos ?? Infinity) - _counted),
+            this.textBlocks[_i].style,
+          ),
+        );
       }
+      // Block after start containing end
+      else if (
+        _counted > startPos &&
+        endPos &&
+        _counted + this.textBlocks[_i].text.length >= endPos
+      ) {
+        ret.push(
+          new EditorV3TextBlock(
+            this.textBlocks[_i].text.slice(0, endPos - _counted),
+            this.textBlocks[_i].style,
+          ),
+        );
+      }
+      // Block after start and before end
+      else if (
+        _counted > startPos &&
+        _counted + this.textBlocks[_i].text.length < (endPos ?? Infinity)
+      ) {
+        ret.push(this.textBlocks[_i]);
+      }
+      _counted += this.textBlocks[_i].text.length;
+      // Stop if the end is reached
+      if (_counted >= (endPos ?? Infinity)) break;
     }
     return ret;
   }
@@ -146,30 +158,54 @@ export class EditorV3Line {
   }
 
   public deleteCharacter(pos: number) {
-    const pre = this.upToPos(pos);
-    const post = this.fromPos(pos + 1);
-    this.textBlocks = [...pre, ...post];
+    if (pos < this.lineText.length) {
+      const pre = this.upToPos(pos);
+      const post = this.fromPos(pos + 1);
+      this.textBlocks = [...pre, ...post];
+      this._mergeBlocks();
+    }
   }
 
-  // applyStyle(styleName: string, start: number, end: number) {
-  //   this.styleBlocks = explodeLine(
-  //     [
-  //       { styleName, start, end },
-  //       ...this.styleBlocks // Add existing styleBlocks
-  //         .filter((b) => b.start < start || b.end > end), // Remove any covered styleBlcoks
-  //     ],
-  //     this.text.length,
-  //   );
-  // }
+  public applyStyle(styleName: string, startPos: number, endPos: number) {
+    if (startPos < endPos) {
+      this.textBlocks = [
+        ...this.upToPos(startPos),
+        new EditorV3TextBlock(this.lineText.substring(startPos, endPos), styleName),
+        ...this.fromPos(endPos),
+      ];
+      this._mergeBlocks();
+    }
+  }
 
-  // removeStyle(start: number, end: number) {
-  //   this.styleBlocks = explodeLine(
-  //     [
-  //       { start, end },
-  //       ...this.styleBlocks // Add existing styleBlocks
-  //         .filter((b) => b.start < start || b.end > end), // Remove any covered styleBlcoks
-  //     ],
-  //     this.text.length,
-  //   );
-  // }
+  public removeStyle(startPos: number, endPos: number) {
+    if (startPos < endPos) {
+      this.textBlocks = [
+        ...this.upToPos(startPos),
+        new EditorV3TextBlock(this.lineText.substring(startPos, endPos)),
+        ...this.fromPos(endPos),
+      ];
+      this._mergeBlocks();
+    }
+  }
+
+  private _mergeBlocks() {
+    if (new Set(this.textBlocks.map((tb) => tb.style)).size < this.textBlocks.length) {
+      const mergedBlocks: EditorV3TextBlock[] = [];
+      let lastStyle: string | null | undefined = null;
+      for (let _i = 0; _i < this.textBlocks.length; _i++) {
+        if (this.textBlocks[_i].style === lastStyle && mergedBlocks.length > 0) {
+          mergedBlocks[mergedBlocks.length - 1] = new EditorV3TextBlock(
+            mergedBlocks[mergedBlocks.length - 1].text + this.textBlocks[_i].text,
+            lastStyle,
+          );
+        } else {
+          mergedBlocks.push(this.textBlocks[_i]);
+          lastStyle = this.textBlocks[_i].style;
+        }
+      }
+      if (mergedBlocks.length < this.textBlocks.length) {
+        this.textBlocks = mergedBlocks;
+      }
+    }
+  }
 }

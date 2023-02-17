@@ -40,6 +40,7 @@ export const App = (): JSX.Element => {
               />
             </span>
           </div>
+
           <div className='row'>
             <span className='label'>JSON input</span>
             <span className='content'>
@@ -57,6 +58,7 @@ export const App = (): JSX.Element => {
               />
             </span>
           </div>
+
           <div className='row'>
             <span className='label'>Text input</span>
             <span className='content'>
