@@ -172,17 +172,21 @@ export class EditorV3Line {
     }
   }
 
-  public removeSection(startPos: number, endPos: number) {
+  public removeSection(startPos: number, endPos: number): EditorV3TextBlock[] {
+    let ret: EditorV3TextBlock[] = [];
     if (startPos < endPos && startPos < this.lineText.length) {
       const pre = this.upToPos(startPos);
+      ret = this.subBlocks(startPos, endPos);
       const post = this.fromPos(endPos);
       this.textBlocks = [...pre, ...post];
       this._mergeBlocks();
     }
+    return ret;
   }
 
   public deleteCharacter(pos: number) {
     this.removeSection(pos, pos + 1);
+    return this;
   }
 
   public applyStyle(styleName: string, startPos: number, endPos: number) {
@@ -194,6 +198,7 @@ export class EditorV3Line {
       ];
       this._mergeBlocks();
     }
+    return this;
   }
 
   public removeStyle(startPos: number, endPos: number) {
@@ -205,6 +210,7 @@ export class EditorV3Line {
       ];
       this._mergeBlocks();
     }
+    return this;
   }
 
   private _mergeBlocks() {

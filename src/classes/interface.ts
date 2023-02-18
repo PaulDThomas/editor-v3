@@ -32,7 +32,7 @@ export interface EditorV3Position {
   startChar: number;
   endLine: number;
   endChar: number;
-  isCollapsed: boolean;
+  isCollapsed?: boolean;
 }
 
 export interface EditorV3Styles {

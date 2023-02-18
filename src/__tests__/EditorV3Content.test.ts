@@ -109,12 +109,12 @@ describe('Check basic EditorV3Content', () => {
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}"></div>' +
         '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span aiev3-span-point lhs" style="right: 45%; min-width: 55%;">Hello</span>' +
+        '<span class="aiev3-span aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span>Hello</span></span>' +
         '<span class="aiev3-span aiev3-span-point rhs" style="left: 55%; min-width: 45%;">\u200b</span>' +
         '</div>' +
         '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span aiev3-span-point lhs" style="right: 45%; min-width: 55%;">.</span>' +
-        '<span class="aiev3-span aiev3-span-point rhs" style="left: 55%; min-width: 45%;">World</span>' +
+        '<span class="aiev3-span aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span>.</span></span>' +
+        '<span class="aiev3-span aiev3-span-point rhs" style="left: 55%; min-width: 45%;"><span>World</span></span>' +
         '</div>',
     );
     expect(new EditorV3Content(div.innerHTML)).toEqual(testContent);
@@ -170,5 +170,60 @@ describe('Content functions', () => {
       isCollapsed: true,
     });
     expect(testContent.text).toEqual('1\n34\n56');
+  });
+
+  test('Remove Section', async () => {
+    const testContent = new EditorV3Content('123\n456\n789');
+    const remove = testContent.removeSection({
+      isCollapsed: false,
+      startLine: 0,
+      startChar: 1,
+      endLine: 2,
+      endChar: 1,
+    });
+    expect(remove.map((l) => l.lineText).join('\n')).toEqual('23\n456\n7');
+    expect(testContent.text).toEqual('189');
+
+    const testContent2 = new EditorV3Content('123\n456\n789');
+    const remove2 = testContent.removeSection({
+      isCollapsed: true,
+      startLine: 0,
+      startChar: 1,
+      endLine: 0,
+      endChar: 1,
+    });
+    expect(remove2.map((l) => l.lineText).join('\n')).toEqual('');
+    expect(testContent2.text).toEqual('123\n456\n789');
+
+    const testContent3 = new EditorV3Content('123\n456\n789');
+    const remove3 = testContent3.removeSection({
+      isCollapsed: false,
+      startLine: 1,
+      startChar: 0,
+      endLine: 1,
+      endChar: 2,
+    });
+    expect(remove3.map((l) => l.lineText).join('\n')).toEqual('45');
+    expect(testContent3.text).toEqual('123\n6\n789');
+
+    const testContent4 = new EditorV3Content('123\n456\n789');
+    const remove4 = testContent4.removeSection({
+      startLine: 0,
+      startChar: 3,
+      endLine: 2,
+      endChar: 2,
+    });
+    expect(remove4.map((l) => l.lineText).join('\n')).toEqual('\n456\n78');
+    expect(testContent4.text).toEqual('1239');
+
+    const testContent5 = new EditorV3Content('123\n456\n789');
+    const remove5 = testContent5.removeSection({
+      startLine: 0,
+      startChar: 3,
+      endLine: 3,
+      endChar: 2,
+    });
+    expect(remove5.map((l) => l.lineText).join('\n')).toEqual('\n456\n789');
+    expect(testContent5.text).toEqual('123');
   });
 });

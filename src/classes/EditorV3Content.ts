@@ -64,9 +64,9 @@ export class EditorV3Content {
   get jsonString(): string {
     return JSON.stringify({
       lines: this.lines,
-      textAlignment: this.textAlignment,
-      decimalAlignPercent: this.decimalAlignPercent,
-      styles: this.styles,
+      textAlignment: this._textAlignment,
+      decimalAlignPercent: this._decimalAlignPercent,
+      styles: this._styles,
     });
   }
 
@@ -82,18 +82,18 @@ export class EditorV3Content {
       // Check for stringified class input
       const jsonInput: EditorV3Import = JSON.parse(input);
       if (!Array.isArray(jsonInput.lines)) throw 'No lines';
-      this.copyFrom(jsonInput, props);
+      this.copyImport(jsonInput, props);
     } catch {
       // Establish input as string
       const inputString = input as string;
       // Read in v3 HTML/text
       const r = readV3Html(inputString, this._textAlignment, this._decimalAlignPercent);
-      this.copyFrom(r, props);
+      this.copyImport(r, props);
       return;
     }
   }
 
-  private copyFrom(read: EditorV3Import, props?: EditorV3ContentProps): void {
+  private copyImport(read: EditorV3Import, props?: EditorV3ContentProps): void {
     this._textAlignment = props?.textAlignment ?? read.textAlignment ?? EditorV3Align.left;
     this._decimalAlignPercent = props?.decimalAlignPercent ?? read.decimalAlignPercent ?? 60;
     this._styles = props?.styles ?? read.styles ?? {};
@@ -104,32 +104,46 @@ export class EditorV3Content {
     );
   }
 
-  private upToPos(line: number, char: number): EditorV3Line[] {
-    const ret: EditorV3Line[] = [
-      ...this.lines.slice(0, line),
-      new EditorV3Line(
-        this.lines[line].upToPos(char),
-        this.textAlignment,
-        this.decimalAlignPercent,
-      ),
-    ];
-
+  public subLines(pos: EditorV3Position) {
+    let ret: EditorV3Line[] = [];
+    if (pos.startLine < this.lines.length && pos.startLine <= pos.endLine) {
+      ret = [
+        ...(pos.startLine === pos.endLine
+          ? [
+              new EditorV3Line(
+                this.lines[pos.startLine].subBlocks(pos.startChar, pos.endChar),
+                this._textAlignment,
+                this._decimalAlignPercent,
+              ),
+            ]
+          : [
+              new EditorV3Line(
+                this.lines[pos.startLine].subBlocks(pos.startChar),
+                this._textAlignment,
+                this._decimalAlignPercent,
+              ),
+              ...this.lines.slice(pos.startLine + 1, pos.endLine),
+            ]),
+        ...(pos.endLine > pos.startLine && pos.endLine < this.lines.length
+          ? [
+              new EditorV3Line(
+                this.lines[pos.endLine].subBlocks(0, pos.endChar),
+                this._textAlignment,
+                this._decimalAlignPercent,
+              ),
+            ]
+          : []),
+      ];
+    }
     return ret;
   }
 
-  private fromPos(line: number, char: number): EditorV3Line[] {
-    const ret: EditorV3Line[] = [];
-    if (this.lines.length > line && this.lines[line].fromPos(char).length > 0) {
-      ret.push(
-        new EditorV3Line(
-          this.lines[line].fromPos(char),
-          this.textAlignment,
-          this.decimalAlignPercent,
-        ),
-      );
-    }
-    ret.push(...this.lines.slice(line + 1));
-    return ret;
+  public upToPos(endLine: number, endChar: number): EditorV3Line[] {
+    return this.subLines({ startLine: 0, startChar: 0, endLine, endChar });
+  }
+
+  public fromPos(startLine: number, startChar: number): EditorV3Line[] {
+    return this.subLines({ startLine, startChar, endLine: Infinity, endChar: Infinity });
   }
 
   // Split line in two
@@ -159,5 +173,15 @@ export class EditorV3Content {
 
   public deleteCharacter(pos: EditorV3Position) {
     if (this.lines.length > pos.startLine) this.lines[pos.startLine].deleteCharacter(pos.startChar);
+  }
+
+  public removeSection(pos: EditorV3Position): EditorV3Line[] {
+    const ret: EditorV3Line[] = this.subLines(pos);
+    this.lines = [
+      ...this.upToPos(pos.startLine, pos.startChar),
+      ...this.fromPos(pos.endLine, pos.endChar),
+    ];
+    this.mergeLines(pos.startLine);
+    return ret;
   }
 }
