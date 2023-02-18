@@ -109,12 +109,12 @@ describe('Check basic EditorV3Content', () => {
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}"></div>' +
         '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span>Hello</span></span>' +
-        '<span class="aiev3-span aiev3-span-point rhs" style="left: 55%; min-width: 45%;">\u200b</span>' +
+        '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span>Hello</span></span>' +
+        '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;">\u200b</span>' +
         '</div>' +
         '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span>.</span></span>' +
-        '<span class="aiev3-span aiev3-span-point rhs" style="left: 55%; min-width: 45%;"><span>World</span></span>' +
+        '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span>.</span></span>' +
+        '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;"><span>World</span></span>' +
         '</div>',
     );
     expect(new EditorV3Content(div.innerHTML)).toEqual(testContent);
@@ -225,5 +225,55 @@ describe('Content functions', () => {
     });
     expect(remove5.map((l) => l.lineText).join('\n')).toEqual('\n456\n789');
     expect(testContent5.text).toEqual('123');
+  });
+
+  test('Apply & remove style', async () => {
+    const testContent = new EditorV3Content('123\n456\n789');
+    testContent.applyStyle('shiny', {
+      isCollapsed: false,
+      startLine: 0,
+      startChar: 1,
+      endLine: 2,
+      endChar: 1,
+    });
+    expect(testContent.text).toEqual('123\n456\n789');
+    expect(JSON.parse(testContent.jsonString).lines).toEqual([
+      {
+        decimalAlignPercent: 60,
+        textAlignment: 'left',
+        textBlocks: [{ text: '1' }, { text: '23', style: 'shiny' }],
+      },
+      {
+        decimalAlignPercent: 60,
+        textAlignment: 'left',
+        textBlocks: [{ text: '456', style: 'shiny' }],
+      },
+      {
+        decimalAlignPercent: 60,
+        textAlignment: 'left',
+        textBlocks: [{ text: '7', style: 'shiny' }, { text: '89' }],
+      },
+    ]);
+    expect(
+      JSON.parse(
+        testContent.removeStyle({ startLine: 1, startChar: 0, endLine: 1, endChar: 2 }).jsonString,
+      ).lines,
+    ).toEqual([
+      {
+        decimalAlignPercent: 60,
+        textAlignment: 'left',
+        textBlocks: [{ text: '1' }, { text: '23', style: 'shiny' }],
+      },
+      {
+        decimalAlignPercent: 60,
+        textAlignment: 'left',
+        textBlocks: [{ text: '45' }, { text: '6', style: 'shiny' }],
+      },
+      {
+        decimalAlignPercent: 60,
+        textAlignment: 'left',
+        textBlocks: [{ text: '7', style: 'shiny' }, { text: '89' }],
+      },
+    ]);
   });
 });
