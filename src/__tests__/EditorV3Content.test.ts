@@ -1,4 +1,5 @@
 import { EditorV3Content } from '../classes/EditorV3Content';
+import { EditorV3Line } from '../classes/EditorV3Line';
 import { EditorV3Align } from '../classes/interface';
 
 // Load and read tests
@@ -275,5 +276,53 @@ describe('Content functions', () => {
         textBlocks: [{ text: '7', style: 'shiny' }, { text: '89' }],
       },
     ]);
+  });
+
+  test('Splice line', async () => {
+    const testContent = new EditorV3Content('123\n456\n789');
+    expect(testContent.upToPos(0, 0)).toEqual([]);
+    testContent.splice(
+      {
+        startLine: 0,
+        startChar: 0,
+        endLine: 0,
+        endChar: 0,
+      },
+      [new EditorV3Line('abc')],
+    );
+    expect(testContent.text).toEqual('abc123\n456\n789');
+
+    testContent.splice(
+      {
+        startLine: 1,
+        startChar: 0,
+        endLine: 1,
+        endChar: 3,
+      },
+      [new EditorV3Line('def')],
+    );
+    expect(testContent.text).toEqual('abc123\ndef\n789');
+
+    testContent.splice(
+      {
+        startLine: 1,
+        startChar: 0,
+        endLine: 1,
+        endChar: 4,
+      },
+      [new EditorV3Line('ghi')],
+    );
+    expect(testContent.text).toEqual('abc123\nghi\n789');
+
+    testContent.splice(
+      {
+        startLine: 4,
+        startChar: 0,
+        endLine: 1,
+        endChar: 4,
+      },
+      [new EditorV3Line('jkl')],
+    );
+    expect(testContent.text).toEqual('abc123\nghi\n789');
   });
 });
