@@ -96,7 +96,10 @@ export class EditorV3Content {
   private copyImport(read: EditorV3Import, props?: EditorV3ContentProps): void {
     this._textAlignment = props?.textAlignment ?? read.textAlignment ?? EditorV3Align.left;
     this._decimalAlignPercent = props?.decimalAlignPercent ?? read.decimalAlignPercent ?? 60;
-    this._styles = props?.styles ?? read.styles ?? {};
+    this._styles = {
+      ...read.styles,
+      ...props?.styles,
+    };
     this.lines = read.lines.map((l) =>
       l instanceof EditorV3Line
         ? l

@@ -52,6 +52,10 @@
   align-items: flex-end;
 }
 
+.aiev3-line.style-info {
+  display: none;
+}
+
 .aiev3-span {
   display: inline-block;
   min-width: 4px;
@@ -60,6 +64,11 @@
 .aiev3-span-point {
   position: absolute;
   top: 0;
+}
+
+.aiev3-span-point > span {
+  height: 100%;
+  display: inline-block;
 }
 
 .aiev3-span-point.lhs {

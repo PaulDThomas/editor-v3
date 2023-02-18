@@ -52,25 +52,35 @@ export const EditorV3 = ({
   );
 
   // Redraw function
-  const redraw = useCallback(
-    (el: HTMLDivElement | null, content: EditorV3Content) => {
-      if (el) {
-        el.innerHTML = '';
-        el.append(content.el);
-        // Update height after render for decimals because of absolute positioning
-        if (textAlignment === EditorV3Align.decimal) {
-          [...el.querySelectorAll('.aiev3-line.decimal')].forEach((line) => {
-            (line as HTMLDivElement).style.height = `${Math.max(
-              ...(Array.from(el.getElementsByClassName('aiev3-span')) as HTMLSpanElement[]).map(
-                (el) => el.clientHeight,
-              ),
-            )}px`;
-          });
-        }
-      }
-    },
-    [textAlignment],
-  );
+  const redraw = useCallback((el: HTMLDivElement | null, content: EditorV3Content) => {
+    if (el) {
+      el.innerHTML = '';
+      el.append(content.el);
+      // Update height and styles after render
+      [...el.querySelectorAll('.aiev3-line')].forEach((line) => {
+        (line as HTMLDivElement).style.height = `${Math.max(
+          ...[...line.querySelectorAll('span')].map((el) => (el as HTMLSpanElement).clientHeight),
+        )}px`;
+        // Apply styles
+        [...line.querySelectorAll('span[data-style-name')].forEach((el) => {
+          const span = el as HTMLSpanElement;
+          if (
+            span.dataset.styleName &&
+            content.styles &&
+            content.styles[span.dataset.styleName] !== undefined
+          ) {
+            Object.entries(content.styles[span.dataset.styleName]).forEach(([k, v]) => {
+              span.style.setProperty(
+                k.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase()),
+                v,
+              );
+            });
+          }
+        });
+      });
+      // }
+    }
+  }, []);
 
   // Update if input changes
   useEffect(() => {
@@ -238,18 +248,18 @@ export const EditorV3 = ({
               newContent.deleteCharacter(caret);
             } else if (caret.startLine > 0 && caret.startChar === 0) {
               caret.startLine = caret.startLine - 1;
-              caret.startChar = newContent.lines[caret.startLine].text.length;
+              caret.startChar = newContent.lines[caret.startLine].lineText.length;
               newContent.mergeLines(caret.startLine);
             }
           }
           // Remove line break with delete in decimal form
           else if (textAlignment === EditorV3Align.decimal && e.key === 'Delete' && caret) {
             if (
-              caret.startChar === newContent.lines[caret.startLine]?.text.length &&
+              caret.startChar === newContent.lines[caret.startLine]?.lineText.length &&
               newContent.lines.length > caret.startLine + 1
             )
               newContent.mergeLines(caret.startLine);
-            else if (caret.startChar < (newContent.lines[caret.startLine]?.text.length ?? 0)) {
+            else if (caret.startChar < (newContent.lines[caret.startLine]?.lineText.length ?? 0)) {
               newContent.deleteCharacter(caret);
             }
           }
@@ -299,6 +309,20 @@ export const EditorV3 = ({
         ref={divRef}
         onKeyUpCapture={handleKeyUp}
         // onSelectCapture={handleSelect}
+        onPasteCapture={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('Pasting...');
+          console.log(e.clipboardData);
+          console.log(e.clipboardData.getData('Text'));
+          console.log(e.clipboardData.getData('text/plain'));
+          console.log(e.clipboardData.getData('text/html'));
+          console.log(e.clipboardData.getData('text/rtf'));
+
+          console.log(e.clipboardData.getData('Url'));
+          console.log(e.clipboardData.getData('text/uri-list'));
+          console.log(e.clipboardData.getData('text/x-moz-url'));
+        }}
         onKeyDownCapture={handleKeyDown}
         onBlurCapture={handleBlur}
         onFocus={handleFocus}

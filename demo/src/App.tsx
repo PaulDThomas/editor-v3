@@ -1,12 +1,25 @@
 import { useState } from 'react';
-import { EditorV3Align } from '../../src/classes/interface';
+import { EditorV3Align, EditorV3Styles } from '../../src/classes/interface';
 import { EditorV3 } from '../../src/components/EditorV3';
 
 export const App = (): JSX.Element => {
   const [input, setHtml] = useState<string>(
-    // '<div classname="aie-text" data-inline-style-ranges=\'[{"length":9,"offset":0,"style":""}]\'><div class="aiev3-decimal-line" style="height: 21px;"><span class="aiev3-span aiev3-span-point" style="text-align: right; right: 40%;"><span>d12</span></span><span class="aiev3-span aiev3-span-point" style="text-align: left; left: 60%;"><span>.34d</span></span></div></div>',
-    '12.3\n\n4\n\n43\n.45\nhello',
-    // 'what\ndo\nyou\n\nwant?',
+    JSON.stringify({
+      textAlign: 'left',
+      lines: [
+        { text: '12.34', style: 'optional' },
+        { text: '0' },
+        { text: '56.78', style: 'notes' },
+      ],
+      styles: {
+        optional: {
+          color: 'green',
+          backgroundColor: 'white',
+          fontFamily: 'Courier New',
+        },
+        notes: { backgroundColor: 'white', color: 'pink' },
+      },
+    }),
   );
   const [input2, setJson2] = useState<string>('Another one');
   const [input3, setText3] = useState<string>('And another one');
@@ -16,6 +29,15 @@ export const App = (): JSX.Element => {
   const [editable, setEditable] = useState<boolean>(true);
   const [allowNewLine, setAllowNewLine] = useState<boolean>(true);
   const [decPct, setDecPct] = useState<number>(60);
+  const styleMap: EditorV3Styles = {
+    //   optional: {
+    //     color: 'green',
+    //     backgroundColor: 'white',
+    //     fontFamily: 'Courier New',
+    //     fontSize: '8px',
+    //   },
+    //   notes: { backgroundColor: 'white', color: 'pink' },
+  };
 
   return (
     <div className='app-holder'>
@@ -34,6 +56,7 @@ export const App = (): JSX.Element => {
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}
                 editable={editable}
+                customStyleMap={styleMap}
                 style={{
                   width: '240px',
                 }}
@@ -52,6 +75,7 @@ export const App = (): JSX.Element => {
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}
                 editable={editable}
+                customStyleMap={styleMap}
                 style={{
                   width: '240px',
                 }}
@@ -70,6 +94,7 @@ export const App = (): JSX.Element => {
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}
                 editable={editable}
+                customStyleMap={styleMap}
                 style={{
                   width: '240px',
                 }}
