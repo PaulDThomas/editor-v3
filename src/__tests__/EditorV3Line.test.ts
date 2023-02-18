@@ -49,8 +49,11 @@ describe('Check basic EditorV3Line', () => {
     );
     expect(testLine.el.outerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span aiev3-span-point lhs" style="right: 40%; min-width: 60%;">Hello&nbsp;world.</span>' +
-        '<span class="aiev3-span aiev3-span-point rhs" style="left: 60%; min-width: 40%;">&nbsp;How&nbsp;is&nbsp;it&nbsp;going?</span>' +
+        '<span class="aiev3-span aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span>Hello&nbsp;world.</span></span>' +
+        '<span class="aiev3-span aiev3-span-point rhs" style="left: 60%; min-width: 40%;">' +
+        '<span>&nbsp;</span>' +
+        '<span class="editorv3style-shiny" data-style-name="shiny">How&nbsp;is&nbsp;it&nbsp;going?</span>' +
+        '</span>' +
         '</div>',
     );
     expect(testLine.lineText).toEqual('Hello world. How is it going?');
@@ -62,8 +65,8 @@ describe('Check basic EditorV3Line', () => {
     const testLine = new EditorV3Line('12.34', EditorV3Align.decimal);
     expect(testLine.el.outerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span aiev3-span-point lhs" style="right: 40%; min-width: 60%;">12.</span>' +
-        '<span class="aiev3-span aiev3-span-point rhs" style="left: 60%; min-width: 40%;">34</span>' +
+        '<span class="aiev3-span aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span>12.</span></span>' +
+        '<span class="aiev3-span aiev3-span-point rhs" style="left: 60%; min-width: 40%;"><span>34</span></span>' +
         '</div>',
     );
     expect(testLine.lineText).toEqual('12.34');
@@ -73,19 +76,57 @@ describe('Check basic EditorV3Line', () => {
 
   test('Load badly written decimal div', async () => {
     const testLine = new EditorV3Line(
-      '<div class="aiev3-line decimal">12.34</div>',
+      '<div class="aiev3-line decimal"><span data-style-name="shiny">12.34</span>&nbsp;slow</div>',
       EditorV3Align.decimal,
     );
 
-    expect(testLine.el.outerHTML).toEqual(
-      '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span aiev3-span-point lhs" style="right: 40%; min-width: 60%;">12.</span>' +
-        '<span class="aiev3-span aiev3-span-point rhs" style="left: 60%; min-width: 40%;">34</span>' +
-        '</div>',
-    );
-    expect(testLine.lineText).toEqual('12.34');
+    expect(testLine.lineText).toEqual('12.34 slow');
     expect(testLine.textAlignment).toEqual(EditorV3Align.decimal);
     expect(testLine.decimalAlignPercent).toEqual(60);
+    expect(testLine.el.outerHTML).toEqual(
+      '<div class="aiev3-line decimal">' +
+        '<span class="aiev3-span aiev3-span-point lhs" style="right: 40%; min-width: 60%;">' +
+        '<span class="editorv3style-shiny" data-style-name="shiny">12.</span>' +
+        '</span>' +
+        '<span class="aiev3-span aiev3-span-point rhs" style="left: 60%; min-width: 40%;">' +
+        '<span class="editorv3style-shiny" data-style-name="shiny">34</span>' +
+        '<span>&nbsp;slow</span>' +
+        '</span>' +
+        '</div>',
+    );
+    expect(JSON.parse(testLine.jsonString)).toEqual({
+      decimalAlignPercent: 60,
+      textAlignment: 'decimal',
+      textBlocks: [{ text: '12.34', style: 'shiny' }, { text: ' slow' }],
+    });
+    expect(new EditorV3Line(testLine.jsonString)).toEqual(testLine);
+    expect(new EditorV3Line(testLine.el)).toEqual(testLine);
+
+    const testLine2 = new EditorV3Line(
+      '<div class="aiev3-line decimal">' +
+        '<span class="aiev3-span aiev3-span-point lhs">' +
+        '<span class="editorv3style-shiny" data-style-name="shiny">12.</span>' +
+        'boys' +
+        '</span>' +
+        '<span class="aiev3-span aiev3-span-point rhs">' +
+        '<span class="editorv3style-shiny" data-style-name="shiny">34</span>' +
+        '&nbsp;slow' +
+        '<script>console.error("Inject")</script>' +
+        '<span> treats</span>' +
+        '</span>' +
+        '</div>',
+      EditorV3Align.decimal,
+    );
+    expect(JSON.parse(testLine2.jsonString)).toEqual({
+      decimalAlignPercent: 60,
+      textAlignment: 'decimal',
+      textBlocks: [
+        { text: '12.', style: 'shiny' },
+        { text: 'boys' },
+        { text: '34', style: 'shiny' },
+        { text: ' slow treats' },
+      ],
+    });
   });
 
   test('Load normal div', async () => {

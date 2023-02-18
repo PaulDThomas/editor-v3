@@ -20,12 +20,41 @@ export const readV3DivElement = (
   // Decimal aligned
   if (arg.classList.contains('aiev3-line')) {
     if (arg.classList.contains('decimal')) {
-      ret.textBlocks = [new EditorV3TextBlock(arg.textContent ?? '')];
       ret.textAlignment = EditorV3Align.decimal;
       ret.decimalAlignPercent =
-        arg.children.length === 2
-          ? parseFloat((arg.children[0] as HTMLSpanElement).style.minWidth) ?? 60
+        arg.children.length === 2 &&
+        arg.children[0] instanceof HTMLSpanElement &&
+        arg.children[0].style.minWidth
+          ? parseFloat(arg.children[0].style.minWidth)
           : 60;
+      ret.textBlocks =
+        arg.firstChild instanceof HTMLSpanElement &&
+        arg.lastChild instanceof HTMLSpanElement &&
+        arg.childNodes.length === 2 &&
+        arg.firstChild.classList.contains('lhs') &&
+        arg.lastChild.classList.contains('rhs')
+          ? [
+              ...[...(arg.firstChild as HTMLSpanElement).childNodes].map(
+                (el) =>
+                  new EditorV3TextBlock(
+                    el instanceof HTMLSpanElement || el instanceof Text ? el : '',
+                  ),
+              ),
+              ...[...(arg.lastChild as HTMLSpanElement).childNodes].map(
+                (el) =>
+                  new EditorV3TextBlock(
+                    el instanceof HTMLSpanElement || el instanceof Text ? el : '',
+                  ),
+              ),
+            ]
+          : [
+              ...[...arg.childNodes].map(
+                (el) =>
+                  new EditorV3TextBlock(
+                    el instanceof HTMLSpanElement || el instanceof Text ? el : '',
+                  ),
+              ),
+            ];
     }
     // Standard alignment
     else if (['left', 'center', 'right'].includes(arg.classList[1])) {

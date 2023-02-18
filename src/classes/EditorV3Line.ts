@@ -13,7 +13,13 @@ export class EditorV3Line {
     const h = document.createElement('div');
     h.className = `aiev3-line ${this.textAlignment}`;
     if (this.textAlignment === EditorV3Align.decimal) {
-      drawHtmlDecimalAlign(h, this.lineText, this.decimalAlignPercent);
+      const decimalPosition = this.lineText.match(/\./)?.index ?? Infinity;
+      drawHtmlDecimalAlign(
+        h,
+        this.decimalAlignPercent,
+        this.upToPos(decimalPosition + 1),
+        this.fromPos(decimalPosition + 1),
+      );
     } else {
       this.textBlocks.forEach((tb) => h.append(tb.el));
     }
