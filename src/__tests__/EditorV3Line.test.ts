@@ -238,6 +238,53 @@ describe('Check EditorV3Line functions', () => {
     expect(line5.textBlocks).toEqual([{ text: '0123.456' }]);
   });
 
+  test('insertBlocks', async () => {
+    const line1 = new EditorV3Line('0123.456');
+    line1.insertBlocks([new EditorV3TextBlock('hello')], 3);
+    expect(line1.lineText).toEqual('012hello3.456');
+    expect(line1.textBlocks.length).toEqual(1);
+
+    const line2 = new EditorV3Line([
+      new EditorV3TextBlock('hello', 'world'),
+      new EditorV3TextBlock(' slow'),
+    ]);
+    line2.insertBlocks(
+      [
+        new EditorV3TextBlock('tree'),
+        new EditorV3TextBlock('pie', 'lid'),
+        new EditorV3TextBlock('pie', 'world'),
+      ],
+      0,
+    );
+    expect(JSON.parse(line2.jsonString)).toEqual({
+      decimalAlignPercent: 60,
+      textAlignment: 'left',
+      textBlocks: [
+        { text: 'tree' },
+        { text: 'pie', style: 'lid' },
+        { text: 'piehello', style: 'world' },
+        { text: ' slow' },
+      ],
+    });
+  });
+
+  test('removeSection', async () => {
+    const line1 = new EditorV3Line('0123.456');
+    line1.insertBlocks([new EditorV3TextBlock('hello')], 3);
+    expect(line1.lineText).toEqual('012hello3.456');
+    expect(line1.textBlocks.length).toEqual(1);
+    const line2 = new EditorV3Line([
+      new EditorV3TextBlock('hello', 'world'),
+      new EditorV3TextBlock(' slow'),
+    ]);
+    line2.removeSection(4, 7);
+    expect(JSON.parse(line2.jsonString)).toEqual({
+      textBlocks: [{ text: 'hell', style: 'world' }, { text: 'low' }],
+      decimalAlignPercent: 60,
+      textAlignment: 'left',
+    });
+  });
+
   test('deleteCharacter', async () => {
     const line2 = new EditorV3Line([
       new EditorV3TextBlock('hello', 'world'),
