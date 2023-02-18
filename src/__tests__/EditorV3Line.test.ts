@@ -49,8 +49,8 @@ describe('Check basic EditorV3Line', () => {
     );
     expect(testLine.el.outerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span>Hello&nbsp;world.</span></span>' +
-        '<span class="aiev3-span aiev3-span-point rhs" style="left: 60%; min-width: 40%;">' +
+        '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span>Hello&nbsp;world.</span></span>' +
+        '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;">' +
         '<span>&nbsp;</span>' +
         '<span class="editorv3style-shiny" data-style-name="shiny">How&nbsp;is&nbsp;it&nbsp;going?</span>' +
         '</span>' +
@@ -65,8 +65,8 @@ describe('Check basic EditorV3Line', () => {
     const testLine = new EditorV3Line('12.34', EditorV3Align.decimal);
     expect(testLine.el.outerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span>12.</span></span>' +
-        '<span class="aiev3-span aiev3-span-point rhs" style="left: 60%; min-width: 40%;"><span>34</span></span>' +
+        '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span>12.</span></span>' +
+        '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;"><span>34</span></span>' +
         '</div>',
     );
     expect(testLine.lineText).toEqual('12.34');
@@ -85,10 +85,10 @@ describe('Check basic EditorV3Line', () => {
     expect(testLine.decimalAlignPercent).toEqual(60);
     expect(testLine.el.outerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span aiev3-span-point lhs" style="right: 40%; min-width: 60%;">' +
+        '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;">' +
         '<span class="editorv3style-shiny" data-style-name="shiny">12.</span>' +
         '</span>' +
-        '<span class="aiev3-span aiev3-span-point rhs" style="left: 60%; min-width: 40%;">' +
+        '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;">' +
         '<span class="editorv3style-shiny" data-style-name="shiny">34</span>' +
         '<span>&nbsp;slow</span>' +
         '</span>' +
@@ -104,11 +104,11 @@ describe('Check basic EditorV3Line', () => {
 
     const testLine2 = new EditorV3Line(
       '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span aiev3-span-point lhs">' +
+        '<span class="aiev3-span-point lhs">' +
         '<span class="editorv3style-shiny" data-style-name="shiny">12.</span>' +
         'boys' +
         '</span>' +
-        '<span class="aiev3-span aiev3-span-point rhs">' +
+        '<span class="aiev3-span-point rhs">' +
         '<span class="editorv3style-shiny" data-style-name="shiny">34</span>' +
         '&nbsp;slow' +
         '<script>console.error("Inject")</script>' +

@@ -187,4 +187,29 @@ export class EditorV3Content {
     this.mergeLines(pos.startLine);
     return ret;
   }
+
+  public applyStyle(styleName: string, pos: EditorV3Position) {
+    if (pos.startLine < this.lines.length && pos.startLine <= pos.endLine) {
+      for (let _i = pos.startLine; _i <= pos.endLine && _i < this.lines.length; _i++) {
+        this.lines[_i].applyStyle(
+          styleName,
+          _i === pos.startLine ? pos.startChar : 0,
+          _i === pos.endLine ? pos.endChar : Infinity,
+        );
+      }
+    }
+    return this;
+  }
+
+  public removeStyle(pos: EditorV3Position) {
+    if (pos.startLine < this.lines.length && pos.startLine <= pos.endLine) {
+      for (let _i = pos.startLine; _i <= pos.endLine && _i < this.lines.length; _i++) {
+        this.lines[_i].removeStyle(
+          _i === pos.startLine ? pos.startChar : 0,
+          _i === pos.endLine ? pos.endChar : Infinity,
+        );
+      }
+    }
+    return this;
+  }
 }
