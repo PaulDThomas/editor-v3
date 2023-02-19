@@ -17,7 +17,7 @@ export const App = (): JSX.Element => {
           backgroundColor: 'white',
           fontFamily: 'Courier New',
         },
-        notes: { backgroundColor: 'white', color: 'pink' },
+        notes: { color: 'darkgreen', fontWeight: 700 },
       },
     }),
   );
