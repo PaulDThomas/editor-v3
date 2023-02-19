@@ -1,10 +1,11 @@
 import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { EditorV3Content } from '../classes/EditorV3Content';
-import { EditorV3Align, EditorV3Position, EditorV3Styles } from '../classes/interface';
+import { EditorV3Align, EditorV3Styles } from '../classes/interface';
 import { getCaretPosition } from '../functions/getCaretPosition';
 import { getCurrentData } from '../functions/getCurrentData';
 import { setCaretPosition } from '../functions/setCaretPosition';
 import './EditorV3.css';
+import { redraw } from '../functions/redraw';
 
 interface EditorV3Props {
   id: string;
@@ -35,9 +36,6 @@ export const EditorV3 = ({
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
-  // const [keyDownContent, setKeyDownContent] = useState<EditorV3Content | null>(null);
-  const [keyDownPosition, setKeyDownPosition] = useState<EditorV3Position | null>(null);
-  // const [currentStyleName, setCurrentStyleName] = useState<string>('');
 
   // General return function
   const returnData = useCallback(
@@ -51,37 +49,6 @@ export const EditorV3 = ({
     [input, setHtml, setJson, setText],
   );
 
-  // Redraw function
-  const redraw = useCallback((el: HTMLDivElement | null, content: EditorV3Content) => {
-    if (el) {
-      el.innerHTML = '';
-      el.append(content.el);
-      // Update height and styles after render
-      [...el.querySelectorAll('.aiev3-line')].forEach((line) => {
-        (line as HTMLDivElement).style.height = `${Math.max(
-          ...[...line.querySelectorAll('span')].map((el) => (el as HTMLSpanElement).clientHeight),
-        )}px`;
-        // Apply styles
-        [...line.querySelectorAll('span[data-style-name')].forEach((el) => {
-          const span = el as HTMLSpanElement;
-          if (
-            span.dataset.styleName &&
-            content.styles &&
-            content.styles[span.dataset.styleName] !== undefined
-          ) {
-            Object.entries(content.styles[span.dataset.styleName]).forEach(([k, v]) => {
-              span.style.setProperty(
-                k.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase()),
-                v,
-              );
-            });
-          }
-        });
-      });
-      // }
-    }
-  }, []);
-
   // Update if input changes
   useEffect(() => {
     const newContent = new EditorV3Content(input, {
@@ -89,9 +56,9 @@ export const EditorV3 = ({
       decimalAlignPercent,
       styles: customStyleMap,
     });
-    redraw(divRef.current, newContent);
+    divRef.current && redraw(divRef.current, newContent);
     returnData(getCurrentData(divRef), true);
-  }, [customStyleMap, decimalAlignPercent, input, redraw, returnData, textAlignment]);
+  }, [customStyleMap, decimalAlignPercent, input, returnData, textAlignment]);
 
   // Work out backgroup colour and border
   const [inFocus, setInFocus] = useState<boolean>(false);
@@ -100,176 +67,117 @@ export const EditorV3 = ({
   }, []);
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLSpanElement>) {
-    // No new lines
-    if (e.key === 'Enter') {
+    // Handle awkward keys
+    if (['Enter', 'Backspace', 'Delete'].includes(e.key)) {
+      e.stopPropagation();
+      e.preventDefault();
+      if (divRef.current) {
+        const pos = getCaretPosition(divRef.current);
+        // Enter
+        if (pos && allowNewLine && e.key === 'Enter') {
+          const content = new EditorV3Content(divRef.current.innerHTML);
+          const newPos = content.splitLine(pos);
+          redraw(divRef.current, content);
+          setCaretPosition(divRef.current, newPos);
+        }
+        // Backspace
+        if (pos && ['Backspace', 'Delete'].includes(e.key)) {
+          const content = new EditorV3Content(divRef.current.innerHTML);
+          const newPos = content.deleteCharacter(pos, e.key === 'Backspace');
+          redraw(divRef.current, content);
+          console.log(newPos);
+          setCaretPosition(divRef.current, newPos);
+        }
+      }
+      return;
+    } else if (
+      divRef.current &&
+      ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key) &&
+      !e.shiftKey &&
+      !e.ctrlKey
+    ) {
+      const pos = getCaretPosition(divRef.current);
+      // Left arrow
+      if (pos?.isCollapsed) {
+        e.preventDefault();
+        e.stopPropagation();
+        const newPos = { ...pos };
+        const thisLine =
+          divRef.current.querySelectorAll('div.aiev3-line').length < pos.startLine
+            ? (divRef.current.querySelectorAll('div.aiev3-line')[pos.startLine] as HTMLDivElement)
+            : null;
+        switch (e.key) {
+          case 'ArrowLeft':
+            newPos.startLine =
+              pos.startChar === 0 && pos.startLine > 0 ? pos.startLine - 1 : pos.startLine;
+            newPos.startChar =
+              pos.startChar === 0 && pos.startLine > 0
+                ? (
+                    divRef.current.querySelectorAll('div.aiev3-line')[
+                      pos.startLine - 1
+                    ] as HTMLDivElement
+                  ).innerText.length
+                : Math.max(0, pos.startChar - 1);
+            break;
+          case 'ArrowRight':
+            if (thisLine && pos.startChar + 1 < thisLine.innerText.length) {
+              newPos.startChar = pos.startChar + 1;
+            } else if (
+              thisLine &&
+              pos.startChar === thisLine.innerText.length &&
+              pos.startLine + 1 < divRef.current.querySelectorAll('div.aiev3-line').length
+            ) {
+              newPos.startLine = pos.startLine + 1;
+              newPos.startChar = 0;
+            }
+            newPos.startLine =
+              divRef.current.querySelectorAll('div.aiev3-line').length > pos.startLine + 1 &&
+              (divRef.current.querySelectorAll('div.aiev3-line')[pos.startLine] as HTMLDivElement)
+                .innerText.length <= pos.startChar
+                ? pos.startLine + 1
+                : pos.startLine;
+            newPos.startChar =
+              divRef.current.querySelectorAll('div.aiev3-line').length > pos.startLine + 1 &&
+              (divRef.current.querySelectorAll('div.aiev3-line')[pos.startLine] as HTMLDivElement)
+                .innerText.length <= pos.startChar
+                ? 0
+                : pos.startChar + 1;
+            break;
+          case 'ArrowDown':
+            if (divRef.current.querySelectorAll('div.aiev3-line').length > pos.startLine + 1) {
+              const nextLine = divRef.current.querySelectorAll('div.aiev3-line')[
+                pos.startLine + 1
+              ] as HTMLDivElement;
+              newPos.startLine = pos.startLine + 1;
+              newPos.startChar = Math.min(nextLine.innerText.length, pos.startChar);
+            }
+            break;
+          case 'ArrowUp':
+          default:
+            if (pos.startLine > 0) {
+              const nextLine = divRef.current.querySelectorAll('div.aiev3-line')[
+                pos.startLine - 1
+              ] as HTMLDivElement;
+              newPos.startLine = pos.startLine - 1;
+              newPos.startChar = Math.min(nextLine.innerText.length, pos.startChar);
+            }
+        }
+        newPos.endChar = newPos.startChar;
+        newPos.endLine = newPos.startLine;
+        console.log(`Key: ${e.key}\nFrom: ${JSON.stringify(pos)}\nTo: ${JSON.stringify(newPos)}`);
+        setCaretPosition(divRef.current, newPos);
+      }
+    }
+  }
+
+  const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLSpanElement>) => {
+    // Stop handled keys
+    if (['Enter', 'Backspace', 'Delete'].includes(e.key)) {
       e.stopPropagation();
       e.preventDefault();
       return;
     }
-    // Handle decimal state deletes
-    else if (
-      divRef.current &&
-      ['Backspace', 'Delete'].includes(e.key) &&
-      textAlignment === EditorV3Align.decimal
-    ) {
-      const range = window.getSelection();
-      if (
-        range &&
-        range.anchorNode === range.focusNode &&
-        range.anchorOffset === range.focusOffset
-      ) {
-        e.stopPropagation();
-        e.preventDefault();
-        setKeyDownPosition(getCaretPosition(divRef.current));
-        return;
-      }
-      // Doing the delete, so set these to null
-      else {
-        // setKeyDownContent(null);
-        setKeyDownPosition(null);
-        return;
-      }
-    }
-    // Handle decimal state moves
-    else if (
-      divRef.current &&
-      ['ArrowRight', 'ArrowDown', 'Home', 'End'].includes(e.key) &&
-      textAlignment === EditorV3Align.decimal &&
-      window.getSelection()?.isCollapsed
-    ) {
-      const caret = getCaretPosition(divRef.current);
-      const els = [...(divRef.current as HTMLDivElement).querySelectorAll('.aiev3-line')];
-      if (caret && e.key === 'Home') {
-        setCaretPosition(divRef.current, {
-          startLine: caret.startLine,
-          startChar: 0,
-          isCollapsed: true,
-          endLine: caret.startLine,
-          endChar: 0,
-        });
-      } else if (
-        caret &&
-        (e.key === 'End' || (e.key === 'ArrowDown' && els.length === caret.startLine + 1))
-      ) {
-        setCaretPosition(divRef.current, {
-          startLine: caret.startLine,
-          startChar:
-            (divRef.current as HTMLDivElement).querySelectorAll('.aiev3-line')[caret.startLine]
-              .textContent?.length ?? 0,
-          isCollapsed: true,
-          endLine: caret.startLine,
-          endChar:
-            (divRef.current as HTMLDivElement).querySelectorAll('.aiev3-line')[caret.startLine]
-              .textContent?.length ?? 0,
-        });
-      } else if (caret && e.key === 'ArrowDown' && els.length > caret.startLine + 1) {
-        setCaretPosition(divRef.current, {
-          startLine: caret.startLine + 1,
-          startChar: caret.startChar,
-          isCollapsed: true,
-          endLine: caret.startLine + 1,
-          endChar: caret.startChar,
-        });
-      } else if (caret && e.key === 'ArrowRight') {
-        const decPos = els[caret.startLine].textContent?.replace(/\u200b/g, '').match(/\./)?.index;
-        if (
-          decPos === caret.startChar - 1 &&
-          (els[caret.startLine].textContent?.replace(/\u200b/g, '').length ?? 0) > caret.startChar
-        ) {
-          setCaretPosition(divRef.current, {
-            startLine: caret.startLine,
-            startChar: caret.startChar + 1,
-            isCollapsed: true,
-            endLine: caret.startLine,
-            endChar: caret.startChar + 1,
-          });
-          e.preventDefault();
-          e.stopPropagation();
-        } else if (
-          caret.startChar >=
-            (els[caret.startLine].textContent?.replace(/\u200b/g, '').length ?? 0) &&
-          els.length > caret.startLine + 1
-        ) {
-          setCaretPosition(divRef.current, {
-            startLine: caret.startLine + 1,
-            startChar: 0,
-            isCollapsed: true,
-            endLine: caret.startLine + 1,
-            endChar: 0,
-          });
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      }
-    }
-    // What has been pressed
-    // else {
-    //   console.log(`Key down ${e.key}`);
-    // }
-  }
-
-  const handleKeyUp = useCallback(
-    (e: React.KeyboardEvent<HTMLSpanElement>) => {
-      // No new lines
-      if (e.key === 'Enter' && !allowNewLine) {
-        e.stopPropagation();
-        e.preventDefault();
-        return;
-      }
-
-      const sel: Selection | null = window.getSelection();
-      if (divRef.current && sel && sel.rangeCount > 0) {
-        const range: Range = sel.getRangeAt(0);
-        // Add new line
-        const caret = getCaretPosition(divRef.current);
-        const newContent = new EditorV3Content(divRef.current.innerHTML, {
-          textAlignment,
-          decimalAlignPercent,
-          styles: customStyleMap,
-        });
-
-        // Enter pressed
-        if (e.key === 'Enter' && allowNewLine && caret) {
-          newContent.splitLine(caret);
-          caret.startChar = 0;
-          caret.startLine = caret.startLine + 1;
-          redraw(divRef.current, newContent);
-          caret && setCaretPosition(divRef.current, caret);
-        } else if (range.collapsed) {
-          // Remove line break with backspace in decimal form
-          if (
-            textAlignment === EditorV3Align.decimal &&
-            e.key === 'Backspace' &&
-            caret &&
-            keyDownPosition
-          ) {
-            if (caret.startChar > 0) {
-              caret.startChar = caret.startChar - 1;
-              newContent.deleteCharacter(caret);
-            } else if (caret.startLine > 0 && caret.startChar === 0) {
-              caret.startLine = caret.startLine - 1;
-              caret.startChar = newContent.lines[caret.startLine].lineText.length;
-              newContent.mergeLines(caret.startLine);
-            }
-          }
-          // Remove line break with delete in decimal form
-          else if (textAlignment === EditorV3Align.decimal && e.key === 'Delete' && caret) {
-            if (
-              caret.startChar === newContent.lines[caret.startLine]?.lineText.length &&
-              newContent.lines.length > caret.startLine + 1
-            )
-              newContent.mergeLines(caret.startLine);
-            else if (caret.startChar < (newContent.lines[caret.startLine]?.lineText.length ?? 0)) {
-              newContent.deleteCharacter(caret);
-            }
-          }
-          redraw(divRef.current, newContent);
-          caret && setCaretPosition(divRef.current, caret);
-        }
-      }
-    },
-    [allowNewLine, customStyleMap, decimalAlignPercent, keyDownPosition, redraw, textAlignment],
-  );
+  }, []);
 
   // function handleSelect(_e: React.SyntheticEvent<HTMLDivElement>) {
   // console.log('Select event');

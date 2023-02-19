@@ -16,31 +16,24 @@ export const readV3Html = (
     const frag = document.createElement('div');
     frag.innerHTML = text;
 
-    // Loop through children in fragment
-    [...frag.childNodes].forEach((el) => {
+    // Read line nodes
+    [...frag.querySelectorAll('div.aiev3-line')].forEach((el) => {
       const div = el as HTMLDivElement;
-      // Read style node
-      if (div.classList.contains('style-info')) {
-        ret.styles = JSON.parse(div.dataset.style ?? '');
+      ret.lines.push(readV3DivElement(div));
+      // Get alignment from second classname
+      if (!ret.textAlignment && div.classList.length > 1) {
+        ret.textAlignment = el.classList[1].toString() as EditorV3Align;
       }
-      // Read line nodes
-      else ret.lines.push(readV3DivElement(div));
+      // Get decimal align percent from mid width
+      if (ret.textAlignment === EditorV3Align.decimal && el.children.length === 2) {
+        ret.decimalAlignPercent = parseFloat((el.children[0] as HTMLSpanElement).style.minWidth);
+      }
     });
 
-    // Get alignment from second classname
-    const firstLine =
-      [...frag.children].filter((el) => !el.classList.contains('style-info')).length > 0
-        ? [...frag.children].filter((el) => !el.classList.contains('style-info'))[0]
-        : (null as HTMLDivElement | null);
-    if (firstLine) {
-      if (firstLine.classList.length > 1) {
-        ret.textAlignment = firstLine.classList[1].toString() as EditorV3Align;
-      }
-      if (ret.textAlignment === EditorV3Align.decimal && firstLine.children.length === 2) {
-        ret.decimalAlignPercent = parseFloat(
-          (firstLine.children[0] as HTMLSpanElement).style.minWidth,
-        );
-      }
+    // Read style node
+    const styleNode = frag.querySelector('div.aiev3-style-info');
+    if (styleNode && (styleNode as HTMLDivElement).dataset.style !== '') {
+      ret.styles = JSON.parse((styleNode as HTMLDivElement).dataset.style ?? '');
     }
   }
   // Everything else is just text

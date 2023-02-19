@@ -37,29 +37,33 @@
 
 .aiev3-line.left {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-direction: row;
+  justify-content: start;
 }
 
 .aiev3-line.center {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  justify-content: center;
 }
 
 .aiev3-line.right {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: row;
+  justify-content: flex-end;
 }
 
-.aiev3-line.style-info {
+.aiev3-style-info {
   display: none;
 }
 
-.aiev3-span {
+/* .aiev3-span {
   display: inline-block;
   min-width: 4px;
+} */
+
+.aiev3-line.right > span {
+  display: inline-flex;
 }
 
 .aiev3-span-point {

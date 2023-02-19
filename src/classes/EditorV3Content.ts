@@ -1,4 +1,5 @@
 import { EditorV3Line } from './EditorV3Line';
+import { EditorV3TextBlock } from './EditorV3TextBlock';
 import {
   EditorV3Align,
   EditorV3ContentProps,
@@ -44,7 +45,7 @@ export class EditorV3Content {
 
   private _styleNode(): HTMLDivElement {
     const sn = document.createElement('div');
-    sn.className = 'aiev3-line style-info';
+    sn.className = 'aiev3-style-info';
     sn.dataset.style = JSON.stringify(this._styles);
     return sn;
   }
@@ -52,8 +53,8 @@ export class EditorV3Content {
   // Read only attributes
   get el(): DocumentFragment {
     const ret = new DocumentFragment();
-    if (Object.keys(this._styles).length > 0) ret.append(this._styleNode());
     this.lines.forEach((l) => ret.append(l.el));
+    if (Object.keys(this._styles).length > 0) ret.append(this._styleNode());
     return ret;
   }
 
@@ -108,42 +109,43 @@ export class EditorV3Content {
   }
 
   public subLines(pos: EditorV3Position) {
-    let ret: EditorV3Line[] = [];
-    if (pos.startLine < this.lines.length && pos.startLine <= pos.endLine) {
-      ret = [
-        ...(pos.startLine === pos.endLine &&
-        (pos.startChar >= pos.endChar || pos.startChar > this.lines[pos.startLine].lineText.length)
-          ? []
-          : pos.startLine === pos.endLine
-          ? [
-              new EditorV3Line(
-                this.lines[pos.startLine].subBlocks(pos.startChar, pos.endChar),
-                this._textAlignment,
-                this._decimalAlignPercent,
-              ),
-            ]
-          : [
-              ...(pos.startChar <= this.lines[pos.startLine].lineText.length
-                ? [
-                    new EditorV3Line(
-                      this.lines[pos.startLine].subBlocks(pos.startChar),
-                      this._textAlignment,
-                      this._decimalAlignPercent,
-                    ),
-                  ]
-                : []),
-              ...this.lines.slice(pos.startLine + 1, pos.endLine),
-            ]),
-        ...(pos.endLine > pos.startLine && pos.endLine < this.lines.length && pos.endChar > 0
-          ? [
-              new EditorV3Line(
-                this.lines[pos.endLine].subBlocks(0, pos.endChar),
-                this._textAlignment,
-                this._decimalAlignPercent,
-              ),
-            ]
-          : []),
-      ];
+    const ret: EditorV3Line[] = [];
+    // Check selection contains something
+    if (
+      pos.startLine < this.lines.length &&
+      ((pos.startLine === pos.endLine && pos.startChar < pos.endChar) ||
+        pos.startLine < pos.endLine)
+    ) {
+      const lineText = this.lines[pos.startLine].lineText;
+      // First line
+      if (pos.startLine <= pos.endLine && pos.startChar <= lineText.length) {
+        ret.push(
+          new EditorV3Line(
+            pos.startChar < lineText.length
+              ? this.lines[pos.startLine].subBlocks(
+                  pos.startChar,
+                  pos.endLine === pos.startLine ? pos.endChar : Infinity,
+                )
+              : [new EditorV3TextBlock('')],
+            this._textAlignment,
+            this._decimalAlignPercent,
+          ),
+        );
+      }
+      // At least one line between
+      if (pos.startLine + 1 < pos.endLine) {
+        ret.push(...this.lines.slice(pos.startLine + 1, pos.endLine));
+      }
+      // End line to end character
+      if (pos.startLine < pos.endLine && pos.endLine < this.lines.length) {
+        ret.push(
+          new EditorV3Line(
+            this.lines[pos.endLine].subBlocks(0, pos.endChar),
+            this._textAlignment,
+            this._decimalAlignPercent,
+          ),
+        );
+      }
     }
     return ret;
   }
@@ -157,7 +159,7 @@ export class EditorV3Content {
   }
 
   // Split line in two
-  public splitLine(pos: EditorV3Position) {
+  public splitLine(pos: EditorV3Position): EditorV3Position {
     // Check it is possible
     if (this.lines.length > pos.startLine && pos.isCollapsed) {
       // Split existing line, and get new one
@@ -171,6 +173,13 @@ export class EditorV3Content {
       ];
       this.lines = newLines;
     }
+    return {
+      isCollapsed: true,
+      startLine: pos.startLine + 1,
+      startChar: 0,
+      endLine: pos.startLine + 1,
+      endChar: 0,
+    };
   }
 
   // Merge line with next line
@@ -181,23 +190,53 @@ export class EditorV3Content {
     }
   }
 
-  public deleteCharacter(pos: EditorV3Position) {
-    if (this.lines.length > pos.startLine) this.lines[pos.startLine].deleteCharacter(pos.startChar);
+  public deleteCharacter(pos: EditorV3Position, backwards: boolean): EditorV3Position {
+    if (this.lines.length > pos.startLine && this.text !== '') {
+      // console.log(`Incoming: ${JSON.stringify(pos)} & ${backwards}`);
+      const newPos = { ...pos };
+      // Move cursor if start and end are the same
+      if (pos.startLine === pos.endLine && pos.startChar === pos.endChar) {
+        // Backspace at end of line
+        if (backwards && pos.startLine > 0 && pos.startChar === 0) {
+          newPos.startChar = this.lines[pos.startLine - 1].lineText.length;
+          newPos.startLine = pos.startLine - 1;
+        }
+        // Backspace after first character
+        else if (backwards && pos.startChar > 0) {
+          newPos.startChar = pos.startChar - 1;
+        }
+        // Delete end line
+        else if (pos.endChar >= this.lines[pos.endLine].lineText.length) {
+          newPos.endChar = 0;
+          newPos.endLine = pos.endLine + 1;
+        } else if (pos.endChar < this.lines[pos.endLine].lineText.length) {
+          newPos.endChar = pos.endChar + 1;
+        }
+      }
+      // Remove under selected
+      // console.log(`Splicing: ${JSON.stringify(newPos)} & ${backwards}`);
+      this.splice(newPos);
+      if (pos.isCollapsed) {
+        newPos.endLine = newPos.startLine;
+        newPos.endChar = newPos.startChar;
+      }
+      // console.log(`Returning: ${JSON.stringify(newPos)} & ${backwards}`);
+      return newPos;
+    }
+    return pos;
   }
 
   public splice(pos: EditorV3Position, newLines?: EditorV3Line[]): EditorV3Line[] {
     if (pos.startLine < this.lines.length && pos.startLine <= pos.endLine) {
       const ret: EditorV3Line[] = this.subLines(pos);
+      const u = this.upToPos(pos.startLine, pos.startChar);
+      const f = this.fromPos(pos.endLine, pos.endChar);
       const mergeStart =
         this.upToPos(pos.startLine, pos.startChar).length === pos.startLine + 1 &&
         pos.startChar <= this.lines[pos.startLine].lineText.length;
       const mergeEnd =
         this.fromPos(pos.endLine, pos.endChar).length > 0 && pos.endChar <= this.lines.length;
-      this.lines = [
-        ...this.upToPos(pos.startLine, pos.startChar),
-        ...(newLines ? newLines : []),
-        ...this.fromPos(pos.endLine, pos.endChar),
-      ];
+      this.lines = [...u, ...(newLines ? newLines : []), ...f];
       mergeEnd &&
         newLines &&
         newLines.length > 0 &&

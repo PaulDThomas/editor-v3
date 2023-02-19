@@ -51,10 +51,10 @@ describe('Check basic EditorV3Content', () => {
     const div = document.createElement('div');
     div.append(testContent.el);
     expect(div.innerHTML).toEqual(
-      '<div class="aiev3-line style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}"></div>' +
-        '<div class="aiev3-line center">' +
+      '<div class="aiev3-line center">' +
         '<span>34.56</span>' +
-        '</div>',
+        '</div>' +
+        '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}"></div>',
     );
 
     // Check self equivalence
@@ -108,15 +108,15 @@ describe('Check basic EditorV3Content', () => {
     div.innerHTML = '';
     div.appendChild(testContent.el);
     expect(div.innerHTML).toEqual(
-      '<div class="aiev3-line style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}"></div>' +
-        '<div class="aiev3-line decimal">' +
+      '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span>Hello</span></span>' +
         '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;">\u200b</span>' +
         '</div>' +
         '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span>.</span></span>' +
         '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;"><span>World</span></span>' +
-        '</div>',
+        '</div>' +
+        '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}"></div>',
     );
     expect(new EditorV3Content(div.innerHTML)).toEqual(testContent);
     expect(new EditorV3Content(testContent.jsonString)).toEqual(testContent);
@@ -153,24 +153,81 @@ describe('Content functions', () => {
     });
     expect(testContent.text).toEqual('1\n56');
   });
+
   test('Delete character', async () => {
     const testContent = new EditorV3Content('12\n34\n56');
-    testContent.deleteCharacter({
-      startLine: 0,
-      startChar: 1,
-      endLine: 0,
-      endChar: 1,
-      isCollapsed: true,
-    });
+    testContent.deleteCharacter(
+      {
+        startLine: 0,
+        startChar: 1,
+        endLine: 0,
+        endChar: 1,
+        isCollapsed: true,
+      },
+      false,
+    );
     expect(testContent.text).toEqual('1\n34\n56');
-    testContent.deleteCharacter({
-      startLine: 0,
-      startChar: 4,
-      endLine: 0,
-      endChar: 4,
-      isCollapsed: true,
-    });
+
+    testContent.deleteCharacter(
+      {
+        startLine: 0,
+        startChar: 4,
+        endLine: 0,
+        endChar: 4,
+        isCollapsed: true,
+      },
+      false,
+    );
     expect(testContent.text).toEqual('1\n34\n56');
+
+    testContent.deleteCharacter(
+      {
+        startLine: 1,
+        startChar: 0,
+        endLine: 1,
+        endChar: 2,
+        isCollapsed: false,
+      },
+      true,
+    );
+    expect(testContent.text).toEqual('1\n\n56');
+    expect(testContent.lines[1].textBlocks.length).toEqual(1);
+
+    testContent.deleteCharacter(
+      {
+        startLine: 2,
+        startChar: 0,
+        endLine: 2,
+        endChar: 0,
+        isCollapsed: true,
+      },
+      true,
+    );
+    expect(testContent.text).toEqual('1\n56');
+
+    testContent.deleteCharacter(
+      {
+        startLine: 1,
+        startChar: 2,
+        endLine: 1,
+        endChar: 2,
+        isCollapsed: true,
+      },
+      true,
+    );
+    expect(testContent.text).toEqual('1\n5');
+
+    testContent.deleteCharacter(
+      {
+        startLine: 2,
+        startChar: 2,
+        endLine: 1,
+        endChar: 2,
+        isCollapsed: true,
+      },
+      true,
+    );
+    expect(testContent.text).toEqual('1\n5');
   });
 
   test('Remove Section', async () => {

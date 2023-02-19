@@ -2,8 +2,12 @@ import { EditorV3Position } from '../classes/interface';
 
 export function setCaretPosition(el: Node, position: EditorV3Position): number {
   // Go to a lower line if required
-  if (position.startLine > 0 && position.startLine <= el.childNodes.length) {
-    return setCaretPosition(el.childNodes[position.startLine], {
+  if (
+    position.startLine > 0 &&
+    el instanceof Element &&
+    position.startLine <= el.querySelectorAll('.aiev3-line').length
+  ) {
+    return setCaretPosition(el.querySelectorAll('div.aiev3-line')[position.startLine], {
       startLine: 0,
       startChar: position.startChar,
       isCollapsed: true,

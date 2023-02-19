@@ -17,15 +17,17 @@ export function getCaretPosition(element: HTMLDivElement): EditorV3Position | nu
         ? sel.focusNode
         : sel.anchorNode;
     // Get anchor node position (should be the same as focusNode as collapsed)
-    const f = firstNode.parentElement?.closest('.aiev3-line');
+    const f = firstNode.parentElement?.closest('div.aiev3-line');
     const startLine =
-      f && element.contains(f) && f.parentElement ? [...f.parentElement.children].indexOf(f) : null;
+      f && element.contains(f) && f.parentElement
+        ? [...f.parentElement.querySelectorAll('div.aiev3-line')].indexOf(f)
+        : null;
     if (startLine === null || !f) return null;
     preCaretRange.selectNodeContents(f);
     preCaretRange.setEnd(range.startContainer, range.startOffset);
     const startChar = preCaretRange.toString().replace(/\u200b/, '').length;
 
-    const l = lastNode.parentElement?.closest('.aiev3-line');
+    const l = lastNode.parentElement?.closest('div.aiev3-line');
     const endLine =
       l && element.contains(l) && l.parentElement ? [...l.parentElement.children].indexOf(l) : -1;
     let endChar: number;
