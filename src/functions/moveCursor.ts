@@ -1,6 +1,10 @@
 import { getCaretPosition } from './getCaretPosition';
 import { setCaretPosition } from './setCaretPosition';
 
+function lineLength(l: NodeListOf<HTMLDivElement>, line: number): number {
+  return line < l.length ? (l[line].textContent?.replace(/\u200b/, '') ?? '').length : 0;
+}
+
 export const moveCursor = (divRef: HTMLDivElement, e: React.KeyboardEvent<HTMLDivElement>) => {
   const pos = getCaretPosition(divRef);
   // Left arrow
@@ -8,83 +12,47 @@ export const moveCursor = (divRef: HTMLDivElement, e: React.KeyboardEvent<HTMLDi
     e.preventDefault();
     e.stopPropagation();
     const newPos = { ...pos };
-    const thisLine =
-      pos.startLine < divRef.querySelectorAll('div.aiev3-line').length
-        ? (divRef.querySelectorAll('div.aiev3-line')[pos.startLine] as HTMLDivElement)
-        : null;
+    const lines = divRef.querySelectorAll('div.aiev3-line') as NodeListOf<HTMLDivElement>;
+    const thisLineLength = lineLength(lines, pos.startLine);
     switch (e.key) {
       case 'Home':
         newPos.startChar = 0;
         break;
       case 'End':
-        newPos.startChar = (thisLine?.textContent ?? '').length;
+        newPos.startChar = thisLineLength;
         break;
       case 'ArrowLeft':
         newPos.startLine =
           pos.startChar === 0 && pos.startLine > 0 ? pos.startLine - 1 : pos.startLine;
         newPos.startChar =
           pos.startChar === 0 && pos.startLine > 0
-            ? (
-                (divRef.querySelectorAll('div.aiev3-line')[pos.startLine - 1] as HTMLDivElement)
-                  .textContent ?? ''
-              ).length
+            ? lineLength(lines, pos.startLine - 1)
             : Math.max(0, pos.startChar - 1);
         break;
       case 'ArrowRight':
-        if (pos.startChar + 1 < (thisLine?.textContent ?? '').length) {
-          newPos.startChar = pos.startChar + 1;
-        } else if (
-          thisLine &&
-          pos.startChar === (thisLine?.textContent ?? '').length &&
-          pos.startLine + 1 < divRef.querySelectorAll('div.aiev3-line').length
-        ) {
-          newPos.startLine = pos.startLine + 1;
-          newPos.startChar = 0;
-        }
         newPos.startLine =
-          divRef.querySelectorAll('div.aiev3-line').length > pos.startLine + 1 &&
-          (
-            (divRef.querySelectorAll('div.aiev3-line')[pos.startLine] as HTMLDivElement)
-              .textContent ?? ''
-          ).length <= pos.startChar
+          pos.startLine + 1 < lines.length && thisLineLength <= pos.startChar
             ? pos.startLine + 1
             : pos.startLine;
-        newPos.startChar =
-          divRef.querySelectorAll('div.aiev3-line').length > pos.startLine + 1 &&
-          (
-            (divRef.querySelectorAll('div.aiev3-line')[pos.startLine] as HTMLDivElement)
-              .textContent ?? ''
-          ).length <= pos.startChar
-            ? 0
-            : pos.startChar + 1;
+        newPos.startChar = thisLineLength <= pos.startChar ? 0 : pos.startChar + 1;
         break;
       case 'ArrowDown':
-        if (divRef.querySelectorAll('div.aiev3-line').length > pos.startLine + 1) {
-          const nextLine = divRef.querySelectorAll('div.aiev3-line')[
-            pos.startLine + 1
-          ] as HTMLDivElement;
-          newPos.startLine = pos.startLine + 1;
-          newPos.startChar = Math.min((nextLine.textContent ?? '').length, pos.startChar);
-        } else {
-          newPos.startChar = (thisLine?.textContent ?? '').length;
-        }
+        newPos.startLine = Math.min(lines.length - 1, pos.startLine + 1);
+        newPos.startChar =
+          pos.startLine + 1 < lines.length
+            ? Math.min(pos.startChar, lineLength(lines, pos.startLine + 1))
+            : thisLineLength;
         break;
       case 'ArrowUp':
-        if (pos.startLine > 0) {
-          const nextLine = divRef.querySelectorAll('div.aiev3-line')[
-            pos.startLine - 1
-          ] as HTMLDivElement;
-          newPos.startLine = pos.startLine - 1;
-          newPos.startChar = Math.min((nextLine.textContent ?? '').length, pos.startChar);
-        } else {
-          newPos.startChar = 0;
-        }
+        newPos.startLine = Math.max(0, pos.startLine - 1);
+        newPos.startChar =
+          pos.startLine > 0 ? Math.min(pos.startChar, lineLength(lines, pos.startLine - 1)) : 0;
         break;
       default:
     }
     newPos.endChar = newPos.startChar;
     newPos.endLine = newPos.startLine;
-    // console.log(`New pos: ${JSON.stringify(newPos)}`);
+    console.log(`Setting new position: ${JSON.stringify(newPos)}`);
     setCaretPosition(divRef, newPos);
   }
 };
