@@ -83,6 +83,10 @@ export class EditorV3Content {
       // Check for stringified class input
       const jsonInput: EditorV3Import = JSON.parse(input);
       if (!Array.isArray(jsonInput.lines)) throw 'No lines';
+      // Overide from JSON, can assume this is intentional
+      if (jsonInput.textAlignment && props) props.textAlignment = jsonInput.textAlignment;
+      if (jsonInput.decimalAlignPercent && props)
+        props.decimalAlignPercent = jsonInput.decimalAlignPercent;
       this.copyImport(jsonInput, props);
     } catch {
       // Establish input as string

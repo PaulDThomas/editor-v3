@@ -9,6 +9,6 @@ export function getCurrentData(
   return {
     html: divRef.current?.innerHTML ?? '',
     text: currentContent.text,
-    json: JSON.stringify(currentContent),
+    json: currentContent.jsonString,
   };
 }

@@ -3,9 +3,10 @@ import { EditorV3Content } from '../classes/EditorV3Content';
 import { EditorV3Align, EditorV3Styles } from '../classes/interface';
 import { getCaretPosition } from '../functions/getCaretPosition';
 import { getCurrentData } from '../functions/getCurrentData';
+import { redraw } from '../functions/redraw';
 import { setCaretPosition } from '../functions/setCaretPosition';
 import './EditorV3.css';
-import { redraw } from '../functions/redraw';
+import { moveCursor } from '../functions/moveCursor';
 
 interface EditorV3Props {
   id: string;
@@ -66,7 +67,7 @@ export const EditorV3 = ({
     setInFocus(true);
   }, []);
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLSpanElement>) {
+  function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
     // Handle awkward keys
     if (['Enter', 'Backspace', 'Delete'].includes(e.key)) {
       e.stopPropagation();
@@ -80,93 +81,22 @@ export const EditorV3 = ({
           redraw(divRef.current, content);
           setCaretPosition(divRef.current, newPos);
         }
-        // Backspace
+        // Backspace and delete
         if (pos && ['Backspace', 'Delete'].includes(e.key)) {
           const content = new EditorV3Content(divRef.current.innerHTML);
           const newPos = content.deleteCharacter(pos, e.key === 'Backspace');
           redraw(divRef.current, content);
-          console.log(newPos);
           setCaretPosition(divRef.current, newPos);
         }
       }
       return;
     } else if (
       divRef.current &&
-      ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key) &&
+      ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key) &&
       !e.shiftKey &&
       !e.ctrlKey
     ) {
-      const pos = getCaretPosition(divRef.current);
-      // Left arrow
-      if (pos?.isCollapsed) {
-        e.preventDefault();
-        e.stopPropagation();
-        const newPos = { ...pos };
-        const thisLine =
-          divRef.current.querySelectorAll('div.aiev3-line').length < pos.startLine
-            ? (divRef.current.querySelectorAll('div.aiev3-line')[pos.startLine] as HTMLDivElement)
-            : null;
-        switch (e.key) {
-          case 'ArrowLeft':
-            newPos.startLine =
-              pos.startChar === 0 && pos.startLine > 0 ? pos.startLine - 1 : pos.startLine;
-            newPos.startChar =
-              pos.startChar === 0 && pos.startLine > 0
-                ? (
-                    divRef.current.querySelectorAll('div.aiev3-line')[
-                      pos.startLine - 1
-                    ] as HTMLDivElement
-                  ).innerText.length
-                : Math.max(0, pos.startChar - 1);
-            break;
-          case 'ArrowRight':
-            if (thisLine && pos.startChar + 1 < thisLine.innerText.length) {
-              newPos.startChar = pos.startChar + 1;
-            } else if (
-              thisLine &&
-              pos.startChar === thisLine.innerText.length &&
-              pos.startLine + 1 < divRef.current.querySelectorAll('div.aiev3-line').length
-            ) {
-              newPos.startLine = pos.startLine + 1;
-              newPos.startChar = 0;
-            }
-            newPos.startLine =
-              divRef.current.querySelectorAll('div.aiev3-line').length > pos.startLine + 1 &&
-              (divRef.current.querySelectorAll('div.aiev3-line')[pos.startLine] as HTMLDivElement)
-                .innerText.length <= pos.startChar
-                ? pos.startLine + 1
-                : pos.startLine;
-            newPos.startChar =
-              divRef.current.querySelectorAll('div.aiev3-line').length > pos.startLine + 1 &&
-              (divRef.current.querySelectorAll('div.aiev3-line')[pos.startLine] as HTMLDivElement)
-                .innerText.length <= pos.startChar
-                ? 0
-                : pos.startChar + 1;
-            break;
-          case 'ArrowDown':
-            if (divRef.current.querySelectorAll('div.aiev3-line').length > pos.startLine + 1) {
-              const nextLine = divRef.current.querySelectorAll('div.aiev3-line')[
-                pos.startLine + 1
-              ] as HTMLDivElement;
-              newPos.startLine = pos.startLine + 1;
-              newPos.startChar = Math.min(nextLine.innerText.length, pos.startChar);
-            }
-            break;
-          case 'ArrowUp':
-          default:
-            if (pos.startLine > 0) {
-              const nextLine = divRef.current.querySelectorAll('div.aiev3-line')[
-                pos.startLine - 1
-              ] as HTMLDivElement;
-              newPos.startLine = pos.startLine - 1;
-              newPos.startChar = Math.min(nextLine.innerText.length, pos.startChar);
-            }
-        }
-        newPos.endChar = newPos.startChar;
-        newPos.endLine = newPos.startLine;
-        console.log(`Key: ${e.key}\nFrom: ${JSON.stringify(pos)}\nTo: ${JSON.stringify(newPos)}`);
-        setCaretPosition(divRef.current, newPos);
-      }
+      moveCursor(divRef.current, e);
     }
   }
 
@@ -178,13 +108,6 @@ export const EditorV3 = ({
       return;
     }
   }, []);
-
-  // function handleSelect(_e: React.SyntheticEvent<HTMLDivElement>) {
-  // console.log('Select event');
-  // console.log(e);
-  // divRef.current &&
-  //   console.log(`Handle select: ${JSON.stringify(getCaretPosition(divRef.current))}`);
-  // }
 
   const handleBlur = useCallback(() => {
     setInFocus(false);
@@ -202,7 +125,7 @@ export const EditorV3 = ({
 
   return (
     <div
-      className={`aiev3 ${inFocus ? 'editing' : ''}`}
+      className={`aiev3${inFocus ? ' editing' : ''}`}
       id={id}
       style={widthStyle}
       onFocusCapture={handleFocus}
@@ -217,20 +140,20 @@ export const EditorV3 = ({
         ref={divRef}
         onKeyUpCapture={handleKeyUp}
         // onSelectCapture={handleSelect}
-        onPasteCapture={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('Pasting...');
-          console.log(e.clipboardData);
-          console.log(e.clipboardData.getData('Text'));
-          console.log(e.clipboardData.getData('text/plain'));
-          console.log(e.clipboardData.getData('text/html'));
-          console.log(e.clipboardData.getData('text/rtf'));
+        // onPasteCapture={(e) => {
+        //   e.preventDefault();
+        //   e.stopPropagation();
+        //   console.log('Pasting...');
+        //   console.log(e.clipboardData);
+        //   console.log(e.clipboardData.getData('Text'));
+        //   console.log(e.clipboardData.getData('text/plain'));
+        //   console.log(e.clipboardData.getData('text/html'));
+        //   console.log(e.clipboardData.getData('text/rtf'));
 
-          console.log(e.clipboardData.getData('Url'));
-          console.log(e.clipboardData.getData('text/uri-list'));
-          console.log(e.clipboardData.getData('text/x-moz-url'));
-        }}
+        //   console.log(e.clipboardData.getData('Url'));
+        //   console.log(e.clipboardData.getData('text/uri-list'));
+        //   console.log(e.clipboardData.getData('text/x-moz-url'));
+        // }}
         onKeyDownCapture={handleKeyDown}
         onBlurCapture={handleBlur}
         onFocus={handleFocus}
