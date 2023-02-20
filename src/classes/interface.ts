@@ -8,6 +8,10 @@ export enum EditorV3Align {
   'right' = 'right',
 }
 
+export interface EditorV3Styles {
+  [styleName: string]: React.CSSProperties;
+}
+
 export interface EditorV3LineProps {
   textBlocks: EditorV3TextBlock[];
 }
@@ -33,8 +37,4 @@ export interface EditorV3Position {
   endLine: number;
   endChar: number;
   isCollapsed?: boolean;
-}
-
-export interface EditorV3Styles {
-  [styleName: string]: React.CSSProperties;
 }

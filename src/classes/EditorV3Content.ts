@@ -98,6 +98,7 @@ export class EditorV3Content {
     this._textAlignment = props?.textAlignment ?? read.textAlignment ?? EditorV3Align.left;
     this._decimalAlignPercent = props?.decimalAlignPercent ?? read.decimalAlignPercent ?? 60;
     this._styles = {
+      ...this._styles,
       ...read.styles,
       ...props?.styles,
     };
@@ -192,7 +193,6 @@ export class EditorV3Content {
 
   public deleteCharacter(pos: EditorV3Position, backwards: boolean): EditorV3Position {
     if (this.lines.length > pos.startLine && this.text !== '') {
-      // console.log(`Incoming: ${JSON.stringify(pos)} & ${backwards}`);
       const newPos = { ...pos };
       // Move cursor if start and end are the same
       if (pos.startLine === pos.endLine && pos.startChar === pos.endChar) {
@@ -214,13 +214,11 @@ export class EditorV3Content {
         }
       }
       // Remove under selected
-      // console.log(`Splicing: ${JSON.stringify(newPos)} & ${backwards}`);
       this.splice(newPos);
       if (pos.isCollapsed) {
         newPos.endLine = newPos.startLine;
         newPos.endChar = newPos.startChar;
       }
-      // console.log(`Returning: ${JSON.stringify(newPos)} & ${backwards}`);
       return newPos;
     }
     return pos;

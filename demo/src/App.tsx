@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { EditorV3Align, EditorV3Styles } from '../../src/classes/interface';
-import { EditorV3 } from '../../src/components/EditorV3';
+import { EditorV3, EditorV3Align, EditorV3Styles } from '../../src/main';
 
 export const App = (): JSX.Element => {
   const [input, setHtml] = useState<string>(
@@ -60,6 +59,32 @@ export const App = (): JSX.Element => {
                 style={{
                   width: '240px',
                 }}
+              />
+            </span>
+          </div>
+
+          <div className='row'>
+            <span className='label'>Test config</span>
+            <span className='content'>
+              <EditorV3
+                id='test-editor'
+                input={JSON.stringify({
+                  lines: [
+                    {
+                      textBlocks: [{ text: '34.56' }],
+                      textAlignment: 'center',
+                      decimalAlignPercent: 80,
+                    },
+                    {
+                      textBlocks: [{ text: 'x.xx' }],
+                      textAlignment: 'center',
+                      decimalAlignPercent: 80,
+                    },
+                  ],
+                  styles: { shiny: { color: 'pink' } },
+                  textAlignment: EditorV3Align.center,
+                  decimalAlignPercent: 80,
+                })}
               />
             </span>
           </div>
