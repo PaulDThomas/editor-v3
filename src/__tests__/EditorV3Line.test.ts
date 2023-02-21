@@ -35,6 +35,7 @@ describe('Check basic EditorV3Line', () => {
         '</div>',
     );
     expect(testLine.lineText).toEqual('Hello world, How is it going?');
+    expect(testLine.lineLength).toEqual(29);
     expect(testLine.textAlignment).toEqual(EditorV3Align.left);
     expect(testLine.decimalAlignPercent).toEqual(60);
   });

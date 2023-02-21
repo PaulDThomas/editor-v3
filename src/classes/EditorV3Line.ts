@@ -30,6 +30,10 @@ export class EditorV3Line {
     return this.textBlocks.map((tb) => tb.text).join('');
   }
 
+  get lineLength(): number {
+    return this.textBlocks.map((tb) => tb.text.length).reduce((p, c) => p + c, 0);
+  }
+
   get jsonString(): string {
     return JSON.stringify(this, [
       'textBlocks',
@@ -152,9 +156,9 @@ export class EditorV3Line {
   }
 
   public splitLine(pos: number): EditorV3Line | null {
-    if (pos === this.lineText.length) {
+    if (pos === this.lineLength) {
       return new EditorV3Line('', this.textAlignment, this.decimalAlignPercent);
-    } else if (pos < this.lineText.length) {
+    } else if (pos < this.lineLength) {
       const preSplit = this.upToPos(pos);
       const postSplit = this.fromPos(pos);
       this.textBlocks = preSplit;
@@ -164,7 +168,7 @@ export class EditorV3Line {
   }
 
   public insertBlocks(newTextBlocks: EditorV3TextBlock[], pos: number) {
-    if (pos < this.lineText.length) {
+    if (pos < this.lineLength) {
       const pre = this.upToPos(pos);
       const post = this.fromPos(pos);
       this.textBlocks = [...pre, ...newTextBlocks, ...post];
@@ -174,7 +178,7 @@ export class EditorV3Line {
 
   public removeSection(startPos: number, endPos: number): EditorV3TextBlock[] {
     let ret: EditorV3TextBlock[] = [];
-    if (startPos < endPos && startPos < this.lineText.length) {
+    if (startPos < endPos && startPos < this.lineLength) {
       const pre = this.upToPos(startPos);
       ret = this.subBlocks(startPos, endPos);
       const post = this.fromPos(endPos);
