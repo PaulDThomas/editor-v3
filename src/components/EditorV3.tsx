@@ -9,6 +9,8 @@ import './EditorV3.css';
 import { moveCursor } from '../functions/moveCursor';
 import { ContextMenuHandler, iMenuItem } from '@asup/context-menu';
 import { applyStyle } from '../functions/applyStyle';
+import { applyStylesToHTML } from '../functions/applyStylesToHTML';
+import { EditorV3Line } from '../classes';
 
 interface EditorV3Props {
   id: string;
@@ -129,12 +131,62 @@ export const EditorV3 = ({
     }
   }
 
-  const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLSpanElement>) => {
+  const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
     // Stop handled keys
     if (['Enter', 'Backspace', 'Delete'].includes(e.key)) {
       e.stopPropagation();
       e.preventDefault();
       return;
+    }
+  }, []);
+
+  const handleCopy = useCallback((e: React.ClipboardEvent<HTMLDivElement>) => {
+    if (divRef.current) {
+      const pos = getCaretPosition(divRef.current);
+      if (pos) {
+        const content = new EditorV3Content(divRef.current.innerHTML);
+        const toPaste = content.subLines(pos);
+        e.clipboardData.setData('text/plain', toPaste.map((l) => l.lineText).join('\n'));
+        e.clipboardData.setData(
+          'text/html',
+          toPaste.map((l) => applyStylesToHTML(l.el, content.styles).outerHTML).join(''),
+        );
+        e.clipboardData.setData('data/aiev3', JSON.stringify(toPaste));
+        if (e.type === 'cut') {
+          content.splice(pos);
+          redraw(divRef.current, content);
+          setCaretPosition(divRef.current, pos);
+        }
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }
+  }, []);
+
+  const handlePaste = useCallback((e: React.ClipboardEvent<HTMLDivElement>) => {
+    try {
+      const fromPaste = e.clipboardData.getData('data/aiev3');
+      if (divRef.current && fromPaste) {
+        const pos = getCaretPosition(divRef.current);
+        if (pos) {
+          const content = new EditorV3Content(divRef.current.innerHTML);
+          const lines: EditorV3Line[] = JSON.parse(fromPaste).map(
+            (l: unknown) => new EditorV3Line(JSON.stringify(l)),
+          );
+          content.splice(pos, lines);
+          redraw(divRef.current, content);
+          pos.startLine = pos.startLine + lines.length - 1;
+          pos.startChar =
+            lines.length === 1
+              ? pos.startChar + lines[1].lineLength - 1
+              : lines[lines.length - 1].lineLength;
+          setCaretPosition(divRef.current, pos);
+        }
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    } catch {
+      console.warn('Paste failed');
     }
   }, []);
 
@@ -177,21 +229,9 @@ export const EditorV3 = ({
           spellCheck={false}
           ref={divRef}
           onKeyUpCapture={handleKeyUp}
-          // onSelectCapture={handleSelect}
-          // onPasteCapture={(e) => {
-          //   e.preventDefault();
-          //   e.stopPropagation();
-          //   console.log('Pasting...');
-          //   console.log(e.clipboardData);
-          //   console.log(e.clipboardData.getData('Text'));
-          //   console.log(e.clipboardData.getData('text/plain'));
-          //   console.log(e.clipboardData.getData('text/html'));
-          //   console.log(e.clipboardData.getData('text/rtf'));
-
-          //   console.log(e.clipboardData.getData('Url'));
-          //   console.log(e.clipboardData.getData('text/uri-list'));
-          //   console.log(e.clipboardData.getData('text/x-moz-url'));
-          // }}
+          onCut={handleCopy}
+          onCopy={handleCopy}
+          onPasteCapture={handlePaste}
           onKeyDownCapture={handleKeyDown}
           onBlurCapture={handleBlur}
           onFocusCapture={handleFocus}

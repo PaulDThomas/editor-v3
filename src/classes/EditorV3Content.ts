@@ -202,7 +202,7 @@ export class EditorV3Content {
       if (pos.startLine === pos.endLine && pos.startChar === pos.endChar) {
         // Backspace at end of line
         if (backwards && pos.startLine > 0 && pos.startChar === 0) {
-          newPos.startChar = this.lines[pos.startLine - 1].lineText.length;
+          newPos.startChar = this.lines[pos.startLine - 1].lineLength;
           newPos.startLine = pos.startLine - 1;
         }
         // Backspace after first character
@@ -210,10 +210,10 @@ export class EditorV3Content {
           newPos.startChar = pos.startChar - 1;
         }
         // Delete end line
-        else if (pos.endChar >= this.lines[pos.endLine].lineText.length) {
+        else if (pos.endChar >= this.lines[pos.endLine].lineLength) {
           newPos.endChar = 0;
           newPos.endLine = pos.endLine + 1;
-        } else if (pos.endChar < this.lines[pos.endLine].lineText.length) {
+        } else if (pos.endChar < this.lines[pos.endLine].lineLength) {
           newPos.endChar = pos.endChar + 1;
         }
       }
@@ -235,14 +235,22 @@ export class EditorV3Content {
       const f = this.fromPos(pos.endLine, pos.endChar);
       const mergeStart =
         this.upToPos(pos.startLine, pos.startChar).length === pos.startLine + 1 &&
-        pos.startChar <= this.lines[pos.startLine].lineText.length;
+        pos.startChar <= this.lines[pos.startLine].lineLength;
       const mergeEnd =
         this.fromPos(pos.endLine, pos.endChar).length > 0 && pos.endChar <= this.lines.length;
-      this.lines = [...u, ...(newLines ? newLines : []), ...f];
+      this.lines = [
+        ...u,
+        ...(newLines ? newLines.map((l) => new EditorV3Line(l.jsonString)) : []),
+        ...f,
+      ];
       mergeEnd &&
         newLines &&
         newLines.length > 0 &&
-        this.mergeLines(pos.startLine + (newLines.length - 1));
+        this.mergeLines(
+          pos.startLine +
+            newLines.length -
+            (pos.startChar < this.lines[pos.startLine].lineLength ? 1 : 0),
+        );
       mergeStart && this.mergeLines(pos.startLine);
       return ret;
     }
