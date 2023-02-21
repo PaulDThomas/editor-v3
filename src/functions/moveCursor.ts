@@ -52,7 +52,6 @@ export const moveCursor = (divRef: HTMLDivElement, e: React.KeyboardEvent<HTMLDi
     }
     newPos.endChar = newPos.startChar;
     newPos.endLine = newPos.startLine;
-    console.log(`Setting new position: ${JSON.stringify(newPos)}`);
     setCaretPosition(divRef, newPos);
   }
 };

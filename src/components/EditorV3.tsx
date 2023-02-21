@@ -7,6 +7,8 @@ import { redraw } from '../functions/redraw';
 import { setCaretPosition } from '../functions/setCaretPosition';
 import './EditorV3.css';
 import { moveCursor } from '../functions/moveCursor';
+import { ContextMenuHandler, iMenuItem } from '@asup/context-menu';
+import { applyStyle } from '../functions/applyStyle';
 
 interface EditorV3Props {
   id: string;
@@ -37,6 +39,33 @@ export const EditorV3 = ({
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
+
+  const menuItems = useMemo((): iMenuItem[] => {
+    return [
+      {
+        label: `Style`,
+        group: [
+          ...(customStyleMap && Object.keys(customStyleMap).length > 0
+            ? Object.keys(customStyleMap ?? {}).map((s) => {
+                return {
+                  label: s,
+                  action: (target?: Range | null) => {
+                    divRef.current && applyStyle(s, divRef.current, target);
+                  },
+                };
+              })
+            : [{ label: 'No styles defined', disabled: true }]),
+
+          {
+            label: 'Remove style',
+            action: (target) => {
+              divRef.current && applyStyle(null, divRef.current, target);
+            },
+          },
+        ],
+      },
+    ];
+  }, [customStyleMap]);
 
   // General return function
   const returnData = useCallback(
@@ -131,33 +160,43 @@ export const EditorV3 = ({
       onFocusCapture={handleFocus}
       onBlur={handleBlur}
     >
-      <div
-        id={`${id}-editable`}
-        className='aiev3-editing'
-        contentEditable={editable && typeof setHtml === 'function'}
-        suppressContentEditableWarning
-        spellCheck={false}
-        ref={divRef}
-        onKeyUpCapture={handleKeyUp}
-        // onSelectCapture={handleSelect}
-        // onPasteCapture={(e) => {
-        //   e.preventDefault();
-        //   e.stopPropagation();
-        //   console.log('Pasting...');
-        //   console.log(e.clipboardData);
-        //   console.log(e.clipboardData.getData('Text'));
-        //   console.log(e.clipboardData.getData('text/plain'));
-        //   console.log(e.clipboardData.getData('text/html'));
-        //   console.log(e.clipboardData.getData('text/rtf'));
+      <ContextMenuHandler
+        menuItems={menuItems}
+        style={{ width: '100%', height: '100%' }}
+      >
+        <div
+          id={`${id}-editable`}
+          className='aiev3-editing'
+          contentEditable={
+            editable &&
+            (typeof setHtml === 'function' ||
+              typeof setJson === 'function' ||
+              typeof setText === 'function')
+          }
+          suppressContentEditableWarning
+          spellCheck={false}
+          ref={divRef}
+          onKeyUpCapture={handleKeyUp}
+          // onSelectCapture={handleSelect}
+          // onPasteCapture={(e) => {
+          //   e.preventDefault();
+          //   e.stopPropagation();
+          //   console.log('Pasting...');
+          //   console.log(e.clipboardData);
+          //   console.log(e.clipboardData.getData('Text'));
+          //   console.log(e.clipboardData.getData('text/plain'));
+          //   console.log(e.clipboardData.getData('text/html'));
+          //   console.log(e.clipboardData.getData('text/rtf'));
 
-        //   console.log(e.clipboardData.getData('Url'));
-        //   console.log(e.clipboardData.getData('text/uri-list'));
-        //   console.log(e.clipboardData.getData('text/x-moz-url'));
-        // }}
-        onKeyDownCapture={handleKeyDown}
-        onBlurCapture={handleBlur}
-        onFocus={handleFocus}
-      ></div>
+          //   console.log(e.clipboardData.getData('Url'));
+          //   console.log(e.clipboardData.getData('text/uri-list'));
+          //   console.log(e.clipboardData.getData('text/x-moz-url'));
+          // }}
+          onKeyDownCapture={handleKeyDown}
+          onBlurCapture={handleBlur}
+          onFocusCapture={handleFocus}
+        ></div>
+      </ContextMenuHandler>
     </div>
   );
 };

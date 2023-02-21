@@ -5,18 +5,9 @@ export const App = (): JSX.Element => {
   const [input, setHtml] = useState<string>(
     JSON.stringify({
       textAlign: 'left',
-      lines: [
-        { text: '12.34', style: 'optional' },
-        { text: '0' },
-        { text: '56.78', style: 'notes' },
-      ],
+      lines: [{ text: '12.34', style: 'green' }, { text: '0' }, { text: '56.78', style: 'blue' }],
       styles: {
-        optional: {
-          color: 'green',
-          backgroundColor: 'white',
-          fontFamily: 'Courier New',
-        },
-        notes: { color: 'darkgreen', fontWeight: 700 },
+        blue: { color: 'blue', fontWeight: 700 },
       },
     }),
   );
@@ -29,13 +20,14 @@ export const App = (): JSX.Element => {
   const [allowNewLine, setAllowNewLine] = useState<boolean>(true);
   const [decPct, setDecPct] = useState<number>(60);
   const styleMap: EditorV3Styles = {
-    //   optional: {
-    //     color: 'green',
-    //     backgroundColor: 'white',
-    //     fontFamily: 'Courier New',
-    //     fontSize: '8px',
-    //   },
-    //   notes: { backgroundColor: 'white', color: 'pink' },
+    green: {
+      color: 'green',
+      backgroundColor: 'white',
+      fontFamily: 'Courier New',
+      fontSize: '1.3rem',
+      fontWeight: 1000,
+    },
+    blue: { color: 'blue', fontWeight: 700 },
   };
 
   return (
@@ -76,12 +68,12 @@ export const App = (): JSX.Element => {
                       decimalAlignPercent: 80,
                     },
                     {
-                      textBlocks: [{ text: 'x.xx' }],
+                      textBlocks: [{ text: 'x.xx', style: 'shiny' }],
                       textAlignment: 'center',
                       decimalAlignPercent: 80,
                     },
                   ],
-                  styles: { shiny: { color: 'pink' } },
+                  styles: { shiny: { color: 'pink', backgroundColor: 'yellow', fontWeight: 700 } },
                   textAlignment: EditorV3Align.center,
                   decimalAlignPercent: 80,
                 })}

@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { EditorV3Content } from '../classes/EditorV3Content';
 import { EditorV3Align } from '../classes/interface';
 import { EditorV3 } from '../components/EditorV3';
+import * as applyStyleModule from '../functions/applyStyle';
 
 const testContent = new EditorV3Content('34.45\n\nx.xx', {
   styles: { shiny: { color: 'pink', fontWeight: '700' } },
@@ -28,6 +29,7 @@ describe('Editor and functions', () => {
     const editor = (await screen.findByTestId('container')).children[0] as HTMLDivElement;
     expect(editor.outerHTML).toEqual(
       '<div class="aiev3" id="test-editor">' +
+        '<div class="context-menu-handler" style="width: 100%; height: 100%;">' +
         '<div id="test-editor-editable" class="aiev3-editing" contenteditable="false" spellcheck="false">' +
         '<div class="aiev3-line decimal" style="height: 0px;">' +
         '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span>34.</span></span>' +
@@ -42,7 +44,7 @@ describe('Editor and functions', () => {
         '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;"><span class="editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">xx</span></span>' +
         '</div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
-        '</div></div>',
+        '</div></div></div>',
     );
     const firstSpan = editor.querySelector('span') as HTMLSpanElement;
     await user.click(firstSpan);
@@ -103,7 +105,6 @@ describe('Editor and functions', () => {
 
     await user.click(firstSpan);
     fireEvent.keyUp(firstSpan, { key: 'Enter' });
-    // await user.keyboard('{End}');
     fireEvent.keyDown(firstSpan, { key: 'End' });
     await act(async () => {
       await user.keyboard('{Backspace}');
@@ -175,5 +176,50 @@ describe('Editor and functions', () => {
         '</div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>',
     );
+  });
+});
+
+describe('Menu styling', () => {
+  test('Add and remove style', async () => {
+    const user = userEvent.setup();
+    const mockSetJson = jest.fn();
+    const mockSetText = jest.fn();
+    const mockApplyStyle = jest.fn();
+    jest.spyOn(applyStyleModule, 'applyStyle').mockImplementation(mockApplyStyle);
+    await act(async () => {
+      render(
+        <div data-testid='container'>
+          <EditorV3
+            id='test-editor'
+            input={testContent.jsonString}
+            setJson={mockSetJson}
+            setText={mockSetText}
+            style={{ width: '200px' }}
+            allowNewLine
+            customStyleMap={{ shiny: { color: 'pink', fontWeight: '700' } }}
+          />
+        </div>,
+      );
+    });
+    // Get component
+    const editor = (await screen.findByTestId('container')).children[0] as HTMLDivElement;
+    // Highlight first line
+    let firstSpan = editor.querySelector('span') as HTMLSpanElement;
+    await user.click(firstSpan);
+    // Click shiny
+    fireEvent.contextMenu(firstSpan);
+    expect(screen.queryByText('shiny')).toBeInTheDocument();
+    const shinyItem = screen.getByText('shiny');
+    await user.click(shinyItem);
+    let calledParams = mockApplyStyle.mock.calls[0];
+    expect(calledParams[0]).toEqual('shiny');
+    // Click remove
+    firstSpan = editor.querySelector('span') as HTMLSpanElement;
+    fireEvent.contextMenu(firstSpan);
+    expect(screen.queryByText('Remove style')).toBeInTheDocument();
+    const removeItem = screen.getByText('Remove style');
+    await user.click(removeItem);
+    calledParams = mockApplyStyle.mock.calls[1];
+    expect(calledParams[0]).toEqual(null);
   });
 });
