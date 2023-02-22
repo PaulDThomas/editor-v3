@@ -32,16 +32,16 @@ describe('Editor and functions', () => {
         '<div class="context-menu-handler" style="width: 100%; height: 100%;">' +
         '<div id="test-editor-editable" class="aiev3-editing" contenteditable="false" spellcheck="false">' +
         '<div class="aiev3-line decimal" style="height: 0px;">' +
-        '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span>34.</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;"><span>45</span></span>' +
+        '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span class="aiev3-tb">34.</span></span>' +
+        '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;"><span class="aiev3-tb">45</span></span>' +
         '</div>' +
         '<div class="aiev3-line decimal" style="height: 0px;">' +
         '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;">\u200b</span>' +
         '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;">\u200b</span>' +
         '</div>' +
         '<div class="aiev3-line decimal" style="height: 0px;">' +
-        '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span class="editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x.</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;"><span class="editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">xx</span></span>' +
+        '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x.</span></span>' +
+        '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">xx</span></span>' +
         '</div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
         '</div></div></div>',
@@ -163,7 +163,7 @@ describe('Editor and functions', () => {
         '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;">\u200b</span>' +
         '</div>' +
         '<div class="aiev3-line decimal" style="height: 0px;">' +
-        '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span>4</span></span>' +
+        '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span class="aiev3-tb">4</span></span>' +
         '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;">\u200b</span>' +
         '</div>' +
         '<div class="aiev3-line decimal" style="height: 0px;">' +
@@ -171,8 +171,8 @@ describe('Editor and functions', () => {
         '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;">\u200b</span>' +
         '</div>' +
         '<div class="aiev3-line decimal" style="height: 0px;">' +
-        '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span class="editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x.</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;"><span class="editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">xx</span></span>' +
+        '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x.</span></span>' +
+        '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">xx</span></span>' +
         '</div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>',
     );

@@ -1,47 +1,43 @@
 import { EditorV3Position } from '../classes/interface';
+import { getCaretPosition } from './getCaretPosition';
+import { getTextNodeAtOffset } from './getTextNodeAtOffset';
 
-export function setCaretPosition(el: Node, position: EditorV3Position): number {
+export function setCaretPosition(
+  el: Node,
+  pos: EditorV3Position,
+  style?: string,
+): EditorV3Position | null {
   // Go to a lower line if required
-  if (
-    position.startLine > 0 &&
-    el instanceof Element &&
-    position.startLine <= el.querySelectorAll('.aiev3-line').length
-  ) {
-    return setCaretPosition(el.querySelectorAll('div.aiev3-line')[position.startLine], {
-      startLine: 0,
-      startChar: position.startChar,
-      isCollapsed: true,
-      endLine: 0,
-      endChar: position.startChar,
-    });
-  }
-  // Must be on the current line, just use startChar
-  if ((el?.textContent?.length ?? 0) < position.startChar) {
-    return el?.textContent?.length ?? 0;
-  }
-  // No text node to enter
-  else if ((el?.textContent?.length ?? 0) === 0 && position.startChar === 0) {
-    const range = window.getSelection();
-    range?.setPosition(el, 0);
-    return -1;
-  }
-  // Standard set position
-  else if (el.nodeName === '#text' && (el.textContent?.length ?? 0) >= position.startChar) {
-    const range = window.getSelection();
-    range?.setPosition(el, position.startChar);
-    return -1;
-  } else {
-    let curPos = 0;
-    for (let i = 0; i < el.childNodes.length; i++) {
-      curPos = setCaretPosition(el.childNodes[i], {
-        startLine: 0,
-        startChar: position.startChar - curPos,
-        isCollapsed: true,
-        endLine: 0,
-        endChar: position.startChar - curPos,
-      });
-      if (curPos === -1) break;
+  const lines = el instanceof Element ? el.querySelectorAll('div.aiev3-line') : null;
+  if (lines && pos.startLine < lines.length) {
+    const f = getTextNodeAtOffset(lines[pos.startLine], pos.startChar);
+    const l = getTextNodeAtOffset(lines[pos.endLine], pos.endChar);
+    if (f) {
+      const range = document.createRange();
+      range.setStart(f.node, f.offset);
+      if (l) {
+        range.setEnd(l.node, l.offset);
+      } else if (pos.endLine < lines.length) {
+        range.setEndAfter(lines[pos.endLine]);
+      } else {
+        range.setEnd(f.node, f.offset);
+      }
+      const sel = window.getSelection();
+      if (sel) {
+        sel?.removeAllRanges();
+        sel?.addRange(range);
+      }
+      // Check style
+      if (style) {
+        const ls = (
+          range.endContainer instanceof Element
+            ? range.endContainer
+            : (range.endContainer.parentElement as Element)
+        ).closest('.aiev3-span');
+      }
     }
-    return curPos;
+    const ret = el instanceof HTMLDivElement ? getCaretPosition(el) : null;
+    return ret;
   }
+  return null;
 }

@@ -57,11 +57,6 @@
   display: none;
 }
 
-/* .aiev3-span {
-  display: inline-block;
-  min-width: 4px;
-} */
-
 .aiev3-line.right > span {
   display: inline-flex;
 }

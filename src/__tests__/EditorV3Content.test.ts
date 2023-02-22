@@ -9,7 +9,9 @@ describe('Check basic EditorV3Content', () => {
     expect(testContent.text).toEqual('12.34');
     const div = document.createElement('div');
     div.append(testContent.el);
-    expect(div.innerHTML).toEqual('<div class="aiev3-line left"><span>12.34</span></div>');
+    expect(div.innerHTML).toEqual(
+      '<div class="aiev3-line left"><span class="aiev3-tb">12.34</span></div>',
+    );
     expect(testContent.decimalAlignPercent).toEqual(60);
     expect(testContent.textAlignment).toEqual('left');
     testContent.textAlignment = EditorV3Align.decimal;
@@ -52,7 +54,7 @@ describe('Check basic EditorV3Content', () => {
     div.append(testContent.el);
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line center">' +
-        '<span>34.56</span>' +
+        '<span class="aiev3-tb">34.56</span>' +
         '</div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}"></div>',
     );
@@ -87,8 +89,8 @@ describe('Check basic EditorV3Content', () => {
     const div = document.createElement('div');
     div.append(testContent.el);
     expect(div.innerHTML).toEqual(
-      '<div class="aiev3-line left"><span>Hello</span></div>' +
-        '<div class="aiev3-line left"><span>.World</span></div>',
+      '<div class="aiev3-line left"><span class="aiev3-tb">Hello</span></div>' +
+        '<div class="aiev3-line left"><span class="aiev3-tb">.World</span></div>',
     );
 
     // Updates need to flow through
@@ -109,12 +111,12 @@ describe('Check basic EditorV3Content', () => {
     div.appendChild(testContent.el);
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span>Hello</span></span>' +
+        '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span class="aiev3-tb">Hello</span></span>' +
         '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;">\u200b</span>' +
         '</div>' +
         '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span>.</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;"><span>World</span></span>' +
+        '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span class="aiev3-tb">.</span></span>' +
+        '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;"><span class="aiev3-tb">World</span></span>' +
         '</div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}"></div>',
     );

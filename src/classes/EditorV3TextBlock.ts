@@ -7,8 +7,9 @@ export class EditorV3TextBlock {
   // Read only variables
   get el(): HTMLSpanElement {
     const span = document.createElement('span');
+    span.classList.add('aiev3-tb');
     if (this.style) {
-      span.className = `editorv3style-${this.style}`;
+      span.classList.add(`editorv3style-${this.style}`);
       span.dataset.styleName = this.style;
     }
     span.innerHTML = (this.text !== '' ? this.text : '\u200B').replace(/ /g, '\u00A0');

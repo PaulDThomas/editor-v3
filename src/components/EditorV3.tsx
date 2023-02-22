@@ -175,10 +175,10 @@ export const EditorV3 = ({
           );
           content.splice(pos, lines);
           redraw(divRef.current, content);
-          pos.startLine = pos.startLine + lines.length - 1;
-          pos.startChar =
+          pos.endLine = pos.endLine + lines.length - 1;
+          pos.endChar =
             lines.length === 1
-              ? pos.startChar + lines[1].lineLength - 1
+              ? pos.endChar + lines[1].lineLength - 1
               : lines[lines.length - 1].lineLength;
           setCaretPosition(divRef.current, pos);
         }

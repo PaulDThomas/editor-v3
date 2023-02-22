@@ -6,7 +6,7 @@ describe('Check basic EditorV3Line', () => {
   test('Load string', async () => {
     const testLine = new EditorV3Line('Hello world');
     expect(testLine.el.outerHTML).toEqual(
-      '<div class="aiev3-line left"><span>Hello&nbsp;world</span></div>',
+      '<div class="aiev3-line left"><span class="aiev3-tb">Hello&nbsp;world</span></div>',
     );
     expect(testLine.lineText).toEqual('Hello world');
     expect(testLine.textAlignment).toEqual(EditorV3Align.left);
@@ -16,7 +16,7 @@ describe('Check basic EditorV3Line', () => {
   test('Load string with line breaks, tabs', async () => {
     const testLine = new EditorV3Line('  Hello \r\n\t world  ', EditorV3Align.center, 22);
     expect(testLine.el.outerHTML).toEqual(
-      '<div class="aiev3-line center"><span>&nbsp;&nbsp;Hello&nbsp;&nbsp;world&nbsp;&nbsp;</span></div>',
+      '<div class="aiev3-line center"><span class="aiev3-tb">&nbsp;&nbsp;Hello&nbsp;&nbsp;world&nbsp;&nbsp;</span></div>',
     );
     expect(testLine.lineText).toEqual('  Hello  world  ');
     expect(testLine.textAlignment).toEqual(EditorV3Align.center);
@@ -30,8 +30,8 @@ describe('Check basic EditorV3Line', () => {
     ]);
     expect(testLine.el.outerHTML).toEqual(
       '<div class="aiev3-line left">' +
-        '<span>Hello&nbsp;world,&nbsp;</span>' +
-        '<span class="editorv3style-shiny" data-style-name="shiny">How&nbsp;is&nbsp;it&nbsp;going?</span>' +
+        '<span class="aiev3-tb">Hello&nbsp;world,&nbsp;</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How&nbsp;is&nbsp;it&nbsp;going?</span>' +
         '</div>',
     );
     expect(testLine.lineText).toEqual('Hello world, How is it going?');
@@ -50,10 +50,10 @@ describe('Check basic EditorV3Line', () => {
     );
     expect(testLine.el.outerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span>Hello&nbsp;world.</span></span>' +
+        '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span class="aiev3-tb">Hello&nbsp;world.</span></span>' +
         '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;">' +
-        '<span>&nbsp;</span>' +
-        '<span class="editorv3style-shiny" data-style-name="shiny">How&nbsp;is&nbsp;it&nbsp;going?</span>' +
+        '<span class="aiev3-tb">&nbsp;</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How&nbsp;is&nbsp;it&nbsp;going?</span>' +
         '</span>' +
         '</div>',
     );
@@ -66,8 +66,8 @@ describe('Check basic EditorV3Line', () => {
     const testLine = new EditorV3Line('12.34', EditorV3Align.decimal);
     expect(testLine.el.outerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span>12.</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;"><span>34</span></span>' +
+        '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span class="aiev3-tb">12.</span></span>' +
+        '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;"><span class="aiev3-tb">34</span></span>' +
         '</div>',
     );
     expect(testLine.lineText).toEqual('12.34');
@@ -87,11 +87,11 @@ describe('Check basic EditorV3Line', () => {
     expect(testLine.el.outerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;">' +
-        '<span class="editorv3style-shiny" data-style-name="shiny">12.</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">12.</span>' +
         '</span>' +
         '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;">' +
-        '<span class="editorv3style-shiny" data-style-name="shiny">34</span>' +
-        '<span>&nbsp;slow</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">34</span>' +
+        '<span class="aiev3-tb">&nbsp;slow</span>' +
         '</span>' +
         '</div>',
     );
@@ -106,11 +106,11 @@ describe('Check basic EditorV3Line', () => {
     const testLine2 = new EditorV3Line(
       '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs">' +
-        '<span class="editorv3style-shiny" data-style-name="shiny">12.</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">12.</span>' +
         'boys' +
         '</span>' +
         '<span class="aiev3-span-point rhs">' +
-        '<span class="editorv3style-shiny" data-style-name="shiny">34</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">34</span>' +
         '&nbsp;slow' +
         '<script>console.error("Inject")</script>' +
         '<span> treats</span>' +
@@ -136,7 +136,9 @@ describe('Check basic EditorV3Line', () => {
       EditorV3Align.right,
     );
 
-    expect(testLine.el.outerHTML).toEqual('<div class="aiev3-line right"><span>12.34</span></div>');
+    expect(testLine.el.outerHTML).toEqual(
+      '<div class="aiev3-line right"><span class="aiev3-tb">12.34</span></div>',
+    );
     expect(testLine.lineText).toEqual('12.34');
     expect(testLine.textAlignment).toEqual(EditorV3Align.right);
     expect(testLine.decimalAlignPercent).toEqual(60);
@@ -144,13 +146,13 @@ describe('Check basic EditorV3Line', () => {
 
   test('Load badly written spanned div', async () => {
     const testLine = new EditorV3Line(
-      '<div class="aiev3-line right"><span>12.34</span> wut? <span class="editorv3style-shiny" data-style-name="shiny">5678</span></div>',
+      '<div class="aiev3-line right"><span>12.34</span> wut? <span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">5678</span></div>',
     );
 
     expect(testLine.el.outerHTML).toEqual(
       '<div class="aiev3-line right">' +
-        '<span>12.34&nbsp;wut?&nbsp;</span>' +
-        '<span class="editorv3style-shiny" data-style-name="shiny">5678</span>' +
+        '<span class="aiev3-tb">12.34&nbsp;wut?&nbsp;</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">5678</span>' +
         '</div>',
     );
     expect(testLine.lineText).toEqual('12.34 wut? 5678');
