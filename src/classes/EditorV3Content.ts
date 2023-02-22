@@ -165,17 +165,13 @@ export class EditorV3Content {
 
   // Split line in two
   public splitLine(pos: EditorV3Position): EditorV3Position {
-    // Check it is possible
-    if (this.lines.length > pos.startLine && pos.isCollapsed) {
-      // Split existing line, and get new one
-      const newLine = this.lines[pos.startLine].splitLine(pos.startChar);
-      // Add new one in
-      if (newLine) this.lines.splice(pos.startLine + 1, 0, newLine);
-    } else if (this.lines.length > pos.startLine) {
-      const newLines = [
-        ...this.upToPos(pos.startLine, pos.startChar),
-        ...this.fromPos(pos.endLine, pos.endChar),
-      ];
+    if (this.lines.length > pos.startLine) {
+      const u =
+        pos.startLine === 0 && pos.startChar === 0
+          ? [new EditorV3Line('', this._textAlignment, this._decimalAlignPercent)]
+          : this.upToPos(pos.startLine, pos.startChar);
+      const f = this.fromPos(pos.endLine, pos.endChar);
+      const newLines = [...u, ...f];
       this.lines = newLines;
     }
     return {
