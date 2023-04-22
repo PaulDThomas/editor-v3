@@ -36,7 +36,7 @@ export const App = (): JSX.Element => {
         <div className='app-inner'>
           <div className='row'>
             <span className='label'>This is the input</span>
-            <span className='content debug'>
+            <span className='content'>
               <EditorV3
                 id={'e1'}
                 input={input}

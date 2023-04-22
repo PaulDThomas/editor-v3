@@ -100,38 +100,41 @@ export const EditorV3 = ({
     setInFocus(true);
   }, []);
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
-    // Handle awkward keys
-    if (['Enter', 'Backspace', 'Delete'].includes(e.key)) {
-      e.stopPropagation();
-      e.preventDefault();
-      if (divRef.current) {
-        const pos = getCaretPosition(divRef.current);
-        // Enter
-        if (pos && allowNewLine && e.key === 'Enter') {
-          const content = new EditorV3Content(divRef.current.innerHTML);
-          const newPos = content.splitLine(pos);
-          redraw(divRef.current, content);
-          setCaretPosition(divRef.current, newPos);
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      // Handle awkward keys
+      if (['Enter', 'Backspace', 'Delete'].includes(e.key)) {
+        e.stopPropagation();
+        e.preventDefault();
+        if (divRef.current) {
+          const pos = getCaretPosition(divRef.current);
+          // Enter
+          if (pos && allowNewLine && e.key === 'Enter') {
+            const content = new EditorV3Content(divRef.current.innerHTML);
+            const newPos = content.splitLine(pos);
+            redraw(divRef.current, content);
+            setCaretPosition(divRef.current, newPos);
+          }
+          // Backspace and delete
+          if (pos && ['Backspace', 'Delete'].includes(e.key)) {
+            const content = new EditorV3Content(divRef.current.innerHTML);
+            const newPos = content.deleteCharacter(pos, e.key === 'Backspace');
+            redraw(divRef.current, content);
+            setCaretPosition(divRef.current, newPos);
+          }
         }
-        // Backspace and delete
-        if (pos && ['Backspace', 'Delete'].includes(e.key)) {
-          const content = new EditorV3Content(divRef.current.innerHTML);
-          const newPos = content.deleteCharacter(pos, e.key === 'Backspace');
-          redraw(divRef.current, content);
-          setCaretPosition(divRef.current, newPos);
-        }
+        return;
+      } else if (
+        divRef.current &&
+        ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key) &&
+        !e.shiftKey &&
+        !e.ctrlKey
+      ) {
+        moveCursor(divRef.current, e);
       }
-      return;
-    } else if (
-      divRef.current &&
-      ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key) &&
-      !e.shiftKey &&
-      !e.ctrlKey
-    ) {
-      moveCursor(divRef.current, e);
-    }
-  }
+    },
+    [allowNewLine],
+  );
 
   const handleKeyUp = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {

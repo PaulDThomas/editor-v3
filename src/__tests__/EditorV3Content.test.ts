@@ -381,26 +381,26 @@ describe('Content functions', () => {
         textBlocks: [{ text: '7', style: 'shiny' }, { text: '89' }],
       },
     ]);
-    //   expect(
-    //     JSON.parse(
-    //       testContent.removeStyle({ startLine: 1, startChar: 0, endLine: 1, endChar: 2 }).jsonString,
-    //     ).lines,
-    //   ).toEqual([
-    //     {
-    //       decimalAlignPercent: 60,
-    //       textAlignment: 'left',
-    //       textBlocks: [{ text: '1' }, { text: '23', style: 'shiny' }],
-    //     },
-    //     {
-    //       decimalAlignPercent: 60,
-    //       textAlignment: 'left',
-    //       textBlocks: [{ text: '45' }, { text: '6', style: 'shiny' }],
-    //     },
-    //     {
-    //       decimalAlignPercent: 60,
-    //       textAlignment: 'left',
-    //       textBlocks: [{ text: '7', style: 'shiny' }, { text: '89' }],
-    //     },
-    //   ]);
+    expect(
+      JSON.parse(
+        testContent.removeStyle({ startLine: 1, startChar: 0, endLine: 1, endChar: 2 }).jsonString,
+      ).lines,
+    ).toEqual([
+      {
+        decimalAlignPercent: 60,
+        textAlignment: 'left',
+        textBlocks: [{ text: '1' }, { text: '23', style: 'shiny' }],
+      },
+      {
+        decimalAlignPercent: 60,
+        textAlignment: 'left',
+        textBlocks: [{ text: '45' }, { text: '6', style: 'shiny' }],
+      },
+      {
+        decimalAlignPercent: 60,
+        textAlignment: 'left',
+        textBlocks: [{ text: '7', style: 'shiny' }, { text: '89' }],
+      },
+    ]);
   });
 });
