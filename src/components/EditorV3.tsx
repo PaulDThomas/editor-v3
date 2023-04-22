@@ -186,49 +186,62 @@ export const EditorV3 = ({
   const handlePaste = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
       try {
+        if (!divRef.current) return;
         e.preventDefault();
         e.stopPropagation();
-        const fromPaste = e.clipboardData.getData('data/aiev3');
-        if (divRef.current && fromPaste) {
-          const pos = getCaretPosition(divRef.current);
-          if (pos) {
-            const content = new EditorV3Content(divRef.current.innerHTML);
-            const lines: EditorV3Line[] = [];
-            const linesImport = JSON.parse(fromPaste) as EditorV3LineImport[];
-            // Just text blocks if only one line is allowed
-            if (linesImport.length > 1 && !allowNewLine) {
-              const textBlocks: EditorV3TextBlock[] = linesImport
-                .flatMap((l) => l.textBlocks)
-                .map((tb) => new EditorV3TextBlock(tb));
-              lines.push(
-                new EditorV3Line(
-                  textBlocks,
-                  linesImport[0].textAlignment as EditorV3Align,
-                  linesImport[0].decimalAlignPercent,
-                ),
-              );
-            } else {
-              lines.push(...linesImport.map((l) => new EditorV3Line(JSON.stringify(l))));
-            }
-            content.splice(pos, lines);
-            redraw(divRef.current, content);
-            pos.endLine = pos.endLine + lines.length - 1;
-            pos.endChar =
-              lines.length === 1
-                ? pos.endChar + lines[0].lineLength - 1
-                : lines[lines.length - 1].lineLength;
-            setCaretPosition(divRef.current, {
-              ...pos,
-              startLine: pos.endLine,
-              startChar: pos.endChar,
-            });
+        const pos = getCaretPosition(divRef.current);
+        if (pos) {
+          const content = new EditorV3Content(divRef.current.innerHTML);
+          const lines: EditorV3Line[] = [];
+          const linesImport = (
+            e.clipboardData.getData('data/aiev3') !== ''
+              ? JSON.parse(e.clipboardData.getData('data/aiev3'))
+              : e.clipboardData
+                  .getData('text/plain')
+                  .split('\n')
+                  .map((t) => ({
+                    textBlocks: [{ text: t }],
+                    textAlignment,
+                    decimalAlignPercent,
+                  }))
+          ) as EditorV3LineImport[];
+          // Just text blocks if only one line is allowed
+          if (linesImport.length > 1 && !allowNewLine) {
+            const textBlocks: EditorV3TextBlock[] = linesImport
+              .flatMap((l) => l.textBlocks)
+              .map((tb) => new EditorV3TextBlock(tb));
+            lines.push(
+              new EditorV3Line(
+                textBlocks,
+                linesImport[0].textAlignment as EditorV3Align,
+                linesImport[0].decimalAlignPercent,
+              ),
+            );
+          } else {
+            lines.push(...linesImport.map((l) => new EditorV3Line(JSON.stringify(l))));
           }
+          console.log('Pasting:');
+          console.log(lines.map((l) => l.lineText).join('\n'));
+          content.splice(pos, lines);
+          console.log('\nNew content:');
+          console.log(content.text);
+          redraw(divRef.current, content);
+          pos.endLine = pos.endLine + lines.length - 1;
+          pos.endChar =
+            lines.length === 1
+              ? pos.endChar + lines[0].lineLength - 1
+              : lines[lines.length - 1].lineLength;
+          setCaretPosition(divRef.current, {
+            ...pos,
+            startLine: pos.endLine,
+            startChar: pos.endChar,
+          });
         }
       } catch (error) {
         console.warn(`Paste failed because: ${error}`);
       }
     },
-    [allowNewLine],
+    [allowNewLine, decimalAlignPercent, textAlignment],
   );
 
   const handleBlur = useCallback(() => {
