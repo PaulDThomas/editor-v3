@@ -11,8 +11,8 @@ export const App = (): JSX.Element => {
       },
     }),
   );
-  const [input2, setJson2] = useState<string>('Another one');
-  const [input3, setText3] = useState<string>('And another one');
+  const [input2, setInput2] = useState<string>('Another one');
+  const [input3, setInput3] = useState<string>('And another one');
   const [json, setJson] = useState<string>('');
   const [text, setText] = useState<string>('');
   const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.center);
@@ -60,6 +60,7 @@ export const App = (): JSX.Element => {
             <span className='content'>
               <EditorV3
                 id='test-editor'
+                resize
                 input={JSON.stringify({
                   lines: [
                     {
@@ -87,7 +88,7 @@ export const App = (): JSX.Element => {
               <EditorV3
                 id={'e2'}
                 input={input2}
-                setJson={setJson2}
+                setJson={setInput2}
                 textAlignment={align}
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}
@@ -106,7 +107,7 @@ export const App = (): JSX.Element => {
               <EditorV3
                 id={'e3'}
                 input={input3}
-                setText={setText3}
+                setText={setInput3}
                 textAlignment={align}
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}

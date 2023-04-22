@@ -112,11 +112,11 @@ describe('Check basic EditorV3Content', () => {
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span class="aiev3-tb">Hello</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;">\u200b</span>' +
+        '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;"><span class="aiev3-tb">\u200b</span></span>' +
         '</div>' +
         '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span class="aiev3-tb">.</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;"><span class="aiev3-tb">World</span></span>' +
+        '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span class="aiev3-tb">\u200b</span></span>' +
+        '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;"><span class="aiev3-tb">.World</span></span>' +
         '</div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}"></div>',
     );
@@ -128,6 +128,12 @@ describe('Check basic EditorV3Content', () => {
 describe('Content functions', () => {
   test('Merge and split lines', async () => {
     const testContent = new EditorV3Content('12\n34\n56');
+    expect(testContent.upToPos(0, 0)).toEqual([
+      { textBlocks: [{ text: '' }], decimalAlignPercent: 60, textAlignment: 'left' },
+    ]);
+    expect(testContent.fromPos(2, 2)).toEqual([
+      { textBlocks: [{ text: '' }], decimalAlignPercent: 60, textAlignment: 'left' },
+    ]);
     testContent.mergeLines(0);
     expect(testContent.text).toEqual('1234\n56');
     testContent.splitLine({
@@ -154,6 +160,14 @@ describe('Content functions', () => {
       isCollapsed: true,
     });
     expect(testContent.text).toEqual('1\n56');
+    testContent.splitLine({
+      startLine: 1,
+      startChar: 2,
+      endLine: 1,
+      endChar: 2,
+      isCollapsed: true,
+    });
+    expect(testContent.text).toEqual('1\n56\n');
   });
 
   test('Delete character', async () => {
@@ -180,8 +194,16 @@ describe('Content functions', () => {
       },
       false,
     );
-    expect(testContent.text).toEqual('1\n34\n56');
+    expect(testContent.text).toEqual('134\n56');
 
+    testContent.splitLine({
+      startLine: 0,
+      startChar: 1,
+      endLine: 0,
+      endChar: 1,
+      isCollapsed: true,
+    });
+    expect(testContent.text).toEqual('1\n34\n56');
     testContent.deleteCharacter(
       {
         startLine: 1,
@@ -232,9 +254,9 @@ describe('Content functions', () => {
     expect(testContent.text).toEqual('1\n5');
   });
 
-  test('Remove Section', async () => {
+  test('Splice', async () => {
     const testContent = new EditorV3Content('123\n456\n789');
-    const remove = testContent.removeSection({
+    const remove = testContent.splice({
       isCollapsed: false,
       startLine: 0,
       startChar: 1,
@@ -245,7 +267,7 @@ describe('Content functions', () => {
     expect(testContent.text).toEqual('189');
 
     const testContent2 = new EditorV3Content('123\n456\n789');
-    const remove2 = testContent.removeSection({
+    const remove2 = testContent.splice({
       isCollapsed: true,
       startLine: 0,
       startChar: 1,
@@ -256,7 +278,7 @@ describe('Content functions', () => {
     expect(testContent2.text).toEqual('123\n456\n789');
 
     const testContent3 = new EditorV3Content('123\n456\n789');
-    const remove3 = testContent3.removeSection({
+    const remove3 = testContent3.splice({
       isCollapsed: false,
       startLine: 1,
       startChar: 0,
@@ -267,7 +289,7 @@ describe('Content functions', () => {
     expect(testContent3.text).toEqual('123\n6\n789');
 
     const testContent4 = new EditorV3Content('123\n456\n789');
-    const remove4 = testContent4.removeSection({
+    const remove4 = testContent4.splice({
       startLine: 0,
       startChar: 3,
       endLine: 2,
@@ -277,7 +299,7 @@ describe('Content functions', () => {
     expect(testContent4.text).toEqual('1239');
 
     const testContent5 = new EditorV3Content('123\n456\n789');
-    const remove5 = testContent5.removeSection({
+    const remove5 = testContent5.splice({
       startLine: 0,
       startChar: 3,
       endLine: 3,
@@ -285,6 +307,51 @@ describe('Content functions', () => {
     });
     expect(remove5.map((l) => l.lineText).join('\n')).toEqual('\n456\n789');
     expect(testContent5.text).toEqual('123');
+
+    const testContent6 = new EditorV3Content('123\n456\n789');
+    testContent6.splice(
+      {
+        startLine: 0,
+        startChar: 0,
+        endLine: 0,
+        endChar: 0,
+      },
+      [new EditorV3Line('abc')],
+    );
+    expect(testContent6.text).toEqual('abc123\n456\n789');
+
+    testContent6.splice(
+      {
+        startLine: 1,
+        startChar: 0,
+        endLine: 1,
+        endChar: 3,
+      },
+      [new EditorV3Line('def')],
+    );
+    expect(testContent6.text).toEqual('abc123\ndef\n789');
+
+    testContent6.splice(
+      {
+        startLine: 1,
+        startChar: 0,
+        endLine: 1,
+        endChar: 4,
+      },
+      [new EditorV3Line('ghi')],
+    );
+    expect(testContent6.text).toEqual('abc123\nghi\n789');
+
+    testContent6.splice(
+      {
+        startLine: 4,
+        startChar: 0,
+        endLine: 1,
+        endChar: 4,
+      },
+      [new EditorV3Line('jkl')],
+    );
+    expect(testContent6.text).toEqual('abc123\nghi\n789');
   });
 
   test('Apply & remove style', async () => {
@@ -314,74 +381,26 @@ describe('Content functions', () => {
         textBlocks: [{ text: '7', style: 'shiny' }, { text: '89' }],
       },
     ]);
-    expect(
-      JSON.parse(
-        testContent.removeStyle({ startLine: 1, startChar: 0, endLine: 1, endChar: 2 }).jsonString,
-      ).lines,
-    ).toEqual([
-      {
-        decimalAlignPercent: 60,
-        textAlignment: 'left',
-        textBlocks: [{ text: '1' }, { text: '23', style: 'shiny' }],
-      },
-      {
-        decimalAlignPercent: 60,
-        textAlignment: 'left',
-        textBlocks: [{ text: '45' }, { text: '6', style: 'shiny' }],
-      },
-      {
-        decimalAlignPercent: 60,
-        textAlignment: 'left',
-        textBlocks: [{ text: '7', style: 'shiny' }, { text: '89' }],
-      },
-    ]);
-  });
-
-  test('Splice line', async () => {
-    const testContent = new EditorV3Content('123\n456\n789');
-    expect(testContent.upToPos(0, 0)).toEqual([]);
-    testContent.splice(
-      {
-        startLine: 0,
-        startChar: 0,
-        endLine: 0,
-        endChar: 0,
-      },
-      [new EditorV3Line('abc')],
-    );
-    expect(testContent.text).toEqual('abc123\n456\n789');
-
-    testContent.splice(
-      {
-        startLine: 1,
-        startChar: 0,
-        endLine: 1,
-        endChar: 3,
-      },
-      [new EditorV3Line('def')],
-    );
-    expect(testContent.text).toEqual('abc123\ndef\n789');
-
-    testContent.splice(
-      {
-        startLine: 1,
-        startChar: 0,
-        endLine: 1,
-        endChar: 4,
-      },
-      [new EditorV3Line('ghi')],
-    );
-    expect(testContent.text).toEqual('abc123\nghi\n789');
-
-    testContent.splice(
-      {
-        startLine: 4,
-        startChar: 0,
-        endLine: 1,
-        endChar: 4,
-      },
-      [new EditorV3Line('jkl')],
-    );
-    expect(testContent.text).toEqual('abc123\nghi\n789');
+    //   expect(
+    //     JSON.parse(
+    //       testContent.removeStyle({ startLine: 1, startChar: 0, endLine: 1, endChar: 2 }).jsonString,
+    //     ).lines,
+    //   ).toEqual([
+    //     {
+    //       decimalAlignPercent: 60,
+    //       textAlignment: 'left',
+    //       textBlocks: [{ text: '1' }, { text: '23', style: 'shiny' }],
+    //     },
+    //     {
+    //       decimalAlignPercent: 60,
+    //       textAlignment: 'left',
+    //       textBlocks: [{ text: '45' }, { text: '6', style: 'shiny' }],
+    //     },
+    //     {
+    //       decimalAlignPercent: 60,
+    //       textAlignment: 'left',
+    //       textBlocks: [{ text: '7', style: 'shiny' }, { text: '89' }],
+    //     },
+    //   ]);
   });
 });

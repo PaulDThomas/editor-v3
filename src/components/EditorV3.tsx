@@ -1,16 +1,16 @@
+import { ContextMenuHandler, iMenuItem } from '@asup/context-menu';
 import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { EditorV3Line, EditorV3TextBlock } from '../classes';
 import { EditorV3Content } from '../classes/EditorV3Content';
-import { EditorV3Align, EditorV3Styles } from '../classes/interface';
+import { EditorV3Align, EditorV3LineImport, EditorV3Styles } from '../classes/interface';
+import { applyStyle } from '../functions/applyStyle';
+import { applyStylesToHTML } from '../functions/applyStylesToHTML';
 import { getCaretPosition } from '../functions/getCaretPosition';
 import { getCurrentData } from '../functions/getCurrentData';
+import { moveCursor } from '../functions/moveCursor';
 import { redraw } from '../functions/redraw';
 import { setCaretPosition } from '../functions/setCaretPosition';
 import './EditorV3.css';
-import { moveCursor } from '../functions/moveCursor';
-import { ContextMenuHandler, iMenuItem } from '@asup/context-menu';
-import { applyStyle } from '../functions/applyStyle';
-import { applyStylesToHTML } from '../functions/applyStylesToHTML';
-import { EditorV3Line } from '../classes';
 
 interface EditorV3Props {
   id: string;
@@ -24,6 +24,7 @@ interface EditorV3Props {
   textAlignment?: EditorV3Align;
   decimalAlignPercent?: number;
   style?: CSSProperties;
+  resize?: boolean;
 }
 
 export const EditorV3 = ({
@@ -38,6 +39,7 @@ export const EditorV3 = ({
   textAlignment = EditorV3Align.left,
   decimalAlignPercent = 60,
   style,
+  resize = false,
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
@@ -131,64 +133,103 @@ export const EditorV3 = ({
     }
   }
 
-  const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
-    // Stop handled keys
-    if (['Enter', 'Backspace', 'Delete'].includes(e.key)) {
-      e.stopPropagation();
-      e.preventDefault();
-      return;
-    }
-  }, []);
-
-  const handleCopy = useCallback((e: React.ClipboardEvent<HTMLDivElement>) => {
-    if (divRef.current) {
-      const pos = getCaretPosition(divRef.current);
-      if (pos) {
-        const content = new EditorV3Content(divRef.current.innerHTML);
-        const toPaste = content.subLines(pos);
-        e.clipboardData.setData('text/plain', toPaste.map((l) => l.lineText).join('\n'));
-        e.clipboardData.setData(
-          'text/html',
-          toPaste.map((l) => applyStylesToHTML(l.el, content.styles).outerHTML).join(''),
-        );
-        e.clipboardData.setData('data/aiev3', JSON.stringify(toPaste));
-        if (e.type === 'cut') {
-          content.splice(pos);
-          redraw(divRef.current, content);
-          setCaretPosition(divRef.current, pos);
-        }
-        e.preventDefault();
+  const handleKeyUp = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      // Stop handled keys
+      if (['Enter', 'Backspace', 'Delete'].includes(e.key)) {
         e.stopPropagation();
-      }
-    }
-  }, []);
-
-  const handlePaste = useCallback((e: React.ClipboardEvent<HTMLDivElement>) => {
-    try {
-      const fromPaste = e.clipboardData.getData('data/aiev3');
-      if (divRef.current && fromPaste) {
+        e.preventDefault();
+        return;
+      } else if (divRef.current && e.key === '.' && textAlignment === EditorV3Align.decimal) {
         const pos = getCaretPosition(divRef.current);
         if (pos) {
           const content = new EditorV3Content(divRef.current.innerHTML);
-          const lines: EditorV3Line[] = JSON.parse(fromPaste).map(
-            (l: unknown) => new EditorV3Line(JSON.stringify(l)),
-          );
-          content.splice(pos, lines);
           redraw(divRef.current, content);
-          pos.endLine = pos.endLine + lines.length - 1;
-          pos.endChar =
-            lines.length === 1
-              ? pos.endChar + lines[1].lineLength - 1
-              : lines[lines.length - 1].lineLength;
           setCaretPosition(divRef.current, pos);
         }
-        e.preventDefault();
-        e.stopPropagation();
       }
-    } catch {
-      console.warn('Paste failed');
+    },
+    [textAlignment],
+  );
+
+  const handleCopy = useCallback((e: React.ClipboardEvent<HTMLDivElement>) => {
+    try {
+      e.preventDefault();
+      e.stopPropagation();
+      if (divRef.current) {
+        const pos = getCaretPosition(divRef.current);
+        if (pos) {
+          const content = new EditorV3Content(divRef.current.innerHTML);
+          const toPaste = content.subLines(pos);
+          e.clipboardData.setData('text/plain', toPaste.map((l) => l.lineText).join('\n'));
+          e.clipboardData.setData(
+            'text/html',
+            toPaste.map((l) => applyStylesToHTML(l.el, content.styles).outerHTML).join(''),
+          );
+          e.clipboardData.setData('data/aiev3', JSON.stringify(toPaste));
+          if (e.type === 'cut') {
+            content.splice(pos);
+            redraw(divRef.current, content);
+            setCaretPosition(divRef.current, {
+              ...pos,
+              endLine: pos.startLine,
+              endChar: pos.startChar,
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.warn(`Copy failed because ${error}`);
     }
   }, []);
+
+  const handlePaste = useCallback(
+    (e: React.ClipboardEvent<HTMLDivElement>) => {
+      try {
+        e.preventDefault();
+        e.stopPropagation();
+        const fromPaste = e.clipboardData.getData('data/aiev3');
+        if (divRef.current && fromPaste) {
+          const pos = getCaretPosition(divRef.current);
+          if (pos) {
+            const content = new EditorV3Content(divRef.current.innerHTML);
+            const lines: EditorV3Line[] = [];
+            const linesImport = JSON.parse(fromPaste) as EditorV3LineImport[];
+            // Just text blocks if only one line is allowed
+            if (linesImport.length > 1 && !allowNewLine) {
+              const textBlocks: EditorV3TextBlock[] = linesImport
+                .flatMap((l) => l.textBlocks)
+                .map((tb) => new EditorV3TextBlock(tb));
+              lines.push(
+                new EditorV3Line(
+                  textBlocks,
+                  linesImport[0].textAlignment as EditorV3Align,
+                  linesImport[0].decimalAlignPercent,
+                ),
+              );
+            } else {
+              lines.push(...linesImport.map((l) => new EditorV3Line(JSON.stringify(l))));
+            }
+            content.splice(pos, lines);
+            redraw(divRef.current, content);
+            pos.endLine = pos.endLine + lines.length - 1;
+            pos.endChar =
+              lines.length === 1
+                ? pos.endChar + lines[0].lineLength - 1
+                : lines[lines.length - 1].lineLength;
+            setCaretPosition(divRef.current, {
+              ...pos,
+              startLine: pos.endLine,
+              startChar: pos.endChar,
+            });
+          }
+        }
+      } catch (error) {
+        console.warn(`Paste failed because: ${error}`);
+      }
+    },
+    [allowNewLine],
+  );
 
   const handleBlur = useCallback(() => {
     setInFocus(false);
@@ -219,6 +260,7 @@ export const EditorV3 = ({
         <div
           id={`${id}-editable`}
           className='aiev3-editing'
+          style={resize ? { resize: 'both', overflow: 'auto' } : undefined}
           contentEditable={
             editable &&
             (typeof setHtml === 'function' ||
@@ -235,6 +277,7 @@ export const EditorV3 = ({
           onKeyDownCapture={handleKeyDown}
           onBlurCapture={handleBlur}
           onFocusCapture={handleFocus}
+          // Add resizable? when required ?
         ></div>
       </ContextMenuHandler>
     </div>
