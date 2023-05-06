@@ -1,5 +1,6 @@
 {
   "env": {
+    "node": true,
     "browser": true,
     "es2021": true,
     "jest": true,
@@ -31,7 +32,7 @@
     "react/react-in-jsx-scope": "off",
     "spaced-comment": "error",
     // Prettier rule
-    "prettier/prettier": ["error", { "singleQuote": true }],
+    "prettier/prettier": ["warn", { "singleQuote": true }],
     // "quotes": ["error", "single"],
     "no-duplicate-imports": "error",
     "react-hooks/rules-of-hooks": "error",

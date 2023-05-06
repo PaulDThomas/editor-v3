@@ -15,7 +15,7 @@ export const App = (): JSX.Element => {
   const [input3, setInput3] = useState<string>('And another one');
   const [json, setJson] = useState<string>('');
   const [text, setText] = useState<string>('');
-  const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.center);
+  const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.decimal);
   const [editable, setEditable] = useState<boolean>(true);
   const [allowNewLine, setAllowNewLine] = useState<boolean>(true);
   const [decPct, setDecPct] = useState<number>(60);
@@ -36,7 +36,7 @@ export const App = (): JSX.Element => {
         <div className='app-inner'>
           <div className='row'>
             <span className='label'>This is the input</span>
-            <span className='content'>
+            <span className='content debug'>
               <EditorV3
                 id={'e1'}
                 input={input}

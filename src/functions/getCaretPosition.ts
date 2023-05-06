@@ -39,15 +39,12 @@ export function getCaretPosition(
   ).closest('div.aiev3-line');
   const endLine =
     l && element.contains(l) && l.parentElement ? [...l.parentElement.children].indexOf(l) : -1;
-  let endChar: number;
+  let endChar = -1;
   if (l) {
     preCaretRange.selectNodeContents(l);
     preCaretRange.setEnd(range.endContainer, range.endOffset);
     endChar = preCaretRange.toString().replace(/\u200b/, '').length;
-  } else {
-    endChar = -1;
   }
-
   return {
     startLine,
     startChar,

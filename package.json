@@ -1,6 +1,6 @@
 {
   "name": "@asup/editor-v3",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "REACT Typescript Editor component",
   "author": "Paul Thomas <@PaulDThomas>",
   "private": false,
@@ -91,6 +91,7 @@
   "scripts": {
     "build": "parcel build src/main.ts",
     "start": "parcel demo/index.html --dist-dir demo/dist",
+    "prepare": "husky install",
     "test": "jest --watch",
     "test:coverage-report": "npm test -- --coverage --watchAll=false"
   }

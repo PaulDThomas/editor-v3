@@ -6,6 +6,7 @@
   flex-direction: column;
   justify-content: center;
   padding: 1px;
+  overflow: hidden;
 }
 
 .aiev3.editing .aiev3-editing {
@@ -64,6 +65,8 @@
 .aiev3-span-point {
   position: absolute;
   top: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .aiev3-span-point > span {
@@ -73,8 +76,12 @@
 
 .aiev3-span-point.lhs {
   text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .aiev3-span-point.rhs {
   text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

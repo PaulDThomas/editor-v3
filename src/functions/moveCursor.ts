@@ -1,57 +1,91 @@
+import { EditorV3Content } from '../classes';
+import { EditorV3 } from '../components';
 import { getCaretPosition } from './getCaretPosition';
 import { setCaretPosition } from './setCaretPosition';
 
-function lineLength(l: NodeListOf<HTMLDivElement>, line: number): number {
-  return line < l.length ? (l[line].textContent?.replace(/\u200b/, '') ?? '').length : 0;
-}
-
 export const moveCursor = (divRef: HTMLDivElement, e: React.KeyboardEvent<HTMLDivElement>) => {
+  e.preventDefault();
+  e.stopPropagation();
+
   const pos = getCaretPosition(divRef);
-  // Left arrow
-  if (pos?.isCollapsed) {
-    e.preventDefault();
-    e.stopPropagation();
+  const content = new EditorV3Content(divRef.innerHTML);
+  const lines = content.lines;
+
+  if (pos && lines && pos.endChar > -1) {
     const newPos = { ...pos };
-    const lines = divRef.querySelectorAll('div.aiev3-line') as NodeListOf<HTMLDivElement>;
-    const thisLineLength = lineLength(lines, pos.startLine);
+    const lastLineLength = lines[pos.endLine].lineLength;
     switch (e.key) {
       case 'Home':
-        newPos.startChar = 0;
+        if (newPos.startChar === 0) {
+          newPos.startLine = 0;
+        } else newPos.startChar = 0;
+        if (!e.shiftKey) {
+          newPos.endLine = newPos.startLine;
+          newPos.endChar = newPos.startChar;
+        }
         break;
       case 'End':
-        newPos.startChar = thisLineLength;
+        if (newPos.endChar === lastLineLength) {
+          newPos.endLine = lines.length - 1;
+          newPos.endChar = lines[lines.length - 1].lineLength;
+        } else newPos.endChar = lastLineLength;
+        if (!e.shiftKey) {
+          newPos.startLine = newPos.endLine;
+          newPos.startChar = newPos.endChar;
+        }
         break;
       case 'ArrowLeft':
         newPos.startLine =
           pos.startChar === 0 && pos.startLine > 0 ? pos.startLine - 1 : pos.startLine;
         newPos.startChar =
           pos.startChar === 0 && pos.startLine > 0
-            ? lineLength(lines, pos.startLine - 1)
-            : Math.max(0, pos.startChar - 1);
+            ? lines[pos.startLine - 1].lineLength
+            : Math.max(0, e.ctrlKey ? 0 : pos.startChar - 1);
+        if (!e.shiftKey) {
+          newPos.endLine = newPos.startLine;
+          newPos.endChar = newPos.startChar;
+        }
         break;
       case 'ArrowRight':
-        newPos.startLine =
-          pos.startLine + 1 < lines.length && thisLineLength <= pos.startChar
-            ? pos.startLine + 1
-            : pos.startLine;
-        newPos.startChar = thisLineLength <= pos.startChar ? 0 : pos.startChar + 1;
-        break;
-      case 'ArrowDown':
-        newPos.startLine = Math.min(lines.length - 1, pos.startLine + 1);
-        newPos.startChar =
-          pos.startLine + 1 < lines.length
-            ? Math.min(pos.startChar, lineLength(lines, pos.startLine + 1))
-            : thisLineLength;
+        if (lastLineLength >= newPos.endChar) {
+          newPos.endChar =
+            e.ctrlKey && lastLineLength > newPos.endChar ? lastLineLength : pos.endChar + 1;
+        }
+        if (lastLineLength < newPos.endChar && pos.endLine + 1 < lines.length) {
+          newPos.endLine = newPos.endLine + 1;
+          newPos.endChar = 0;
+        }
+        if (!e.shiftKey) {
+          newPos.startLine = newPos.endLine;
+          newPos.startChar = newPos.endChar;
+        }
         break;
       case 'ArrowUp':
-        newPos.startLine = Math.max(0, pos.startLine - 1);
+        newPos.startLine = Math.max(0, e.ctrlKey ? 0 : newPos.startLine - 1);
         newPos.startChar =
-          pos.startLine > 0 ? Math.min(pos.startChar, lineLength(lines, pos.startLine - 1)) : 0;
+          pos.startLine > 0 ? Math.min(newPos.startChar, lines[newPos.startLine].lineLength) : 0;
+        if (!e.shiftKey) {
+          newPos.endLine = newPos.startLine;
+          newPos.endChar = newPos.startChar;
+        }
+        break;
+      case 'ArrowDown':
+        newPos.endLine = Math.min(
+          lines.length - 1,
+          e.ctrlKey ? lines.length - 1 : newPos.endLine + 1,
+        );
+        newPos.endChar =
+          pos.endLine < lines.length - 1
+            ? Math.min(newPos.endChar, lines[newPos.endLine].lineLength)
+            : lastLineLength;
+        if (!e.shiftKey) {
+          newPos.startLine = newPos.endLine;
+          newPos.startChar = newPos.endChar;
+        }
         break;
       default:
     }
-    newPos.endChar = newPos.startChar;
-    newPos.endLine = newPos.startLine;
+    newPos.isCollapsed = newPos.startLine === newPos.endLine && newPos.startChar === newPos.endChar;
     setCaretPosition(divRef, newPos);
   }
 };

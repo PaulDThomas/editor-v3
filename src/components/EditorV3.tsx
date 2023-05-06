@@ -103,88 +103,113 @@ export const EditorV3 = ({
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       // Handle awkward keys
-      if (['Enter', 'Backspace', 'Delete'].includes(e.key)) {
+      if (['Enter', 'Backspace', 'Delete'].includes(e.key) && divRef.current) {
         e.stopPropagation();
         e.preventDefault();
-        if (divRef.current) {
-          const pos = getCaretPosition(divRef.current);
-          // Enter
-          if (pos && allowNewLine && e.key === 'Enter') {
-            const content = new EditorV3Content(divRef.current.innerHTML);
-            const newPos = content.splitLine(pos);
-            redraw(divRef.current, content);
-            setCaretPosition(divRef.current, newPos);
-          }
-          // Backspace and delete
-          if (pos && ['Backspace', 'Delete'].includes(e.key)) {
-            const content = new EditorV3Content(divRef.current.innerHTML);
-            const newPos = content.deleteCharacter(pos, e.key === 'Backspace');
-            redraw(divRef.current, content);
-            setCaretPosition(divRef.current, newPos);
-          }
+        const pos = getCaretPosition(divRef.current);
+        // Enter
+        if (pos && allowNewLine && e.key === 'Enter') {
+          const content = new EditorV3Content(divRef.current.innerHTML, {
+            textAlignment,
+            decimalAlignPercent,
+            styles: customStyleMap,
+          });
+          const newPos = content.splitLine(pos);
+          redraw(divRef.current, content);
+          setCaretPosition(divRef.current, newPos);
+        }
+        // Backspace and delete
+        if (pos && ['Backspace', 'Delete'].includes(e.key)) {
+          const content = new EditorV3Content(divRef.current.innerHTML, {
+            textAlignment,
+            decimalAlignPercent,
+            styles: customStyleMap,
+          });
+          const newPos = content.deleteCharacter(pos, e.key === 'Backspace');
+          redraw(divRef.current, content);
+          setCaretPosition(divRef.current, newPos);
         }
         return;
       } else if (
         divRef.current &&
-        ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key) &&
-        !e.shiftKey &&
-        !e.ctrlKey
+        ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)
       ) {
         moveCursor(divRef.current, e);
       }
-    },
-    [allowNewLine],
-  );
-
-  const handleKeyUp = useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
-      // Stop handled keys
-      if (['Enter', 'Backspace', 'Delete'].includes(e.key)) {
+      // Decimal handling
+      else if (divRef.current && e.key === '.' && textAlignment === EditorV3Align.decimal) {
         e.stopPropagation();
         e.preventDefault();
-        return;
-      } else if (divRef.current && e.key === '.' && textAlignment === EditorV3Align.decimal) {
         const pos = getCaretPosition(divRef.current);
         if (pos) {
-          const content = new EditorV3Content(divRef.current.innerHTML);
-          redraw(divRef.current, content);
-          setCaretPosition(divRef.current, pos);
-        }
-      }
-    },
-    [textAlignment],
-  );
-
-  const handleCopy = useCallback((e: React.ClipboardEvent<HTMLDivElement>) => {
-    try {
-      e.preventDefault();
-      e.stopPropagation();
-      if (divRef.current) {
-        const pos = getCaretPosition(divRef.current);
-        if (pos) {
-          const content = new EditorV3Content(divRef.current.innerHTML);
-          const toPaste = content.subLines(pos);
-          e.clipboardData.setData('text/plain', toPaste.map((l) => l.lineText).join('\n'));
-          e.clipboardData.setData(
-            'text/html',
-            toPaste.map((l) => applyStylesToHTML(l.el, content.styles).outerHTML).join(''),
-          );
-          e.clipboardData.setData('data/aiev3', JSON.stringify(toPaste));
-          if (e.type === 'cut') {
-            content.splice(pos);
+          const content = new EditorV3Content(divRef.current.innerHTML, {
+            textAlignment,
+            decimalAlignPercent,
+            styles: customStyleMap,
+          });
+          if (!content.lines[pos.startLine].lineText.includes('.')) {
+            content.splice(pos, [new EditorV3Line('.')]);
             redraw(divRef.current, content);
             setCaretPosition(divRef.current, {
-              ...pos,
+              startLine: pos.startLine,
+              startChar: pos.startChar + 1,
+              isCollapsed: true,
               endLine: pos.startLine,
-              endChar: pos.startChar,
+              endChar: pos.startChar + 1,
             });
           }
         }
       }
-    } catch (error) {
-      console.warn(`Copy failed because ${error}`);
+    },
+    [allowNewLine, customStyleMap, decimalAlignPercent, textAlignment],
+  );
+
+  const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
+    // Stop handled keys
+    if (['Enter', 'Backspace', 'Delete'].includes(e.key)) {
+      e.stopPropagation();
+      e.preventDefault();
+      return;
     }
   }, []);
+
+  const handleCopy = useCallback(
+    (e: React.ClipboardEvent<HTMLDivElement>) => {
+      try {
+        e.preventDefault();
+        e.stopPropagation();
+        if (divRef.current) {
+          const pos = getCaretPosition(divRef.current);
+          if (pos) {
+            const content = new EditorV3Content(divRef.current.innerHTML, {
+              textAlignment,
+              decimalAlignPercent,
+              styles: customStyleMap,
+            });
+            const toPaste = content.subLines(pos);
+            e.clipboardData.setData('text/plain', toPaste.map((l) => l.lineText).join('\n'));
+            e.clipboardData.setData(
+              'text/html',
+              toPaste.map((l) => applyStylesToHTML(l.el, content.styles).outerHTML).join(''),
+            );
+            e.clipboardData.setData('data/aiev3', JSON.stringify(toPaste));
+            if (e.type === 'cut') {
+              content.splice(pos);
+              redraw(divRef.current, content);
+              setCaretPosition(divRef.current, {
+                ...pos,
+                endLine: pos.startLine,
+                endChar: pos.startChar,
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.warn(`Copy failed because ${error}`);
+      }
+    },
+    [customStyleMap, decimalAlignPercent, textAlignment],
+  );
 
   const handlePaste = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
@@ -194,7 +219,11 @@ export const EditorV3 = ({
         e.stopPropagation();
         const pos = getCaretPosition(divRef.current);
         if (pos) {
-          const content = new EditorV3Content(divRef.current.innerHTML);
+          const content = new EditorV3Content(divRef.current.innerHTML, {
+            textAlignment,
+            decimalAlignPercent,
+            styles: customStyleMap,
+          });
           const lines: EditorV3Line[] = [];
           const linesImport = (
             e.clipboardData.getData('data/aiev3') !== ''
@@ -223,28 +252,25 @@ export const EditorV3 = ({
           } else {
             lines.push(...linesImport.map((l) => new EditorV3Line(JSON.stringify(l))));
           }
-          console.log('Pasting:');
-          console.log(lines.map((l) => l.lineText).join('\n'));
+          // Splice in new data and redraw
           content.splice(pos, lines);
-          console.log('\nNew content:');
-          console.log(content.text);
           redraw(divRef.current, content);
-          pos.endLine = pos.endLine + lines.length - 1;
-          pos.endChar =
+          pos.startLine = pos.startLine + lines.length - 1;
+          pos.startChar =
             lines.length === 1
-              ? pos.endChar + lines[0].lineLength - 1
+              ? pos.startChar + lines[0].lineLength
               : lines[lines.length - 1].lineLength;
           setCaretPosition(divRef.current, {
             ...pos,
-            startLine: pos.endLine,
-            startChar: pos.endChar,
+            endLine: pos.startLine,
+            endChar: pos.startChar,
           });
         }
       } catch (error) {
         console.warn(`Paste failed because: ${error}`);
       }
     },
-    [allowNewLine, decimalAlignPercent, textAlignment],
+    [allowNewLine, customStyleMap, decimalAlignPercent, textAlignment],
   );
 
   const handleBlur = useCallback(() => {

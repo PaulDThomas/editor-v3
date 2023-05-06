@@ -17,23 +17,11 @@ export function setCaretPosition(
       range.setStart(f.node, f.offset);
       if (l) {
         range.setEnd(l.node, l.offset);
-      } else if (pos.endLine < lines.length) {
-        range.setEndAfter(lines[pos.endLine]);
-      } else {
-        range.setEnd(f.node, f.offset);
       }
       const sel = window.getSelection();
       if (sel) {
         sel?.removeAllRanges();
         sel?.addRange(range);
-      }
-      // Check style
-      if (style) {
-        const ls = (
-          range.endContainer instanceof Element
-            ? range.endContainer
-            : (range.endContainer.parentElement as Element)
-        ).closest('.aiev3-span');
       }
     }
     const ret = el instanceof HTMLDivElement ? getCaretPosition(el) : null;

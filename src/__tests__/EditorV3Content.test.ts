@@ -364,6 +364,8 @@ describe('Content functions', () => {
       endChar: 1,
     });
     expect(testContent.text).toEqual('123\n456\n789');
+    expect(testContent.getStyleAt(1, 1)).toEqual('shiny');
+    expect(testContent.getStyleAt(0, 1)).toEqual(undefined);
     expect(JSON.parse(testContent.jsonString).lines).toEqual([
       {
         decimalAlignPercent: 60,
