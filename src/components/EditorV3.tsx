@@ -25,6 +25,7 @@ interface EditorV3Props {
   decimalAlignPercent?: number;
   style?: CSSProperties;
   resize?: boolean;
+  spellCheck?: boolean;
 }
 
 export const EditorV3 = ({
@@ -40,6 +41,7 @@ export const EditorV3 = ({
   decimalAlignPercent = 60,
   style,
   resize = false,
+  spellCheck = false,
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
@@ -314,7 +316,7 @@ export const EditorV3 = ({
               typeof setText === 'function')
           }
           suppressContentEditableWarning
-          spellCheck={false}
+          spellCheck={spellCheck}
           ref={divRef}
           onFocus={handleFocus}
           onKeyUpCapture={handleKeyUp}

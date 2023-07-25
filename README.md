@@ -42,6 +42,7 @@ import { EditorV3, EditorV3Align, EditorV3Styles } from '@asup/editor-v3';
   decimalAlignPercent?: number;
   style?: CSSProperties;
   resize?: boolean;
+  spellCheck?: boolean;
 />
 ```
 
@@ -61,6 +62,7 @@ import { EditorV3, EditorV3Align, EditorV3Styles } from '@asup/editor-v3';
 | decimalAlignPercent | Percentage of the control width from the left hand side that the first decimal point will be placed when textAlignment = `EditorV3Align.decimal` | `60`                 |
 | style               | CSS styles to apply to the outer control element                                                                                                 |                      |
 | resize              | Indicates whether the control can be resized or not                                                                                              | `false`              |
+| spellCheck          | Indicates whether the control allows the browser spell check to run                                                                              | `false`              |
 
 # Returns
 
