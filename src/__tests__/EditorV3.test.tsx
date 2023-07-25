@@ -16,7 +16,6 @@ mockContent.applyStyle('shiny', { startLine: 2, startChar: 0, endLine: 2, endCha
 describe('Editor and functions', () => {
   test('Draw and fire cursor events', async () => {
     const user = userEvent.setup();
-    expect;
     await act(async () => {
       render(
         <div data-testid='container'>
@@ -27,8 +26,8 @@ describe('Editor and functions', () => {
         </div>,
       );
     });
-    const editor = (await screen.findByTestId('container')).children[0] as HTMLDivElement;
-    expect(editor.outerHTML).toEqual(
+    const container = (await screen.findByTestId('container')).children[0] as HTMLDivElement;
+    expect(container.outerHTML).toEqual(
       '<div class="aiev3" id="test-editor">' +
         '<div class="context-menu-handler" style="width: 100%; height: 100%;">' +
         '<div id="test-editor-editable" class="aiev3-editing" contenteditable="false" spellcheck="false">' +
@@ -44,7 +43,7 @@ describe('Editor and functions', () => {
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
         '</div></div></div>',
     );
-    const firstSpan = editor.querySelector('span') as HTMLSpanElement;
+    const firstSpan = container.querySelector('span') as HTMLSpanElement;
     await user.click(firstSpan);
     fireEvent.keyDown(firstSpan, { key: 'Home' });
     for (let i = 0; i < 15; i++) {
@@ -88,7 +87,7 @@ describe('Editor and functions', () => {
       JSON.stringify({
         lines: [
           { textBlocks: [{ text: '34.45' }], textAlignment: 'decimal', decimalAlignPercent: 70 },
-          { textBlocks: [{ text: '' }], textAlignment: 'decimal', decimalAlignPercent: 70 },
+          { textBlocks: [], textAlignment: 'decimal', decimalAlignPercent: 70 },
           {
             textBlocks: [{ text: 'x.xx', style: 'shiny' }],
             textAlignment: 'decimal',
@@ -127,9 +126,9 @@ describe('Editor and functions', () => {
     expect(mockSetJson).toHaveBeenLastCalledWith(
       JSON.stringify({
         lines: [
-          { textBlocks: [{ text: '' }], textAlignment: 'decimal', decimalAlignPercent: 70 },
+          { textBlocks: [], textAlignment: 'decimal', decimalAlignPercent: 70 },
           { textBlocks: [{ text: '4' }], textAlignment: 'decimal', decimalAlignPercent: 70 },
-          { textBlocks: [{ text: '' }], textAlignment: 'decimal', decimalAlignPercent: 70 },
+          { textBlocks: [], textAlignment: 'decimal', decimalAlignPercent: 70 },
           {
             textBlocks: [{ text: 'x.xx', style: 'shiny' }],
             textAlignment: 'decimal',
@@ -186,9 +185,9 @@ describe('Menu styling', () => {
       );
     });
     // Get component
-    const editor = (await screen.findByTestId('container')).children[0] as HTMLDivElement;
+    const container = (await screen.findByTestId('container')).children[0] as HTMLDivElement;
     // Highlight first line
-    let firstSpan = editor.querySelector('span') as HTMLSpanElement;
+    let firstSpan = container.querySelector('span') as HTMLSpanElement;
     await user.click(firstSpan);
     // Click shiny
     fireEvent.contextMenu(firstSpan);
@@ -198,7 +197,7 @@ describe('Menu styling', () => {
     let calledParams = mockApplyStyle.mock.calls[0];
     expect(calledParams[0]).toEqual('shiny');
     // Click remove
-    firstSpan = editor.querySelector('span') as HTMLSpanElement;
+    firstSpan = container.querySelector('span') as HTMLSpanElement;
     fireEvent.contextMenu(firstSpan);
     expect(screen.queryByText('Remove style')).toBeInTheDocument();
     const removeItem = screen.getByText('Remove style');
@@ -229,11 +228,11 @@ describe('Cursor tests', () => {
       );
     });
     // Get component
-    const editor = (await screen.findByTestId('container')).children[0] as HTMLDivElement;
+    const container = (await screen.findByTestId('container')).children[0] as HTMLDivElement;
     // Go to start of text
-    await user.click(editor.querySelector('span') as HTMLSpanElement);
+    await user.click(container.querySelector('span') as HTMLSpanElement);
     await user.keyboard('{Control>}{Home}{/Control}{Home}');
-    expect(getCaretPosition(editor)).toEqual({
+    expect(getCaretPosition(container)).toEqual({
       startLine: 0,
       startChar: 0,
       isCollapsed: true,
@@ -241,7 +240,7 @@ describe('Cursor tests', () => {
       endChar: 0,
     });
     await user.keyboard('{End}{Shift>}{Home}{Shift}');
-    expect(getCaretPosition(editor)).toEqual({
+    expect(getCaretPosition(container)).toEqual({
       startLine: 0,
       startChar: 0,
       isCollapsed: false,
@@ -249,7 +248,7 @@ describe('Cursor tests', () => {
       endChar: 5,
     });
     await user.keyboard('{Shift>}{End}{/Shift}');
-    expect(getCaretPosition(editor)).toEqual({
+    expect(getCaretPosition(container)).toEqual({
       startLine: 0,
       startChar: 0,
       isCollapsed: false,
@@ -257,7 +256,7 @@ describe('Cursor tests', () => {
       endChar: 4,
     });
     await user.keyboard('{Home}{ArrowRight}{ArrowRight}{Shift>}{ArrowRight}{/Shift}');
-    expect(getCaretPosition(editor)).toEqual({
+    expect(getCaretPosition(container)).toEqual({
       startLine: 0,
       startChar: 2,
       isCollapsed: false,
@@ -265,7 +264,7 @@ describe('Cursor tests', () => {
       endChar: 3,
     });
     await user.keyboard('{Control>}{ArrowDown}{/Control}');
-    expect(getCaretPosition(editor)).toEqual({
+    expect(getCaretPosition(container)).toEqual({
       startLine: 2,
       startChar: 3,
       isCollapsed: true,
@@ -273,7 +272,7 @@ describe('Cursor tests', () => {
       endChar: 3,
     });
     await user.keyboard('{Shift>}{ArrowUp}{ArrowLeft}{/Shift}');
-    expect(getCaretPosition(editor)).toEqual({
+    expect(getCaretPosition(container)).toEqual({
       startLine: 0,
       startChar: 5,
       isCollapsed: false,
@@ -281,7 +280,7 @@ describe('Cursor tests', () => {
       endChar: 3,
     });
     await user.keyboard('{ArrowLeft}');
-    expect(getCaretPosition(editor)).toEqual({
+    expect(getCaretPosition(container)).toEqual({
       startLine: 0,
       startChar: 4,
       isCollapsed: true,
@@ -289,7 +288,7 @@ describe('Cursor tests', () => {
       endChar: 4,
     });
     await user.keyboard('{ArrowUp}{ArrowDown}');
-    expect(getCaretPosition(editor)).toEqual({
+    expect(getCaretPosition(container)).toEqual({
       startLine: 1,
       startChar: 0,
       isCollapsed: true,
@@ -297,7 +296,7 @@ describe('Cursor tests', () => {
       endChar: 0,
     });
     await user.keyboard('{ArrowRight}');
-    expect(getCaretPosition(editor)).toEqual({
+    expect(getCaretPosition(container)).toEqual({
       startLine: 2,
       startChar: 0,
       isCollapsed: true,
@@ -331,11 +330,11 @@ describe('Cut and paste', () => {
       );
     });
     // Get component
-    const editor = (await screen.findByTestId('container')).children[0] as HTMLDivElement;
+    const container = (await screen.findByTestId('container')).children[0] as HTMLDivElement;
     // Go to start of text
-    await user.click(editor.querySelector('span') as HTMLSpanElement);
+    await user.click(container.querySelector('span') as HTMLSpanElement);
     await user.keyboard('{Control>}{Home}{/Control}{Home}{Shift>}{ArrowRight}{ArrowRight}{/Shift}');
-    expect(getCaretPosition(editor)).toEqual({
+    expect(getCaretPosition(container)).toEqual({
       startLine: 0,
       startChar: 0,
       isCollapsed: false,
@@ -350,13 +349,13 @@ describe('Cut and paste', () => {
     expect(thingCut?.getData('data/aiev3')).toEqual(
       '[{"textBlocks":[{"text":"34"}],"textAlignment":"center","decimalAlignPercent":60}]',
     );
-    fireEvent.blur(editor);
+    fireEvent.blur(container);
     expect(mockSetText).toHaveBeenLastCalledWith('.45\n\nx.xx');
     // Paste at the end
-    await user.click(editor.querySelector('span') as HTMLSpanElement);
+    await user.click(container.querySelector('span') as HTMLSpanElement);
     await user.keyboard('{Control>}{End}{End}{/Control}');
     await user.paste('34');
-    expect(getCaretPosition(editor)).toEqual({
+    expect(getCaretPosition(container)).toEqual({
       startLine: 2,
       startChar: 6,
       isCollapsed: true,
@@ -364,7 +363,7 @@ describe('Cut and paste', () => {
       endChar: 6,
     });
 
-    fireEvent.blur(editor);
+    fireEvent.blur(container);
     expect(mockSetText).toHaveBeenLastCalledWith('.45\n\nx.xx34');
   });
 
@@ -408,5 +407,44 @@ describe('Cut and paste', () => {
     await user.paste(thingCut);
     fireEvent.blur(editor2);
     expect(mockSetText2).toHaveBeenCalledWith('Initialtext');
+  });
+});
+
+describe('Edge events', () => {
+  test('Initial focus', async () => {
+    const mockSetText = jest.fn();
+    await act(async () => {
+      render(
+        <div data-testid='container'>
+          <EditorV3
+            id='test-editor'
+            input={mockContent.jsonString}
+            setText={mockSetText}
+          />
+        </div>,
+      );
+    });
+    const container = (await screen.findByTestId('container')).children[0] as HTMLDivElement;
+    const editorHolder = container.querySelector('#test-editor-editable') as HTMLDivElement;
+    expect(editorHolder).toBeInTheDocument();
+    fireEvent.focus(editorHolder);
+  });
+  test('Copy error', async () => {
+    const mockSetText = jest.fn();
+    await act(async () => {
+      render(
+        <div data-testid='container'>
+          <EditorV3
+            id='test-editor'
+            input={mockContent.jsonString}
+            setText={mockSetText}
+          />
+        </div>,
+      );
+    });
+    const container = (await screen.findByTestId('container')).children[0] as HTMLDivElement;
+    const editorHolder = container.querySelector('#test-editor-editable') as HTMLDivElement;
+    expect(editorHolder).toBeInTheDocument();
+    fireEvent.copy(editorHolder, { clipboardData: ['some', 'mash'] });
   });
 });

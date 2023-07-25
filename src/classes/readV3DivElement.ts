@@ -46,7 +46,7 @@ export const readV3DivElement = (
                     el instanceof HTMLSpanElement || el instanceof Text ? el : '',
                   ),
               ),
-            ]
+            ].filter((tb) => tb.text !== '')
           : [
               ...[...arg.childNodes].map(
                 (el) =>
@@ -54,7 +54,7 @@ export const readV3DivElement = (
                     el instanceof HTMLSpanElement || el instanceof Text ? el : '',
                   ),
               ),
-            ];
+            ].filter((tb) => tb.text !== '');
     }
     // Standard alignment
     else if (['left', 'center', 'right'].includes(arg.classList[1])) {
@@ -63,7 +63,7 @@ export const readV3DivElement = (
           (el) =>
             new EditorV3TextBlock(el instanceof HTMLSpanElement || el instanceof Text ? el : ''),
         ),
-      ];
+      ].filter((tb) => tb.text !== '');
       ret.textAlignment = arg.classList[1] as EditorV3Align;
     }
   }

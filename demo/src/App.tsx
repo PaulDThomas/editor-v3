@@ -102,7 +102,7 @@ export const App = (): JSX.Element => {
           </div>
 
           <div className='row'>
-            <span className='label'>Text input</span>
+            <span className='label'>Text input (spelling)</span>
             <span className='content'>
               <EditorV3
                 id={'e3'}
@@ -113,6 +113,7 @@ export const App = (): JSX.Element => {
                 allowNewLine={allowNewLine}
                 editable={editable}
                 customStyleMap={styleMap}
+                spellCheck={true}
                 style={{
                   width: '240px',
                 }}

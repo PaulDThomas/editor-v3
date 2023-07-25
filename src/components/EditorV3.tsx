@@ -25,6 +25,7 @@ interface EditorV3Props {
   decimalAlignPercent?: number;
   style?: CSSProperties;
   resize?: boolean;
+  spellCheck?: boolean;
 }
 
 export const EditorV3 = ({
@@ -40,6 +41,7 @@ export const EditorV3 = ({
   decimalAlignPercent = 60,
   style,
   resize = false,
+  spellCheck = false,
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
@@ -98,6 +100,10 @@ export const EditorV3 = ({
   const [inFocus, setInFocus] = useState<boolean>(false);
   const handleFocus = useCallback(() => {
     setInFocus(true);
+    const pos = (divRef.current && getCaretPosition(divRef.current)) ?? null;
+    if (!pos && divRef.current) {
+      setCaretPosition(divRef.current, { startLine: 0, startChar: 0, endLine: 0, endChar: 0 });
+    }
   }, []);
 
   const handleKeyDown = useCallback(
@@ -310,8 +316,9 @@ export const EditorV3 = ({
               typeof setText === 'function')
           }
           suppressContentEditableWarning
-          spellCheck={false}
+          spellCheck={spellCheck}
           ref={divRef}
+          onFocus={handleFocus}
           onKeyUpCapture={handleKeyUp}
           onCut={handleCopy}
           onCopy={handleCopy}
