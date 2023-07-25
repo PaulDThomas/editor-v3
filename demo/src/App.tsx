@@ -96,6 +96,7 @@ export const App = (): JSX.Element => {
                 customStyleMap={styleMap}
                 style={{
                   width: '240px',
+                  minHeight: '60px',
                 }}
               />
             </span>
