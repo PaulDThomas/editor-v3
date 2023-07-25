@@ -284,20 +284,23 @@ export const EditorV3 = ({
     returnData(getCurrentData(divRef));
   }, [returnData]);
 
-  const widthStyle = useMemo(() => {
+  const styleRecalc = useMemo(() => {
     const s = { ...style };
     // Remove padding/border width
     if (s.width) {
       s.width = `calc(${s.width} - 10px)`;
     }
+    if (resize) {
+      s.resize = 'both';
+      s.overflow = 'auto';
+    }
     return s;
-  }, [style]);
+  }, [resize, style]);
 
   return (
     <div
       className={`aiev3${inFocus ? ' editing' : ''}`}
       id={id}
-      style={widthStyle}
       onFocusCapture={handleFocus}
       onBlur={handleBlur}
     >
@@ -308,7 +311,7 @@ export const EditorV3 = ({
         <div
           id={`${id}-editable`}
           className='aiev3-editing'
-          style={resize ? { resize: 'both', overflow: 'auto' } : undefined}
+          style={styleRecalc}
           contentEditable={
             editable &&
             (typeof setHtml === 'function' ||
