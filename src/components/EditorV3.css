@@ -84,4 +84,5 @@
   text-align: left;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: flex;
 }

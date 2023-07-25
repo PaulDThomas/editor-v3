@@ -98,6 +98,10 @@ export const EditorV3 = ({
   const [inFocus, setInFocus] = useState<boolean>(false);
   const handleFocus = useCallback(() => {
     setInFocus(true);
+    const pos = (divRef.current && getCaretPosition(divRef.current)) ?? null;
+    if (!pos && divRef.current) {
+      setCaretPosition(divRef.current, { startLine: 0, startChar: 0, endLine: 0, endChar: 0 });
+    }
   }, []);
 
   const handleKeyDown = useCallback(
@@ -312,6 +316,7 @@ export const EditorV3 = ({
           suppressContentEditableWarning
           spellCheck={false}
           ref={divRef}
+          onFocus={handleFocus}
           onKeyUpCapture={handleKeyUp}
           onCut={handleCopy}
           onCopy={handleCopy}
