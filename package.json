@@ -1,6 +1,6 @@
 {
   "name": "@asup/editor-v3",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "REACT Typescript Editor component",
   "author": "Paul Thomas <@PaulDThomas>",
   "private": false,
