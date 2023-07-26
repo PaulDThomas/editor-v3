@@ -111,14 +111,14 @@ export const App = (): JSX.Element => {
                 id={'e3'}
                 input={input3}
                 setText={setInput3}
-                textAlignment={align}
+                textAlignment={EditorV3Align.left}
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}
                 editable={editable}
                 customStyleMap={styleMap}
                 spellCheck={true}
                 style={{
-                  width: '240px',
+                  width: '600px',
                 }}
               />
             </span>

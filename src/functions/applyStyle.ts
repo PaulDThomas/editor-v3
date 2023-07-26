@@ -9,7 +9,13 @@ export const applyStyle = (style: string | null, div: HTMLDivElement, target?: R
     if (pos) {
       const content = new EditorV3Content(div.innerHTML);
       redraw(div, style ? content.applyStyle(style, pos) : content.removeStyle(pos));
-      setCaretPosition(div, pos);
+      setCaretPosition(div, {
+        startLine: pos.startLine,
+        startChar: pos.startChar,
+        isCollapsed: true,
+        endLine: pos.startLine,
+        endChar: pos.startChar,
+      });
     }
   }
 };

@@ -335,3 +335,5 @@ export const EditorV3 = ({
     </div>
   );
 };
+
+EditorV3.displayName = 'EditorV3';

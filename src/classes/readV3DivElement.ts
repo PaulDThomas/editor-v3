@@ -67,5 +67,7 @@ export const readV3DivElement = (
       ret.textAlignment = arg.classList[1] as EditorV3Align;
     }
   }
+  // Ensure there is at least something
+  if (ret.textBlocks.length === 0) ret.textBlocks = [new EditorV3TextBlock('')];
   return ret;
 };
