@@ -36,11 +36,13 @@ export const readV3Html = (
       ret.styles = JSON.parse((styleNode as HTMLDivElement).dataset.style ?? '');
     }
   }
-  // Everything else is just text
+  // Everything else is just text(ish)
   else {
     ret.lines = text
       .replace(/[\u200B-\u200F\uFEFF\r\t]/g, '') // Undesirable non-printing chars
       .replace(/[\u202F|\u00A0]/g, ' ') // Spaces are spaces
+      .replaceAll('</div><div', '</div>\n<div')
+      .replaceAll('&nbsp;', ' ')
       .split('\n')
       .map((l) => new EditorV3Line(l, textAlignment, decimalAlignPercent));
   }

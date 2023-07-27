@@ -12,7 +12,9 @@ export const App = (): JSX.Element => {
     }),
   );
   const [input2, setInput2] = useState<string>('Another one');
-  const [input3, setInput3] = useState<string>('And another one');
+  const [input3, setInput3] = useState<string>(
+    `<div classname="aie-text" data-key="2usqj" data-type="unstyled" data-inline-style-ranges="[]">Scatter plot of eGFR values post randomization, with LOESS smoothing line overlayed.</div><div classname="aie-text" data-key="8uaa4" data-type="unstyled" data-inline-style-ranges="[]"></div><div classname="aie-text" data-key="5mj3a" data-type="unstyled" data-inline-style-ranges="[]">Y-axis label: eGFR (ml/min/1.73^2)</div><div classname="aie-text" data-key="ebhpo" data-type="unstyled" data-inline-style-ranges="[]">X-axis label: Time since randomization (months)</div><div classname="aie-text" data-key="fafoq" data-type="unstyled" data-inline-style-ranges="[]"></div><div classname="aie-text" data-key="bs8eq" data-type="unstyled" data-inline-style-ranges="[]">Separate plots for SZC and Placebo arm; LOESS line should have 95% Confidence interval included too.</div><div classname="aie-text" data-key="14o5e" data-type="unstyled" data-inline-style-ranges="[]"></div>`,
+  );
   const [json, setJson] = useState<string>('');
   const [text, setText] = useState<string>('');
   const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.decimal);
@@ -51,6 +53,7 @@ export const App = (): JSX.Element => {
                 style={{
                   width: '240px',
                 }}
+                spellCheck={false}
               />
             </span>
           </div>
@@ -109,14 +112,14 @@ export const App = (): JSX.Element => {
                 id={'e3'}
                 input={input3}
                 setText={setInput3}
-                textAlignment={align}
+                textAlignment={EditorV3Align.left}
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}
                 editable={editable}
                 customStyleMap={styleMap}
                 spellCheck={true}
                 style={{
-                  width: '240px',
+                  width: '600px',
                 }}
               />
             </span>

@@ -9,6 +9,11 @@
   overflow: hidden;
 }
 
+.aiev3:focus,
+.aiev3:hover {
+  overflow: visible;
+}
+
 .aiev3.editing .aiev3-editing {
   border: 1px solid black;
   background-color: white;
