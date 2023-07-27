@@ -26,6 +26,7 @@ interface EditorV3Props {
   style?: CSSProperties;
   resize?: boolean;
   spellCheck?: boolean;
+  styleOnContextMenu?: boolean;
 }
 
 export const EditorV3 = ({
@@ -42,6 +43,7 @@ export const EditorV3 = ({
   style,
   resize = false,
   spellCheck = false,
+  styleOnContextMenu = true,
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
@@ -307,6 +309,7 @@ export const EditorV3 = ({
       <ContextMenuHandler
         menuItems={menuItems}
         style={{ width: '100%', height: '100%' }}
+        showLowMenu={spellCheck || !styleOnContextMenu}
       >
         <div
           id={`${id}-editable`}
@@ -330,7 +333,7 @@ export const EditorV3 = ({
           onBlurCapture={handleBlur}
           onFocusCapture={handleFocus}
           // Add resizable? when required ?
-        ></div>
+        />
       </ContextMenuHandler>
     </div>
   );

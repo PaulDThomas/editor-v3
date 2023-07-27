@@ -41,7 +41,7 @@ describe('Editor and functions', () => {
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x.xx</span>' +
         '</div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
-        '</div></div></div>',
+        '</div></div> </div>',
     );
     const firstSpan = container.querySelector('span') as HTMLSpanElement;
     await user.click(firstSpan);
@@ -87,7 +87,7 @@ describe('Editor and functions', () => {
       JSON.stringify({
         lines: [
           { textBlocks: [{ text: '34.45' }], textAlignment: 'decimal', decimalAlignPercent: 70 },
-          { textBlocks: [], textAlignment: 'decimal', decimalAlignPercent: 70 },
+          { textBlocks: [{ text: '' }], textAlignment: 'decimal', decimalAlignPercent: 70 },
           {
             textBlocks: [{ text: 'x.xx', style: 'shiny' }],
             textAlignment: 'decimal',
@@ -126,9 +126,9 @@ describe('Editor and functions', () => {
     expect(mockSetJson).toHaveBeenLastCalledWith(
       JSON.stringify({
         lines: [
-          { textBlocks: [], textAlignment: 'decimal', decimalAlignPercent: 70 },
+          { textBlocks: [{ text: '' }], textAlignment: 'decimal', decimalAlignPercent: 70 },
           { textBlocks: [{ text: '4' }], textAlignment: 'decimal', decimalAlignPercent: 70 },
-          { textBlocks: [], textAlignment: 'decimal', decimalAlignPercent: 70 },
+          { textBlocks: [{ text: '' }], textAlignment: 'decimal', decimalAlignPercent: 70 },
           {
             textBlocks: [{ text: 'x.xx', style: 'shiny' }],
             textAlignment: 'decimal',
@@ -191,8 +191,9 @@ describe('Menu styling', () => {
     await user.click(firstSpan);
     // Click shiny
     fireEvent.contextMenu(firstSpan);
-    expect(screen.queryByText('shiny')).toBeInTheDocument();
-    const shinyItem = screen.getByText('shiny');
+    const shinyItem = screen.queryByLabelText('shiny') as HTMLSpanElement;
+    expect(shinyItem).toBeInTheDocument();
+    fireEvent.mouseDown(shinyItem);
     await user.click(shinyItem);
     let calledParams = mockApplyStyle.mock.calls[0];
     expect(calledParams[0]).toEqual('shiny');
@@ -200,7 +201,7 @@ describe('Menu styling', () => {
     firstSpan = container.querySelector('span') as HTMLSpanElement;
     fireEvent.contextMenu(firstSpan);
     expect(screen.queryByText('Remove style')).toBeInTheDocument();
-    const removeItem = screen.getByText('Remove style');
+    const removeItem = screen.getByLabelText('Remove style');
     await user.click(removeItem);
     calledParams = mockApplyStyle.mock.calls[1];
     expect(calledParams[0]).toEqual(null);

@@ -53,6 +53,7 @@ export const App = (): JSX.Element => {
                 style={{
                   width: '240px',
                 }}
+                spellCheck={false}
               />
             </span>
           </div>
