@@ -1,7 +1,7 @@
-import { drawHtmlDecimalAlign } from './drawHtmlDecimalAlign';
-import { EditorV3TextBlock } from './EditorV3TextBlock';
-import { EditorV3Align } from './interface';
-import { readV3DivElement } from './readV3DivElement';
+import { drawHtmlDecimalAlign } from "./drawHtmlDecimalAlign";
+import { EditorV3TextBlock } from "./EditorV3TextBlock";
+import { EditorV3Align } from "./interface";
+import { readV3DivElement } from "./readV3DivElement";
 
 export class EditorV3Line {
   public textBlocks: EditorV3TextBlock[];
@@ -10,7 +10,7 @@ export class EditorV3Line {
 
   // Read only variables
   get el(): HTMLDivElement {
-    const h = document.createElement('div');
+    const h = document.createElement("div");
     h.className = `aiev3-line ${this.textAlignment}`;
     if (this.textAlignment === EditorV3Align.decimal) {
       const decimalPosition = this.lineText.match(/\./)?.index ?? Infinity;
@@ -27,7 +27,7 @@ export class EditorV3Line {
   }
 
   get lineText(): string {
-    return this.textBlocks.map((tb) => tb.text).join('');
+    return this.textBlocks.map((tb) => tb.text).join("");
   }
 
   get lineLength(): number {
@@ -36,11 +36,11 @@ export class EditorV3Line {
 
   get jsonString(): string {
     return JSON.stringify(this, [
-      'textBlocks',
-      'textAlignment',
-      'decimalAlignPercent',
-      'text',
-      'style',
+      "textBlocks",
+      "textAlignment",
+      "decimalAlignPercent",
+      "text",
+      "style",
     ]);
   }
 
@@ -55,10 +55,10 @@ export class EditorV3Line {
     this.decimalAlignPercent = 60;
     this.textAlignment = EditorV3Align.left;
     // Text
-    if (typeof arg === 'string') {
+    if (typeof arg === "string") {
       // Decimal html string
       if (arg.match(/^<div class="aiev3-line .*">.*<\/div>$/)) {
-        const h = document.createElement('template');
+        const h = document.createElement("template");
         h.innerHTML = arg;
         const d = h.content.children[0] as HTMLDivElement;
         const ret = readV3DivElement(d);
@@ -75,7 +75,7 @@ export class EditorV3Line {
               (tb: string | { text: string; style?: string }) => new EditorV3TextBlock(tb),
             );
           } else {
-            throw 'No blocks';
+            throw "No blocks";
           }
           if (jsonInput.decimalAlignPercent)
             this.decimalAlignPercent = jsonInput.decimalAlignPercent;
@@ -120,7 +120,7 @@ export class EditorV3Line {
     const ret: EditorV3TextBlock[] = [];
     // Return empty styled block for start/end same
     if (startPos >= (endPos ?? this.lineLength)) {
-      ret.push(new EditorV3TextBlock('', this.getStyleAt(startPos)));
+      ret.push(new EditorV3TextBlock("", this.getStyleAt(startPos)));
       return ret;
     }
     let _counted = 0;
@@ -129,7 +129,7 @@ export class EditorV3Line {
       if (
         _counted <= startPos &&
         _counted + this.textBlocks[_i].text.length >= startPos &&
-        this.textBlocks[_i].text.slice(startPos - _counted, (endPos ?? Infinity) - _counted) !== ''
+        this.textBlocks[_i].text.slice(startPos - _counted, (endPos ?? Infinity) - _counted) !== ""
       ) {
         ret.push(
           new EditorV3TextBlock(
@@ -175,7 +175,7 @@ export class EditorV3Line {
 
   public splitLine(pos: number): EditorV3Line {
     if (pos >= this.lineLength) {
-      return new EditorV3Line('', this.textAlignment, this.decimalAlignPercent);
+      return new EditorV3Line("", this.textAlignment, this.decimalAlignPercent);
     } else {
       const preSplit = this.upToPos(pos);
       const postSplit = this.fromPos(pos);
@@ -247,10 +247,10 @@ export class EditorV3Line {
           lastStyle = this.textBlocks[_i].style;
         }
       }
-      if (mergedBlocks.filter((tb) => tb.text !== '').length === 0) {
+      if (mergedBlocks.filter((tb) => tb.text !== "").length === 0) {
         this.textBlocks = [mergedBlocks[0]];
-      } else if (mergedBlocks.filter((tb) => tb.text !== '').length < this.textBlocks.length) {
-        this.textBlocks = mergedBlocks.filter((tb) => tb.text !== '');
+      } else if (mergedBlocks.filter((tb) => tb.text !== "").length < this.textBlocks.length) {
+        this.textBlocks = mergedBlocks.filter((tb) => tb.text !== "");
       }
     }
   }

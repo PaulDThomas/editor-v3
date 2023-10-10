@@ -1,10 +1,10 @@
-import { EditorV3TextBlock } from './EditorV3TextBlock';
+import { EditorV3TextBlock } from "./EditorV3TextBlock";
 
 export enum EditorV3Align {
-  'left' = 'left',
-  'center' = 'center',
-  'decimal' = 'decimal',
-  'right' = 'right',
+  "left" = "left",
+  "center" = "center",
+  "decimal" = "decimal",
+  "right" = "right",
 }
 
 export interface EditorV3Styles {

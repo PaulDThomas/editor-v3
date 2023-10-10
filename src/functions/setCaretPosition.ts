@@ -1,6 +1,6 @@
-import { EditorV3Position } from '../classes/interface';
-import { getCaretPosition } from './getCaretPosition';
-import { getTextNodeAtOffset } from './getTextNodeAtOffset';
+import { EditorV3Position } from "../classes/interface";
+import { getCaretPosition } from "./getCaretPosition";
+import { getTextNodeAtOffset } from "./getTextNodeAtOffset";
 
 export function setCaretPosition(
   el: Node,
@@ -8,7 +8,7 @@ export function setCaretPosition(
   style?: string,
 ): EditorV3Position | null {
   // Go to a lower line if required
-  const lines = el instanceof Element ? el.querySelectorAll('div.aiev3-line') : null;
+  const lines = el instanceof Element ? el.querySelectorAll("div.aiev3-line") : null;
   if (lines && pos.startLine < lines.length) {
     const f = getTextNodeAtOffset(lines[pos.startLine], pos.startChar);
     const l = getTextNodeAtOffset(lines[pos.endLine], pos.endChar);

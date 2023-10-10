@@ -1,13 +1,13 @@
-import { EditorV3Line } from './EditorV3Line';
-import { EditorV3TextBlock } from './EditorV3TextBlock';
+import { EditorV3Line } from "./EditorV3Line";
+import { EditorV3TextBlock } from "./EditorV3TextBlock";
 import {
   EditorV3Align,
   EditorV3ContentProps,
   EditorV3Import,
   EditorV3Position,
   EditorV3Styles,
-} from './interface';
-import { readV3Html } from './readV3Html';
+} from "./interface";
+import { readV3Html } from "./readV3Html";
 
 export class EditorV3Content {
   // Standard attributes
@@ -44,8 +44,8 @@ export class EditorV3Content {
   public lines: EditorV3Line[] = [];
 
   private _styleNode(): HTMLDivElement {
-    const sn = document.createElement('div');
-    sn.className = 'aiev3-style-info';
+    const sn = document.createElement("div");
+    sn.className = "aiev3-style-info";
     sn.dataset.style = JSON.stringify(this._styles);
     return sn;
   }
@@ -59,7 +59,7 @@ export class EditorV3Content {
   }
 
   get text(): string {
-    return this.lines.map((l) => l.textBlocks.map((b) => b.text).join('')).join('\n');
+    return this.lines.map((l) => l.textBlocks.map((b) => b.text).join("")).join("\n");
   }
 
   get jsonString(): string {
@@ -82,7 +82,7 @@ export class EditorV3Content {
     try {
       // Check for stringified class input
       const jsonInput: EditorV3Import = JSON.parse(input);
-      if (!Array.isArray(jsonInput.lines)) throw 'No lines';
+      if (!Array.isArray(jsonInput.lines)) throw "No lines";
       this.copyImport(jsonInput, props);
     } catch {
       // Establish input as string
@@ -119,7 +119,7 @@ export class EditorV3Content {
       const style = this.lines[pos.startLine].getStyleAt(pos.startChar);
       ret.push(
         new EditorV3Line(
-          [new EditorV3TextBlock('', style)],
+          [new EditorV3TextBlock("", style)],
           this.textAlignment,
           this.decimalAlignPercent,
         ),
@@ -203,7 +203,7 @@ export class EditorV3Content {
   }
 
   public deleteCharacter(pos: EditorV3Position, backwards: boolean): EditorV3Position {
-    if (this.lines.length > pos.startLine && this.text !== '') {
+    if (this.lines.length > pos.startLine && this.text !== "") {
       const newPos = { ...pos };
       // Move cursor if start and end are the same
       if (pos.startLine === pos.endLine && pos.startChar === pos.endChar) {
