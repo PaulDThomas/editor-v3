@@ -162,6 +162,31 @@ describe('Editor and functions', () => {
   });
 });
 
+describe('Stop force update', () => {
+  test('Force update off', async () => {
+    const mockSetJson = jest.fn();
+    const mockApplyStyle = jest.fn();
+    jest.spyOn(applyStyleModule, 'applyStyle').mockImplementation(mockApplyStyle);
+    await act(async () => {
+      render(
+        <div data-testid='container'>
+          <EditorV3
+            id='test-editor'
+            input={'Hello'}
+            forceUpdate={false}
+            setJson={mockSetJson}
+          />
+        </div>,
+      );
+    });
+    // Get component
+    const container = (await screen.findByTestId('container')).children[0] as HTMLDivElement;
+    expect(mockSetJson).not.toHaveBeenCalled();
+    fireEvent.focus(container);
+    expect(mockSetJson).toHaveBeenCalled();
+  });
+});
+
 describe('Menu styling', () => {
   test('Add and remove style', async () => {
     const user = userEvent.setup();

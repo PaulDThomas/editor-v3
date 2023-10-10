@@ -27,6 +27,7 @@ interface EditorV3Props {
   resize?: boolean;
   spellCheck?: boolean;
   styleOnContextMenu?: boolean;
+  forceUpdate?: boolean;
 }
 
 export const EditorV3 = ({
@@ -44,6 +45,7 @@ export const EditorV3 = ({
   resize = false,
   spellCheck = false,
   styleOnContextMenu = true,
+  forceUpdate = true,
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
@@ -51,7 +53,7 @@ export const EditorV3 = ({
   const menuItems = useMemo((): iMenuItem[] => {
     return [
       {
-        label: `Style`,
+        label: 'Style',
         group: [
           ...(customStyleMap && Object.keys(customStyleMap).length > 0
             ? Object.keys(customStyleMap ?? {}).map((s) => {
@@ -63,7 +65,6 @@ export const EditorV3 = ({
                 };
               })
             : [{ label: 'No styles defined', disabled: true }]),
-
           {
             label: 'Remove style',
             action: (target) => {
@@ -76,15 +77,19 @@ export const EditorV3 = ({
   }, [customStyleMap]);
 
   // General return function
+  const [canReturn, setCanReturn] = useState<boolean>(forceUpdate);
   const returnData = useCallback(
     (ret: { text: string; html: string; json: string }, force?: boolean) => {
-      if (force || (ret.text !== input && ret.html !== input && ret.json !== input)) {
+      if (
+        canReturn &&
+        (force || (ret.text !== input && ret.html !== input && ret.json !== input))
+      ) {
         setText && setText(ret.text);
         setHtml && setHtml(ret.html);
         setJson && setJson(ret.json);
       }
     },
-    [input, setHtml, setJson, setText],
+    [canReturn, input, setHtml, setJson, setText],
   );
 
   // Update if input changes
@@ -102,6 +107,7 @@ export const EditorV3 = ({
   const [inFocus, setInFocus] = useState<boolean>(false);
   const handleFocus = useCallback(() => {
     setInFocus(true);
+    setCanReturn(true);
     const pos = (divRef.current && getCaretPosition(divRef.current)) ?? null;
     if (!pos && divRef.current) {
       setCaretPosition(divRef.current, { startLine: 0, startChar: 0, endLine: 0, endChar: 0 });
@@ -322,6 +328,14 @@ export const EditorV3 = ({
               typeof setText === 'function')
           }
           suppressContentEditableWarning
+          role={
+            editable &&
+            (typeof setHtml === 'function' ||
+              typeof setJson === 'function' ||
+              typeof setText === 'function')
+              ? 'textbox'
+              : undefined
+          }
           spellCheck={spellCheck}
           ref={divRef}
           onFocus={handleFocus}
