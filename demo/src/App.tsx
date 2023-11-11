@@ -205,7 +205,7 @@ export const App = (): JSX.Element => {
           <div className='row'>
             <span className='label'>HTML</span>
             <span className='content'>
-              <pre>{input.replace(/></g, ">\u200b<").split("\u200b").join("\n")}</pre>
+              <pre>{input.replace(/></g, ">\u2009<").split("\u2009").join("\n")}</pre>
             </span>
           </div>
         </div>

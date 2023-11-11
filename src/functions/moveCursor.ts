@@ -1,5 +1,4 @@
 import { EditorV3Content } from "../classes";
-import { EditorV3 } from "../components";
 import { getCaretPosition } from "./getCaretPosition";
 import { setCaretPosition } from "./setCaretPosition";
 
@@ -16,7 +15,10 @@ export const moveCursor = (divRef: HTMLDivElement, e: React.KeyboardEvent<HTMLDi
     const lastLineLength = lines[pos.endLine].lineLength;
     switch (e.key) {
       case "Home":
-        if (newPos.startChar === 0) {
+        if (e.ctrlKey) {
+          newPos.startLine = 0;
+          newPos.startChar = 0;
+        } else if (newPos.startChar === 0) {
           newPos.startLine = 0;
         } else newPos.startChar = 0;
         if (!e.shiftKey) {
@@ -25,7 +27,10 @@ export const moveCursor = (divRef: HTMLDivElement, e: React.KeyboardEvent<HTMLDi
         }
         break;
       case "End":
-        if (newPos.endChar === lastLineLength) {
+        if (e.ctrlKey) {
+          newPos.endLine = lines.length - 1;
+          newPos.endChar = lines[lines.length - 1].lineLength;
+        } else if (newPos.endChar === lastLineLength) {
           newPos.endLine = lines.length - 1;
           newPos.endChar = lines[lines.length - 1].lineLength;
         } else newPos.endChar = lastLineLength;

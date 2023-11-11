@@ -75,7 +75,7 @@ describe("Check basic EditorV3Content", () => {
   });
 
   test("Load multiline string", async () => {
-    const testContent = new EditorV3Content("Hello\n.World\u200b");
+    const testContent = new EditorV3Content("Hello\n.World\u2009");
     expect(testContent.text).toEqual("Hello\n.World");
     expect(JSON.parse(testContent.jsonString)).toEqual({
       lines: [
@@ -112,10 +112,10 @@ describe("Check basic EditorV3Content", () => {
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span class="aiev3-tb">Hello</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;"><span class="aiev3-tb">\u200b</span></span>' +
+        '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;"><span class="aiev3-tb">\u2009</span></span>' +
         "</div>" +
         '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span class="aiev3-tb">\u200b</span></span>' +
+        '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span class="aiev3-tb">\u2009</span></span>' +
         '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;"><span class="aiev3-tb">.World</span></span>' +
         "</div>" +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}"></div>',

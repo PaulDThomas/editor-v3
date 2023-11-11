@@ -104,7 +104,7 @@ describe("Check basic EditorV3Line", () => {
     expect(newDecimalTestLine.el.outerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span class="aiev3-tb">q</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;"><span class="aiev3-tb">\u200b</span></span>' +
+        '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;"><span class="aiev3-tb">\u2009</span></span>' +
         "</div>",
     );
     const testLine = new EditorV3Line("12.34", EditorV3Align.decimal);

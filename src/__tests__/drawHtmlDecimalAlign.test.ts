@@ -18,7 +18,7 @@ describe("Test draw decimal align function", () => {
     expect(div.outerHTML).toEqual(
       "<div>" +
         '<span class="aiev3-span-point lhs" style="right: 60%; min-width: 40%;"><span class="aiev3-tb">1234</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 40%; min-width: 60%;">\u200b</span>' +
+        '<span class="aiev3-span-point rhs" style="left: 40%; min-width: 60%;">\u2009</span>' +
         "</div>",
     );
   });
@@ -27,7 +27,7 @@ describe("Test draw decimal align function", () => {
     drawHtmlDecimalAlign(div, 75, [], [new EditorV3TextBlock("34")]);
     expect(div.outerHTML).toEqual(
       "<div>" +
-        '<span class="aiev3-span-point lhs" style="right: 25%; min-width: 75%;">\u200b</span>' +
+        '<span class="aiev3-span-point lhs" style="right: 25%; min-width: 75%;">\u2009</span>' +
         '<span class="aiev3-span-point rhs" style="left: 75%; min-width: 25%;"><span class="aiev3-tb">34</span></span>' +
         "</div>",
     );
@@ -37,8 +37,8 @@ describe("Test draw decimal align function", () => {
     drawHtmlDecimalAlign(div, 35, [], []);
     expect(div.outerHTML).toEqual(
       "<div>" +
-        '<span class="aiev3-span-point lhs" style="right: 65%; min-width: 35%;">\u200b</span>' +
-        '<span class="aiev3-span-point rhs" style="left: 35%; min-width: 65%;">\u200b</span>' +
+        '<span class="aiev3-span-point lhs" style="right: 65%; min-width: 35%;">\u2009</span>' +
+        '<span class="aiev3-span-point rhs" style="left: 35%; min-width: 65%;">\u2009</span>' +
         "</div>",
     );
   });

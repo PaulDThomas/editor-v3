@@ -41,7 +41,7 @@ describe("Check basic EditorV3TextBlock", () => {
     testSpan.textContent = null;
     const testBlock = new EditorV3TextBlock(testSpan);
     expect(testBlock.text).toEqual("");
-    expect(testBlock.el.outerHTML).toEqual('<span class="aiev3-tb">\u200b</span>');
+    expect(testBlock.el.outerHTML).toEqual('<span class="aiev3-tb">\u2009</span>');
   });
 
   test("Load text node", async () => {

@@ -35,7 +35,7 @@ describe("Editor and functions", () => {
         '<span class="aiev3-tb">34.45</span>' +
         "</div>" +
         '<div class="aiev3-line left" style="height: 0px;">' +
-        '<span class="aiev3-tb">\u200b</span>' +
+        '<span class="aiev3-tb">\u2009</span>' +
         "</div>" +
         '<div class="aiev3-line left" style="height: 0px;">' +
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x.xx</span>' +
@@ -78,6 +78,7 @@ describe("Editor and functions", () => {
             allowNewLine
             textAlignment={EditorV3Align.decimal}
             decimalAlignPercent={70}
+            forceUpdate
           />
         </div>,
       );
@@ -142,16 +143,16 @@ describe("Editor and functions", () => {
     );
     expect(mockSetHtml).toHaveBeenLastCalledWith(
       '<div class="aiev3-line decimal" style="height: 0px;">' +
-        '<span class="aiev3-span-point lhs" style="right: 30%; min-width: 70%;">\u200b</span>' +
-        '<span class="aiev3-span-point rhs" style="left: 70%; min-width: 30%;"><span class="aiev3-tb">\u200b</span></span>' +
+        '<span class="aiev3-span-point lhs" style="right: 30%; min-width: 70%;">\u2009</span>' +
+        '<span class="aiev3-span-point rhs" style="left: 70%; min-width: 30%;"><span class="aiev3-tb">\u2009</span></span>' +
         "</div>" +
         '<div class="aiev3-line decimal" style="height: 0px;">' +
         '<span class="aiev3-span-point lhs" style="right: 30%; min-width: 70%;"><span class="aiev3-tb">4</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 70%; min-width: 30%;"><span class="aiev3-tb">\u200b</span></span>' +
+        '<span class="aiev3-span-point rhs" style="left: 70%; min-width: 30%;"><span class="aiev3-tb">\u2009</span></span>' +
         "</div>" +
         '<div class="aiev3-line decimal" style="height: 0px;">' +
-        '<span class="aiev3-span-point lhs" style="right: 30%; min-width: 70%;">\u200b</span>' +
-        '<span class="aiev3-span-point rhs" style="left: 70%; min-width: 30%;"><span class="aiev3-tb">\u200b</span></span>' +
+        '<span class="aiev3-span-point lhs" style="right: 30%; min-width: 70%;">\u2009</span>' +
+        '<span class="aiev3-span-point rhs" style="left: 70%; min-width: 30%;"><span class="aiev3-tb">\u2009</span></span>' +
         "</div>" +
         '<div class="aiev3-line decimal" style="height: 0px;">' +
         '<span class="aiev3-span-point lhs" style="right: 30%; min-width: 70%;"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x</span></span>' +
@@ -205,6 +206,7 @@ describe("Menu styling", () => {
             style={{ width: "200px" }}
             allowNewLine
             customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
+            forceUpdate
           />
         </div>,
       );
@@ -249,12 +251,15 @@ describe("Cursor tests", () => {
             allowNewLine
             customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
             resize
+            forceUpdate
           />
         </div>,
       );
     });
     // Get component
-    const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
+    const container = (await screen.findByTestId("container")).querySelector(
+      "#test-editor",
+    ) as HTMLDivElement;
     // Go to start of text
     await user.click(container.querySelector("span") as HTMLSpanElement);
     await user.keyboard("{Control>}{Home}{/Control}{Home}");
@@ -351,6 +356,7 @@ describe("Cut and paste", () => {
             allowNewLine
             customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
             resize
+            forceUpdate
           />
         </div>,
       );
@@ -407,6 +413,7 @@ describe("Cut and paste", () => {
             style={{ width: "200px" }}
             allowNewLine
             textAlignment={EditorV3Align.center}
+            forceUpdate
           />
           <EditorV3
             id='test-editor-2'
@@ -414,6 +421,7 @@ describe("Cut and paste", () => {
             setText={mockSetText2}
             style={{ width: "200px" }}
             textAlignment={EditorV3Align.center}
+            forceUpdate
           />
         </div>,
       );
