@@ -30,7 +30,7 @@ export function getCaretPosition(
   if (startLine === null || !f) return null;
   preCaretRange.selectNodeContents(f);
   preCaretRange.setEnd(range.startContainer, range.startOffset);
-  const startChar = preCaretRange.toString().replace(/\u200b/, "").length;
+  const startChar = preCaretRange.toString().replace(/[\u2009-\u200F]/, "").length;
 
   const l = (
     range.endContainer instanceof Element
@@ -43,7 +43,7 @@ export function getCaretPosition(
   if (l) {
     preCaretRange.selectNodeContents(l);
     preCaretRange.setEnd(range.endContainer, range.endOffset);
-    endChar = preCaretRange.toString().replace(/\u200b/, "").length;
+    endChar = preCaretRange.toString().replace(/[\u2009-\u200F]/, "").length;
   }
   return {
     startLine,
