@@ -45,7 +45,7 @@ export const EditorV3 = ({
   resize = false,
   spellCheck = false,
   styleOnContextMenu = true,
-  forceUpdate = true,
+  forceUpdate = false,
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
@@ -346,11 +346,10 @@ export const EditorV3 = ({
           onKeyDownCapture={handleKeyDown}
           onBlurCapture={handleBlur}
           onFocusCapture={handleFocus}
-          // Add resizable? when required ?
         />
       </ContextMenuHandler>
     </div>
   );
 };
 
-EditorV3.displayName = "EditorV3";
+EditorV3.displayName = "AsupEditorV3";
