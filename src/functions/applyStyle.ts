@@ -1,7 +1,7 @@
-import { EditorV3Content } from '../classes/EditorV3Content';
-import { getCaretPosition } from './getCaretPosition';
-import { redraw } from './redraw';
-import { setCaretPosition } from './setCaretPosition';
+import { EditorV3Content } from "../classes/EditorV3Content";
+import { getCaretPosition } from "./getCaretPosition";
+import { redraw } from "./redraw";
+import { setCaretPosition } from "./setCaretPosition";
 
 export const applyStyle = (style: string | null, div: HTMLDivElement, target?: Range | null) => {
   if (target) {

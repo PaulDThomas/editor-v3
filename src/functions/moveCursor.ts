@@ -1,7 +1,6 @@
-import { EditorV3Content } from '../classes';
-import { EditorV3 } from '../components';
-import { getCaretPosition } from './getCaretPosition';
-import { setCaretPosition } from './setCaretPosition';
+import { EditorV3Content } from "../classes";
+import { getCaretPosition } from "./getCaretPosition";
+import { setCaretPosition } from "./setCaretPosition";
 
 export const moveCursor = (divRef: HTMLDivElement, e: React.KeyboardEvent<HTMLDivElement>) => {
   e.preventDefault();
@@ -15,8 +14,11 @@ export const moveCursor = (divRef: HTMLDivElement, e: React.KeyboardEvent<HTMLDi
     const newPos = { ...pos };
     const lastLineLength = lines[pos.endLine].lineLength;
     switch (e.key) {
-      case 'Home':
-        if (newPos.startChar === 0) {
+      case "Home":
+        if (e.ctrlKey) {
+          newPos.startLine = 0;
+          newPos.startChar = 0;
+        } else if (newPos.startChar === 0) {
           newPos.startLine = 0;
         } else newPos.startChar = 0;
         if (!e.shiftKey) {
@@ -24,8 +26,11 @@ export const moveCursor = (divRef: HTMLDivElement, e: React.KeyboardEvent<HTMLDi
           newPos.endChar = newPos.startChar;
         }
         break;
-      case 'End':
-        if (newPos.endChar === lastLineLength) {
+      case "End":
+        if (e.ctrlKey) {
+          newPos.endLine = lines.length - 1;
+          newPos.endChar = lines[lines.length - 1].lineLength;
+        } else if (newPos.endChar === lastLineLength) {
           newPos.endLine = lines.length - 1;
           newPos.endChar = lines[lines.length - 1].lineLength;
         } else newPos.endChar = lastLineLength;
@@ -34,7 +39,7 @@ export const moveCursor = (divRef: HTMLDivElement, e: React.KeyboardEvent<HTMLDi
           newPos.startChar = newPos.endChar;
         }
         break;
-      case 'ArrowLeft':
+      case "ArrowLeft":
         newPos.startLine =
           pos.startChar === 0 && pos.startLine > 0 ? pos.startLine - 1 : pos.startLine;
         newPos.startChar =
@@ -46,7 +51,7 @@ export const moveCursor = (divRef: HTMLDivElement, e: React.KeyboardEvent<HTMLDi
           newPos.endChar = newPos.startChar;
         }
         break;
-      case 'ArrowRight':
+      case "ArrowRight":
         if (lastLineLength >= newPos.endChar) {
           newPos.endChar =
             e.ctrlKey && lastLineLength > newPos.endChar ? lastLineLength : pos.endChar + 1;
@@ -60,7 +65,7 @@ export const moveCursor = (divRef: HTMLDivElement, e: React.KeyboardEvent<HTMLDi
           newPos.startChar = newPos.endChar;
         }
         break;
-      case 'ArrowUp':
+      case "ArrowUp":
         newPos.startLine = Math.max(0, e.ctrlKey ? 0 : newPos.startLine - 1);
         newPos.startChar =
           pos.startLine > 0 ? Math.min(newPos.startChar, lines[newPos.startLine].lineLength) : 0;
@@ -69,7 +74,7 @@ export const moveCursor = (divRef: HTMLDivElement, e: React.KeyboardEvent<HTMLDi
           newPos.endChar = newPos.startChar;
         }
         break;
-      case 'ArrowDown':
+      case "ArrowDown":
         newPos.endLine = Math.min(
           lines.length - 1,
           e.ctrlKey ? lines.length - 1 : newPos.endLine + 1,

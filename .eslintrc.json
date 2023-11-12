@@ -32,7 +32,7 @@
     "react/react-in-jsx-scope": "off",
     "spaced-comment": "error",
     // Prettier rule
-    "prettier/prettier": ["warn", { "singleQuote": true }],
+    "prettier/prettier": ["warn", { "doubleQuote": true }],
     // "quotes": ["error", "single"],
     "no-duplicate-imports": "error",
     "react-hooks/rules-of-hooks": "error",

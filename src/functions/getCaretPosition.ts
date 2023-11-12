@@ -1,4 +1,4 @@
-import { EditorV3Position } from '../classes/interface';
+import { EditorV3Position } from "../classes/interface";
 
 export function getCaretPosition(
   element: HTMLDivElement,
@@ -22,28 +22,28 @@ export function getCaretPosition(
     range.startContainer instanceof Element
       ? range.startContainer
       : (range.startContainer.parentElement as Element)
-  ).closest('div.aiev3-line');
+  ).closest("div.aiev3-line");
   const startLine =
     f && element.contains(f) && f.parentElement
-      ? [...f.parentElement.querySelectorAll('div.aiev3-line')].indexOf(f)
+      ? [...f.parentElement.querySelectorAll("div.aiev3-line")].indexOf(f)
       : null;
   if (startLine === null || !f) return null;
   preCaretRange.selectNodeContents(f);
   preCaretRange.setEnd(range.startContainer, range.startOffset);
-  const startChar = preCaretRange.toString().replace(/\u200b/, '').length;
+  const startChar = preCaretRange.toString().replace(/[\u2009-\u200F]/, "").length;
 
   const l = (
     range.endContainer instanceof Element
       ? range.endContainer
       : (range.endContainer.parentElement as Element)
-  ).closest('div.aiev3-line');
+  ).closest("div.aiev3-line");
   const endLine =
     l && element.contains(l) && l.parentElement ? [...l.parentElement.children].indexOf(l) : -1;
   let endChar = -1;
   if (l) {
     preCaretRange.selectNodeContents(l);
     preCaretRange.setEnd(range.endContainer, range.endOffset);
-    endChar = preCaretRange.toString().replace(/\u200b/, '').length;
+    endChar = preCaretRange.toString().replace(/[\u2009-\u200F]/, "").length;
   }
   return {
     startLine,

@@ -6,8 +6,8 @@ export const getTextNodeAtOffset = (
   if (el)
     for (let _i = 0; _i < el.childNodes.length && currentPos <= offset; _i++) {
       const currentNode = el.childNodes[_i] as Node;
-      if (currentPos + (currentNode?.textContent ?? '').length < offset) {
-        currentPos += (currentNode?.textContent ?? '').length;
+      if (currentPos + (currentNode?.textContent ?? "").length < offset) {
+        currentPos += (currentNode?.textContent ?? "").length;
       } else if (currentNode instanceof Element) {
         return getTextNodeAtOffset(currentNode, offset - currentPos);
       } else if (currentNode instanceof Text) {

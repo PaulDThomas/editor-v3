@@ -1,16 +1,16 @@
-import { ContextMenuHandler, iMenuItem } from '@asup/context-menu';
-import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { EditorV3Line, EditorV3TextBlock } from '../classes';
-import { EditorV3Content } from '../classes/EditorV3Content';
-import { EditorV3Align, EditorV3LineImport, EditorV3Styles } from '../classes/interface';
-import { applyStyle } from '../functions/applyStyle';
-import { applyStylesToHTML } from '../functions/applyStylesToHTML';
-import { getCaretPosition } from '../functions/getCaretPosition';
-import { getCurrentData } from '../functions/getCurrentData';
-import { moveCursor } from '../functions/moveCursor';
-import { redraw } from '../functions/redraw';
-import { setCaretPosition } from '../functions/setCaretPosition';
-import './EditorV3.css';
+import { ContextMenuHandler, iMenuItem } from "@asup/context-menu";
+import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { EditorV3Line, EditorV3TextBlock } from "../classes";
+import { EditorV3Content } from "../classes/EditorV3Content";
+import { EditorV3Align, EditorV3LineImport, EditorV3Styles } from "../classes/interface";
+import { applyStyle } from "../functions/applyStyle";
+import { applyStylesToHTML } from "../functions/applyStylesToHTML";
+import { getCaretPosition } from "../functions/getCaretPosition";
+import { getCurrentData } from "../functions/getCurrentData";
+import { moveCursor } from "../functions/moveCursor";
+import { redraw } from "../functions/redraw";
+import { setCaretPosition } from "../functions/setCaretPosition";
+import "./EditorV3.css";
 
 interface EditorV3Props {
   id: string;
@@ -27,6 +27,7 @@ interface EditorV3Props {
   resize?: boolean;
   spellCheck?: boolean;
   styleOnContextMenu?: boolean;
+  forceUpdate?: boolean;
 }
 
 export const EditorV3 = ({
@@ -44,6 +45,7 @@ export const EditorV3 = ({
   resize = false,
   spellCheck = false,
   styleOnContextMenu = true,
+  forceUpdate = false,
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
@@ -51,7 +53,7 @@ export const EditorV3 = ({
   const menuItems = useMemo((): iMenuItem[] => {
     return [
       {
-        label: `Style`,
+        label: "Style",
         group: [
           ...(customStyleMap && Object.keys(customStyleMap).length > 0
             ? Object.keys(customStyleMap ?? {}).map((s) => {
@@ -62,10 +64,9 @@ export const EditorV3 = ({
                   },
                 };
               })
-            : [{ label: 'No styles defined', disabled: true }]),
-
+            : [{ label: "No styles defined", disabled: true }]),
           {
-            label: 'Remove style',
+            label: "Remove style",
             action: (target) => {
               divRef.current && applyStyle(null, divRef.current, target);
             },
@@ -76,15 +77,19 @@ export const EditorV3 = ({
   }, [customStyleMap]);
 
   // General return function
+  const [canReturn, setCanReturn] = useState<boolean>(forceUpdate);
   const returnData = useCallback(
     (ret: { text: string; html: string; json: string }, force?: boolean) => {
-      if (force || (ret.text !== input && ret.html !== input && ret.json !== input)) {
+      if (
+        canReturn &&
+        (force || (ret.text !== input && ret.html !== input && ret.json !== input))
+      ) {
         setText && setText(ret.text);
         setHtml && setHtml(ret.html);
         setJson && setJson(ret.json);
       }
     },
-    [input, setHtml, setJson, setText],
+    [canReturn, input, setHtml, setJson, setText],
   );
 
   // Update if input changes
@@ -102,6 +107,7 @@ export const EditorV3 = ({
   const [inFocus, setInFocus] = useState<boolean>(false);
   const handleFocus = useCallback(() => {
     setInFocus(true);
+    setCanReturn(true);
     const pos = (divRef.current && getCaretPosition(divRef.current)) ?? null;
     if (!pos && divRef.current) {
       setCaretPosition(divRef.current, { startLine: 0, startChar: 0, endLine: 0, endChar: 0 });
@@ -111,12 +117,12 @@ export const EditorV3 = ({
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       // Handle awkward keys
-      if (['Enter', 'Backspace', 'Delete'].includes(e.key) && divRef.current) {
+      if (["Enter", "Backspace", "Delete"].includes(e.key) && divRef.current) {
         e.stopPropagation();
         e.preventDefault();
         const pos = getCaretPosition(divRef.current);
         // Enter
-        if (pos && allowNewLine && e.key === 'Enter') {
+        if (pos && allowNewLine && e.key === "Enter") {
           const content = new EditorV3Content(divRef.current.innerHTML, {
             textAlignment,
             decimalAlignPercent,
@@ -127,25 +133,25 @@ export const EditorV3 = ({
           setCaretPosition(divRef.current, newPos);
         }
         // Backspace and delete
-        if (pos && ['Backspace', 'Delete'].includes(e.key)) {
+        if (pos && ["Backspace", "Delete"].includes(e.key)) {
           const content = new EditorV3Content(divRef.current.innerHTML, {
             textAlignment,
             decimalAlignPercent,
             styles: customStyleMap,
           });
-          const newPos = content.deleteCharacter(pos, e.key === 'Backspace');
+          const newPos = content.deleteCharacter(pos, e.key === "Backspace");
           redraw(divRef.current, content);
           setCaretPosition(divRef.current, newPos);
         }
         return;
       } else if (
         divRef.current &&
-        ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)
+        ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)
       ) {
         moveCursor(divRef.current, e);
       }
       // Decimal handling
-      else if (divRef.current && e.key === '.' && textAlignment === EditorV3Align.decimal) {
+      else if (divRef.current && e.key === "." && textAlignment === EditorV3Align.decimal) {
         e.stopPropagation();
         e.preventDefault();
         const pos = getCaretPosition(divRef.current);
@@ -155,8 +161,8 @@ export const EditorV3 = ({
             decimalAlignPercent,
             styles: customStyleMap,
           });
-          if (!content.lines[pos.startLine].lineText.includes('.')) {
-            content.splice(pos, [new EditorV3Line('.')]);
+          if (!content.lines[pos.startLine].lineText.includes(".")) {
+            content.splice(pos, [new EditorV3Line(".")]);
             redraw(divRef.current, content);
             setCaretPosition(divRef.current, {
               startLine: pos.startLine,
@@ -174,7 +180,7 @@ export const EditorV3 = ({
 
   const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
     // Stop handled keys
-    if (['Enter', 'Backspace', 'Delete'].includes(e.key)) {
+    if (["Enter", "Backspace", "Delete"].includes(e.key)) {
       e.stopPropagation();
       e.preventDefault();
       return;
@@ -195,13 +201,13 @@ export const EditorV3 = ({
               styles: customStyleMap,
             });
             const toPaste = content.subLines(pos);
-            e.clipboardData.setData('text/plain', toPaste.map((l) => l.lineText).join('\n'));
+            e.clipboardData.setData("text/plain", toPaste.map((l) => l.lineText).join("\n"));
             e.clipboardData.setData(
-              'text/html',
-              toPaste.map((l) => applyStylesToHTML(l.el, content.styles).outerHTML).join(''),
+              "text/html",
+              toPaste.map((l) => applyStylesToHTML(l.el, content.styles).outerHTML).join(""),
             );
-            e.clipboardData.setData('data/aiev3', JSON.stringify(toPaste));
-            if (e.type === 'cut') {
+            e.clipboardData.setData("data/aiev3", JSON.stringify(toPaste));
+            if (e.type === "cut") {
               content.splice(pos);
               redraw(divRef.current, content);
               setCaretPosition(divRef.current, {
@@ -234,11 +240,11 @@ export const EditorV3 = ({
           });
           const lines: EditorV3Line[] = [];
           const linesImport = (
-            e.clipboardData.getData('data/aiev3') !== ''
-              ? JSON.parse(e.clipboardData.getData('data/aiev3'))
+            e.clipboardData.getData("data/aiev3") !== ""
+              ? JSON.parse(e.clipboardData.getData("data/aiev3"))
               : e.clipboardData
-                  .getData('text/plain')
-                  .split('\n')
+                  .getData("text/plain")
+                  .split("\n")
                   .map((t) => ({
                     textBlocks: [{ text: t }],
                     textAlignment,
@@ -293,22 +299,22 @@ export const EditorV3 = ({
       s.width = `calc(${s.width} - 10px)`;
     }
     if (resize) {
-      s.resize = 'both';
-      s.overflow = 'auto';
+      s.resize = "both";
+      s.overflow = "auto";
     }
     return s;
   }, [resize, style]);
 
   return (
     <div
-      className={`aiev3${inFocus ? ' editing' : ''}`}
+      className={`aiev3${inFocus ? " editing" : ""}`}
       id={id}
       onFocusCapture={handleFocus}
       onBlur={handleBlur}
     >
       <ContextMenuHandler
         menuItems={menuItems}
-        style={{ width: '100%', height: '100%' }}
+        style={{ width: "100%", height: "100%" }}
         showLowMenu={spellCheck || !styleOnContextMenu}
       >
         <div
@@ -317,11 +323,19 @@ export const EditorV3 = ({
           style={styleRecalc}
           contentEditable={
             editable &&
-            (typeof setHtml === 'function' ||
-              typeof setJson === 'function' ||
-              typeof setText === 'function')
+            (typeof setHtml === "function" ||
+              typeof setJson === "function" ||
+              typeof setText === "function")
           }
           suppressContentEditableWarning
+          role={
+            editable &&
+            (typeof setHtml === "function" ||
+              typeof setJson === "function" ||
+              typeof setText === "function")
+              ? "textbox"
+              : undefined
+          }
           spellCheck={spellCheck}
           ref={divRef}
           onFocus={handleFocus}
@@ -332,11 +346,10 @@ export const EditorV3 = ({
           onKeyDownCapture={handleKeyDown}
           onBlurCapture={handleBlur}
           onFocusCapture={handleFocus}
-          // Add resizable? when required ?
         />
       </ContextMenuHandler>
     </div>
   );
 };
 
-EditorV3.displayName = 'EditorV3';
+EditorV3.displayName = "AsupEditorV3";
