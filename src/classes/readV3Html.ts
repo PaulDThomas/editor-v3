@@ -40,7 +40,6 @@ export const readV3Html = (
   else {
     ret.lines = text
       .replace(/[\u2009-\u200F\uFEFF\r\t]/g, "") // Undesirable non-printing chars
-      .replace(/[\u202F|\u00A0]/g, " ") // Spaces are spaces
       .replaceAll("</div><div", "</div>\n<div")
       .replaceAll("&nbsp;", " ")
       .split("\n")

@@ -59,7 +59,7 @@ export const App = (): JSX.Element => {
           </div>
 
           <div className='row'>
-            <span className='label'>Test config</span>
+            <span className='label'>Test config, readonly</span>
             <span className='content'>
               <EditorV3
                 id='test-editor'

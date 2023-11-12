@@ -12,7 +12,7 @@ export class EditorV3TextBlock {
       span.classList.add(`editorv3style-${this.style}`);
       span.dataset.styleName = this.style;
     }
-    span.innerHTML = (this.text !== "" ? this.text : "\u2009").replace(/ /g, "\u00A0");
+    span.innerHTML = this.text !== "" ? this.text : "\u2009";
 
     return span;
   }
@@ -68,8 +68,6 @@ export class EditorV3TextBlock {
     if (style) this.style = style;
 
     // Fix characters
-    this.text = this.text
-      .replace(/[\u2009-\u200F\uFEFF\t\r\n]/g, "") // Remove undesirable non-printing chars
-      .replace(/[\u202F|\u00A0]/g, " "); // Only normal spaces here
+    this.text = this.text.replace(/[\u2009-\u200F\uFEFF\t\r\n]/g, ""); // Remove undesirable non-printing chars
   }
 }

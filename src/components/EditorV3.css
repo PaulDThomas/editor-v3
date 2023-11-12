@@ -23,8 +23,7 @@
   padding: 2px;
   border: 1px dashed rgb(190, 190, 189);
   border-radius: 6px;
-  overflow: visible;
-  overflow-wrap: normal;
+  overflow-wrap: break-word;
   outline: 0;
   align-content: start;
   vertical-align: top;
