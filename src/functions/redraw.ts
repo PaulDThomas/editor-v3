@@ -1,9 +1,13 @@
 import { EditorV3Content } from "../classes/EditorV3Content";
 import { applyStylesToHTML } from "./applyStylesToHTML";
 
-export const redraw = (el: HTMLDivElement, content: EditorV3Content) => {
+export const redraw = (el: HTMLDivElement, content: EditorV3Content, showMarkdown: boolean) => {
   el.innerHTML = "";
-  el.append(content.el);
+  if (showMarkdown) {
+    el.append(content.toMarkdownElement());
+  } else {
+    el.append(content.toHtml());
+  }
   // Update height and styles after render
   [...el.querySelectorAll(".aiev3-line")].forEach((line) => {
     (line as HTMLDivElement).style.height = `${Math.max(
