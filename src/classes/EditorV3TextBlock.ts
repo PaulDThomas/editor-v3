@@ -1,3 +1,5 @@
+import { IMarkdownSettings, defaultMarkdownSettings } from "./markdown/MarkdownSettings";
+
 // Class
 export class EditorV3TextBlock {
   // Variables
@@ -5,19 +7,35 @@ export class EditorV3TextBlock {
   style?: string;
 
   // Read only variables
-  get el(): HTMLSpanElement {
+  get data() {
+    return { text: this.text, style: this.style };
+  }
+  get jsonString(): string {
+    return JSON.stringify(this.data);
+  }
+  // Content returns
+  public toHtml(): HTMLSpanElement {
     const span = document.createElement("span");
     span.classList.add("aiev3-tb");
     if (this.style) {
+      const textNode = document.createTextNode(this.text);
+      span.appendChild(textNode);
       span.classList.add(`editorv3style-${this.style}`);
       span.dataset.styleName = this.style;
+    } else {
+      span.innerHTML = this.text !== "" ? this.text : "\u2009";
     }
-    span.innerHTML = this.text !== "" ? this.text : "\u2009";
-
     return span;
   }
-  get jsonString(): string {
-    return JSON.stringify(this);
+  public toMarkdown(markdownSettings: IMarkdownSettings = defaultMarkdownSettings): string {
+    if (!this.style) return this.text;
+    else {
+      return `${markdownSettings.styleStartTag}${
+        this.style !== markdownSettings.defaultStyle ? this.style : ""
+      }${this.style !== markdownSettings.defaultStyle ? markdownSettings.styleNameEndTag : ""}${
+        this.text
+      }${markdownSettings.styleEndTag}`;
+    }
   }
 
   // Overloads

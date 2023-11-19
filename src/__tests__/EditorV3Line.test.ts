@@ -5,8 +5,8 @@ import { EditorV3Align } from "../classes/interface";
 describe("Check basic EditorV3Line", () => {
   test("Load string", async () => {
     const testLine = new EditorV3Line("Hello world");
-    expect(testLine.el.outerHTML).toEqual(
-      '<div class="aiev3-line left"><span class="aiev3-tb">Hello&nbsp;world</span></div>',
+    expect(testLine.toHtml().outerHTML).toEqual(
+      '<div class="aiev3-line left"><span class="aiev3-tb">Hello world</span></div>',
     );
     expect(testLine.lineText).toEqual("Hello world");
     expect(testLine.textAlignment).toEqual(EditorV3Align.left);
@@ -15,8 +15,8 @@ describe("Check basic EditorV3Line", () => {
 
   test("Load string with line breaks, tabs", async () => {
     const testLine = new EditorV3Line("  Hello \r\n\t world  ", EditorV3Align.center, 22);
-    expect(testLine.el.outerHTML).toEqual(
-      '<div class="aiev3-line center"><span class="aiev3-tb">&nbsp;&nbsp;Hello&nbsp;&nbsp;world&nbsp;&nbsp;</span></div>',
+    expect(testLine.toHtml().outerHTML).toEqual(
+      '<div class="aiev3-line center"><span class="aiev3-tb">  Hello  world  </span></div>',
     );
     expect(testLine.lineText).toEqual("  Hello  world  ");
     expect(testLine.textAlignment).toEqual(EditorV3Align.center);
@@ -28,13 +28,13 @@ describe("Check basic EditorV3Line", () => {
       new EditorV3TextBlock("Hello\u00A0world, "),
       new EditorV3TextBlock("How is it going?", "shiny"),
     ]);
-    expect(testLine.el.outerHTML).toEqual(
+    expect(testLine.toHtml().outerHTML).toEqual(
       '<div class="aiev3-line left">' +
-        '<span class="aiev3-tb">Hello&nbsp;world,&nbsp;</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How&nbsp;is&nbsp;it&nbsp;going?</span>' +
+        '<span class="aiev3-tb">Hello&nbsp;world, </span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How is it going?</span>' +
         "</div>",
     );
-    expect(testLine.lineText).toEqual("Hello world, How is it going?");
+    expect(testLine.lineText).toEqual("Hello\u00a0world, How is it going?");
     expect(testLine.lineLength).toEqual(29);
     expect(testLine.textAlignment).toEqual(EditorV3Align.left);
     expect(testLine.decimalAlignPercent).toEqual(60);
@@ -85,30 +85,30 @@ describe("Check basic EditorV3Line", () => {
       ],
       EditorV3Align.decimal,
     );
-    expect(testLine.el.outerHTML).toEqual(
+    expect(testLine.toHtml().outerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span class="aiev3-tb">Hello&nbsp;world</span></span>' +
         '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;">' +
-        '<span class="aiev3-tb">.&nbsp;</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How&nbsp;is&nbsp;it&nbsp;going?</span>' +
+        '<span class="aiev3-tb">. </span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How is it going?</span>' +
         "</span>" +
         "</div>",
     );
-    expect(testLine.lineText).toEqual("Hello world. How is it going?");
+    expect(testLine.lineText).toEqual("Hello\u00a0world. How is it going?");
     expect(testLine.textAlignment).toEqual(EditorV3Align.decimal);
     expect(testLine.decimalAlignPercent).toEqual(60);
   });
 
   test("Load decimal text", async () => {
     const newDecimalTestLine = new EditorV3Line("q", EditorV3Align.decimal);
-    expect(newDecimalTestLine.el.outerHTML).toEqual(
+    expect(newDecimalTestLine.toHtml().outerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span class="aiev3-tb">q</span></span>' +
         '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;"><span class="aiev3-tb">\u2009</span></span>' +
         "</div>",
     );
     const testLine = new EditorV3Line("12.34", EditorV3Align.decimal);
-    expect(testLine.el.outerHTML).toEqual(
+    expect(testLine.toHtml().outerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span class="aiev3-tb">12</span></span>' +
         '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;"><span class="aiev3-tb">.34</span></span>' +
@@ -125,10 +125,10 @@ describe("Check basic EditorV3Line", () => {
       EditorV3Align.decimal,
     );
 
-    expect(testLine.lineText).toEqual("12.34 slow");
+    expect(testLine.lineText).toEqual("12.34\u00a0slow");
     expect(testLine.textAlignment).toEqual(EditorV3Align.decimal);
     expect(testLine.decimalAlignPercent).toEqual(60);
-    expect(testLine.el.outerHTML).toEqual(
+    expect(testLine.toHtml().outerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;">' +
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">12</span>' +
@@ -142,10 +142,10 @@ describe("Check basic EditorV3Line", () => {
     expect(JSON.parse(testLine.jsonString)).toEqual({
       decimalAlignPercent: 60,
       textAlignment: "decimal",
-      textBlocks: [{ text: "12.34", style: "shiny" }, { text: " slow" }],
+      textBlocks: [{ text: "12.34", style: "shiny" }, { text: "\u00a0slow" }],
     });
     expect(new EditorV3Line(testLine.jsonString)).toEqual(testLine);
-    expect(new EditorV3Line(testLine.el)).toEqual(testLine);
+    expect(new EditorV3Line(testLine.toHtml())).toEqual(testLine);
 
     const testLine2 = new EditorV3Line(
       '<div class="aiev3-line decimal">' +
@@ -169,7 +169,7 @@ describe("Check basic EditorV3Line", () => {
         { text: "12.", style: "shiny" },
         { text: "boys" },
         { text: "34", style: "shiny" },
-        { text: " slow treats" },
+        { text: "\u00a0slow treats" },
       ],
     });
   });
@@ -180,7 +180,7 @@ describe("Check basic EditorV3Line", () => {
       EditorV3Align.right,
     );
 
-    expect(testLine.el.outerHTML).toEqual(
+    expect(testLine.toHtml().outerHTML).toEqual(
       '<div class="aiev3-line right"><span class="aiev3-tb">12.34</span></div>',
     );
     expect(testLine.lineText).toEqual("12.34");
@@ -193,9 +193,9 @@ describe("Check basic EditorV3Line", () => {
       '<div class="aiev3-line right"><span>12.34</span> wut? <span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">5678</span></div>',
     );
 
-    expect(testLine.el.outerHTML).toEqual(
+    expect(testLine.toHtml().outerHTML).toEqual(
       '<div class="aiev3-line right">' +
-        '<span class="aiev3-tb">12.34&nbsp;wut?&nbsp;</span>' +
+        '<span class="aiev3-tb">12.34 wut? </span>' +
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">5678</span>' +
         "</div>",
     );
@@ -209,16 +209,16 @@ describe("Check basic EditorV3Line", () => {
       [new EditorV3TextBlock("12.34"), new EditorV3TextBlock(" Hello ")],
       EditorV3Align.left,
     );
-    expect(new EditorV3Line(firstLine.el)).toEqual(firstLine);
-    expect(new EditorV3Line(firstLine.el.outerHTML)).toEqual(firstLine);
+    expect(new EditorV3Line(firstLine.toHtml())).toEqual(firstLine);
+    expect(new EditorV3Line(firstLine.toHtml().outerHTML)).toEqual(firstLine);
     expect(new EditorV3Line(firstLine.jsonString)).toEqual(firstLine);
     expect(new EditorV3Line(JSON.stringify(firstLine))).toEqual(firstLine);
   });
 
   test("Self equivalence for decimal", async () => {
     const firstLine = new EditorV3Line("12.34", EditorV3Align.decimal);
-    expect(new EditorV3Line(firstLine.el)).toEqual(firstLine);
-    expect(new EditorV3Line(firstLine.el.outerHTML)).toEqual(firstLine);
+    expect(new EditorV3Line(firstLine.toHtml())).toEqual(firstLine);
+    expect(new EditorV3Line(firstLine.toHtml().outerHTML)).toEqual(firstLine);
     expect(new EditorV3Line(firstLine.jsonString)).toEqual(firstLine);
     expect(new EditorV3Line(JSON.stringify(firstLine))).toEqual(firstLine);
   });
@@ -419,5 +419,14 @@ describe("Check EditorV3Line functions", () => {
     expect(line2.textBlocks).toEqual([{ text: "hel", style: "world" }, { text: "lo slow" }]);
     line2.removeStyle(1, 1);
     expect(line2.textBlocks).toEqual([{ text: "hel", style: "world" }, { text: "lo slow" }]);
+  });
+
+  test("Generate markdown", async () => {
+    const mdLine = new EditorV3Line([
+      new EditorV3TextBlock("hello", "world"),
+      new EditorV3TextBlock(" slow"),
+      new EditorV3TextBlock("and?fat", "defaultStyle"),
+    ]);
+    expect(mdLine.toMarkdown()).toEqual("<<world::hello>> slow<<and?fat>>");
   });
 });
