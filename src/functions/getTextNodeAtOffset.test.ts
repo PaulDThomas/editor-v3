@@ -1,4 +1,4 @@
-import { getTextNodeAtOffset } from "../functions/getTextNodeAtOffset";
+import { getTextNodeAtOffset } from "./getTextNodeAtOffset";
 
 describe("Test getTextNodeAtOffset", () => {
   test("Basic test", async () => {

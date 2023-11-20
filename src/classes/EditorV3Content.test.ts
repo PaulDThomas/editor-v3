@@ -1,6 +1,6 @@
-import { EditorV3Content } from "../classes/EditorV3Content";
-import { EditorV3Line } from "../classes/EditorV3Line";
-import { EditorV3Align } from "../classes/interface";
+import { EditorV3Content } from "./EditorV3Content";
+import { EditorV3Line } from "./EditorV3Line";
+import { EditorV3Align } from "./interface";
 
 // Load and read tests
 describe("Check basic EditorV3Content", () => {
@@ -8,7 +8,7 @@ describe("Check basic EditorV3Content", () => {
     const testContent = new EditorV3Content("12.34");
     expect(testContent.text).toEqual("12.34");
     const div = document.createElement("div");
-    div.append(testContent.el);
+    div.append(testContent.toHtml());
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line left"><span class="aiev3-tb">12.34</span></div>',
     );
@@ -51,7 +51,7 @@ describe("Check basic EditorV3Content", () => {
       styles: { shiny: { color: "pink" } },
     });
     const div = document.createElement("div");
-    div.append(testContent.el);
+    div.append(testContent.toHtml());
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line center">' +
         '<span class="aiev3-tb">34.56</span>' +
@@ -70,7 +70,7 @@ describe("Check basic EditorV3Content", () => {
     testContent.textAlignment = EditorV3Align.decimal;
     expect(new EditorV3Content(testContent.jsonString)).toEqual(testContent);
     div.innerHTML = "";
-    div.appendChild(testContent.el);
+    div.appendChild(testContent.toHtml());
     expect(new EditorV3Content(div.innerHTML)).toEqual(testContent);
   });
 
@@ -87,7 +87,7 @@ describe("Check basic EditorV3Content", () => {
       styles: {},
     });
     const div = document.createElement("div");
-    div.append(testContent.el);
+    div.append(testContent.toHtml());
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line left"><span class="aiev3-tb">Hello</span></div>' +
         '<div class="aiev3-line left"><span class="aiev3-tb">.World</span></div>',
@@ -108,7 +108,7 @@ describe("Check basic EditorV3Content", () => {
       styles: { shiny: { color: "pink" } },
     });
     div.innerHTML = "";
-    div.appendChild(testContent.el);
+    div.appendChild(testContent.toHtml());
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span class="aiev3-tb">Hello</span></span>' +

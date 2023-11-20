@@ -1,4 +1,4 @@
-import { applyStyle } from "../functions/applyStyle";
+import { applyStyle } from "./applyStyle";
 
 describe("Test apply style", () => {
   test("Draw with point", async () => {

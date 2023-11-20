@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { EditorV3Content } from "../classes/EditorV3Content";
 import { EditorV3Align } from "../classes/interface";
-import { EditorV3 } from "../components/EditorV3";
+import { EditorV3 } from "./EditorV3";
 import * as applyStyleModule from "../functions/applyStyle";
 import { getCaretPosition } from "../functions/getCaretPosition";
 

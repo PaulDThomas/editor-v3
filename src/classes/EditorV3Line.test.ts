@@ -1,6 +1,6 @@
-import { EditorV3Line } from "../classes/EditorV3Line";
-import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";
-import { EditorV3Align } from "../classes/interface";
+import { EditorV3Line } from "./EditorV3Line";
+import { EditorV3TextBlock } from "./EditorV3TextBlock";
+import { EditorV3Align } from "./interface";
 
 describe("Check basic EditorV3Line", () => {
   test("Load string", async () => {

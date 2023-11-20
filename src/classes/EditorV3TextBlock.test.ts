@@ -1,4 +1,4 @@
-import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";
+import { EditorV3TextBlock } from "./EditorV3TextBlock";
 
 // Load and read tests
 describe("Check basic EditorV3TextBlock", () => {
