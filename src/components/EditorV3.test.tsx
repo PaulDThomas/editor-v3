@@ -238,7 +238,6 @@ describe("Menu styling", () => {
     fireEvent.contextMenu(firstSpan);
     const showMarkdown = screen.getByLabelText("Show markdown");
     await user.click(showMarkdown);
-    screen.debug();
     const markdownText = screen.queryByText(/shiny::x.xx/) as HTMLDivElement;
     expect(markdownText).toBeInTheDocument();
     fireEvent.contextMenu(markdownText);

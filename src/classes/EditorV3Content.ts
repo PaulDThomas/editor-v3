@@ -8,7 +8,7 @@ import {
   EditorV3Styles,
 } from "./interface";
 import { IMarkdownSettings, defaultMarkdownSettings } from "./markdown/MarkdownSettings";
-import { readV3Html } from "./readV3Html";
+import { readV3Html } from "../functions/readV3Html";
 
 /**
  * Represents the content of an EditorV3 instance.

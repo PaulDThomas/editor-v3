@@ -1,6 +1,6 @@
 import { readV3Html } from "./readV3Html";
-import { EditorV3Align } from "./interface";
-import { EditorV3TextBlock } from "./EditorV3TextBlock";
+import { EditorV3Align } from "../classes/interface";
+import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";
 
 describe("readV3Html tests", () => {
   test("Read v3-html string input with line nodes", async () => {

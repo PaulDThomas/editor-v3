@@ -2,8 +2,8 @@ import { drawHtmlDecimalAlign } from "./drawHtmlDecimalAlign";
 import { EditorV3TextBlock } from "./EditorV3TextBlock";
 import { EditorV3Align } from "./interface";
 import { defaultMarkdownSettings, IMarkdownSettings } from "./markdown/MarkdownSettings";
-import { readV3DivElement } from "./readV3DivElement";
-import { readV3MarkdownElement } from "./readV3MarkdownElement";
+import { readV3DivElement } from "../functions/readV3DivElement";
+import { readV3MarkdownElement } from "../functions/readV3MarkdownElement";
 
 export class EditorV3Line {
   public textBlocks: EditorV3TextBlock[];

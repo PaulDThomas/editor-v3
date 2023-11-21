@@ -1,5 +1,5 @@
-import { EditorV3Align } from "./interface";
-import { defaultMarkdownSettings } from "./markdown/MarkdownSettings";
+import { EditorV3Align } from "../classes/interface";
+import { defaultMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 import { readV3MarkdownElement } from "./readV3MarkdownElement";
 
 describe("Test readV3MarkdownElement", () => {

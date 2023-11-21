@@ -1,8 +1,8 @@
-import { fromHtml } from "../functions/tofromHtml";
-import { EditorV3TextBlock } from "./EditorV3TextBlock";
-import { EditorV3Align } from "./interface";
-import { MarkdownLineClass } from "./markdown/MarkdownLineClass";
-import { IMarkdownSettings } from "./markdown/MarkdownSettings";
+import { fromHtml } from "./tofromHtml";
+import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";
+import { EditorV3Align } from "../classes/interface";
+import { MarkdownLineClass } from "../classes/markdown/MarkdownLineClass";
+import { IMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 
 export const readV3MarkdownElement = (
   arg: HTMLDivElement,

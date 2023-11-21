@@ -1,5 +1,5 @@
-import { EditorV3TextBlock } from "./EditorV3TextBlock";
-import { EditorV3Align } from "./interface";
+import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";
+import { EditorV3Align } from "../classes/interface";
 
 export const readV3DivElement = (
   arg: HTMLDivElement,

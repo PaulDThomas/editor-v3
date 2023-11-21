@@ -1,6 +1,6 @@
 import { readV3DivElement } from "./readV3DivElement";
-import { EditorV3Align } from "./interface";
-import { EditorV3TextBlock } from "./EditorV3TextBlock";
+import { EditorV3Align } from "../classes/interface";
+import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";
 
 describe("readV3DivElement", () => {
   test("Read decimal aligned div element", async () => {

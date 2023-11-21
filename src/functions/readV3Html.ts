@@ -1,6 +1,6 @@
-import { EditorV3Line } from "./EditorV3Line";
-import { EditorV3Align, EditorV3Import } from "./interface";
-import { IMarkdownSettings, defaultMarkdownSettings } from "./markdown/MarkdownSettings";
+import { EditorV3Line } from "../classes/EditorV3Line";
+import { EditorV3Align, EditorV3Import } from "../classes/interface";
+import { IMarkdownSettings, defaultMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 import { readV3DivElement } from "./readV3DivElement";
 import { readV3MarkdownElement } from "./readV3MarkdownElement";
 
