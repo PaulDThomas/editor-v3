@@ -17,13 +17,11 @@ export class EditorV3TextBlock {
   public toHtml(): HTMLSpanElement {
     const span = document.createElement("span");
     span.classList.add("aiev3-tb");
+    const textNode = document.createTextNode(this.text === "" ? "\u2009" : this.text);
+    span.appendChild(textNode);
     if (this.style) {
-      const textNode = document.createTextNode(this.text);
-      span.appendChild(textNode);
       span.classList.add(`editorv3style-${this.style}`);
       span.dataset.styleName = this.style;
-    } else {
-      span.innerHTML = this.text !== "" ? this.text : "\u2009";
     }
     return span;
   }

@@ -139,13 +139,13 @@ describe("Check basic EditorV3Line", () => {
         "</span>" +
         "</div>",
     );
+    expect(new EditorV3Line(testLine.toHtml())).toEqual(testLine);
     expect(JSON.parse(testLine.jsonString)).toEqual({
       decimalAlignPercent: 60,
       textAlignment: "decimal",
       textBlocks: [{ text: "12.34", style: "shiny" }, { text: "\u00a0slow" }],
     });
     expect(new EditorV3Line(testLine.jsonString)).toEqual(testLine);
-    expect(new EditorV3Line(testLine.toHtml())).toEqual(testLine);
 
     const testLine2 = new EditorV3Line(
       '<div class="aiev3-line decimal">' +
@@ -428,5 +428,37 @@ describe("Check EditorV3Line functions", () => {
       new EditorV3TextBlock("and?fat", "defaultStyle"),
     ]);
     expect(mdLine.toMarkdown()).toEqual("<<world::hello>> slow<<and?fat>>");
+  });
+
+  test("Load markdown html strings", async () => {
+    const htmlString = '<div class="aiev3-markdown-line">Some html</div>';
+    const testLine = new EditorV3Line(htmlString);
+    expect(testLine.textBlocks).toEqual([new EditorV3TextBlock("Some html")]);
+    expect(testLine.decimalAlignPercent).toEqual(60);
+    expect(testLine.textAlignment).toEqual(EditorV3Align.left);
+
+    const htmlString2 =
+      '<div class="aiev3-markdown-line" data-text-alignment="right" data-decimal-align-percent="50">&lt;&lt;red::Hello world&gt;&gt;</span></div>';
+    const testLine2 = new EditorV3Line(htmlString2);
+    expect(testLine2.textBlocks).toEqual([
+      new EditorV3TextBlock({ text: "Hello world", style: "red" }),
+    ]);
+    expect(testLine2.decimalAlignPercent).toEqual(50);
+    expect(testLine2.textAlignment).toEqual(EditorV3Align.right);
+  });
+
+  test("Load markdown div elements", async () => {
+    const div = document.createElement("div");
+    const text = document.createTextNode("<<st1::what>> are you doing? <<with that>> thing?");
+    div.appendChild(text);
+
+    const result = new EditorV3Line(div);
+
+    expect(result.textBlocks).toEqual([
+      new EditorV3TextBlock({ text: "what", style: "st1" }),
+      new EditorV3TextBlock(" are you doing? "),
+      new EditorV3TextBlock({ text: "with that", style: "defaultStyle" }),
+      new EditorV3TextBlock(" thing?"),
+    ]);
   });
 });

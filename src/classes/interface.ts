@@ -56,6 +56,7 @@ export interface EditorV3LineImport {
  */
 export interface EditorV3Import extends EditorV3ContentProps {
   lines: EditorV3LineImport[];
+  styles?: EditorV3Styles;
 }
 
 /**
