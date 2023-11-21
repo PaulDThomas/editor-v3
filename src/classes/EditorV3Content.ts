@@ -84,7 +84,7 @@ export class EditorV3Content {
     return ret;
   }
 
-  public toMarkdownElement(
+  public toMarkdownHtml(
     markdownSettings: IMarkdownSettings = defaultMarkdownSettings,
   ): DocumentFragment {
     const ret = new DocumentFragment();
@@ -128,7 +128,6 @@ export class EditorV3Content {
       textAlignment: this._textAlignment,
       decimalAlignPercent: this._decimalAlignPercent,
       styles: this._styles,
-      showMarkdown: this._showMarkdown,
     };
   }
 
@@ -144,8 +143,6 @@ export class EditorV3Content {
     this._decimalAlignPercent = props?.decimalAlignPercent ?? 60;
     this._styles = props?.styles ?? {};
     this.lines = [];
-    this._showMarkdown = props?.showMarkdown ?? this._showMarkdown;
-    console.log("Markdown interface:", this._showMarkdown, this._markdownSettings);
 
     // Process incoming data
     try {
@@ -164,8 +161,10 @@ export class EditorV3Content {
   }
 
   private copyImport(read: EditorV3Import, props?: EditorV3ContentProps): void {
-    this._textAlignment = props?.textAlignment ?? read.textAlignment ?? EditorV3Align.left;
-    this._decimalAlignPercent = props?.decimalAlignPercent ?? read.decimalAlignPercent ?? 60;
+    this._textAlignment =
+      props?.textAlignment ?? (read.lines[0].textAlignment as EditorV3Align) ?? EditorV3Align.left;
+    this._decimalAlignPercent =
+      props?.decimalAlignPercent ?? read.lines[0].decimalAlignPercent ?? 60;
     this._styles = {
       ...this._styles,
       ...read.styles,

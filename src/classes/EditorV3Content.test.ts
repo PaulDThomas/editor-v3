@@ -406,3 +406,33 @@ describe("Content functions", () => {
     ]);
   });
 });
+
+describe("Render markdown text from content", () => {
+  test("Render markdown text", async () => {
+    const props = {
+      styles: { shiny: { color: "pink" } },
+      textAlignment: EditorV3Align.center,
+      decimalAlignPercent: 80,
+    };
+    const testContent = new EditorV3Content("123\n456\n789", props);
+    testContent.applyStyle("shiny", {
+      isCollapsed: false,
+      startLine: 0,
+      startChar: 1,
+      endLine: 2,
+      endChar: 1,
+    });
+    expect(testContent.contentProps).toEqual(props);
+    const result = testContent.toMarkdownHtml();
+    const div = document.createElement("div");
+    div.append(result);
+    expect(div.innerHTML).toEqual(
+      `<div class="aiev3-markdown-line" data-text-alignment="center" data-decimal-align-percent="80">1&lt;&lt;shiny::23&gt;&gt;</div>` +
+        `<div class="aiev3-markdown-line" data-text-alignment="center" data-decimal-align-percent="80">&lt;&lt;shiny::456&gt;&gt;</div>` +
+        `<div class="aiev3-markdown-line" data-text-alignment="center" data-decimal-align-percent="80">&lt;&lt;shiny::7&gt;&gt;89</div>` +
+        `<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}"></div>`,
+    );
+    // Eat your own tail
+    expect(new EditorV3Content(div.innerHTML)).toEqual(testContent);
+  });
+});
