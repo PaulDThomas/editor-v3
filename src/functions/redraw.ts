@@ -4,7 +4,7 @@ import { applyStylesToHTML } from "./applyStylesToHTML";
 export const redraw = (el: HTMLDivElement, content: EditorV3Content, showMarkdown: boolean) => {
   el.innerHTML = "";
   if (showMarkdown) {
-    el.append(content.toMarkdownElement());
+    el.append(content.toMarkdownHtml());
   } else {
     el.append(content.toHtml());
   }

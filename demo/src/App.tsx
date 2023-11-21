@@ -2,7 +2,19 @@ import { useState } from "react";
 import { EditorV3, EditorV3Align, EditorV3Styles } from "../../src/main";
 
 export const App = (): JSX.Element => {
-  const [input, setHtml] = useState<string>(
+  const [html, setHtml] = useState<string>("");
+  const [input2, setInput2] = useState<string>("Another one");
+  const [input3, setInput3] = useState<string>(
+    // '<div classname="aie-text" data-key="2usqj" data-type="unstyled" data-inline-style-ranges="[]">Scatter plot of eGFR values post randomization, with LOESS smoothing line overlayed.</div><div classname="aie-text" data-key="8uaa4" data-type="unstyled" data-inline-style-ranges="[]"></div><div classname="aie-text" data-key="5mj3a" data-type="unstyled" data-inline-style-ranges="[]">Y-axis label: eGFR (ml/min/1.73^2)</div><div classname="aie-text" data-key="ebhpo" data-type="unstyled" data-inline-style-ranges="[]">X-axis label: Time since randomization (months)</div><div classname="aie-text" data-key="fafoq" data-type="unstyled" data-inline-style-ranges="[]"></div><div classname="aie-text" data-key="bs8eq" data-type="unstyled" data-inline-style-ranges="[]">Separate plots for SZC and Placebo arm; LOESS line should have 95% Confidence interval included too.</div><div classname="aie-text" data-key="14o5e" data-type="unstyled" data-inline-style-ranges="[]"></div>',
+    JSON.stringify({
+      textAlign: "left",
+      lines: [{ text: "12.34", style: "defaultStyle" }],
+      styles: {
+        defaultStyle: { color: "green", fontWeight: 700 },
+      },
+    }),
+  );
+  const [json, setJson] = useState<string>(
     JSON.stringify({
       textAlign: "left",
       lines: [{ text: "12.34", style: "green" }, { text: "0" }, { text: "56.78", style: "blue" }],
@@ -11,11 +23,6 @@ export const App = (): JSX.Element => {
       },
     }),
   );
-  const [input2, setInput2] = useState<string>("Another one");
-  const [input3, setInput3] = useState<string>(
-    '<div classname="aie-text" data-key="2usqj" data-type="unstyled" data-inline-style-ranges="[]">Scatter plot of eGFR values post randomization, with LOESS smoothing line overlayed.</div><div classname="aie-text" data-key="8uaa4" data-type="unstyled" data-inline-style-ranges="[]"></div><div classname="aie-text" data-key="5mj3a" data-type="unstyled" data-inline-style-ranges="[]">Y-axis label: eGFR (ml/min/1.73^2)</div><div classname="aie-text" data-key="ebhpo" data-type="unstyled" data-inline-style-ranges="[]">X-axis label: Time since randomization (months)</div><div classname="aie-text" data-key="fafoq" data-type="unstyled" data-inline-style-ranges="[]"></div><div classname="aie-text" data-key="bs8eq" data-type="unstyled" data-inline-style-ranges="[]">Separate plots for SZC and Placebo arm; LOESS line should have 95% Confidence interval included too.</div><div classname="aie-text" data-key="14o5e" data-type="unstyled" data-inline-style-ranges="[]"></div>',
-  );
-  const [json, setJson] = useState<string>("");
   const [text, setText] = useState<string>("");
   const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.decimal);
   const [editable, setEditable] = useState<boolean>(true);
@@ -41,7 +48,7 @@ export const App = (): JSX.Element => {
             <span className='content debug'>
               <EditorV3
                 id={"e1"}
-                input={input}
+                input={json}
                 setHtml={setHtml}
                 setText={setText}
                 setJson={setJson}
@@ -111,7 +118,8 @@ export const App = (): JSX.Element => {
               <EditorV3
                 id={"e3"}
                 input={input3}
-                setText={setInput3}
+                setJson={setInput3}
+                allowMarkdown
                 textAlignment={EditorV3Align.left}
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}
@@ -205,7 +213,7 @@ export const App = (): JSX.Element => {
           <div className='row'>
             <span className='label'>HTML</span>
             <span className='content'>
-              <pre>{input.replace(/></g, ">\u2009<").split("\u2009").join("\n")}</pre>
+              <pre>{html.replace(/></g, ">\u2009<").split("\u2009").join("\n")}</pre>
             </span>
           </div>
         </div>

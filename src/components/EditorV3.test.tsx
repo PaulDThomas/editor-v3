@@ -79,6 +79,7 @@ describe("Editor and functions", () => {
             textAlignment={EditorV3Align.decimal}
             decimalAlignPercent={70}
             forceUpdate
+            allowMarkdown
           />
         </div>,
       );
@@ -207,6 +208,7 @@ describe("Menu styling", () => {
             allowNewLine
             customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
             forceUpdate
+            allowMarkdown
           />
         </div>,
       );
@@ -232,6 +234,15 @@ describe("Menu styling", () => {
     await user.click(removeItem);
     calledParams = mockApplyStyle.mock.calls[1];
     expect(calledParams[0]).toEqual(null);
+    // Click show markdown
+    fireEvent.contextMenu(firstSpan);
+    const showMarkdown = screen.getByLabelText("Show markdown");
+    await user.click(showMarkdown);
+    screen.debug();
+    const markdownText = screen.queryByText(/shiny::x.xx/) as HTMLDivElement;
+    expect(markdownText).toBeInTheDocument();
+    fireEvent.contextMenu(markdownText);
+    expect(screen.queryByText("Hide markdown")).toBeInTheDocument();
   });
 });
 

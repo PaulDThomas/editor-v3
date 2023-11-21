@@ -59,11 +59,13 @@ export const EditorV3 = ({
   const menuItems = useMemo((): iMenuItem[] => {
     const styleMenuItem: iMenuItem = {
       label: "Style",
+      disabled: showMarkdown,
       group: [
         ...(customStyleMap && Object.keys(customStyleMap).length > 0
           ? Object.keys(customStyleMap ?? {}).map((s) => {
               return {
                 label: s,
+                disabled: showMarkdown,
                 action: (target?: Range | null) => {
                   divRef.current && applyStyle(s, divRef.current, target);
                 },
@@ -72,6 +74,7 @@ export const EditorV3 = ({
           : [{ label: "No styles defined", disabled: true }]),
         {
           label: "Remove style",
+          disabled: showMarkdown,
           action: (target) => {
             divRef.current && applyStyle(null, divRef.current, target);
           },
@@ -139,6 +142,7 @@ export const EditorV3 = ({
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (showMarkdown) return;
       // Handle awkward keys
       if (["Enter", "Backspace", "Delete"].includes(e.key) && divRef.current) {
         e.stopPropagation();
@@ -201,17 +205,22 @@ export const EditorV3 = ({
     [allowNewLine, customStyleMap, decimalAlignPercent, showMarkdown, textAlignment],
   );
 
-  const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
-    // Stop handled keys
-    if (["Enter", "Backspace", "Delete"].includes(e.key)) {
-      e.stopPropagation();
-      e.preventDefault();
-      return;
-    }
-  }, []);
+  const handleKeyUp = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (showMarkdown) return;
+      // Stop handled keys
+      if (["Enter", "Backspace", "Delete"].includes(e.key)) {
+        e.stopPropagation();
+        e.preventDefault();
+        return;
+      }
+    },
+    [showMarkdown],
+  );
 
   const handleCopy = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
+      if (showMarkdown) return;
       try {
         e.preventDefault();
         e.stopPropagation();
@@ -251,7 +260,7 @@ export const EditorV3 = ({
   const handlePaste = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
       try {
-        if (!divRef.current) return;
+        if (!divRef.current || showMarkdown) return;
         e.preventDefault();
         e.stopPropagation();
         const pos = getCaretPosition(divRef.current);
