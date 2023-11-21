@@ -20,6 +20,17 @@ describe("Test readV3MarkdownElement", () => {
     expect(result.textAlignment).toEqual(EditorV3Align.center);
   });
 
+  test("Default style", async () => {
+    const div = document.createElement("div");
+    div.textContent = "<<Hello world>>";
+    div.className = "aiev3-markdown-line";
+    const result = readV3MarkdownElement(div, defaultMarkdownSettings);
+
+    expect(result.textBlocks.map((tb) => tb.data)).toEqual([
+      { text: "Hello world", style: "defaultStyle" },
+    ]);
+  });
+
   test("Empty div", async () => {
     // Create a mock HTMLDivElement with no innerText
     const div = document.createElement("div");
@@ -37,7 +48,9 @@ describe("Test readV3MarkdownElement", () => {
   test("Multiple styles", async () => {
     // Create a mock HTMLDivElement with multiple styles
     const div = document.createElement("div");
-    div.innerText = "&lt;&lt;st1::hello&gt;&gt; world <<st2::annoyed>>";
+    const s = document.createElement("span");
+    div.appendChild(s);
+    s.textContent = "&lt;&lt;st1::hello&gt;&gt; world <<st2::annoyed>>";
     div.className = "aiev3-markdown-line";
 
     // Call the function

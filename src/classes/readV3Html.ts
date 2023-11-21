@@ -13,7 +13,6 @@ export const readV3Html = (
   const ret: EditorV3Import = {
     lines: [],
   };
-
   // Read in v3-html string input
   if (text.match(/^<div class="aiev3-line.*">.*<\/div>$/)) {
     const frag = document.createElement("div");
@@ -23,14 +22,6 @@ export const readV3Html = (
     [...frag.querySelectorAll("div.aiev3-line")].forEach((el) => {
       const div = el as HTMLDivElement;
       ret.lines.push(readV3DivElement(div));
-      // Get alignment from second classname
-      if (!ret.textAlignment && div.classList.length > 1) {
-        ret.textAlignment = el.classList[1].toString() as EditorV3Align;
-      }
-      // Get decimal align percent from mid width
-      if (ret.textAlignment === EditorV3Align.decimal && el.children.length === 2) {
-        ret.decimalAlignPercent = parseFloat((el.children[0] as HTMLSpanElement).style.minWidth);
-      }
     });
 
     // Read style node
@@ -47,7 +38,8 @@ export const readV3Html = (
     // Read line nodes
     [...frag.querySelectorAll("div.aiev3-markdown-line")].forEach((el) => {
       const div = el as HTMLDivElement;
-      ret.lines.push(readV3MarkdownElement(div, markdownSettings));
+      const lineRet = readV3MarkdownElement(div, markdownSettings);
+      ret.lines.push(lineRet);
     });
 
     // Read style node

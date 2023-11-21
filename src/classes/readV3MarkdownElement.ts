@@ -18,7 +18,7 @@ export const readV3MarkdownElement = (
     textAlignment: EditorV3Align;
   } = {
     textBlocks: new MarkdownLineClass({
-      line: fromHtml(arg.innerText ?? ""),
+      line: fromHtml(arg.innerText ?? arg.textContent ?? ""),
       markdownSettings,
     }).toTextBlocks(),
     decimalAlignPercent: parseFloat(arg.dataset.decimalAlignPercent ?? "60"),
