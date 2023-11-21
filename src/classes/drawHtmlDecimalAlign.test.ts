@@ -1,5 +1,5 @@
-import { drawHtmlDecimalAlign } from "../classes/drawHtmlDecimalAlign";
-import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";
+import { drawHtmlDecimalAlign } from "./drawHtmlDecimalAlign";
+import { EditorV3TextBlock } from "./EditorV3TextBlock";
 
 describe("Test draw decimal align function", () => {
   test("Draw with point", async () => {

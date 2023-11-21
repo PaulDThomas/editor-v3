@@ -1,7 +1,9 @@
 import { drawHtmlDecimalAlign } from "./drawHtmlDecimalAlign";
 import { EditorV3TextBlock } from "./EditorV3TextBlock";
 import { EditorV3Align } from "./interface";
-import { readV3DivElement } from "./readV3DivElement";
+import { defaultMarkdownSettings, IMarkdownSettings } from "./markdown/MarkdownSettings";
+import { readV3DivElement } from "../functions/readV3DivElement";
+import { readV3MarkdownElement } from "../functions/readV3MarkdownElement";
 
 export class EditorV3Line {
   public textBlocks: EditorV3TextBlock[];
@@ -9,7 +11,7 @@ export class EditorV3Line {
   public decimalAlignPercent: number;
 
   // Read only variables
-  get el(): HTMLDivElement {
+  public toHtml(): HTMLDivElement {
     const h = document.createElement("div");
     h.className = `aiev3-line ${this.textAlignment}`;
     if (this.textAlignment === EditorV3Align.decimal) {
@@ -21,7 +23,7 @@ export class EditorV3Line {
         this.fromPos(decimalPosition),
       );
     } else {
-      this.textBlocks.forEach((tb) => h.append(tb.el));
+      this.textBlocks.forEach((tb) => h.append(tb.toHtml()));
     }
     return h;
   }
@@ -34,14 +36,20 @@ export class EditorV3Line {
     return this.textBlocks.map((tb) => tb.text.length).reduce((p, c) => p + c, 0);
   }
 
+  get data() {
+    return {
+      textBlocks: this.textBlocks,
+      decimalAlignPercent: this.decimalAlignPercent,
+      textAlignment: this.textAlignment,
+    };
+  }
+
   get jsonString(): string {
-    return JSON.stringify(this, [
-      "textBlocks",
-      "textAlignment",
-      "decimalAlignPercent",
-      "text",
-      "style",
-    ]);
+    return JSON.stringify(this.data);
+  }
+
+  public toMarkdown(markdownSettings: IMarkdownSettings = defaultMarkdownSettings): string {
+    return this.textBlocks.map((tb) => tb.toMarkdown(markdownSettings)).join("");
   }
 
   // Constructor
@@ -49,6 +57,7 @@ export class EditorV3Line {
     arg: string | HTMLDivElement | EditorV3TextBlock[],
     textAlignment?: EditorV3Align,
     decimalAlignPercent?: number,
+    markdownSettings: IMarkdownSettings = defaultMarkdownSettings,
   ) {
     // Set defaults
     this.textBlocks = [];
@@ -57,11 +66,21 @@ export class EditorV3Line {
     // Text
     if (typeof arg === "string") {
       // Decimal html string
-      if (arg.match(/^<div class="aiev3-line .*">.*<\/div>$/)) {
+      if (arg.match(/^<div class="aiev3-line.*<\/div>$/)) {
         const h = document.createElement("template");
         h.innerHTML = arg;
         const d = h.content.children[0] as HTMLDivElement;
         const ret = readV3DivElement(d);
+        this.textBlocks = ret.textBlocks;
+        this.decimalAlignPercent = ret.decimalAlignPercent;
+        this.textAlignment = ret.textAlignment;
+      }
+      // Markdown string
+      else if (arg.match(/^<div class="aiev3-markdown-line.*<\/div>$/)) {
+        const h = document.createElement("template");
+        h.innerHTML = arg;
+        const d = h.content.children[0] as HTMLDivElement;
+        const ret = readV3MarkdownElement(d, markdownSettings);
         this.textBlocks = ret.textBlocks;
         this.decimalAlignPercent = ret.decimalAlignPercent;
         this.textAlignment = ret.textAlignment;
@@ -89,7 +108,9 @@ export class EditorV3Line {
     }
     // HTMLDivElement
     else {
-      const ret = readV3DivElement(arg);
+      const ret = Array.from(arg.classList).includes("aiev3-line")
+        ? readV3DivElement(arg)
+        : readV3MarkdownElement(arg, markdownSettings);
       this.textBlocks = ret.textBlocks;
       this.decimalAlignPercent = ret.decimalAlignPercent;
       this.textAlignment = ret.textAlignment;

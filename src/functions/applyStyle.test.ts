@@ -1,4 +1,4 @@
-import { applyStyle } from "../functions/applyStyle";
+import { applyStyle } from "./applyStyle";
 
 describe("Test apply style", () => {
   test("Draw with point", async () => {
@@ -15,7 +15,7 @@ describe("Test apply style", () => {
     let rhs = div.querySelector("span.rhs") as HTMLSpanElement;
     range.selectNodeContents(lhs);
     range.setEndAfter(rhs);
-    applyStyle(null, div, range);
+    applyStyle(null, div, range, false);
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line decimal" style="height: 0px;">' +
         '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span class="aiev3-tb">x</span></span>' +
@@ -29,7 +29,7 @@ describe("Test apply style", () => {
     rhs = div.querySelector("span.rhs") as HTMLSpanElement;
     range.selectNodeContents(lhs);
     range.setEndAfter(rhs);
-    applyStyle("shiny", div, range);
+    applyStyle("shiny", div, range, false);
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line decimal" style="height: 0px;">' +
         '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x</span></span>' +

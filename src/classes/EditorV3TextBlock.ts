@@ -1,3 +1,5 @@
+import { IMarkdownSettings, defaultMarkdownSettings } from "./markdown/MarkdownSettings";
+
 // Class
 export class EditorV3TextBlock {
   // Variables
@@ -5,19 +7,33 @@ export class EditorV3TextBlock {
   style?: string;
 
   // Read only variables
-  get el(): HTMLSpanElement {
+  get data() {
+    return { text: this.text, style: this.style };
+  }
+  get jsonString(): string {
+    return JSON.stringify(this.data);
+  }
+  // Content returns
+  public toHtml(): HTMLSpanElement {
     const span = document.createElement("span");
     span.classList.add("aiev3-tb");
+    const textNode = document.createTextNode(this.text === "" ? "\u2009" : this.text);
+    span.appendChild(textNode);
     if (this.style) {
       span.classList.add(`editorv3style-${this.style}`);
       span.dataset.styleName = this.style;
     }
-    span.innerHTML = (this.text !== "" ? this.text : "\u2009").replace(/ /g, "\u00A0");
-
     return span;
   }
-  get jsonString(): string {
-    return JSON.stringify(this);
+  public toMarkdown(markdownSettings: IMarkdownSettings = defaultMarkdownSettings): string {
+    if (!this.style) return this.text;
+    else {
+      return `${markdownSettings.styleStartTag}${
+        this.style !== markdownSettings.defaultStyle ? this.style : ""
+      }${this.style !== markdownSettings.defaultStyle ? markdownSettings.styleNameEndTag : ""}${
+        this.text
+      }${markdownSettings.styleEndTag}`;
+    }
   }
 
   // Overloads
@@ -68,8 +84,6 @@ export class EditorV3TextBlock {
     if (style) this.style = style;
 
     // Fix characters
-    this.text = this.text
-      .replace(/[\u2009-\u200F\uFEFF\t\r\n]/g, "") // Remove undesirable non-printing chars
-      .replace(/[\u202F|\u00A0]/g, " "); // Only normal spaces here
+    this.text = this.text.replace(/[\u2009-\u200F\uFEFF\t\r\n]/g, ""); // Remove undesirable non-printing chars
   }
 }

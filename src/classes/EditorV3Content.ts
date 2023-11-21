@@ -7,14 +7,25 @@ import {
   EditorV3Position,
   EditorV3Styles,
 } from "./interface";
-import { readV3Html } from "./readV3Html";
+import { IMarkdownSettings, defaultMarkdownSettings } from "./markdown/MarkdownSettings";
+import { readV3Html } from "../functions/readV3Html";
 
+/**
+ * Represents the content of an EditorV3 instance.
+ */
 export class EditorV3Content {
   // Standard attributes
   private _textAlignment: EditorV3Align = EditorV3Align.left;
+  /**
+   * Current text alignment
+   */
   get textAlignment() {
     return this._textAlignment;
   }
+  /**
+   * Set text alignment
+   * Can be left, center, right, or justify
+   */
   set textAlignment(newTa: EditorV3Align) {
     if (newTa !== this._textAlignment) {
       this.lines.forEach((l) => (l.textAlignment = newTa));
@@ -23,6 +34,9 @@ export class EditorV3Content {
   }
 
   private _decimalAlignPercent = 60;
+  /**
+   * Current decimal alignment percent
+   */
   get decimalAlignPercent() {
     return this._decimalAlignPercent;
   }
@@ -34,6 +48,9 @@ export class EditorV3Content {
   }
 
   private _styles: EditorV3Styles = {};
+  /**
+   * Current available styles in the editor
+   */
   get styles() {
     return this._styles;
   }
@@ -41,6 +58,12 @@ export class EditorV3Content {
     this._styles = newStyles;
   }
 
+  private _markdownSettings = defaultMarkdownSettings;
+  private _showMarkdown = false;
+
+  /**
+   * Current lines in the editor
+   */
   public lines: EditorV3Line[] = [];
 
   private _styleNode(): HTMLDivElement {
@@ -51,17 +74,43 @@ export class EditorV3Content {
   }
 
   // Read only attributes
-  get el(): DocumentFragment {
+  /**
+   * Element to render
+   */
+  public toHtml(): DocumentFragment {
     const ret = new DocumentFragment();
-    this.lines.forEach((l) => ret.append(l.el));
+    this.lines.forEach((l) => ret.append(l.toHtml()));
     if (Object.keys(this._styles).length > 0) ret.append(this._styleNode());
     return ret;
   }
 
+  public toMarkdownHtml(
+    markdownSettings: IMarkdownSettings = defaultMarkdownSettings,
+  ): DocumentFragment {
+    const ret = new DocumentFragment();
+    this.lines.forEach((line) => {
+      const l = document.createElement("div");
+      l.classList.add("aiev3-markdown-line");
+      l.dataset.textAlignment = this._textAlignment;
+      l.dataset.decimalAlignPercent = this._decimalAlignPercent.toString();
+      const tn = document.createTextNode(line.toMarkdown(markdownSettings));
+      l.append(tn);
+      ret.append(l);
+    });
+    if (Object.keys(this._styles).length > 0) ret.append(this._styleNode());
+    return ret;
+  }
+
+  /**
+   * Text from the element
+   */
   get text(): string {
     return this.lines.map((l) => l.textBlocks.map((b) => b.text).join("")).join("\n");
   }
 
+  /**
+   * JSON string of the content
+   */
   get jsonString(): string {
     return JSON.stringify({
       lines: this.lines,
@@ -71,6 +120,23 @@ export class EditorV3Content {
     });
   }
 
+  /**
+   * Current content properties
+   */
+  get contentProps(): EditorV3ContentProps {
+    return {
+      textAlignment: this._textAlignment,
+      decimalAlignPercent: this._decimalAlignPercent,
+      styles: this._styles,
+    };
+  }
+
+  /**
+   * Create a new EditorV3Content instance
+   * @param input Stringified JSON or HTML/text
+   * @param props Optional properties
+   * @returns Instance of the object
+   */
   constructor(input: string, props?: EditorV3ContentProps) {
     // Defaults
     this._textAlignment = props?.textAlignment ?? EditorV3Align.left;
@@ -95,8 +161,10 @@ export class EditorV3Content {
   }
 
   private copyImport(read: EditorV3Import, props?: EditorV3ContentProps): void {
-    this._textAlignment = props?.textAlignment ?? read.textAlignment ?? EditorV3Align.left;
-    this._decimalAlignPercent = props?.decimalAlignPercent ?? read.decimalAlignPercent ?? 60;
+    this._textAlignment =
+      props?.textAlignment ?? (read.lines[0].textAlignment as EditorV3Align) ?? EditorV3Align.left;
+    this._decimalAlignPercent =
+      props?.decimalAlignPercent ?? read.lines[0].decimalAlignPercent ?? 60;
     this._styles = {
       ...this._styles,
       ...read.styles,

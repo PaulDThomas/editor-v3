@@ -1,6 +1,6 @@
-import { EditorV3Content } from "../classes/EditorV3Content";
-import { EditorV3Line } from "../classes/EditorV3Line";
-import { EditorV3Align } from "../classes/interface";
+import { EditorV3Content } from "./EditorV3Content";
+import { EditorV3Line } from "./EditorV3Line";
+import { EditorV3Align } from "./interface";
 
 // Load and read tests
 describe("Check basic EditorV3Content", () => {
@@ -8,7 +8,7 @@ describe("Check basic EditorV3Content", () => {
     const testContent = new EditorV3Content("12.34");
     expect(testContent.text).toEqual("12.34");
     const div = document.createElement("div");
-    div.append(testContent.el);
+    div.append(testContent.toHtml());
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line left"><span class="aiev3-tb">12.34</span></div>',
     );
@@ -51,7 +51,7 @@ describe("Check basic EditorV3Content", () => {
       styles: { shiny: { color: "pink" } },
     });
     const div = document.createElement("div");
-    div.append(testContent.el);
+    div.append(testContent.toHtml());
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line center">' +
         '<span class="aiev3-tb">34.56</span>' +
@@ -70,7 +70,7 @@ describe("Check basic EditorV3Content", () => {
     testContent.textAlignment = EditorV3Align.decimal;
     expect(new EditorV3Content(testContent.jsonString)).toEqual(testContent);
     div.innerHTML = "";
-    div.appendChild(testContent.el);
+    div.appendChild(testContent.toHtml());
     expect(new EditorV3Content(div.innerHTML)).toEqual(testContent);
   });
 
@@ -87,7 +87,7 @@ describe("Check basic EditorV3Content", () => {
       styles: {},
     });
     const div = document.createElement("div");
-    div.append(testContent.el);
+    div.append(testContent.toHtml());
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line left"><span class="aiev3-tb">Hello</span></div>' +
         '<div class="aiev3-line left"><span class="aiev3-tb">.World</span></div>',
@@ -108,7 +108,7 @@ describe("Check basic EditorV3Content", () => {
       styles: { shiny: { color: "pink" } },
     });
     div.innerHTML = "";
-    div.appendChild(testContent.el);
+    div.appendChild(testContent.toHtml());
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span class="aiev3-tb">Hello</span></span>' +
@@ -404,5 +404,35 @@ describe("Content functions", () => {
         textBlocks: [{ text: "7", style: "shiny" }, { text: "89" }],
       },
     ]);
+  });
+});
+
+describe("Render markdown text from content", () => {
+  test("Render markdown text", async () => {
+    const props = {
+      styles: { shiny: { color: "pink" } },
+      textAlignment: EditorV3Align.center,
+      decimalAlignPercent: 80,
+    };
+    const testContent = new EditorV3Content("123\n456\n789", props);
+    testContent.applyStyle("shiny", {
+      isCollapsed: false,
+      startLine: 0,
+      startChar: 1,
+      endLine: 2,
+      endChar: 1,
+    });
+    expect(testContent.contentProps).toEqual(props);
+    const result = testContent.toMarkdownHtml();
+    const div = document.createElement("div");
+    div.append(result);
+    expect(div.innerHTML).toEqual(
+      `<div class="aiev3-markdown-line" data-text-alignment="center" data-decimal-align-percent="80">1&lt;&lt;shiny::23&gt;&gt;</div>` +
+        `<div class="aiev3-markdown-line" data-text-alignment="center" data-decimal-align-percent="80">&lt;&lt;shiny::456&gt;&gt;</div>` +
+        `<div class="aiev3-markdown-line" data-text-alignment="center" data-decimal-align-percent="80">&lt;&lt;shiny::7&gt;&gt;89</div>` +
+        `<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}"></div>`,
+    );
+    // Eat your own tail
+    expect(new EditorV3Content(div.innerHTML)).toEqual(testContent);
   });
 });

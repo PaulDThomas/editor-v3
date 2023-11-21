@@ -11,6 +11,7 @@ import { moveCursor } from "../functions/moveCursor";
 import { redraw } from "../functions/redraw";
 import { setCaretPosition } from "../functions/setCaretPosition";
 import "./EditorV3.css";
+import { IMarkdownSettings, defaultMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 
 interface EditorV3Props {
   id: string;
@@ -28,6 +29,8 @@ interface EditorV3Props {
   spellCheck?: boolean;
   styleOnContextMenu?: boolean;
   forceUpdate?: boolean;
+  allowMarkdown?: boolean;
+  markdownSettings?: IMarkdownSettings;
 }
 
 export const EditorV3 = ({
@@ -46,35 +49,50 @@ export const EditorV3 = ({
   spellCheck = false,
   styleOnContextMenu = true,
   forceUpdate = false,
+  allowMarkdown = false,
+  markdownSettings = defaultMarkdownSettings,
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
 
+  const [showMarkdown, setShowMarkdown] = useState<boolean>(false);
   const menuItems = useMemo((): iMenuItem[] => {
-    return [
-      {
-        label: "Style",
-        group: [
-          ...(customStyleMap && Object.keys(customStyleMap).length > 0
-            ? Object.keys(customStyleMap ?? {}).map((s) => {
-                return {
-                  label: s,
-                  action: (target?: Range | null) => {
-                    divRef.current && applyStyle(s, divRef.current, target);
-                  },
-                };
-              })
-            : [{ label: "No styles defined", disabled: true }]),
+    const styleMenuItem: iMenuItem = {
+      label: "Style",
+      disabled: showMarkdown,
+      group: [
+        ...(customStyleMap && Object.keys(customStyleMap).length > 0
+          ? Object.keys(customStyleMap ?? {}).map((s) => {
+              return {
+                label: s,
+                disabled: showMarkdown,
+                action: (target?: Range | null) => {
+                  divRef.current && applyStyle(s, divRef.current, target);
+                },
+              };
+            })
+          : [{ label: "No styles defined", disabled: true }]),
+        {
+          label: "Remove style",
+          disabled: showMarkdown,
+          action: (target) => {
+            divRef.current && applyStyle(null, divRef.current, target);
+          },
+        },
+      ],
+    };
+    const showMarkdownMenu = !allowMarkdown
+      ? []
+      : [
           {
-            label: "Remove style",
-            action: (target) => {
-              divRef.current && applyStyle(null, divRef.current, target);
+            label: `${showMarkdown ? "Hide" : "Show"} markdown`,
+            action: () => {
+              setShowMarkdown(!showMarkdown);
             },
           },
-        ],
-      },
-    ];
-  }, [customStyleMap]);
+        ];
+    return [styleMenuItem, ...showMarkdownMenu];
+  }, [allowMarkdown, customStyleMap, showMarkdown]);
 
   // General return function
   const [canReturn, setCanReturn] = useState<boolean>(forceUpdate);
@@ -99,9 +117,17 @@ export const EditorV3 = ({
       decimalAlignPercent,
       styles: customStyleMap,
     });
-    divRef.current && redraw(divRef.current, newContent);
+    divRef.current && redraw(divRef.current, newContent, showMarkdown);
     returnData(getCurrentData(divRef), true);
-  }, [customStyleMap, decimalAlignPercent, input, returnData, textAlignment]);
+  }, [
+    customStyleMap,
+    decimalAlignPercent,
+    input,
+    markdownSettings,
+    returnData,
+    showMarkdown,
+    textAlignment,
+  ]);
 
   // Work out backgroup colour and border
   const [inFocus, setInFocus] = useState<boolean>(false);
@@ -116,6 +142,7 @@ export const EditorV3 = ({
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (showMarkdown) return;
       // Handle awkward keys
       if (["Enter", "Backspace", "Delete"].includes(e.key) && divRef.current) {
         e.stopPropagation();
@@ -129,7 +156,7 @@ export const EditorV3 = ({
             styles: customStyleMap,
           });
           const newPos = content.splitLine(pos);
-          redraw(divRef.current, content);
+          redraw(divRef.current, content, showMarkdown);
           setCaretPosition(divRef.current, newPos);
         }
         // Backspace and delete
@@ -140,7 +167,7 @@ export const EditorV3 = ({
             styles: customStyleMap,
           });
           const newPos = content.deleteCharacter(pos, e.key === "Backspace");
-          redraw(divRef.current, content);
+          redraw(divRef.current, content, showMarkdown);
           setCaretPosition(divRef.current, newPos);
         }
         return;
@@ -163,7 +190,7 @@ export const EditorV3 = ({
           });
           if (!content.lines[pos.startLine].lineText.includes(".")) {
             content.splice(pos, [new EditorV3Line(".")]);
-            redraw(divRef.current, content);
+            redraw(divRef.current, content, showMarkdown);
             setCaretPosition(divRef.current, {
               startLine: pos.startLine,
               startChar: pos.startChar + 1,
@@ -175,20 +202,25 @@ export const EditorV3 = ({
         }
       }
     },
-    [allowNewLine, customStyleMap, decimalAlignPercent, textAlignment],
+    [allowNewLine, customStyleMap, decimalAlignPercent, showMarkdown, textAlignment],
   );
 
-  const handleKeyUp = useCallback((e: React.KeyboardEvent<HTMLDivElement>) => {
-    // Stop handled keys
-    if (["Enter", "Backspace", "Delete"].includes(e.key)) {
-      e.stopPropagation();
-      e.preventDefault();
-      return;
-    }
-  }, []);
+  const handleKeyUp = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (showMarkdown) return;
+      // Stop handled keys
+      if (["Enter", "Backspace", "Delete"].includes(e.key)) {
+        e.stopPropagation();
+        e.preventDefault();
+        return;
+      }
+    },
+    [showMarkdown],
+  );
 
   const handleCopy = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
+      if (showMarkdown) return;
       try {
         e.preventDefault();
         e.stopPropagation();
@@ -204,12 +236,12 @@ export const EditorV3 = ({
             e.clipboardData.setData("text/plain", toPaste.map((l) => l.lineText).join("\n"));
             e.clipboardData.setData(
               "text/html",
-              toPaste.map((l) => applyStylesToHTML(l.el, content.styles).outerHTML).join(""),
+              toPaste.map((l) => applyStylesToHTML(l.toHtml(), content.styles).outerHTML).join(""),
             );
             e.clipboardData.setData("data/aiev3", JSON.stringify(toPaste));
             if (e.type === "cut") {
               content.splice(pos);
-              redraw(divRef.current, content);
+              redraw(divRef.current, content, showMarkdown);
               setCaretPosition(divRef.current, {
                 ...pos,
                 endLine: pos.startLine,
@@ -222,13 +254,13 @@ export const EditorV3 = ({
         console.warn(`Copy failed because ${error}`);
       }
     },
-    [customStyleMap, decimalAlignPercent, textAlignment],
+    [customStyleMap, decimalAlignPercent, showMarkdown, textAlignment],
   );
 
   const handlePaste = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
       try {
-        if (!divRef.current) return;
+        if (!divRef.current || showMarkdown) return;
         e.preventDefault();
         e.stopPropagation();
         const pos = getCaretPosition(divRef.current);
@@ -268,7 +300,7 @@ export const EditorV3 = ({
           }
           // Splice in new data and redraw
           content.splice(pos, lines);
-          redraw(divRef.current, content);
+          redraw(divRef.current, content, showMarkdown);
           pos.startLine = pos.startLine + lines.length - 1;
           pos.startChar =
             lines.length === 1
@@ -284,7 +316,7 @@ export const EditorV3 = ({
         console.warn(`Paste failed because: ${error}`);
       }
     },
-    [allowNewLine, customStyleMap, decimalAlignPercent, textAlignment],
+    [allowNewLine, customStyleMap, decimalAlignPercent, showMarkdown, textAlignment],
   );
 
   const handleBlur = useCallback(() => {
