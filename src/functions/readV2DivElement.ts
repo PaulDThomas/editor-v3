@@ -27,14 +27,12 @@ export const readV2DivElement = (
         if (child.attributes[0].name === "classname") {
           // Add text block with style
           const newBlbock = new EditorV3TextBlock(child.textContent, child.attributes[0].value);
-          console.log("With style", newBlbock);
           ret.textBlocks.push(newBlbock);
         }
         // If span has no style
         else {
           // Add text block without style
           const newBlock = new EditorV3TextBlock(child.textContent);
-          console.log("No style", ret);
           ret.textBlocks.push(newBlock);
         }
       }
@@ -45,7 +43,6 @@ export const readV2DivElement = (
       if (child.textContent) {
         // Add text block without style
         ret.textBlocks.push(new EditorV3TextBlock(child.textContent));
-        console.log("Text block push", child.textContent);
       }
     }
   });
