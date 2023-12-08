@@ -436,3 +436,24 @@ describe("Render markdown text from content", () => {
     expect(new EditorV3Content(div.innerHTML)).toEqual(testContent);
   });
 });
+
+describe("Render html text from v2 content", () => {
+  test("Load multiple v2 lines", async () => {
+    const textString =
+      `<div classname="aie-text" data-key="2v9v5" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":1,"style":"Notes"},{"offset":4,"length":1,"style":"Notes"},{"offset":1,"length":3,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">N</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  w</div>` +
+      `<div classname="aie-text" data-key="1u61b" data-type="unstyled" data-inline-style-ranges='[]'></div>` +
+      `<div classname="aie-text" data-key="4l4fu" data-type="unstyled" data-inline-style-ranges='[]'>ork</div>`;
+    const result = new EditorV3Content(textString);
+    expect(result.lines.length).toEqual(3);
+    expect(result.lines[0].textBlocks.map((t) => t.data)).toEqual([
+      { text: "N", style: "Notes" },
+      { text: "ote", style: "Optional" },
+      { text: "s", style: "Notes" },
+      { text: "  w", style: undefined },
+    ]);
+    expect(result.lines[1].textBlocks.map((t) => t.data)).toEqual([{ text: "", style: undefined }]);
+    expect(result.lines[2].textBlocks.map((t) => t.data)).toEqual([
+      { text: "ork", style: undefined },
+    ]);
+  });
+});

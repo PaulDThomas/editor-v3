@@ -4,6 +4,7 @@ import { EditorV3Align } from "./interface";
 import { defaultMarkdownSettings, IMarkdownSettings } from "./markdown/MarkdownSettings";
 import { readV3DivElement } from "../functions/readV3DivElement";
 import { readV3MarkdownElement } from "../functions/readV3MarkdownElement";
+import { readV2DivElement } from "../functions/readV2DivElement";
 
 export class EditorV3Line {
   public textBlocks: EditorV3TextBlock[];
@@ -81,6 +82,16 @@ export class EditorV3Line {
         h.innerHTML = arg;
         const d = h.content.children[0] as HTMLDivElement;
         const ret = readV3MarkdownElement(d, markdownSettings);
+        this.textBlocks = ret.textBlocks;
+        this.decimalAlignPercent = ret.decimalAlignPercent;
+        this.textAlignment = ret.textAlignment;
+      }
+      // V2 text
+      else if (arg.match(/^<div classname="aie-text.*<\/div>$/)) {
+        const h = document.createElement("template");
+        h.innerHTML = arg;
+        const d = h.content.children[0] as HTMLDivElement;
+        const ret = readV2DivElement(d);
         this.textBlocks = ret.textBlocks;
         this.decimalAlignPercent = ret.decimalAlignPercent;
         this.textAlignment = ret.textAlignment;

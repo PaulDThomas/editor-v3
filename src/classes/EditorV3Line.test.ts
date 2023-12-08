@@ -462,3 +462,25 @@ describe("Check EditorV3Line functions", () => {
     ]);
   });
 });
+
+describe("Read in v2 div element", () => {
+  test("Read basic div element", async () => {
+    const htmlString =
+      '<div classname="aie-text" data-key="3fsuc" data-type="unstyled" data-inline-style-ranges=\'[{"offset":32,"length":9,"style":"Optional"}]\'>[b] CR, non-measurable disease: <span classname="Optional" style="color:seagreen">Confirmed</span>' +
+      " CR response but subject has non-measurable disease at baseline.</div>";
+    const result = new EditorV3Line(htmlString);
+    expect(result.textBlocks.length).toEqual(3);
+    expect(result.textBlocks[0].data).toEqual({
+      style: undefined,
+      text: "[b] CR, non-measurable disease: ",
+    });
+    expect(result.textBlocks[1].data).toEqual({
+      style: "Optional",
+      text: "Confirmed",
+    });
+    expect(result.textBlocks[2].data).toEqual({
+      style: undefined,
+      text: " CR response but subject has non-measurable disease at baseline.",
+    });
+  });
+});
