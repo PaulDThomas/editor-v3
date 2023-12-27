@@ -142,62 +142,68 @@ export const EditorV3 = ({
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (showMarkdown) return;
-      // Handle awkward keys
-      if (["Enter", "Backspace", "Delete"].includes(e.key) && divRef.current) {
-        e.stopPropagation();
-        e.preventDefault();
-        const pos = getCaretPosition(divRef.current);
-        // Enter
-        if (pos && allowNewLine && e.key === "Enter") {
-          const content = new EditorV3Content(divRef.current.innerHTML, {
-            textAlignment,
-            decimalAlignPercent,
-            styles: customStyleMap,
-          });
-          const newPos = content.splitLine(pos);
-          redraw(divRef.current, content, showMarkdown);
-          setCaretPosition(divRef.current, newPos);
-        }
-        // Backspace and delete
-        if (pos && ["Backspace", "Delete"].includes(e.key)) {
-          const content = new EditorV3Content(divRef.current.innerHTML, {
-            textAlignment,
-            decimalAlignPercent,
-            styles: customStyleMap,
-          });
-          const newPos = content.deleteCharacter(pos, e.key === "Backspace");
-          redraw(divRef.current, content, showMarkdown);
-          setCaretPosition(divRef.current, newPos);
-        }
-        return;
-      } else if (
-        divRef.current &&
-        ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)
-      ) {
-        moveCursor(divRef.current, e);
-      }
-      // Decimal handling
-      else if (divRef.current && e.key === "." && textAlignment === EditorV3Align.decimal) {
-        e.stopPropagation();
-        e.preventDefault();
-        const pos = getCaretPosition(divRef.current);
-        if (pos) {
-          const content = new EditorV3Content(divRef.current.innerHTML, {
-            textAlignment,
-            decimalAlignPercent,
-            styles: customStyleMap,
-          });
-          if (!content.lines[pos.startLine].lineText.includes(".")) {
-            content.splice(pos, [new EditorV3Line(".")]);
-            redraw(divRef.current, content, showMarkdown);
-            setCaretPosition(divRef.current, {
-              startLine: pos.startLine,
-              startChar: pos.startChar + 1,
-              isCollapsed: true,
-              endLine: pos.startLine,
-              endChar: pos.startChar + 1,
+      // Markdown editing should not be handled
+      if (!showMarkdown) {
+        // Handle awkward keys
+        if (["Enter", "Backspace", "Delete"].includes(e.key) && divRef.current) {
+          e.stopPropagation();
+          e.preventDefault();
+          const pos = getCaretPosition(divRef.current);
+          // Enter
+          if (pos && allowNewLine && e.key === "Enter") {
+            const content = new EditorV3Content(divRef.current.innerHTML, {
+              textAlignment,
+              decimalAlignPercent,
+              styles: customStyleMap,
             });
+            const newPos = content.splitLine(pos);
+            redraw(divRef.current, content, showMarkdown);
+            setCaretPosition(divRef.current, newPos);
+          }
+          // Backspace and delete
+          if (pos && ["Backspace", "Delete"].includes(e.key)) {
+            const content = new EditorV3Content(divRef.current.innerHTML, {
+              textAlignment,
+              decimalAlignPercent,
+              styles: customStyleMap,
+            });
+            const newPos = content.deleteCharacter(pos, e.key === "Backspace");
+            redraw(divRef.current, content, showMarkdown);
+            setCaretPosition(divRef.current, newPos);
+          }
+          return;
+        }
+        // Cursor movement
+        else if (
+          divRef.current &&
+          ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)
+        ) {
+          e.stopPropagation();
+          e.preventDefault();
+          moveCursor(divRef.current, e);
+        }
+        // Decimal handling
+        else if (divRef.current && e.key === "." && textAlignment === EditorV3Align.decimal) {
+          e.stopPropagation();
+          e.preventDefault();
+          const pos = getCaretPosition(divRef.current);
+          if (pos) {
+            const content = new EditorV3Content(divRef.current.innerHTML, {
+              textAlignment,
+              decimalAlignPercent,
+              styles: customStyleMap,
+            });
+            if (!content.lines[pos.startLine].lineText.includes(".")) {
+              content.splice(pos, [new EditorV3Line(".")]);
+              redraw(divRef.current, content, showMarkdown);
+              setCaretPosition(divRef.current, {
+                startLine: pos.startLine,
+                startChar: pos.startChar + 1,
+                isCollapsed: true,
+                endLine: pos.startLine,
+                endChar: pos.startChar + 1,
+              });
+            }
           }
         }
       }
@@ -207,60 +213,35 @@ export const EditorV3 = ({
 
   const handleKeyUp = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (showMarkdown) return;
-      // Stop handled keys
-      if (["Enter", "Backspace", "Delete"].includes(e.key)) {
-        e.stopPropagation();
-        e.preventDefault();
-        return;
-      }
-    },
-    [showMarkdown],
-  );
-
-  const handleCopy = useCallback(
-    (e: React.ClipboardEvent<HTMLDivElement>) => {
-      if (showMarkdown) return;
-      try {
-        e.preventDefault();
-        e.stopPropagation();
-        if (divRef.current) {
-          const pos = getCaretPosition(divRef.current);
-          if (pos) {
-            const content = new EditorV3Content(divRef.current.innerHTML, {
-              textAlignment,
-              decimalAlignPercent,
-              styles: customStyleMap,
-            });
-            const toPaste = content.subLines(pos);
-            e.clipboardData.setData("text/plain", toPaste.map((l) => l.lineText).join("\n"));
-            e.clipboardData.setData(
-              "text/html",
-              toPaste.map((l) => applyStylesToHTML(l.toHtml(), content.styles).outerHTML).join(""),
-            );
-            e.clipboardData.setData("data/aiev3", JSON.stringify(toPaste));
-            if (e.type === "cut") {
-              content.splice(pos);
-              redraw(divRef.current, content, showMarkdown);
-              setCaretPosition(divRef.current, {
-                ...pos,
-                endLine: pos.startLine,
-                endChar: pos.startChar,
-              });
-            }
-          }
+      // Markdown editing should not be handled
+      if (!showMarkdown) {
+        // Stop handled keys
+        if (["Enter", "Backspace", "Delete"].includes(e.key)) {
+          e.stopPropagation();
+          e.preventDefault();
+          return;
         }
-      } catch (error) {
-        console.warn(`Copy failed because ${error}`);
+        // Always redraw?
+        else if (divRef.current) {
+          e.preventDefault();
+          e.stopPropagation();
+          const pos = getCaretPosition(divRef.current);
+          const content = new EditorV3Content(divRef.current.innerHTML, {
+            textAlignment,
+            decimalAlignPercent,
+            styles: customStyleMap,
+          });
+          redraw(divRef.current, content, showMarkdown);
+          if (pos) setCaretPosition(divRef.current, pos);
+        }
       }
     },
     [customStyleMap, decimalAlignPercent, showMarkdown, textAlignment],
   );
 
-  const handlePaste = useCallback(
+  const handleCopy = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
-      try {
-        if (!divRef.current || showMarkdown) return;
+      if (!showMarkdown && divRef.current) {
         e.preventDefault();
         e.stopPropagation();
         const pos = getCaretPosition(divRef.current);
@@ -270,50 +251,86 @@ export const EditorV3 = ({
             decimalAlignPercent,
             styles: customStyleMap,
           });
-          const lines: EditorV3Line[] = [];
-          const linesImport = (
-            e.clipboardData.getData("data/aiev3") !== ""
-              ? JSON.parse(e.clipboardData.getData("data/aiev3"))
-              : e.clipboardData
-                  .getData("text/plain")
-                  .split("\n")
-                  .map((t) => ({
-                    textBlocks: [{ text: t }],
-                    textAlignment,
-                    decimalAlignPercent,
-                  }))
-          ) as EditorV3LineImport[];
-          // Just text blocks if only one line is allowed
-          if (linesImport.length > 1 && !allowNewLine) {
-            const textBlocks: EditorV3TextBlock[] = linesImport
-              .flatMap((l) => l.textBlocks)
-              .map((tb) => new EditorV3TextBlock(tb));
-            lines.push(
-              new EditorV3Line(
-                textBlocks,
-                linesImport[0].textAlignment as EditorV3Align,
-                linesImport[0].decimalAlignPercent,
-              ),
-            );
-          } else {
-            lines.push(...linesImport.map((l) => new EditorV3Line(JSON.stringify(l))));
+          const toPaste = content.subLines(pos);
+          e.clipboardData.setData("text/plain", toPaste.map((l) => l.lineText).join("\n"));
+          e.clipboardData.setData(
+            "text/html",
+            toPaste.map((l) => applyStylesToHTML(l.toHtml(), content.styles).outerHTML).join(""),
+          );
+          e.clipboardData.setData("data/aiev3", JSON.stringify(toPaste));
+          if (e.type === "cut") {
+            content.splice(pos);
+            redraw(divRef.current, content, showMarkdown);
+            setCaretPosition(divRef.current, {
+              ...pos,
+              endLine: pos.startLine,
+              endChar: pos.startChar,
+            });
           }
-          // Splice in new data and redraw
-          content.splice(pos, lines);
-          redraw(divRef.current, content, showMarkdown);
-          pos.startLine = pos.startLine + lines.length - 1;
-          pos.startChar =
-            lines.length === 1
-              ? pos.startChar + lines[0].lineLength
-              : lines[lines.length - 1].lineLength;
-          setCaretPosition(divRef.current, {
-            ...pos,
-            endLine: pos.startLine,
-            endChar: pos.startChar,
-          });
+        }
+      }
+    },
+    [customStyleMap, decimalAlignPercent, showMarkdown, textAlignment],
+  );
+
+  const handlePaste = useCallback(
+    (e: React.ClipboardEvent<HTMLDivElement>) => {
+      try {
+        if (divRef.current && !showMarkdown) {
+          e.preventDefault();
+          e.stopPropagation();
+          const pos = getCaretPosition(divRef.current);
+          if (pos) {
+            const content = new EditorV3Content(divRef.current.innerHTML, {
+              textAlignment,
+              decimalAlignPercent,
+              styles: customStyleMap,
+            });
+            const lines: EditorV3Line[] = [];
+            const linesImport = (
+              e.clipboardData.getData("data/aiev3") !== ""
+                ? JSON.parse(e.clipboardData.getData("data/aiev3"))
+                : e.clipboardData
+                    .getData("text/plain")
+                    .split("\n")
+                    .map((t) => ({
+                      textBlocks: [{ text: t }],
+                      textAlignment,
+                      decimalAlignPercent,
+                    }))
+            ) as EditorV3LineImport[];
+            // Just text blocks if only one line is allowed
+            if (linesImport.length > 1 && !allowNewLine) {
+              const textBlocks: EditorV3TextBlock[] = linesImport
+                .flatMap((l) => l.textBlocks)
+                .map((tb) => new EditorV3TextBlock(tb));
+              lines.push(
+                new EditorV3Line(
+                  textBlocks,
+                  linesImport[0].textAlignment as EditorV3Align,
+                  linesImport[0].decimalAlignPercent,
+                ),
+              );
+            } else {
+              lines.push(...linesImport.map((l) => new EditorV3Line(JSON.stringify(l))));
+            }
+            // Splice in new data and redraw
+            content.splice(pos, lines);
+            redraw(divRef.current, content, showMarkdown);
+            pos.startLine = pos.startLine + lines.length - 1;
+            pos.startChar =
+              lines.length === 1
+                ? pos.startChar + lines[0].lineLength
+                : lines[lines.length - 1].lineLength;
+            setCaretPosition(divRef.current, {
+              ...pos,
+              endLine: pos.startLine,
+              endChar: pos.startChar,
+            });
+          }
         }
       } catch (error) {
-        console.warn(`Paste failed because: ${error}`);
+        throw new Error(`Paste failed because: ${error}`);
       }
     },
     [allowNewLine, customStyleMap, decimalAlignPercent, showMarkdown, textAlignment],

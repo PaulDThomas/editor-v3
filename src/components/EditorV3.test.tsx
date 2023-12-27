@@ -473,22 +473,33 @@ describe("Edge events", () => {
     expect(editorHolder).toBeInTheDocument();
     fireEvent.focus(editorHolder);
   });
-  test("Copy error", async () => {
-    const mockSetText = jest.fn();
-    await act(async () => {
-      render(
-        <div data-testid='container'>
-          <EditorV3
-            id='test-editor'
-            input={mockContent.jsonString}
-            setText={mockSetText}
-          />
-        </div>,
-      );
-    });
-    const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
-    const editorHolder = container.querySelector("#test-editor-editable") as HTMLDivElement;
-    expect(editorHolder).toBeInTheDocument();
-    fireEvent.copy(editorHolder, { clipboardData: ["some", "mash"] });
-  });
+  // test("Paste error", async () => {
+  //   const user = userEvent.setup();
+  //   const mockSetText = jest.fn();
+  //   await act(async () => {
+  //     render(
+  //       <div data-testid='container'>
+  //         <EditorV3
+  //           id='test-editor'
+  //           input={mockContent.jsonString}
+  //           setText={mockSetText}
+  //           forceUpdate
+  //         />
+  //       </div>,
+  //     );
+  //   });
+  //   const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
+  //   const editorHolder = container.querySelector("#test-editor-editable") as HTMLDivElement;
+  //   expect(editorHolder).toBeInTheDocument();
+  //   await user.click(editorHolder.querySelector("span") as HTMLSpanElement);
+  //   await expect(
+  //     user.paste({
+  //       getData: (type: string) => {
+  //         if (type === "data/aiev3") {
+  //           return "NotJSONString";
+  //         }
+  //       },
+  //     } as DataTransfer),
+  //   ).rejects.toThrow();
+  // });
 });
