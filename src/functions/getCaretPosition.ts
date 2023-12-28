@@ -22,10 +22,10 @@ export function getCaretPosition(
     range.startContainer instanceof Element
       ? range.startContainer
       : (range.startContainer.parentElement as Element)
-  ).closest("div.aiev3-line");
+  ).closest("div.aiev3-line, div.aiev3-markdown-line");
   const startLine =
     f && element.contains(f) && f.parentElement
-      ? [...f.parentElement.querySelectorAll("div.aiev3-line")].indexOf(f)
+      ? [...f.parentElement.querySelectorAll("div.aiev3-line, div.aiev3-markdown-line")].indexOf(f)
       : null;
   if (startLine === null || !f) return null;
   preCaretRange.selectNodeContents(f);
@@ -36,7 +36,7 @@ export function getCaretPosition(
     range.endContainer instanceof Element
       ? range.endContainer
       : (range.endContainer.parentElement as Element)
-  ).closest("div.aiev3-line");
+  ).closest("div.aiev3-line, div.aiev3-markdown-line");
   const endLine =
     l && element.contains(l) && l.parentElement ? [...l.parentElement.children].indexOf(l) : -1;
   let endChar = -1;

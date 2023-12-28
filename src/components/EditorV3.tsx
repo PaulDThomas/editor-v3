@@ -2,7 +2,12 @@ import { ContextMenuHandler, iMenuItem } from "@asup/context-menu";
 import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EditorV3Line, EditorV3TextBlock } from "../classes";
 import { EditorV3Content } from "../classes/EditorV3Content";
-import { EditorV3Align, EditorV3LineImport, EditorV3Styles } from "../classes/interface";
+import {
+  EditorV3Align,
+  EditorV3LineImport,
+  EditorV3Position,
+  EditorV3Styles,
+} from "../classes/interface";
 import { applyStyle } from "../functions/applyStyle";
 import { applyStylesToHTML } from "../functions/applyStylesToHTML";
 import { getCaretPosition } from "../functions/getCaretPosition";
@@ -33,6 +38,11 @@ interface EditorV3Props {
   markdownSettings?: IMarkdownSettings;
 }
 
+interface UndoStackEntry {
+  content: EditorV3Content;
+  pos: EditorV3Position | null;
+}
+
 export const EditorV3 = ({
   id,
   input,
@@ -54,8 +64,11 @@ export const EditorV3 = ({
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
-
   const [showMarkdown, setShowMarkdown] = useState<boolean>(false);
+  const [undoStack, setUndoStack] = useState<UndoStackEntry[]>([]);
+  const [redoStack, setRedoStack] = useState<UndoStackEntry[]>([]);
+
+  // Set up menu items
   const menuItems = useMemo((): iMenuItem[] => {
     const styleMenuItem: iMenuItem = {
       label: "Style",
@@ -129,6 +142,42 @@ export const EditorV3 = ({
     textAlignment,
   ]);
 
+  // Handle undo/redo
+  const handleUndo = useCallback(() => {
+    if (undoStack.length > 0 && divRef.current) {
+      const lastState = undoStack.pop() as UndoStackEntry;
+      const currentState: UndoStackEntry = {
+        content: new EditorV3Content(divRef.current.innerHTML, {
+          textAlignment,
+          decimalAlignPercent,
+          styles: customStyleMap,
+        }),
+        pos: getCaretPosition(divRef.current),
+      };
+      setRedoStack([...redoStack, currentState]);
+      redraw(divRef.current, lastState.content, showMarkdown);
+      lastState.pos && setCaretPosition(divRef.current, lastState.pos);
+      setUndoStack(undoStack);
+    }
+  }, [undoStack, textAlignment, decimalAlignPercent, customStyleMap, redoStack, showMarkdown]);
+  const handleRedo = useCallback(() => {
+    if (redoStack.length > 0 && divRef.current) {
+      const lastState = redoStack.pop() as UndoStackEntry;
+      const currentState = {
+        content: new EditorV3Content(divRef.current.innerHTML, {
+          textAlignment,
+          decimalAlignPercent,
+          styles: customStyleMap,
+        }),
+        pos: getCaretPosition(divRef.current),
+      };
+      setUndoStack([...undoStack, currentState]);
+      redraw(divRef.current, lastState.content, showMarkdown);
+      lastState.pos && setCaretPosition(divRef.current, lastState.pos);
+      setRedoStack(redoStack);
+    }
+  }, [redoStack, textAlignment, decimalAlignPercent, customStyleMap, undoStack, showMarkdown]);
+
   // Work out backgroup colour and border
   const [inFocus, setInFocus] = useState<boolean>(false);
   const handleFocus = useCallback(() => {
@@ -142,73 +191,66 @@ export const EditorV3 = ({
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      // Markdown editing should not be handled
-      if (!showMarkdown) {
-        // Handle awkward keys
-        if (["Enter", "Backspace", "Delete"].includes(e.key) && divRef.current) {
-          e.stopPropagation();
-          e.preventDefault();
+      if (divRef.current) {
+        // Handle undo/redo
+        if (e.ctrlKey && e.key === "z") handleUndo();
+        else if (e.ctrlKey && e.key === "y") handleRedo();
+        else {
+          // Add to undo stack
+          const content = new EditorV3Content(divRef.current.innerHTML, {
+            textAlignment,
+            decimalAlignPercent,
+            styles: customStyleMap,
+          });
           const pos = getCaretPosition(divRef.current);
-          // Enter
-          if (pos && allowNewLine && e.key === "Enter") {
-            const content = new EditorV3Content(divRef.current.innerHTML, {
-              textAlignment,
-              decimalAlignPercent,
-              styles: customStyleMap,
-            });
-            const newPos = content.splitLine(pos);
-            redraw(divRef.current, content, showMarkdown);
-            setCaretPosition(divRef.current, newPos);
+          if (content.jsonString !== undoStack[undoStack.length - 1]?.content.jsonString) {
+            setUndoStack([...undoStack, { content, pos }]);
+            setRedoStack([]);
           }
-          // Backspace and delete
-          if (pos && ["Backspace", "Delete"].includes(e.key)) {
-            const content = new EditorV3Content(divRef.current.innerHTML, {
-              textAlignment,
-              decimalAlignPercent,
-              styles: customStyleMap,
-            });
-            const newPos = content.deleteCharacter(pos, e.key === "Backspace");
-            redraw(divRef.current, content, showMarkdown);
-            setCaretPosition(divRef.current, newPos);
-          }
-          return;
-        }
-        // Cursor movement
-        else if (
-          divRef.current &&
-          ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)
-        ) {
-          e.stopPropagation();
-          e.preventDefault();
-          moveCursor(divRef.current, e);
-        }
-        // Decimal handling
-        else if (divRef.current && e.key === "." && textAlignment === EditorV3Align.decimal) {
-          e.stopPropagation();
-          e.preventDefault();
-          const pos = getCaretPosition(divRef.current);
-          if (pos) {
-            const content = new EditorV3Content(divRef.current.innerHTML, {
-              textAlignment,
-              decimalAlignPercent,
-              styles: customStyleMap,
-            });
-            if (!content.lines[pos.startLine].lineText.includes(".")) {
-              content.splice(pos, [new EditorV3Line(".")]);
-              redraw(divRef.current, content, showMarkdown);
-              setCaretPosition(divRef.current, {
-                startLine: pos.startLine,
-                startChar: pos.startChar + 1,
-                isCollapsed: true,
-                endLine: pos.startLine,
-                endChar: pos.startChar + 1,
-              });
+
+          // Markdown editing should not be handled
+          if (!showMarkdown) {
+            // Handle awkward keys
+            if (["Enter", "Backspace", "Delete"].includes(e.key) && divRef.current) {
+              e.stopPropagation();
+              e.preventDefault();
+              // Enter
+              if (pos && allowNewLine && e.key === "Enter") {
+                const newPos = content.splitLine(pos);
+                redraw(divRef.current, content, showMarkdown);
+                setCaretPosition(divRef.current, newPos);
+              }
+              // Backspace and delete
+              if (pos && ["Backspace", "Delete"].includes(e.key)) {
+                const newPos = content.deleteCharacter(pos, e.key === "Backspace");
+                redraw(divRef.current, content, showMarkdown);
+                setCaretPosition(divRef.current, newPos);
+              }
+              return;
+            }
+            // Cursor movement
+            else if (
+              divRef.current &&
+              ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)
+            ) {
+              e.stopPropagation();
+              e.preventDefault();
+              moveCursor(divRef.current, e);
             }
           }
         }
       }
     },
-    [allowNewLine, customStyleMap, decimalAlignPercent, showMarkdown, textAlignment],
+    [
+      allowNewLine,
+      customStyleMap,
+      decimalAlignPercent,
+      handleRedo,
+      handleUndo,
+      showMarkdown,
+      textAlignment,
+      undoStack,
+    ],
   );
 
   const handleKeyUp = useCallback(
