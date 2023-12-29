@@ -51,4 +51,16 @@ describe("readV2DivElement", () => {
       text: "",
     });
   });
+
+  test("Read small uncharactieristic span", async () => {
+    const template = document.createElement("template");
+    template.innerHTML =
+      '<div classname="aie-text" data-key="3fsuc" data-type="unstyled"><span>Hello world!</span></div>';
+    const result = readV2DivElement(template.content.children[0] as HTMLDivElement);
+    expect(result.textBlocks.length).toEqual(1);
+    expect(result.textBlocks[0].data).toEqual({
+      style: undefined,
+      text: "Hello world!",
+    });
+  });
 });

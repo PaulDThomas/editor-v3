@@ -24,7 +24,7 @@ export const readV2DivElement = (
       // If span has text
       if (child.textContent) {
         // If span has style
-        if (child.attributes[0].name === "classname") {
+        if (child.attributes.length > 0 && child.attributes[0].name === "classname") {
           // Add text block with style
           const newBlbock = new EditorV3TextBlock(child.textContent, child.attributes[0].value);
           ret.textBlocks.push(newBlbock);
