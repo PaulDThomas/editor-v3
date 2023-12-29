@@ -144,6 +144,7 @@ export const EditorV3 = ({
 
   // Handle undo/redo
   const handleUndo = useCallback(() => {
+    console.log("Undoing");
     if (undoStack.length > 0 && divRef.current) {
       const lastState = undoStack.pop() as UndoStackEntry;
       const currentState: UndoStackEntry = {

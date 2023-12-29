@@ -5,6 +5,7 @@ import { EditorV3Align } from "../classes/interface";
 import { EditorV3 } from "./EditorV3";
 import * as applyStyleModule from "../functions/applyStyle";
 import { getCaretPosition } from "../functions/getCaretPosition";
+import { useState } from "react";
 
 const mockContent = new EditorV3Content("34.45\n\nx.xx", {
   styles: { shiny: { color: "pink", fontWeight: "700" } },
@@ -502,4 +503,36 @@ describe("Edge events", () => {
   //     } as DataTransfer),
   //   ).rejects.toThrow();
   // });
+});
+
+describe("Undo/redo", () => {
+  const TestContainer = () => {
+    const [input, setInput] = useState("");
+    return (
+      <div data-testid='container'>
+        <EditorV3
+          id='test-editor'
+          input={input}
+          setJson={setInput}
+          allowMarkdown
+          // forceUpdate
+        />
+      </div>
+    );
+  };
+  test("Undo/redo", async () => {
+    const user = userEvent.setup();
+    await act(async () => {
+      render(<TestContainer />);
+    });
+    const inputSpan = screen.queryByTestId("container")?.querySelector("span") as HTMLSpanElement;
+    expect(inputSpan).toBeInTheDocument();
+    await user.click(inputSpan);
+    await user.keyboard("added");
+    screen.debug();
+    expect(screen.queryByText("added")).toBeInTheDocument();
+    await user.keyboard("{Control>}z{/Control}");
+    screen.debug();
+    expect(screen.queryByText("adde")).toBeInTheDocument();
+  }, 500000);
 });
