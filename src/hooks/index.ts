@@ -1,3 +1,3 @@
-import { useDebounce } from "./useDebounce";
+import { useDebounce } from "./useDebounceStack";
 
 export { useDebounce };
