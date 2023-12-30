@@ -40,8 +40,8 @@
     "build": "parcel build src/main.ts",
     "start": "parcel demo/index.html --dist-dir demo/dist",
     "prepare": "husky install",
-    "test": "jest --watch",
-    "test:coverage-report": "npm test -- --coverage --watchAll=false"
+    "test": "jest",
+    "test:watch": "npm test --watch"
   },
   "dependencies": {
     "@asup/context-menu": "^1.0.1",

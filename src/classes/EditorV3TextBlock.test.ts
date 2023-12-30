@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { EditorV3TextBlock } from "./EditorV3TextBlock";
 
 // Load and read tests

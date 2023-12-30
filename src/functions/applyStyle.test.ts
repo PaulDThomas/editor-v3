@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { applyStyle } from "./applyStyle";
 
 describe("Test apply style", () => {

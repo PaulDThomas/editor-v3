@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { EditorV3Content } from "./EditorV3Content";
 import { EditorV3Line } from "./EditorV3Line";
 import { EditorV3Align } from "./interface";

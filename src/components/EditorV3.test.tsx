@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { EditorV3Content } from "../classes/EditorV3Content";
@@ -29,7 +30,6 @@ describe("Editor and functions", () => {
     });
     const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
     expect(container.outerHTML).toEqual(
-      // eslint-disable-next-line quotes
       '<div class="aiev3" id="test-editor"><div class="context-menu-handler" style="width: 100%; height: 100%;"><div id="test-editor-editable" class="aiev3-editing" contenteditable="false" spellcheck="false"><div class="aiev3-line left" style="height: 0px;"><span class="aiev3-tb">34.45</span></div><div class="aiev3-line left" style="height: 0px;"><span class="aiev3-tb">\u2009</span></div><div class="aiev3-line left" style="height: 0px;"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x.xx</span></div><div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div></div></div> </div>',
     );
     const firstSpan = container.querySelector("span") as HTMLSpanElement;
@@ -130,7 +130,6 @@ describe("Editor and functions", () => {
       }),
     );
     expect(mockSetHtml).toHaveBeenLastCalledWith(
-      // eslint-disable-next-line quotes
       '<div class="aiev3-line decimal" style="height: 0px;"><span class="aiev3-span-point lhs" style="right: 30%; min-width: 70%;">\u2009</span><span class="aiev3-span-point rhs" style="left: 70%; min-width: 30%;"><span class="aiev3-tb">\u2009</span></span></div><div class="aiev3-line decimal" style="height: 0px;"><span class="aiev3-span-point lhs" style="right: 30%; min-width: 70%;"><span class="aiev3-tb">4</span></span><span class="aiev3-span-point rhs" style="left: 70%; min-width: 30%;"><span class="aiev3-tb">\u2009</span></span></div><div class="aiev3-line decimal" style="height: 0px;"><span class="aiev3-span-point lhs" style="right: 30%; min-width: 70%;">\u2009</span><span class="aiev3-span-point rhs" style="left: 70%; min-width: 30%;"><span class="aiev3-tb">\u2009</span></span></div><div class="aiev3-line decimal" style="height: 0px;"><span class="aiev3-span-point lhs" style="right: 30%; min-width: 70%;"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x</span></span><span class="aiev3-span-point rhs" style="left: 70%; min-width: 30%;"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">.xx</span></span></div><div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>',
     );
   });
@@ -332,11 +331,9 @@ describe("Cut and paste", () => {
     const thingCut = await user.cut();
     expect(thingCut?.getData("text/plain")).toEqual("34");
     expect(thingCut?.getData("text/html")).toEqual(
-      // eslint-disable-next-line quotes
       '<div class="aiev3-line center"><span class="aiev3-tb">34</span></div>',
     );
     expect(thingCut?.getData("data/aiev3")).toEqual(
-      // eslint-disable-next-line quotes
       '[{"textBlocks":[{"text":"34"}],"textAlignment":"center","decimalAlignPercent":60}]',
     );
     fireEvent.blur(container);

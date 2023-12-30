@@ -1,10 +1,10 @@
+/* eslint-disable quotes */
 import { readV2DivElement } from "./readV2DivElement";
 
 describe("readV2DivElement", () => {
   test("Read basic div element", async () => {
     const template = document.createElement("template");
     template.innerHTML =
-      // eslint-disable-next-line quotes
       '<div classname="aie-text" data-key="3fsuc" data-type="unstyled" data-inline-style-ranges=\'[{"offset":32,"length":9,"style":"Optional"}]\'>[b] CR, non-measurable disease: <span classname="Optional" style="color:seagreen">Confirmed</span> CR response but subject has non-measurable disease at baseline.</div>';
     const result = readV2DivElement(template.content.children[0] as HTMLDivElement);
     expect(result.textBlocks.length).toEqual(3);
@@ -25,7 +25,6 @@ describe("readV2DivElement", () => {
   test("Read made up element with no style", async () => {
     const template = document.createElement("template");
     template.innerHTML =
-      // eslint-disable-next-line quotes
       '<div classname="aie-text" data-key="3fsuc" data-type="unstyled">[b] CR, non-measurable disease: <span class="style-optional" style="color:seagreen">Confirmed</span> CR response but subject has non-measurable disease at baseline.</div>';
     const result = readV2DivElement(template.content.children[0] as HTMLDivElement);
     expect(result.textBlocks.length).toEqual(3);
@@ -45,7 +44,6 @@ describe("readV2DivElement", () => {
 
   test("Read empty string", async () => {
     const template = document.createElement("template");
-    // eslint-disable-next-line quotes
     template.innerHTML = '<div classname="aie-text" data-key="3fsuc" data-type="unstyled"></div>';
     const result = readV2DivElement(template.content.children[0] as HTMLDivElement);
     expect(result.textBlocks.length).toEqual(1);
@@ -58,7 +56,6 @@ describe("readV2DivElement", () => {
   test("Read small uncharactieristic span", async () => {
     const template = document.createElement("template");
     template.innerHTML =
-      // eslint-disable-next-line quotes
       '<div classname="aie-text" data-key="3fsuc" data-type="unstyled"><span>Hello world!</span></div>';
     const result = readV2DivElement(template.content.children[0] as HTMLDivElement);
     expect(result.textBlocks.length).toEqual(1);
