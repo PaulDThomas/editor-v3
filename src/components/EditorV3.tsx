@@ -17,7 +17,7 @@ import { getCaretPosition } from "../functions/getCaretPosition";
 import { moveCursor } from "../functions/moveCursor";
 import { redraw } from "../functions/redraw";
 import { setCaretPosition } from "../functions/setCaretPosition";
-import { useDebounce } from "../hooks";
+import { useDebounceStack } from "../hooks/useDebounceStack";
 import "./EditorV3.css";
 
 interface EditorV3Props {
@@ -114,7 +114,7 @@ export const EditorV3 = ({
     undo,
     redo,
     forceUpdate: forceReturn,
-  } = useDebounce<EditorV3State>(inputDecode, setInputDecode, null, redrawElement, returnData);
+  } = useDebounceStack<EditorV3State>(inputDecode, setInputDecode, null, redrawElement, returnData);
   const content = currentValue?.content;
   const contentProps = currentValue?.contentProps;
 

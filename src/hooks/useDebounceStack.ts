@@ -24,7 +24,7 @@ import { Dispatch, useCallback, useEffect, useMemo, useRef, useState } from "rea
  * @returns object
  *
  */
-export const useDebounce = <T>(
+export const useDebounceStack = <T>(
   value: T,
   setValue: Dispatch<T>,
   debounceMilliseconds: number | null = 500,

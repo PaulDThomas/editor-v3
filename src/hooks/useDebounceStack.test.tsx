@@ -1,11 +1,13 @@
 import { renderHook, act, render, screen } from "@testing-library/react";
-import { useDebounce } from "./useDebounceStack";
+import { useDebounceStack } from "./useDebounceStack";
 import { Dispatch, useEffect, useState } from "react";
 import userEvent from "@testing-library/user-event";
 
 describe("useDebounce", () => {
   test("Should return the initial value, and change current value", async () => {
-    const { result, rerender } = renderHook(() => useDebounce<string>("initial value", jest.fn()));
+    const { result, rerender } = renderHook(() =>
+      useDebounceStack<string>("initial value", jest.fn()),
+    );
     expect(result.current.currentValue).toBe("initial value");
 
     act(() => {
@@ -27,7 +29,7 @@ describe("useDebounce", () => {
     const onDebounceMock = jest.fn();
     jest.useFakeTimers();
     const { result } = renderHook(() =>
-      useDebounce<string>("initial value", setValueMock, 950, onChangeMock, onDebounceMock),
+      useDebounceStack<string>("initial value", setValueMock, 950, onChangeMock, onDebounceMock),
     );
 
     expect(result.current.currentValue).toBe("initial value");
@@ -66,7 +68,9 @@ describe("useDebounce", () => {
   test("Should not create a timer", () => {
     const setValueMock = jest.fn();
     jest.useFakeTimers();
-    const { result } = renderHook(() => useDebounce<string>("initial value", setValueMock, null));
+    const { result } = renderHook(() =>
+      useDebounceStack<string>("initial value", setValueMock, null),
+    );
 
     expect(result.current.currentValue).toBe("initial value");
 
@@ -96,7 +100,9 @@ describe("useDebounce", () => {
   test("Check with string array", () => {
     const setValueMock = jest.fn();
     jest.useFakeTimers();
-    const { result } = renderHook(() => useDebounce<string[]>(["initial value"], setValueMock));
+    const { result } = renderHook(() =>
+      useDebounceStack<string[]>(["initial value"], setValueMock),
+    );
 
     expect(result.current.currentValue).toStrictEqual(["initial value"]);
 
@@ -121,7 +127,7 @@ describe("useDebounce", () => {
   test("Check with number", () => {
     const setValueMock = jest.fn();
     jest.useFakeTimers();
-    const { result } = renderHook(() => useDebounce<number>(1, setValueMock));
+    const { result } = renderHook(() => useDebounceStack<number>(1, setValueMock));
 
     expect(result.current.currentValue).toBe(1);
 
@@ -147,7 +153,7 @@ describe("useDebounce", () => {
     const setValueMock = jest.fn();
     jest.useFakeTimers();
     const { result } = renderHook(() =>
-      useDebounce<{ a: string; b: number }>({ a: "a", b: 1 }, setValueMock),
+      useDebounceStack<{ a: string; b: number }>({ a: "a", b: 1 }, setValueMock),
     );
 
     expect(result.current.currentValue).toStrictEqual({ a: "a", b: 1 });
@@ -184,7 +190,10 @@ describe("useDebounce with React", () => {
       actualValue: string;
       setActualValue: Dispatch<string>;
     }): JSX.Element => {
-      const { currentValue, setCurrentValue } = useDebounce<string>(actualValue, setActualValue);
+      const { currentValue, setCurrentValue } = useDebounceStack<string>(
+        actualValue,
+        setActualValue,
+      );
       return (
         <input
           data-testid='inp'
@@ -226,7 +235,7 @@ describe("Check undo stack", () => {
   test("Should undo & redo", async () => {
     const setValueMock = jest.fn();
     jest.useFakeTimers();
-    const { result } = renderHook(() => useDebounce<string>("a", setValueMock));
+    const { result } = renderHook(() => useDebounceStack<string>("a", setValueMock));
 
     expect(result.current.currentValue).toStrictEqual("a");
 
