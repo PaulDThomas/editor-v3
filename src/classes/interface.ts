@@ -36,7 +36,6 @@ export interface EditorV3LineProps {
 export interface EditorV3ContentProps {
   textAlignment?: EditorV3Align;
   decimalAlignPercent?: number;
-  caret?: EditorV3Position;
   styles?: EditorV3Styles;
   showMarkdown?: boolean;
   markdownSettings?: IMarkdownSettings;
