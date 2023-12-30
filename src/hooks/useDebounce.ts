@@ -28,7 +28,7 @@ export const useDebounce = <T>(
   value: T,
   setValue: Dispatch<T>,
   debounceMilliseconds: number | null = 500,
-  onChange: (newValue: T) => void = () => {},
+  onChange: (newValue: T, index: number, stack: T[]) => void = () => {},
   onDebounce: (newValue: T) => void = () => {},
 ): {
   currentValue: T | null;
@@ -58,7 +58,7 @@ export const useDebounce = <T>(
         const newIndex = newStack.length - 1;
         setCurrentValueStack(newStack);
         setCurrentValueIndex(newIndex);
-        onChange(newStack[newIndex]);
+        onChange(newStack[newIndex], newIndex, newStack);
       }
     },
     [currentValue, currentValueIndex, currentValueStack, onChange],
@@ -67,17 +67,19 @@ export const useDebounce = <T>(
   // Undo/Redo
   const undo = useCallback(
     (steps = 1) => {
-      const newVersion = Math.max(0, currentValueIndex - steps);
-      setCurrentValueIndex(newVersion);
+      const newIndex = Math.max(0, currentValueIndex - steps);
+      setCurrentValueIndex(newIndex);
+      onChange(currentValueStack[newIndex], newIndex, currentValueStack);
     },
-    [currentValueIndex],
+    [currentValueIndex, currentValueStack, onChange],
   );
   const redo = useCallback(
     (steps = 1) => {
-      const newVersion = Math.min((currentValueStack ?? []).length - 1, currentValueIndex + steps);
-      setCurrentValueIndex(newVersion);
+      const newIndex = Math.min((currentValueStack ?? []).length - 1, currentValueIndex + steps);
+      setCurrentValueIndex(newIndex);
+      onChange(currentValueStack[newIndex], newIndex, currentValueStack);
     },
-    [currentValueIndex, currentValueStack],
+    [currentValueIndex, currentValueStack, onChange],
   );
 
   // Top down update

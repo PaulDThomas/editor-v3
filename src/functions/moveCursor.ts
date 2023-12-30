@@ -1,17 +1,17 @@
 import { EditorV3Content } from "../classes";
-import { getCaretPosition } from "./getCaretPosition";
-import { setCaretPosition } from "./setCaretPosition";
+import { EditorV3Position } from "../classes/interface";
 
-export const moveCursor = (divRef: HTMLDivElement, e: React.KeyboardEvent<HTMLDivElement>) => {
+export const moveCursor = (
+  content: EditorV3Content,
+  pos: EditorV3Position,
+  e: React.KeyboardEvent<HTMLDivElement>,
+): EditorV3Position => {
   e.preventDefault();
   e.stopPropagation();
 
-  const pos = getCaretPosition(divRef);
-  const content = new EditorV3Content(divRef.innerHTML);
   const lines = content.lines;
-
-  if (pos && lines && pos.endChar > -1) {
-    const newPos = { ...pos };
+  const newPos = { ...pos };
+  if (pos.endChar > -1) {
     const lastLineLength = lines[pos.endLine].lineLength;
     switch (e.key) {
       case "Home":
@@ -91,6 +91,6 @@ export const moveCursor = (divRef: HTMLDivElement, e: React.KeyboardEvent<HTMLDi
       default:
     }
     newPos.isCollapsed = newPos.startLine === newPos.endLine && newPos.startChar === newPos.endChar;
-    setCaretPosition(divRef, newPos);
   }
+  return newPos;
 };

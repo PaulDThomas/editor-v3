@@ -67,17 +67,23 @@ describe("Editor and functions", () => {
             allowNewLine
             textAlignment={EditorV3Align.decimal}
             decimalAlignPercent={70}
-            forceUpdate
             allowMarkdown
           />
         </div>,
       );
     });
-    expect(mockSetText).toHaveBeenCalledWith("34.45\n\nx.xx");
+    const editor = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
+    let firstSpan = editor.querySelector("span") as HTMLSpanElement;
+
+    await user.click(firstSpan);
+    await user.keyboard("{Control>}{ArrowUp}{/Control}{End}{Backspace}");
+    fireEvent.blur(editor);
+    expect(mockSetText).toHaveBeenCalledTimes(1);
+    expect(mockSetText).toHaveBeenNthCalledWith(1, "34.4\n\nx.xx");
     expect(mockSetJson).toHaveBeenCalledWith(
       JSON.stringify({
         lines: [
-          { textBlocks: [{ text: "34.45" }], textAlignment: "decimal", decimalAlignPercent: 70 },
+          { textBlocks: [{ text: "34.4" }], textAlignment: "decimal", decimalAlignPercent: 70 },
           { textBlocks: [{ text: "" }], textAlignment: "decimal", decimalAlignPercent: 70 },
           {
             textBlocks: [{ text: "x.xx", style: "shiny" }],
@@ -90,30 +96,22 @@ describe("Editor and functions", () => {
         styles: { shiny: { color: "pink", fontWeight: "700" } },
       }),
     );
-    const editor = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
-    let firstSpan = editor.querySelector("span") as HTMLSpanElement;
-
-    await user.click(firstSpan);
-    await user.keyboard("{Control>}{ArrowUp}{/Control}{End}{Backspace}");
-    fireEvent.blur(editor);
-    expect(mockSetText).toHaveBeenCalledTimes(2);
-    expect(mockSetText).toHaveBeenNthCalledWith(2, "34.4\n\nx.xx");
 
     // Reacquire firstSpan
     firstSpan = editor.querySelector("span") as HTMLSpanElement;
     await user.click(firstSpan);
     await user.keyboard("{Home}{Delete}{Delete}{Delete}");
     fireEvent.blur(editor);
-    expect(mockSetText).toHaveBeenCalledTimes(3);
-    expect(mockSetText).toHaveBeenNthCalledWith(3, "4\n\nx.xx");
+    expect(mockSetText).toHaveBeenCalledTimes(2);
+    expect(mockSetText).toHaveBeenNthCalledWith(2, "4\n\nx.xx");
 
     // Reacquire firstSpan
     firstSpan = editor.querySelector("span") as HTMLSpanElement;
     await user.click(firstSpan);
     await user.keyboard("{Control>}{ArrowUp}{/Control}{Home}{Enter}");
     fireEvent.blur(editor);
-    expect(mockSetText).toHaveBeenCalledTimes(4);
-    expect(mockSetText).toHaveBeenNthCalledWith(4, "\n4\n\nx.xx");
+    expect(mockSetText).toHaveBeenCalledTimes(3);
+    expect(mockSetText).toHaveBeenNthCalledWith(3, "\n4\n\nx.xx");
     expect(mockSetJson).toHaveBeenLastCalledWith(
       JSON.stringify({
         lines: [
@@ -138,31 +136,6 @@ describe("Editor and functions", () => {
   });
 });
 
-describe("Stop force update", () => {
-  test("Force update off", async () => {
-    const mockSetJson = jest.fn();
-    const mockApplyStyle = jest.fn();
-    jest.spyOn(applyStyleModule, "applyStyle").mockImplementation(mockApplyStyle);
-    await act(async () => {
-      render(
-        <div data-testid='container'>
-          <EditorV3
-            id='test-editor'
-            input={"Hello"}
-            forceUpdate={false}
-            setJson={mockSetJson}
-          />
-        </div>,
-      );
-    });
-    // Get component
-    const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
-    expect(mockSetJson).not.toHaveBeenCalled();
-    fireEvent.focus(container);
-    expect(mockSetJson).toHaveBeenCalled();
-  });
-});
-
 describe("Menu styling", () => {
   test("Add and remove style", async () => {
     const user = userEvent.setup();
@@ -181,7 +154,6 @@ describe("Menu styling", () => {
             style={{ width: "200px" }}
             allowNewLine
             customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
-            forceUpdate
             allowMarkdown
           />
         </div>,
@@ -191,9 +163,11 @@ describe("Menu styling", () => {
     const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
     // Highlight first line
     let firstSpan = container.querySelector("span") as HTMLSpanElement;
-    await user.click(firstSpan);
+    expect(firstSpan).toBeInTheDocument();
     // Click shiny
-    fireEvent.contextMenu(firstSpan);
+    await act(async () => {
+      fireEvent.contextMenu(firstSpan);
+    });
     const shinyItem = screen.queryByLabelText("shiny") as HTMLSpanElement;
     expect(shinyItem).toBeInTheDocument();
     fireEvent.mouseDown(shinyItem);
@@ -235,7 +209,6 @@ describe("Cursor tests", () => {
             allowNewLine
             customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
             resize
-            forceUpdate
           />
         </div>,
       );
@@ -340,7 +313,6 @@ describe("Cut and paste", () => {
             allowNewLine
             customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
             resize
-            forceUpdate
           />
         </div>,
       );
@@ -399,7 +371,6 @@ describe("Cut and paste", () => {
             style={{ width: "200px" }}
             allowNewLine
             textAlignment={EditorV3Align.center}
-            forceUpdate
           />
           <EditorV3
             id='test-editor-2'
@@ -407,7 +378,6 @@ describe("Cut and paste", () => {
             setText={mockSetText2}
             style={{ width: "200px" }}
             textAlignment={EditorV3Align.center}
-            forceUpdate
           />
         </div>,
       );
@@ -449,65 +419,66 @@ describe("Edge events", () => {
     expect(editorHolder).toBeInTheDocument();
     fireEvent.focus(editorHolder);
   });
-  // test("Paste error", async () => {
-  //   const user = userEvent.setup();
-  //   const mockSetText = jest.fn();
-  //   await act(async () => {
-  //     render(
-  //       <div data-testid='container'>
-  //         <EditorV3
-  //           id='test-editor'
-  //           input={mockContent.jsonString}
-  //           setText={mockSetText}
-  //           forceUpdate
-  //         />
-  //       </div>,
-  //     );
-  //   });
-  //   const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
-  //   const editorHolder = container.querySelector("#test-editor-editable") as HTMLDivElement;
-  //   expect(editorHolder).toBeInTheDocument();
-  //   await user.click(editorHolder.querySelector("span") as HTMLSpanElement);
-  //   await expect(
-  //     user.paste({
-  //       getData: (type: string) => {
-  //         if (type === "data/aiev3") {
-  //           return "NotJSONString";
-  //         }
-  //       },
-  //     } as DataTransfer),
-  //   ).rejects.toThrow();
-  // });
+  test("Paste error", async () => {
+    const user = userEvent.setup();
+    const mockSetText = jest.fn();
+    await act(async () => {
+      render(
+        <div data-testid='container'>
+          <EditorV3
+            id='test-editor'
+            input={mockContent.jsonString}
+            setText={mockSetText}
+          />
+        </div>,
+      );
+    });
+    const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
+    const editorHolder = container.querySelector("#test-editor-editable") as HTMLDivElement;
+    expect(editorHolder).toBeInTheDocument();
+    await user.click(editorHolder.querySelector("span") as HTMLSpanElement);
+    // await expect(
+    //   user.paste({
+    //     getData: (type: string) => {
+    //       if (type === "data/aiev3") {
+    //         return "NotJSONString";
+    //       }
+    //     },
+    //   } as DataTransfer),
+    // ).rejects.toThrow();
+  });
 });
 
-// describe("Undo/redo", () => {
-//   const TestContainer = () => {
-//     const [input, setInput] = useState("");
-//     return (
-//       <div data-testid='container'>
-//         <EditorV3
-//           id='test-editor'
-//           input={input}
-//           setJson={setInput}
-//           allowMarkdown
-//           // forceUpdate
-//         />
-//       </div>
-//     );
-//   };
-//   test("Undo/redo", async () => {
-//     const user = userEvent.setup();
-//     await act(async () => {
-//       render(<TestContainer />);
-//     });
-//     const inputSpan = screen.queryByTestId("container")?.querySelector("span") as HTMLSpanElement;
-//     expect(inputSpan).toBeInTheDocument();
-//     await user.click(inputSpan);
-//     await user.keyboard("added");
-//     screen.debug();
-//     expect(screen.queryByText("added")).toBeInTheDocument();
-//     await user.keyboard("{Control>}z{/Control}");
-//     screen.debug();
-//     expect(screen.queryByText("adde")).toBeInTheDocument();
-//   }, 500000);
-// });
+describe("Undo/redo", () => {
+  const TestContainer = () => {
+    const [input, setInput] = useState("");
+    return (
+      <div data-testid='container'>
+        <EditorV3
+          id='test-editor'
+          input={input}
+          setJson={setInput}
+          allowMarkdown
+          // forceUpdate
+        />
+      </div>
+    );
+  };
+  test("Undo/redo", async () => {
+    const user = userEvent.setup();
+    await act(async () => {
+      render(<TestContainer />);
+    });
+    const inputSpan = screen.queryByTestId("container")?.querySelector("span") as HTMLSpanElement;
+    expect(inputSpan).toBeInTheDocument();
+    await user.click(inputSpan);
+    await user.keyboard("added");
+    expect(screen.queryByText("added")).toBeInTheDocument();
+    await user.keyboard("{Control>}z{/Control}");
+    expect(screen.queryByText("adde")).toBeInTheDocument();
+    await user.keyboard("{Control>}z{/Control}");
+    expect(screen.queryByText("add")).toBeInTheDocument();
+    await user.keyboard("{Control>}y{/Control}");
+    expect(screen.queryByText("adde")).toBeInTheDocument();
+  });
+});
