@@ -18,8 +18,16 @@
     "noEmit": true,
     "declaration": true,
     "jsx": "react-jsx",
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules",
+        "options": {
+          "classnameTransform": "asIs"
+        }
+      }
+    ]
   },
-  "include": ["src", "demo"],
-  "exclude": ["node_modules"]
+  "include": ["global.d.ts", "src", "demo"],
+  "exclude": ["node_modules", "dist"]
 }
