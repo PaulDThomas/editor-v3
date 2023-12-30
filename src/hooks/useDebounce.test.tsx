@@ -173,9 +173,7 @@ describe("useDebounce with React", () => {
       actualValue: string;
       setActualValue: Dispatch<string>;
     }): JSX.Element => {
-      const { currentValue, setCurrentValue } = useDebounce<string>(actualValue, (ret) =>
-        setActualValue(ret),
-      );
+      const { currentValue, setCurrentValue } = useDebounce<string>(actualValue, setActualValue);
       return (
         <input
           data-testid='inp'
@@ -208,6 +206,39 @@ describe("useDebounce with React", () => {
     expect(inp).toHaveDisplayValue("new values");
     await act(async () => jest.runAllTimers());
     expect(setValueMock).toHaveBeenLastCalledWith("new values");
+
+    jest.useRealTimers();
+  });
+});
+
+describe("Check undo stack", () => {
+  test("Should undo & redo", async () => {
+    const setValueMock = jest.fn();
+    jest.useFakeTimers();
+    const { result } = renderHook(() => useDebounce<string>("a", setValueMock));
+
+    expect(result.current.currentValue).toStrictEqual("a");
+
+    act(() => result.current.setCurrentValue("b"));
+    expect(result.current.currentValue).toStrictEqual("b");
+    act(() => result.current.setCurrentValue("c"));
+    expect(result.current.currentValue).toStrictEqual("c");
+    act(() => result.current.setCurrentValue("d"));
+    expect(result.current.currentValue).toStrictEqual("d");
+    expect(setValueMock).not.toHaveBeenCalled();
+
+    act(() => result.current.undo());
+    expect(result.current.currentValue).toStrictEqual("c");
+    act(() => result.current.undo());
+    expect(result.current.currentValue).toStrictEqual("b");
+    act(() => result.current.redo());
+    expect(result.current.currentValue).toStrictEqual("c");
+
+    act(() => result.current.redo());
+    act(() => jest.advanceTimersByTime(500));
+    expect(result.current.currentValue).toStrictEqual("d");
+    expect(setValueMock).toHaveBeenCalledTimes(1);
+    expect(setValueMock).toHaveBeenCalledWith("d");
 
     jest.useRealTimers();
   });

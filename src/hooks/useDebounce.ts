@@ -1,12 +1,28 @@
-import _ from "lodash";
-import { Dispatch, useCallback, useEffect, useRef, useState } from "react";
+import { isEqual } from "lodash";
+import { Dispatch, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 /**
- * Returns a debounced value, a function to update it before the debounce occurs, with an inbuilt abort controller
+ *  Returns an object containing values/functions for using a debounced value
+ *
+ *  `currentValue`: Current, non-debounced value
+ *
+ *  `setCurrentValue`: Function to update the current value
+ *
+ *  `forceUpdate`: Function to force the current value to bypassing debounce
+ *
+ *  `undo`: Function to go back to previous version
+ *
+ *  `redo`: Function to go forwards to undone version
+ *
+ * Example:
+ *
+ *  `const { currentValue, setCurrentValue } = useDebounce(value, setValue);`
+ *
  * @param value The value to be debounced
  * @param setValue Used to update the value after debounce
- * @param debounceMilliseconds Number of milliseconds to debounce by, defaults to 500
- * @returns currentValue, setCurrentValue, forceUpdate
+ * @param debounceMilliseconds Number of milliseconds to debounce by, defaults to 500, leave null for only forced updates
+ * @returns object
+ *
  */
 export const useDebounce = <T>(
   value: T,
@@ -16,36 +32,66 @@ export const useDebounce = <T>(
   currentValue: T;
   setCurrentValue: Dispatch<T>;
   forceUpdate: () => void;
+  undo: (steps?: number) => void;
+  redo: (steps?: number) => void;
 } => {
-  const [currentValue, setCurrentValue] = useState<T>(value);
+  const [currentValueStack, setCurrentValueStack] = useState<T[]>([value]);
+  const [currentValueIndex, setCurrentValueIndex] = useState<number>(0);
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
   const debounceController = useRef<AbortController>(new AbortController());
+
+  // CurrentValue from memo
+  const currentValue = useMemo(() => {
+    return currentValueStack[currentValueIndex];
+  }, [currentValueIndex, currentValueStack]);
+
+  // Add setCurrentValue as append to stack
+  const setCurrentValue = useCallback(
+    (newValue: T) => {
+      if (!isEqual(newValue, currentValue)) {
+        const newStack = currentValueStack.slice(0, currentValueIndex + 1);
+        newStack.push(newValue);
+        setCurrentValueStack(newStack);
+        setCurrentValueIndex(newStack.length - 1);
+      }
+    },
+    [currentValue, currentValueIndex, currentValueStack],
+  );
+
+  // Undo/Redo
+  const undo = useCallback(
+    (steps = 1) => {
+      const newVersion = Math.max(0, currentValueIndex - steps);
+      setCurrentValueIndex(newVersion);
+      // setDebouncedValue(currentValueStack[newVersion]);
+    },
+    [currentValueIndex],
+  );
+  const redo = useCallback(
+    (steps = 1) => {
+      const newVersion = Math.min(currentValueStack.length - 1, currentValueIndex + steps);
+      setCurrentValueIndex(newVersion);
+    },
+    [currentValueIndex, currentValueStack],
+  );
 
   // Top down update
   const [lastValue, setLastValue] = useState<T>(value);
   useEffect(() => {
-    if (!_.isEqual(value, lastValue)) {
+    if (!isEqual(value, lastValue)) {
       debounceController.current.abort();
       setCurrentValue(value);
       setDebouncedValue(value);
       setLastValue(value);
     }
-  }, [lastValue, value]);
-
-  // Update value from debouncedValue
-  useEffect(() => {
-    if (!_.isEqual(debouncedValue, value)) {
-      setCurrentValue(debouncedValue);
-      setValue(debouncedValue);
-    }
-  }, [debouncedValue, setValue, value]);
+  }, [lastValue, setCurrentValue, value]);
 
   // Update debounce from current
   useEffect(() => {
     if (
       debounceMilliseconds !== null &&
       debounceMilliseconds >= 0 &&
-      !_.isEqual(currentValue, debouncedValue)
+      !isEqual(currentValue, debouncedValue)
     ) {
       debounceController.current.abort();
       debounceController.current = new AbortController();
@@ -67,5 +113,14 @@ export const useDebounce = <T>(
     setDebouncedValue(currentValue);
   }, [currentValue]);
 
-  return { currentValue, setCurrentValue, forceUpdate };
+  // Update value from debouncedValue
+  // Should be last?
+  useEffect(() => {
+    if (!isEqual(debouncedValue, value)) {
+      setCurrentValue(debouncedValue);
+      setValue(debouncedValue);
+    }
+  }, [debouncedValue, setCurrentValue, setValue, value]);
+
+  return { currentValue, setCurrentValue, forceUpdate, undo, redo };
 };
