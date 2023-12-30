@@ -52,6 +52,36 @@ describe("useDebounce", () => {
     jest.useRealTimers();
   });
 
+  test("Should not create a timer", () => {
+    const setValueMock = jest.fn();
+    jest.useFakeTimers();
+    const { result } = renderHook(() => useDebounce<string>("initial value", setValueMock, null));
+
+    expect(result.current.currentValue).toBe("initial value");
+
+    act(() => {
+      result.current.setCurrentValue("new value");
+    });
+
+    expect(result.current.currentValue).toBe("new value");
+    expect(setValueMock).not.toHaveBeenCalled();
+
+    act(() => {
+      jest.runAllTimers();
+    });
+
+    expect(result.current.currentValue).toBe("new value");
+    expect(setValueMock).not.toHaveBeenCalled();
+
+    act(() => {
+      result.current.forceUpdate();
+    });
+
+    expect(result.current.currentValue).toBe("new value");
+    expect(setValueMock).toHaveBeenCalledTimes(1);
+    expect(setValueMock).toHaveBeenCalledWith("new value");
+  });
+
   test("Check with string array", () => {
     const setValueMock = jest.fn();
     jest.useFakeTimers();

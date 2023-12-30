@@ -1,20 +1,21 @@
 import _ from "lodash";
-import { Dispatch, useEffect, useRef, useState } from "react";
+import { Dispatch, useCallback, useEffect, useRef, useState } from "react";
 
 /**
  * Returns a debounced value, a function to update it before the debounce occurs, with an inbuilt abort controller
  * @param value The value to be debounced
  * @param setValue Used to update the value after debounce
  * @param debounceMilliseconds Number of milliseconds to debounce by, defaults to 500
- * @returns currentValue, setCurrentValue
+ * @returns currentValue, setCurrentValue, forceUpdate
  */
 export const useDebounce = <T>(
   value: T,
   setValue: Dispatch<T>,
-  debounceMilliseconds = 500,
+  debounceMilliseconds: number | null = 500,
 ): {
   currentValue: T;
   setCurrentValue: Dispatch<T>;
+  forceUpdate: () => void;
 } => {
   const [currentValue, setCurrentValue] = useState<T>(value);
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -41,7 +42,11 @@ export const useDebounce = <T>(
 
   // Update debounce from current
   useEffect(() => {
-    if (!_.isEqual(currentValue, debouncedValue)) {
+    if (
+      debounceMilliseconds !== null &&
+      debounceMilliseconds >= 0 &&
+      !_.isEqual(currentValue, debouncedValue)
+    ) {
       debounceController.current.abort();
       debounceController.current = new AbortController();
 
@@ -56,5 +61,11 @@ export const useDebounce = <T>(
     }
   }, [currentValue, debounceMilliseconds, debouncedValue]);
 
-  return { currentValue, setCurrentValue };
+  // Force update (for when there is no timer)
+  const forceUpdate = useCallback(() => {
+    debounceController.current.abort();
+    setDebouncedValue(currentValue);
+  }, [currentValue]);
+
+  return { currentValue, setCurrentValue, forceUpdate };
 };
