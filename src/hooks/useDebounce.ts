@@ -28,34 +28,40 @@ export const useDebounce = <T>(
   value: T,
   setValue: Dispatch<T>,
   debounceMilliseconds: number | null = 500,
+  onChange: (newValue: T) => void = () => {},
+  onDebounce: (newValue: T) => void = () => {},
 ): {
-  currentValue: T;
+  currentValue: T | null;
   setCurrentValue: Dispatch<T>;
   forceUpdate: () => void;
   undo: (steps?: number) => void;
   redo: (steps?: number) => void;
+  stack: T[] | null;
+  index: number;
 } => {
-  const [currentValueStack, setCurrentValueStack] = useState<T[]>([value]);
-  const [currentValueIndex, setCurrentValueIndex] = useState<number>(0);
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  const [currentValueStack, setCurrentValueStack] = useState<T[]>([]);
+  const [currentValueIndex, setCurrentValueIndex] = useState<number>(-1);
+  const [debouncedValue, setDebouncedValue] = useState<T | null>(value);
   const debounceController = useRef<AbortController>(new AbortController());
 
   // CurrentValue from memo
   const currentValue = useMemo(() => {
-    return currentValueStack[currentValueIndex];
+    return currentValueStack && currentValueStack[currentValueIndex];
   }, [currentValueIndex, currentValueStack]);
 
   // Add setCurrentValue as append to stack
   const setCurrentValue = useCallback(
     (newValue: T) => {
-      if (!isEqual(newValue, currentValue)) {
+      if (currentValueStack && !isEqual(newValue, currentValue)) {
         const newStack = currentValueStack.slice(0, currentValueIndex + 1);
         newStack.push(newValue);
+        const newIndex = newStack.length - 1;
         setCurrentValueStack(newStack);
-        setCurrentValueIndex(newStack.length - 1);
+        setCurrentValueIndex(newIndex);
+        onChange(newStack[newIndex]);
       }
     },
-    [currentValue, currentValueIndex, currentValueStack],
+    [currentValue, currentValueIndex, currentValueStack, onChange],
   );
 
   // Undo/Redo
@@ -63,20 +69,19 @@ export const useDebounce = <T>(
     (steps = 1) => {
       const newVersion = Math.max(0, currentValueIndex - steps);
       setCurrentValueIndex(newVersion);
-      // setDebouncedValue(currentValueStack[newVersion]);
     },
     [currentValueIndex],
   );
   const redo = useCallback(
     (steps = 1) => {
-      const newVersion = Math.min(currentValueStack.length - 1, currentValueIndex + steps);
+      const newVersion = Math.min((currentValueStack ?? []).length - 1, currentValueIndex + steps);
       setCurrentValueIndex(newVersion);
     },
     [currentValueIndex, currentValueStack],
   );
 
   // Top down update
-  const [lastValue, setLastValue] = useState<T>(value);
+  const [lastValue, setLastValue] = useState<T | null>(null);
   useEffect(() => {
     if (!isEqual(value, lastValue)) {
       debounceController.current.abort();
@@ -114,13 +119,21 @@ export const useDebounce = <T>(
   }, [currentValue]);
 
   // Update value from debouncedValue
-  // Should be last?
   useEffect(() => {
-    if (!isEqual(debouncedValue, value)) {
+    if (debouncedValue && !isEqual(debouncedValue, value)) {
       setCurrentValue(debouncedValue);
       setValue(debouncedValue);
+      onDebounce(debouncedValue);
     }
-  }, [debouncedValue, setCurrentValue, setValue, value]);
+  }, [debouncedValue, onDebounce, setCurrentValue, setValue, value]);
 
-  return { currentValue, setCurrentValue, forceUpdate, undo, redo };
+  return {
+    currentValue,
+    setCurrentValue,
+    forceUpdate,
+    undo,
+    redo,
+    stack: currentValueStack,
+    index: currentValueIndex,
+  };
 };

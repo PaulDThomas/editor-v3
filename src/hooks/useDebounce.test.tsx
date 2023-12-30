@@ -23,10 +23,15 @@ describe("useDebounce", () => {
 
   test("Should update debouncedValue and call setValue when debouncedValue changes", () => {
     const setValueMock = jest.fn();
+    const onChangeMock = jest.fn();
+    const onDebounceMock = jest.fn();
     jest.useFakeTimers();
-    const { result } = renderHook(() => useDebounce<string>("initial value", setValueMock, 950));
+    const { result } = renderHook(() =>
+      useDebounce<string>("initial value", setValueMock, 950, onChangeMock, onDebounceMock),
+    );
 
     expect(result.current.currentValue).toBe("initial value");
+    expect(onChangeMock).toHaveBeenCalledTimes(1);
 
     act(() => {
       result.current.setCurrentValue("new value");
@@ -34,12 +39,16 @@ describe("useDebounce", () => {
 
     expect(result.current.currentValue).toBe("new value");
     expect(setValueMock).not.toHaveBeenCalled();
+    expect(onChangeMock).toHaveBeenCalledTimes(2);
+    expect(onDebounceMock).not.toHaveBeenCalled();
 
     act(() => {
       jest.advanceTimersByTime(500);
     });
 
     expect(setValueMock).not.toHaveBeenCalled();
+    expect(onChangeMock).toHaveBeenCalledTimes(2);
+    expect(onDebounceMock).not.toHaveBeenCalled();
 
     act(() => {
       jest.advanceTimersByTime(450);
@@ -48,6 +57,8 @@ describe("useDebounce", () => {
     expect(result.current.currentValue).toBe("new value");
     expect(setValueMock).toHaveBeenCalledTimes(1);
     expect(setValueMock).toHaveBeenCalledWith("new value");
+    expect(onChangeMock).toHaveBeenCalledTimes(2);
+    expect(onDebounceMock).toHaveBeenCalledTimes(1);
 
     jest.useRealTimers();
   });
@@ -177,7 +188,7 @@ describe("useDebounce with React", () => {
       return (
         <input
           data-testid='inp'
-          value={currentValue}
+          value={currentValue ?? ""}
           onChange={(e) => setCurrentValue(e.target.value)}
         />
       );
