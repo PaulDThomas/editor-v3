@@ -1,4 +1,4 @@
-import { renderHook, act, render, screen } from "@testing-library/react";
+import { renderHook, act, render, screen, fireEvent } from "@testing-library/react";
 import { useDebounceStack } from "./useDebounceStack";
 import { Dispatch, useEffect, useState } from "react";
 import userEvent from "@testing-library/user-event";
@@ -190,7 +190,7 @@ describe("useDebounce with React", () => {
       actualValue: string;
       setActualValue: Dispatch<string>;
     }): JSX.Element => {
-      const { currentValue, setCurrentValue } = useDebounceStack<string>(
+      const { currentValue, setCurrentValue, forceUpdate } = useDebounceStack<string>(
         actualValue,
         setActualValue,
       );
@@ -199,6 +199,7 @@ describe("useDebounce with React", () => {
           data-testid='inp'
           value={currentValue ?? ""}
           onChange={(e) => setCurrentValue(e.target.value)}
+          onBlur={() => forceUpdate()}
         />
       );
     };
@@ -226,6 +227,11 @@ describe("useDebounce with React", () => {
     expect(inp).toHaveDisplayValue("new values");
     await act(async () => jest.runAllTimers());
     expect(setValueMock).toHaveBeenLastCalledWith("new values");
+
+    await user.clear(inp);
+    await user.type(inp, "blurred");
+    await act(async () => fireEvent.blur(inp));
+    expect(setValueMock).toHaveBeenLastCalledWith("blurred");
 
     jest.useRealTimers();
   });

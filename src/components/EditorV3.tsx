@@ -11,7 +11,6 @@ import {
   EditorV3Styles,
 } from "../classes/interface";
 import { IMarkdownSettings, defaultMarkdownSettings } from "../classes/markdown/MarkdownSettings";
-import { applyStyle } from "../functions/applyStyle";
 import { applyStylesToHTML } from "../functions/applyStylesToHTML";
 import { getCaretPosition } from "../functions/getCaretPosition";
 import { moveCursor } from "../functions/moveCursor";
@@ -131,7 +130,24 @@ export const EditorV3 = ({
                   label: s,
                   disabled: contentProps.showMarkdown,
                   action: (target?: Range | null) => {
-                    divRef.current && applyStyle(s, divRef.current, target);
+                    if (divRef.current) {
+                      const content = new EditorV3Content(divRef.current.innerHTML, contentProps);
+                      const pos = getCaretPosition(divRef.current, target);
+                      if (pos) {
+                        content.applyStyle(s, pos);
+                        redrawElement({
+                          content,
+                          pos: {
+                            startLine: pos.endLine,
+                            startChar: pos.endChar,
+                            isCollapsed: true,
+                            endLine: pos.endLine,
+                            endChar: pos.endChar,
+                          },
+                          contentProps,
+                        });
+                      }
+                    }
                   },
                 };
               })
@@ -140,7 +156,24 @@ export const EditorV3 = ({
             label: "Remove style",
             disabled: contentProps.showMarkdown,
             action: (target?: Range | null) => {
-              divRef.current && applyStyle(null, divRef.current, target);
+              if (divRef.current) {
+                const content = new EditorV3Content(divRef.current.innerHTML, contentProps);
+                const pos = getCaretPosition(divRef.current, target);
+                if (pos) {
+                  content.removeStyle(pos);
+                  redrawElement({
+                    content,
+                    pos: {
+                      startLine: pos.endLine,
+                      startChar: pos.endChar,
+                      isCollapsed: true,
+                      endLine: pos.endLine,
+                      endChar: pos.endChar,
+                    },
+                    contentProps,
+                  });
+                }
+              }
             },
           },
         ],
@@ -165,7 +198,7 @@ export const EditorV3 = ({
       return [styleMenuItem, ...showMarkdownMenu];
     }
     return [];
-  }, [allowMarkdown, content, contentProps, setCurrentValue]);
+  }, [allowMarkdown, content, contentProps, redrawElement, setCurrentValue]);
 
   // Work out backgroup colour and border
   const [inFocus, setInFocus] = useState<boolean>(false);
@@ -195,11 +228,7 @@ export const EditorV3 = ({
           redo();
         } else {
           // Get current information
-          const content = new EditorV3Content(divRef.current.innerHTML, {
-            textAlignment,
-            decimalAlignPercent,
-            styles: customStyleMap,
-          });
+          const content = new EditorV3Content(divRef.current.innerHTML, contentProps);
           let pos = getCaretPosition(divRef.current);
 
           // Handle awkward keys
@@ -235,17 +264,7 @@ export const EditorV3 = ({
         }
       }
     },
-    [
-      allowNewLine,
-      content,
-      contentProps,
-      customStyleMap,
-      decimalAlignPercent,
-      redo,
-      setCurrentValue,
-      textAlignment,
-      undo,
-    ],
+    [allowNewLine, content, contentProps, redo, setCurrentValue, undo],
   );
 
   const handleKeyUp = useCallback(

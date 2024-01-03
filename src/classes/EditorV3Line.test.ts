@@ -17,7 +17,7 @@ describe("Check basic EditorV3Line", () => {
   test("Load string with line breaks, tabs", async () => {
     const testLine = new EditorV3Line("  Hello \r\n\t world  ", EditorV3Align.center, 22);
     expect(testLine.toHtml().outerHTML).toEqual(
-      '<div class="aiev3-line center"><span class="aiev3-tb">  Hello  world  </span></div>',
+      '<div class="aiev3-line center"><span class="aiev3-tb">\u2002 Hello\u2002 world \u2002</span></div>',
     );
     expect(testLine.lineText).toEqual("  Hello  world  ");
     expect(testLine.textAlignment).toEqual(EditorV3Align.center);
@@ -31,7 +31,7 @@ describe("Check basic EditorV3Line", () => {
     ]);
     expect(testLine.toHtml().outerHTML).toEqual(
       '<div class="aiev3-line left">' +
-        '<span class="aiev3-tb">Hello&nbsp;world, </span>' +
+        '<span class="aiev3-tb">Hello&nbsp;world,\u2002</span>' +
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How is it going?</span>' +
         "</div>",
     );
@@ -90,7 +90,7 @@ describe("Check basic EditorV3Line", () => {
       '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span class="aiev3-tb">Hello&nbsp;world</span></span>' +
         '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;">' +
-        '<span class="aiev3-tb">. </span>' +
+        '<span class="aiev3-tb">.\u2002</span>' +
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How is it going?</span>' +
         "</span>" +
         "</div>",
@@ -196,7 +196,7 @@ describe("Check basic EditorV3Line", () => {
 
     expect(testLine.toHtml().outerHTML).toEqual(
       '<div class="aiev3-line right">' +
-        '<span class="aiev3-tb">12.34 wut? </span>' +
+        '<span class="aiev3-tb">12.34 wut?\u2002</span>' +
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">5678</span>' +
         "</div>",
     );

@@ -17,7 +17,11 @@ export class EditorV3TextBlock {
   public toHtml(): HTMLSpanElement {
     const span = document.createElement("span");
     span.classList.add("aiev3-tb");
-    const textNode = document.createTextNode(this.text === "" ? "\u2009" : this.text);
+    const textNode = document.createTextNode(
+      this.text === ""
+        ? "\u2009"
+        : this.text.replace(/^ /, "\u2002").replace(/ $/, "\u2002").replaceAll("  ", "\u2002 "),
+    );
     span.appendChild(textNode);
     if (this.style) {
       span.classList.add(`editorv3style-${this.style}`);
@@ -67,12 +71,12 @@ export class EditorV3TextBlock {
     }
     // Span element
     else if (arg instanceof HTMLSpanElement) {
-      this.text = arg.textContent ?? "";
+      this.text = arg.textContent?.replaceAll("\u2002", " ") ?? "";
       this.style = arg.dataset.styleName;
     }
     // Text node
     else if (arg instanceof Text) {
-      this.text = arg.textContent ?? "";
+      this.text = arg.textContent?.replaceAll("\u2002", " ") ?? "";
     }
     // Must be object
     else {

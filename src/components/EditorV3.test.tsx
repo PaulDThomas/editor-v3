@@ -4,7 +4,6 @@ import userEvent from "@testing-library/user-event";
 import { EditorV3Content } from "../classes/EditorV3Content";
 import { EditorV3Align } from "../classes/interface";
 import { EditorV3 } from "./EditorV3";
-import * as applyStyleModule from "../functions/applyStyle";
 import { getCaretPosition } from "../functions/getCaretPosition";
 import { useState } from "react";
 
@@ -135,63 +134,6 @@ describe("Editor and functions", () => {
   });
 });
 
-describe("Menu styling", () => {
-  test("Add and remove style", async () => {
-    const user = userEvent.setup();
-    const mockSetJson = jest.fn();
-    const mockSetText = jest.fn();
-    const mockApplyStyle = jest.fn();
-    jest.spyOn(applyStyleModule, "applyStyle").mockImplementation(mockApplyStyle);
-    await act(async () => {
-      render(
-        <div data-testid='container'>
-          <EditorV3
-            id='test-editor'
-            input={mockContent.jsonString}
-            setJson={mockSetJson}
-            setText={mockSetText}
-            style={{ width: "200px" }}
-            allowNewLine
-            customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
-            allowMarkdown
-          />
-        </div>,
-      );
-    });
-    // Get component
-    const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
-    // Highlight first line
-    let firstSpan = container.querySelector("span") as HTMLSpanElement;
-    expect(firstSpan).toBeInTheDocument();
-    // Click shiny
-    await act(async () => {
-      fireEvent.contextMenu(firstSpan);
-    });
-    const shinyItem = screen.queryByLabelText("shiny") as HTMLSpanElement;
-    expect(shinyItem).toBeInTheDocument();
-    fireEvent.mouseDown(shinyItem);
-    await user.click(shinyItem);
-    let calledParams = mockApplyStyle.mock.calls[0];
-    expect(calledParams[0]).toEqual("shiny");
-    // Click remove
-    firstSpan = container.querySelector("span") as HTMLSpanElement;
-    fireEvent.contextMenu(firstSpan);
-    expect(screen.queryByText("Remove style")).toBeInTheDocument();
-    const removeItem = screen.getByLabelText("Remove style");
-    await user.click(removeItem);
-    calledParams = mockApplyStyle.mock.calls[1];
-    expect(calledParams[0]).toEqual(null);
-    // Click show markdown
-    fireEvent.contextMenu(firstSpan);
-    const showMarkdown = screen.getByLabelText("Show markdown");
-    await user.click(showMarkdown);
-    const markdownText = screen.queryByText(/shiny::x.xx/) as HTMLDivElement;
-    expect(markdownText).toBeInTheDocument();
-    fireEvent.contextMenu(markdownText);
-    expect(screen.queryByText("Hide markdown")).toBeInTheDocument();
-  });
-});
-
 describe("Cursor tests", () => {
   test("Movements", async () => {
     const user = userEvent.setup();
@@ -293,6 +235,178 @@ describe("Cursor tests", () => {
     await user.keyboard(
       "{ArrowDown}{Control>}{ArrowLeft}{ArrowUp}{ArrowRight}{ArrowRight}{/Control}.",
     );
+  });
+});
+
+describe("Menu styling - add", () => {
+  test("Add style", async () => {
+    const user = userEvent.setup();
+    const mockSetText = jest.fn();
+    await act(async () => {
+      render(
+        <div data-testid='container'>
+          <EditorV3
+            id='test-editor'
+            input={mockContent.jsonString}
+            setText={mockSetText}
+            style={{ width: "200px" }}
+            textAlignment={EditorV3Align.left}
+            allowNewLine
+            customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
+            resize
+          />
+        </div>,
+      );
+    });
+    // Get component
+    const container = (await screen.findByTestId("container")).querySelector(
+      "#test-editor",
+    ) as HTMLDivElement;
+    // Go to start of text
+    await user.click(container.querySelectorAll("span")[0] as HTMLSpanElement);
+    await user.keyboard("{Control>}{Home}{/Control}{Home}{End}{Shift>}{Home}{Shift}");
+    expect(getCaretPosition(container)).toEqual({
+      startLine: 0,
+      startChar: 0,
+      isCollapsed: false,
+      endLine: 0,
+      endChar: 5,
+    });
+    fireEvent.contextMenu(container.querySelectorAll("span")[0] as HTMLSpanElement);
+    const shinyItem = screen.queryByLabelText("shiny") as HTMLSpanElement;
+    expect(shinyItem).toBeInTheDocument();
+    fireEvent.mouseDown(shinyItem);
+    await user.click(shinyItem);
+    expect(container.querySelectorAll("span")[0] as HTMLSpanElement).toHaveClass(
+      "editorv3style-shiny",
+    );
+  });
+});
+
+describe("Menu styling - change", () => {
+  test("Change style", async () => {
+    const user = userEvent.setup();
+    const mockSetText = jest.fn();
+    await act(async () => {
+      render(
+        <div data-testid='container'>
+          <EditorV3
+            id='test-editor'
+            input={mockContent.jsonString}
+            setText={mockSetText}
+            style={{ width: "200px" }}
+            textAlignment={EditorV3Align.left}
+            allowNewLine
+            customStyleMap={{
+              shiny: { color: "pink", fontWeight: "700" },
+              notShiny: { color: "blue" },
+            }}
+            resize
+          />
+        </div>,
+      );
+    });
+    // Get component
+    const container = (await screen.findByTestId("container")).querySelector(
+      "#test-editor",
+    ) as HTMLDivElement;
+    // Go to start of text
+    await user.click(container.querySelectorAll("span")[0] as HTMLSpanElement);
+    await user.keyboard("{End}{Shift>}{Home}{Shift}");
+    expect(getCaretPosition(container)).toEqual({
+      startLine: 2,
+      startChar: 0,
+      isCollapsed: false,
+      endLine: 2,
+      endChar: 4,
+    });
+    fireEvent.contextMenu(container.querySelectorAll("span")[2] as HTMLSpanElement);
+    const shinyItem = screen.queryByLabelText("notShiny") as HTMLSpanElement;
+    expect(shinyItem).toBeInTheDocument();
+    fireEvent.mouseDown(shinyItem);
+    await user.click(shinyItem);
+    expect(container.querySelectorAll("span")[2] as HTMLSpanElement).toHaveClass(
+      "editorv3style-notShiny",
+    );
+  });
+});
+
+describe("Menu styling - remove", () => {
+  test("Remove style", async () => {
+    const user = userEvent.setup();
+    const mockSetText = jest.fn();
+    await act(async () => {
+      render(
+        <div data-testid='container'>
+          <EditorV3
+            id='test-editor'
+            input={mockContent.jsonString}
+            setText={mockSetText}
+            style={{ width: "200px" }}
+            textAlignment={EditorV3Align.left}
+            allowNewLine
+            customStyleMap={{
+              shiny: { color: "pink", fontWeight: "700" },
+              notShiny: { color: "blue" },
+            }}
+            resize
+          />
+        </div>,
+      );
+    });
+    // Get component
+    const container = (await screen.findByTestId("container")).querySelector(
+      "#test-editor",
+    ) as HTMLDivElement;
+    // Go to start of text
+    await user.click(container.querySelectorAll("span")[2] as HTMLSpanElement);
+    await user.keyboard("{End}{Shift>}{Home}{Shift}");
+    expect(getCaretPosition(container)).toEqual({
+      startLine: 2,
+      startChar: 0,
+      isCollapsed: false,
+      endLine: 2,
+      endChar: 4,
+    });
+    // Click remove
+    fireEvent.contextMenu(container.querySelectorAll("span")[2]);
+    expect(screen.queryByText("Remove style")).toBeInTheDocument();
+    const removeStyle = screen.getByLabelText("Remove style");
+    await user.click(removeStyle);
+    expect(container.querySelectorAll("span")[2]).not.toHaveClass("editorv3style-shiny");
+  });
+});
+
+describe("Menu styling - markdown", () => {
+  test("Show markdown", async () => {
+    const user = userEvent.setup();
+    await act(async () => {
+      render(
+        <div data-testid='container'>
+          <EditorV3
+            id='test-editor'
+            input={mockContent.jsonString}
+            setJson={jest.fn()}
+            style={{ width: "200px" }}
+            allowNewLine
+            customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
+            allowMarkdown
+          />
+        </div>,
+      );
+    });
+    // Get component
+    const container = screen.getByTestId("container").children[0] as HTMLDivElement;
+    expect(container).toBeInTheDocument();
+    const thirdSpan = container.querySelectorAll("span")[2] as HTMLSpanElement;
+    // Click show markdown
+    fireEvent.contextMenu(thirdSpan);
+    const showMarkdown = screen.getByLabelText("Show markdown");
+    await user.click(showMarkdown);
+    const markdownText = screen.queryByText(/shiny::x.xx/) as HTMLDivElement;
+    expect(markdownText).toBeInTheDocument();
+    fireEvent.contextMenu(markdownText);
+    expect(screen.queryByText("Hide markdown")).toBeInTheDocument();
   });
 });
 
@@ -416,7 +530,7 @@ describe("Edge events", () => {
     expect(editorHolder).toBeInTheDocument();
     fireEvent.focus(editorHolder);
   });
-  test("Paste error", async () => {
+  test("Paste error - cannot work out how to accurately throw", async () => {
     const user = userEvent.setup();
     const mockSetText = jest.fn();
     await act(async () => {
