@@ -16,15 +16,14 @@ export const App = (): JSX.Element => {
       },
     }),
   );
-  const [json, setJson] = useState<string>(
-    JSON.stringify({
-      textAlign: "left",
-      lines: [{ text: "12.34", style: "green" }, { text: "0" }, { text: "56.78", style: "blue" }],
-      styles: {
-        blue: { color: "blue", fontWeight: 700 },
-      },
-    }),
-  );
+  const initialValue = JSON.stringify({
+    textAlign: "left",
+    lines: [{ text: "12.34", style: "green" }, { text: "0" }, { text: "56.78", style: "blue" }],
+    styles: {
+      blue: { color: "blue", fontWeight: 700 },
+    },
+  });
+  const [json, setJson] = useState<string>(initialValue);
   const [text, setText] = useState<string>("");
   const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.decimal);
   const [editable, setEditable] = useState<boolean>(true);
@@ -64,6 +63,15 @@ export const App = (): JSX.Element => {
                 }}
                 spellCheck={false}
               />
+            </span>
+            <span>
+              <button
+                onClick={() => {
+                  setJson(initialValue);
+                }}
+              >
+                Reset
+              </button>
             </span>
           </div>
 

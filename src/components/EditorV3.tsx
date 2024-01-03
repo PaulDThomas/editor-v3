@@ -1,5 +1,5 @@
 import { ContextMenuHandler, iMenuItem } from "@asup/context-menu";
-import { CSSProperties, useCallback, useMemo, useRef, useState } from "react";
+import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EditorV3Content } from "../classes/EditorV3Content";
 import { EditorV3Line } from "../classes/EditorV3Line";
 import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";
@@ -18,6 +18,7 @@ import { redraw } from "../functions/redraw";
 import { setCaretPosition } from "../functions/setCaretPosition";
 import { useDebounceStack } from "../hooks/useDebounceStack";
 import "./EditorV3.css";
+import { isEqual } from "lodash";
 
 interface EditorV3Props {
   id: string;
@@ -116,6 +117,96 @@ export const EditorV3 = ({
   } = useDebounceStack<EditorV3State>(inputDecode, setInputDecode, null, redrawElement, returnData);
   const content = currentValue?.content;
   const contentProps = currentValue?.contentProps;
+
+  // Update text alignment from parent
+  useEffect(() => {
+    if (content && contentProps && textAlignment !== contentProps?.textAlignment) {
+      content.textAlignment = textAlignment;
+      setCurrentValue({
+        content,
+        pos: null,
+        contentProps: {
+          ...contentProps,
+          textAlignment,
+        },
+      });
+    }
+  });
+
+  // Update decimal alignment from parent
+  useEffect(() => {
+    if (content && contentProps && decimalAlignPercent !== contentProps?.decimalAlignPercent) {
+      content.decimalAlignPercent = decimalAlignPercent;
+      setCurrentValue({
+        content,
+        pos: null,
+        contentProps: {
+          ...contentProps,
+          decimalAlignPercent,
+        },
+      });
+    }
+  });
+
+  // Update styles from parent
+  useEffect(() => {
+    if (content && contentProps && !isEqual(customStyleMap, contentProps?.styles)) {
+      content.styles = customStyleMap ?? {};
+      setCurrentValue({
+        content,
+        pos: null,
+        contentProps: {
+          ...contentProps,
+          styles: customStyleMap,
+        },
+      });
+    }
+  });
+
+  // Update markdown settings from parent
+  useEffect(() => {
+    if (content && contentProps && !isEqual(markdownSettings, contentProps?.markdownSettings)) {
+      content.markdownSettings = markdownSettings;
+      setCurrentValue({
+        content,
+        pos: null,
+        contentProps: {
+          ...contentProps,
+          markdownSettings,
+        },
+      });
+    }
+  });
+
+  // Update input from parent, need to track the last string input separately from the debounce stack
+  const [lastInput, setLastInput] = useState<string>(input);
+  useEffect(() => {
+    if (content && contentProps && input !== lastInput) {
+      const newContent = new EditorV3Content(input, {
+        textAlignment,
+        decimalAlignPercent,
+        styles: customStyleMap,
+        showMarkdown: false,
+        markdownSettings,
+      });
+      setCurrentValue({
+        content: newContent,
+        pos: null,
+        contentProps,
+      });
+      setLastInput(input);
+    }
+  }, [
+    content,
+    contentProps,
+    customStyleMap,
+    decimalAlignPercent,
+    input,
+    lastInput,
+    markdownSettings,
+    setCurrentValue,
+    textAlignment,
+  ]);
 
   // Set up menu items
   const menuItems = useMemo((): iMenuItem[] => {

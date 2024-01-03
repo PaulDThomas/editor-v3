@@ -60,6 +60,12 @@ export class EditorV3Content {
   }
 
   private _markdownSettings = defaultMarkdownSettings;
+  get markdownSettings() {
+    return this._markdownSettings;
+  }
+  set markdownSettings(newSettings: IMarkdownSettings) {
+    this._markdownSettings = newSettings;
+  }
 
   /**
    * Current lines in the editor
