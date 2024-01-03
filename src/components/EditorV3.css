@@ -6,13 +6,12 @@
   flex-direction: column;
   justify-content: center;
   padding: 1px;
-  overflow: ellipsis;
-  white-space: nowrap;
+  overflow: hidden;
 }
 
 .aiev3:focus,
 .aiev3:hover {
-  overflow: auto;
+  overflow: visible;
 }
 
 .aiev3.editing .aiev3-editing {
@@ -24,6 +23,7 @@
   padding: 2px;
   border: 1px dashed rgb(190, 190, 189);
   border-radius: 6px;
+  overflow-wrap: break-word;
   outline: 0;
   align-content: start;
   vertical-align: top;
@@ -33,6 +33,7 @@
 .aiev3-line {
   min-height: 1.2rem;
   width: 100%;
+  white-space: nowrap;
 }
 
 .aiev3-line.decimal {

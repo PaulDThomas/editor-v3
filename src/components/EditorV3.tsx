@@ -219,7 +219,7 @@ export const EditorV3 = ({
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (divRef.current && content && contentProps) {
+      if (divRef.current && content && contentProps && !contentProps.showMarkdown) {
         // Handle undo/redo
         if (e.ctrlKey && e.code === "KeyZ") {
           e.stopPropagation();
