@@ -184,14 +184,17 @@ export const EditorV3 = ({
             {
               label: `${contentProps.showMarkdown ? "Hide" : "Show"} markdown`,
               action: () => {
-                setCurrentValue({
-                  content,
-                  pos: null,
-                  contentProps: {
-                    ...contentProps,
-                    showMarkdown: !contentProps.showMarkdown,
-                  },
-                });
+                if (divRef.current) {
+                  const content = new EditorV3Content(divRef.current.innerHTML, contentProps);
+                  setCurrentValue({
+                    content,
+                    pos: null,
+                    contentProps: {
+                      ...contentProps,
+                      showMarkdown: !contentProps.showMarkdown,
+                    },
+                  });
+                }
               },
             },
           ];

@@ -104,9 +104,12 @@ export const App = (): JSX.Element => {
                 allowNewLine={allowNewLine}
                 editable={editable}
                 customStyleMap={{ Notes: { color: "royalblue" }, Optional: { color: "green" } }}
+                resize
+                allowMarkdown
                 style={{
                   width: "240px",
                   minHeight: "60px",
+                  height: "60px",
                 }}
               />
             </span>
