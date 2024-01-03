@@ -299,10 +299,8 @@ export class EditorV3Content {
       }
       // Remove under selected
       this.splice(newPos);
-      if (pos.isCollapsed) {
-        newPos.endLine = newPos.startLine;
-        newPos.endChar = newPos.startChar;
-      }
+      newPos.endLine = newPos.startLine;
+      newPos.endChar = newPos.startChar;
       return newPos;
     }
     return pos;

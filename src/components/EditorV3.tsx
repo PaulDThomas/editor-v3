@@ -218,14 +218,24 @@ export const EditorV3 = ({
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (divRef.current && content && contentProps) {
         // Handle undo/redo
-        if (e.ctrlKey && e.key === "z") {
+        if (e.ctrlKey && e.code === "KeyZ") {
           e.stopPropagation();
           e.preventDefault();
           undo();
-        } else if (e.ctrlKey && e.key === "y") {
+        } else if (e.ctrlKey && e.code === "KeyY") {
           e.stopPropagation();
           e.preventDefault();
           redo();
+        } else if (e.ctrlKey && e.code === "KeyA") {
+          e.stopPropagation();
+          e.preventDefault();
+          setCaretPosition(divRef.current, {
+            startLine: 0,
+            startChar: 0,
+            isCollapsed: false,
+            endLine: content.lines.length - 1,
+            endChar: content.lines[content.lines.length - 1].lineLength,
+          });
         } else {
           // Get current information
           const content = new EditorV3Content(divRef.current.innerHTML, contentProps);
@@ -283,8 +293,8 @@ export const EditorV3 = ({
             "ArrowDown",
             "Home",
             "End",
-          ].includes(e.key) ||
-          (["z", "y"].includes(e.key) && e.ctrlKey)
+          ].includes(e.code) ||
+          (["KeyA", "KeyY", "KeyZ"].includes(e.code) && e.ctrlKey)
         ) {
           e.stopPropagation();
           e.preventDefault();

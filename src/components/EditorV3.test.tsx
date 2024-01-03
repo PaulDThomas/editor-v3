@@ -560,6 +560,48 @@ describe("Edge events", () => {
   });
 });
 
+describe("Select all", () => {
+  test("Programmer notes", async () => {
+    const user = userEvent.setup();
+    const mockSet = jest.fn();
+    render(
+      <div data-testid='container'>
+        <EditorV3
+          id='programmernotes'
+          input={"Item 2 programmer notes"}
+          textAlignment={EditorV3Align.left}
+          setJson={mockSet}
+        />
+      </div>,
+    );
+    const container = screen.getByTestId("container") as HTMLDivElement;
+    const box = container.querySelector("#programmernotes-editable") as HTMLDivElement;
+    expect(box).toBeInTheDocument();
+    // await user.clear(box);
+    // await user.type(box, "New programmer notes");
+    await user.click(box);
+    await user.keyboard("{Control>}a{/Control}{Delete}");
+    await user.keyboard("New programmer notes");
+    fireEvent.blur(box);
+    expect(screen.getByText("New programmer notes")).toBeInTheDocument();
+    expect(mockSet).toHaveBeenCalledTimes(1);
+    expect(mockSet).toHaveBeenCalledWith(
+      JSON.stringify({
+        lines: [
+          {
+            textBlocks: [{ text: "New programmer notes" }],
+            textAlignment: "left",
+            decimalAlignPercent: 60,
+          },
+        ],
+        textAlignment: "left",
+        decimalAlignPercent: 60,
+        styles: {},
+      }),
+    );
+  });
+});
+
 describe("Undo/redo", () => {
   const TestContainer = () => {
     const [input, setInput] = useState("");
