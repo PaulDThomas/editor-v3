@@ -120,14 +120,14 @@ export const useDebounceStack = <T>(
     setDebouncedValue(currentValue);
   }, [currentValue]);
 
-  // Update value from debouncedValue
+  // Update value from debouncedValue, if the value has not changed since the last update
   useEffect(() => {
-    if (debouncedValue && !isEqual(debouncedValue, value)) {
+    if (debouncedValue && !isEqual(debouncedValue, value) && isEqual(value, lastValue)) {
       setCurrentValue(debouncedValue);
       setValue(debouncedValue);
       onDebounce(debouncedValue);
     }
-  }, [debouncedValue, onDebounce, setCurrentValue, setValue, value]);
+  }, [debouncedValue, lastValue, onDebounce, setCurrentValue, setValue, value]);
 
   return {
     currentValue,

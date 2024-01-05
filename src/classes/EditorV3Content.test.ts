@@ -536,5 +536,13 @@ describe("Splice markdown tests", () => {
     expect(testContent.toMarkdownHtml().textContent).toEqual("<<<dull::abc>><shiny::34.56>>");
     expect(testContent.text).toEqual("<abc<shiny::34.56>>");
     expect(splice.map((l) => l.lineText).join("\n")).toEqual("");
+
+    // Change markdown settings
+    testContent.markdownSettings = {
+      ...testContent.markdownSettings,
+      styleStartTag: "¬¬",
+      styleEndTag: "^^",
+    };
+    expect(testContent.toMarkdownHtml().textContent).toEqual("<¬¬dull::abc^^<shiny::34.56>>");
   });
 });

@@ -88,7 +88,7 @@ export const EditorV3 = ({
   const returnData = useCallback(
     (ret: EditorV3State) => {
       const dummyNode = document.createElement("div");
-      redraw(dummyNode, ret.content, false);
+      redraw(dummyNode, ret.content, false, markdownSettings);
       const html = dummyNode.innerHTML ?? "";
       const text = ret.content.text;
       const json = ret.content.jsonString;
@@ -98,13 +98,18 @@ export const EditorV3 = ({
         setJson && setJson(json);
       }
     },
-    [input, setHtml, setJson, setText],
+    [input, markdownSettings, setHtml, setJson, setText],
   );
 
   // Redraw
   const redrawElement = useCallback((ret: EditorV3State) => {
     if (divRef.current) {
-      redraw(divRef.current, ret.content, ret.contentProps.showMarkdown ?? false);
+      redraw(
+        divRef.current,
+        ret.content,
+        ret.contentProps.showMarkdown ?? false,
+        ret.contentProps.markdownSettings ?? defaultMarkdownSettings,
+      );
       if (ret.pos) setCaretPosition(divRef.current, ret.pos);
     }
   }, []);

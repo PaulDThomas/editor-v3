@@ -269,3 +269,45 @@ describe("Check undo stack", () => {
     jest.useRealTimers();
   });
 });
+
+describe("Update to value", () => {
+  const CustomUpdate = (): JSX.Element => {
+    const [value, setValue] = useState<string>("before");
+    const { currentValue, setCurrentValue, forceUpdate } = useDebounceStack(value, setValue, 500);
+    return (
+      <>
+        <button
+          data-testid='btn'
+          onClick={() => setValue("after")}
+        >
+          Change
+        </button>
+        <input
+          data-testid='input'
+          value={currentValue ?? ""}
+          onChange={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setCurrentValue(e.target.value);
+          }}
+          onBlur={() => forceUpdate()}
+        />
+      </>
+    );
+  };
+
+  test("Update from above", async () => {
+    const user = userEvent.setup({ delay: null });
+    await act(async () => {
+      render(<CustomUpdate />);
+    });
+    const testControl = screen.getByTestId("input");
+    const btn = screen.getByTestId("btn");
+    await act(async () => await user.type(testControl, "-"));
+    expect(testControl).toHaveValue("before-");
+    await act(async () => fireEvent.blur(testControl));
+    expect(testControl).toHaveValue("before-");
+    await act(async () => await user.click(btn));
+    expect(testControl).toHaveValue("after");
+  });
+});

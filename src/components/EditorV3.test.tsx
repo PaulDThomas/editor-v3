@@ -6,6 +6,7 @@ import { EditorV3Align } from "../classes/interface";
 import { EditorV3 } from "./EditorV3";
 import { getCaretPosition } from "../functions/getCaretPosition";
 import { useState } from "react";
+import { defaultMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 
 const mockContent = new EditorV3Content("34.45\n\nx.xx", {
   styles: { shiny: { color: "pink", fontWeight: "700" } },
@@ -577,8 +578,6 @@ describe("Select all", () => {
     const container = screen.getByTestId("container") as HTMLDivElement;
     const box = container.querySelector("#programmernotes-editable") as HTMLDivElement;
     expect(box).toBeInTheDocument();
-    // await user.clear(box);
-    // await user.type(box, "New programmer notes");
     await user.click(box);
     await user.keyboard("{Control>}a{/Control}{Delete}");
     await user.keyboard("New programmer notes");
@@ -634,4 +633,168 @@ describe("Undo/redo", () => {
     await user.keyboard("{Control>}y{/Control}");
     expect(screen.queryByText("adde")).toBeInTheDocument();
   });
+});
+
+describe("Updates from above", () => {
+  const TestContainer = () => {
+    const [input, setInput] = useState("Before");
+    const [textAlignment, setTextAlignment] = useState<EditorV3Align>(EditorV3Align.left);
+    const [decimalAlignPercent, setDecimalAlignPercent] = useState<number>(60);
+    const [styles, setStyles] = useState<{ [key: string]: React.CSSProperties }>({
+      shiny: { color: "pink", fontWeight: "700" },
+    });
+    const [markdownSettings, setMarkdownSettings] = useState(defaultMarkdownSettings);
+
+    return (
+      <div data-testid='container'>
+        <button
+          data-testid='change-input'
+          onClick={() => setInput("New <<shiny::input>>")}
+        />
+        <button
+          data-testid='change-text-alignment'
+          onClick={() => setTextAlignment(EditorV3Align.center)}
+        />
+        <button
+          data-testid='change-decimal-align-percent'
+          onClick={() => {
+            setDecimalAlignPercent(80);
+            setTextAlignment(EditorV3Align.decimal);
+          }}
+        />
+        <button
+          data-testid='change-styles'
+          onClick={() => setStyles({ shiny: { color: "blue" } })}
+        />
+        <button
+          data-testid='change-markdown-settings'
+          onClick={() => setMarkdownSettings({ ...defaultMarkdownSettings, styleStartTag: "¬¬" })}
+        />
+        <EditorV3
+          data-testid='editor'
+          id='test-editor'
+          input={input}
+          setJson={setInput}
+          allowMarkdown
+          textAlignment={textAlignment}
+          decimalAlignPercent={decimalAlignPercent}
+          customStyleMap={styles}
+          markdownSettings={markdownSettings}
+        />
+      </div>
+    );
+  };
+
+  test("Change input", async () => {
+    const user = userEvent.setup();
+    await act(async () => render(<TestContainer />));
+    const editor = screen.getByTestId("editor");
+    expect(screen.queryByText("Before")).toBeInTheDocument();
+    const changeInput = screen.getByTestId("change-input");
+    await user.click(changeInput);
+    expect(screen.queryByText("New <<shiny::input>>")).toBeInTheDocument();
+    expect(editor.innerHTML).toEqual(
+      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div id="test-editor-editable" class="aiev3-editing" contenteditable="true" role="textbox" spellcheck="false">' +
+        '<div class="aiev3-line left" style="height: 0px;">' +
+        '<span class="aiev3-tb">New &lt;&lt;shiny::input&gt;&gt;</span>' +
+        "</div>" +
+        '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div></div>' +
+        "</div> ",
+    );
+  });
+
+  test("Change alignment", async () => {
+    const user = userEvent.setup();
+    await act(async () => render(<TestContainer />));
+    const editor = screen.getByTestId("editor");
+    expect(screen.queryByText("Before")).toBeInTheDocument();
+    const changeInput = screen.getByTestId("change-text-alignment");
+    await user.click(changeInput);
+    expect(editor.innerHTML).toEqual(
+      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div id="test-editor-editable" class="aiev3-editing" contenteditable="true" role="textbox" spellcheck="false">' +
+        '<div class="aiev3-line center" style="height: 0px;">' +
+        '<span class="aiev3-tb">Before</span>' +
+        "</div>" +
+        '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div></div>' +
+        "</div> ",
+    );
+  });
+
+  test("Change decimal align percent", async () => {
+    const user = userEvent.setup();
+    await act(async () => render(<TestContainer />));
+    const editor = screen.getByTestId("editor");
+    expect(screen.queryByText("Before")).toBeInTheDocument();
+    const changeInput = screen.getByTestId("change-decimal-align-percent");
+    await user.click(changeInput);
+    expect(editor.innerHTML).toEqual(
+      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div id="test-editor-editable" class="aiev3-editing" contenteditable="true" role="textbox" spellcheck="false">' +
+        '<div class="aiev3-line decimal" style="height: 0px;">' +
+        '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span class="aiev3-tb">Before</span></span>' +
+        '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;"><span class="aiev3-tb"> </span></span>' +
+        "</div>" +
+        '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div></div>' +
+        "</div> ",
+    );
+  });
+
+  test("Change styles", async () => {
+    const user = userEvent.setup();
+    await act(async () => render(<TestContainer />));
+    const editor = screen.getByTestId("editor");
+    expect(screen.queryByText("Before")).toBeInTheDocument();
+    const changeInput = screen.getByTestId("change-styles");
+    await user.click(changeInput);
+    expect(editor.innerHTML).toEqual(
+      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div id="test-editor-editable" class="aiev3-editing" contenteditable="true" role="textbox" spellcheck="false">' +
+        '<div class="aiev3-line left" style="height: 0px;">' +
+        '<span class="aiev3-tb">Before</span>' +
+        "</div>" +
+        '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;blue&quot;}}"></div>' +
+        "</div></div> ",
+    );
+  });
+
+  test("Change markdown settings", async () => {
+    const user = userEvent.setup();
+    await act(async () => render(<TestContainer />));
+    const editor = screen.getByTestId("editor");
+    // Click show markdown
+    fireEvent.contextMenu(editor.querySelectorAll("span")[0] as HTMLSpanElement);
+    let showMarkdown = screen.getByLabelText("Show markdown");
+    await user.click(showMarkdown);
+    expect(editor.innerHTML).toEqual(
+      '<div class="context-menu-handler" style="width: 100%; height: 100%;">' +
+        '<div id="test-editor-editable" class="aiev3-editing" contenteditable="true" role="textbox" spellcheck="false">' +
+        '<div class="aiev3-markdown-line" data-text-alignment="left" data-decimal-align-percent="60">Before</div>' +
+        '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
+        "</div></div> ",
+    );
+    // Update text
+    await user.click(screen.getByTestId("change-input"));
+    expect(editor.innerHTML).toEqual(
+      '<div class="context-menu-handler" style="width: 100%; height: 100%;">' +
+        '<div id="test-editor-editable" class="aiev3-editing" contenteditable="true" role="textbox" spellcheck="false">' +
+        '<div class="aiev3-markdown-line" data-text-alignment="left" data-decimal-align-percent="60">New &lt;&lt;shiny::input&gt;&gt;</div>' +
+        '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
+        "</div></div> ",
+    );
+    // Hide markdown
+    fireEvent.contextMenu(editor.querySelectorAll(".aiev3-markdown-line")[0] as HTMLDivElement);
+    const hideMarkdown = screen.getByLabelText("Hide markdown");
+    await user.click(hideMarkdown);
+
+    // Change markdown and show again
+    await user.click(screen.getByTestId("change-markdown-settings"));
+    fireEvent.contextMenu(editor.querySelectorAll("span")[0] as HTMLSpanElement);
+    showMarkdown = screen.getByLabelText("Show markdown");
+    await user.click(showMarkdown);
+    expect(editor.innerHTML).toEqual(
+      '<div class="context-menu-handler" style="width: 100%; height: 100%;">' +
+        '<div id="test-editor-editable" class="aiev3-editing" contenteditable="true" role="textbox" spellcheck="false">' +
+        '<div class="aiev3-markdown-line" data-text-alignment="left" data-decimal-align-percent="60">New ¬¬shiny::input&gt;&gt;</div>' +
+        '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
+        "</div></div> ",
+    );
+  }, 500000);
 });
