@@ -1,4 +1,5 @@
 import { ContextMenuHandler, iMenuItem } from "@asup/context-menu";
+import { isEqual } from "lodash";
 import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EditorV3Content } from "../classes/EditorV3Content";
 import { EditorV3Line } from "../classes/EditorV3Line";
@@ -18,7 +19,6 @@ import { redraw } from "../functions/redraw";
 import { setCaretPosition } from "../functions/setCaretPosition";
 import { useDebounceStack } from "../hooks/useDebounceStack";
 import "./EditorV3.css";
-import { isEqual } from "lodash";
 
 interface EditorV3Props {
   id: string;
@@ -87,6 +87,7 @@ export const EditorV3 = ({
   // General return function
   const returnData = useCallback(
     (ret: EditorV3State) => {
+      // Redraw dummay for information
       const dummyNode = document.createElement("div");
       redraw(dummyNode, ret.content, false, markdownSettings);
       const html = dummyNode.innerHTML ?? "";
@@ -97,11 +98,12 @@ export const EditorV3 = ({
         setHtml && setHtml(html);
         setJson && setJson(json);
       }
+      dummyNode.remove();
     },
     [input, markdownSettings, setHtml, setJson, setText],
   );
 
-  // Redraw
+  // Redraw element
   const redrawElement = useCallback((ret: EditorV3State) => {
     if (divRef.current) {
       redraw(
@@ -230,16 +232,11 @@ export const EditorV3 = ({
                       const content = new EditorV3Content(divRef.current.innerHTML, contentProps);
                       const pos = getCaretPosition(divRef.current, target);
                       if (pos) {
-                        content.applyStyle(s, pos);
-                        redrawElement({
-                          content,
-                          pos: {
-                            startLine: pos.endLine,
-                            startChar: pos.endChar,
-                            isCollapsed: true,
-                            endLine: pos.endLine,
-                            endChar: pos.endChar,
-                          },
+                        const newContent = content.applyStyle(s, pos);
+                        const newPos = { ...pos, startLine: pos.endLine, startChar: pos.endChar };
+                        setCurrentValue({
+                          content: newContent,
+                          pos: newPos,
                           contentProps,
                         });
                       }
@@ -256,16 +253,11 @@ export const EditorV3 = ({
                 const content = new EditorV3Content(divRef.current.innerHTML, contentProps);
                 const pos = getCaretPosition(divRef.current, target);
                 if (pos) {
-                  content.removeStyle(pos);
-                  redrawElement({
-                    content,
-                    pos: {
-                      startLine: pos.endLine,
-                      startChar: pos.endChar,
-                      isCollapsed: true,
-                      endLine: pos.endLine,
-                      endChar: pos.endChar,
-                    },
+                  const newContent = content.removeStyle(pos);
+                  const newPos = { ...pos, startLine: pos.endLine, startChar: pos.endChar };
+                  setCurrentValue({
+                    content: newContent,
+                    pos: newPos,
                     contentProps,
                   });
                 }
@@ -297,7 +289,7 @@ export const EditorV3 = ({
       return [styleMenuItem, ...showMarkdownMenu];
     }
     return [];
-  }, [allowMarkdown, content, contentProps, redrawElement, setCurrentValue]);
+  }, [allowMarkdown, content, contentProps, setCurrentValue]);
 
   // Work out backgroup colour and border
   const [inFocus, setInFocus] = useState<boolean>(false);
@@ -399,7 +391,7 @@ export const EditorV3 = ({
           e.preventDefault();
           return;
         }
-        // Always redraw?
+        // Always set new content value
         else if (divRef.current) {
           e.preventDefault();
           e.stopPropagation();
@@ -498,7 +490,7 @@ export const EditorV3 = ({
             } else {
               lines.push(...linesImport.map((l) => new EditorV3Line(JSON.stringify(l))));
             }
-            // Splice in new data and redraw
+            // Splice in new data and set new content
             content.splice(pos, lines);
             pos.startLine = pos.startLine + lines.length - 1;
             pos.startChar =

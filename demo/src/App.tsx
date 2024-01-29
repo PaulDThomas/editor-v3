@@ -3,6 +3,13 @@ import { EditorV3, EditorV3Align, EditorV3Styles } from "../../src/main";
 
 export const App = (): JSX.Element => {
   const [html, setHtml] = useState<string>("");
+  const initialValue = JSON.stringify({
+    textAlign: "left",
+    lines: [{ text: "12.34", style: "green" }, { text: "0" }, { text: "56.78", style: "blue" }],
+    styles: {
+      blue: { color: "blue", fontWeight: 700 },
+    },
+  });
   const [input2, setInput2] = useState<string>(
     // eslint-disable-next-line quotes
     `<div classname="aie-text" data-key="2v9v5" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":1,"style":"Notes"},{"offset":4,"length":1,"style":"Notes"},{"offset":1,"length":3,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">N</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  w</div><div classname="aie-text" data-key="1u61b" data-type="unstyled" data-inline-style-ranges='[]'></div><div classname="aie-text" data-key="4l4fu" data-type="unstyled" data-inline-style-ranges='[]'>ork</div><div classname="aie-text" data-inline-style-ranges='[{"length":12,"offset":0,"style":"Notes"}]'><spanclassname="Notes" style="color:blue;font-size:16pt">Notes  w.ork</span></div><div classname="aie-text" data-key="b84n6" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":3,"style":"Notes"},{"offset":3,"length":7,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">Not</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">es  wor</span>k</div><div classname="aie-text" data-key="4stit" data-type="unstyled" data-inline-style-ranges='[{"offset":5,"length":2,"style":"Notes"},{"offset":10,"length":1,"style":"Notes"},{"offset":7,"length":3,"style":"Editable"}]'>treez<span classname="Notes" style="color:blue;font-size:16pt"> N</span><span classname="Editable" style="color:red;font-family:courier;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  work</div><div classname="aie-text" data-key="10tu7" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":72,"style":"Notes"}]'><span classname="Notes" style="color:royalblue">The &apos;Total&apos; column is compulsory if more than 1 treatment group is used.</span></div><div classname="aie-text" data-key="frng6" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":92,"style":"Notes"}]'><span classname="Notes" style="color:royalblue">Timepoint could be days, weeks or visits. Permissable to only present selected (key) visits.</span></div>`,
@@ -16,13 +23,6 @@ export const App = (): JSX.Element => {
       },
     }),
   );
-  const initialValue = JSON.stringify({
-    textAlign: "left",
-    lines: [{ text: "12.34", style: "green" }, { text: "0" }, { text: "56.78", style: "blue" }],
-    styles: {
-      blue: { color: "blue", fontWeight: 700 },
-    },
-  });
   const [json, setJson] = useState<string>(initialValue);
   const [text, setText] = useState<string>("");
   const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.decimal);
@@ -52,7 +52,10 @@ export const App = (): JSX.Element => {
                 input={json}
                 setHtml={setHtml}
                 setText={setText}
-                setJson={setJson}
+                setJson={(ret) => {
+                  console.log("Return JSON", ret);
+                  setJson(ret);
+                }}
                 textAlignment={align}
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}
@@ -108,7 +111,10 @@ export const App = (): JSX.Element => {
               <EditorV3
                 id={"e2"}
                 input={input2}
-                setJson={setInput2}
+                setJson={(ret) => {
+                  console.log("JSON INPUT", ret);
+                  setInput2(ret);
+                }}
                 allowNewLine={allowNewLine}
                 editable={editable}
                 customStyleMap={{ Notes: { color: "royalblue" }, Optional: { color: "green" } }}
