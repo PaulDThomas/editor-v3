@@ -6,18 +6,25 @@ describe("Check basic EditorV3TextBlock", () => {
   test("Load string", async () => {
     const testBlock = new EditorV3TextBlock("Helloworld");
     expect(testBlock.text).toEqual("Helloworld");
-    expect(testBlock.toHtml().outerHTML).toEqual('<span class="aiev3-tb">Helloworld</span>');
+    const tempDiv = document.createElement("div");
+    tempDiv.appendChild(testBlock.toHtml());
+    expect(tempDiv.innerHTML).toEqual('<span class="aiev3-tb">Helloworld</span>');
     const testBlock2 = new EditorV3TextBlock("0");
     expect(testBlock2.text).toEqual("0");
     expect(testBlock2.jsonString).toEqual('{"text":"0"}');
-    expect(testBlock2.toHtml().outerHTML).toEqual('<span class="aiev3-tb">0</span>');
+    const tempDiv2 = document.createElement("div");
+    tempDiv2.appendChild(testBlock2.toHtml());
+    expect(tempDiv2.innerHTML).toEqual('<span class="aiev3-tb">0</span>');
   });
 
   test("Load string with style", async () => {
     const testBlock = new EditorV3TextBlock("Hello world\u00a0", "shiny");
     expect(testBlock.text).toEqual("Hello world\u00a0");
-    expect(testBlock.toHtml().outerHTML).toEqual(
-      '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello world&nbsp;</span>',
+    const tempDiv = document.createElement("div");
+    tempDiv.appendChild(testBlock.toHtml());
+    expect(tempDiv.innerHTML).toEqual(
+      '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">world&nbsp;</span>',
     );
   });
 
@@ -28,10 +35,12 @@ describe("Check basic EditorV3TextBlock", () => {
     testSpan.innerHTML = "Hello world";
     const testBlock = new EditorV3TextBlock(testSpan);
     expect(testBlock.text).toEqual("Hello world");
-    expect(testBlock.toHtml().outerHTML).toEqual(
-      '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello world</span>',
+    const tempDiv = document.createElement("div");
+    tempDiv.appendChild(testBlock.toHtml());
+    expect(tempDiv.innerHTML).toEqual(
+      '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">world</span>',
     );
-    expect(new EditorV3TextBlock(testBlock.toHtml().outerHTML)).toEqual(testBlock);
     expect(new EditorV3TextBlock(testBlock.toHtml())).toEqual(testBlock);
     expect(new EditorV3TextBlock(JSON.stringify(testBlock))).toEqual(testBlock);
     expect(new EditorV3TextBlock(testBlock.jsonString)).toEqual(testBlock);
@@ -42,18 +51,23 @@ describe("Check basic EditorV3TextBlock", () => {
     testSpan.textContent = null;
     const testBlock = new EditorV3TextBlock(testSpan);
     expect(testBlock.text).toEqual("");
-    expect(testBlock.toHtml().outerHTML).toEqual('<span class="aiev3-tb">\u2009</span>');
+    const tempDiv = document.createElement("div");
+    tempDiv.appendChild(testBlock.toHtml());
+    expect(tempDiv.innerHTML).toEqual('<span class="aiev3-tb">\u2009</span>');
   });
 
   test("Load text node", async () => {
     const testSpan = document.createTextNode("12.34");
     const testBlock = new EditorV3TextBlock(testSpan);
     expect(testBlock.text).toEqual("12.34");
-    expect(testBlock.toHtml().outerHTML).toEqual('<span class="aiev3-tb">12.34</span>');
+    const tempDiv = document.createElement("div");
+    tempDiv.appendChild(testBlock.toHtml());
+    expect(tempDiv.innerHTML).toEqual('<span class="aiev3-tb">12.34</span>');
   });
 
   test("Load EditorV3TextBlock", async () => {
     const firstBlock = new EditorV3TextBlock("Hello world", "shiny");
+    ``;
     const testBlock = new EditorV3TextBlock(firstBlock);
     expect(testBlock).toEqual(firstBlock);
   });

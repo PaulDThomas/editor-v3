@@ -28,12 +28,24 @@
   align-content: start;
   vertical-align: top;
   margin: -1px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-height: 1.2rem;
 }
 
 .aiev3-line {
   min-height: 1.2rem;
   width: 100%;
-  white-space: nowrap;
+}
+
+.singleline .aiev3-line {
+  flex-wrap: nowrap;
+}
+
+.multiline .aiev3-line {
+  flex-wrap: wrap;
+  max-width: 100%;
 }
 
 .aiev3-line.decimal {

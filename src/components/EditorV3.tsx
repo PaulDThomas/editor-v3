@@ -563,7 +563,7 @@ export const EditorV3 = ({
       >
         <div
           id={`${id}-editable`}
-          className='aiev3-editing'
+          className={`aiev3-editing ${allowNewLine ? "multiline" : "singleline"}`}
           style={styleRecalc}
           contentEditable={
             editable &&

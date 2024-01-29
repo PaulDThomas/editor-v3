@@ -16,9 +16,6 @@ export const redraw = (
   }
   // Update height and styles after render
   [...el.querySelectorAll(".aiev3-line")].forEach((line) => {
-    (line as HTMLDivElement).style.height = `${Math.max(
-      ...[...line.querySelectorAll("span")].map((el) => (el as HTMLSpanElement).clientHeight),
-    )}px`;
     // Apply styles
     applyStylesToHTML(line as HTMLDivElement, content.styles);
   });

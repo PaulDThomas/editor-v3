@@ -14,20 +14,25 @@ export class EditorV3TextBlock {
     return JSON.stringify(this.data);
   }
   // Content returns
-  public toHtml(): HTMLSpanElement {
-    const span = document.createElement("span");
-    span.classList.add("aiev3-tb");
-    const textNode = document.createTextNode(
+  public toHtml(): DocumentFragment {
+    const text =
       this.text === ""
         ? "\u2009"
-        : this.text.replace(/^ /, "\u2002").replace(/ $/, "\u2002").replaceAll("  ", "\u2002 "),
-    );
-    span.appendChild(textNode);
-    if (this.style) {
-      span.classList.add(`editorv3style-${this.style}`);
-      span.dataset.styleName = this.style;
-    }
-    return span;
+        : this.text.replace(/^ /, "\u00A0").replace(/ $/, "\u00A0").replaceAll(" ", "\u00A0\uFEFF");
+    const words = text.split("\uFEFF");
+    const ret = new DocumentFragment();
+    words.forEach((word) => {
+      const span = document.createElement("span");
+      span.classList.add("aiev3-tb");
+      const textNode = document.createTextNode(word);
+      span.appendChild(textNode);
+      if (this.style) {
+        span.classList.add(`editorv3style-${this.style}`);
+        span.dataset.styleName = this.style;
+      }
+      ret.append(span);
+    });
+    return ret;
   }
   public toMarkdown(markdownSettings: IMarkdownSettings = defaultMarkdownSettings): string {
     if (!this.style) return this.text;
@@ -42,7 +47,13 @@ export class EditorV3TextBlock {
 
   // Overloads
   constructor(
-    arg: HTMLSpanElement | Text | EditorV3TextBlock | { text: string; style?: string } | string,
+    arg:
+      | HTMLSpanElement
+      | Text
+      | EditorV3TextBlock
+      | DocumentFragment
+      | { text: string; style?: string }
+      | string,
     style?: string,
   ) {
     // Initial
@@ -50,33 +61,42 @@ export class EditorV3TextBlock {
 
     // Text
     if (typeof arg === "string") {
-      if (arg.match(/^<span.*<\/span>$/)) {
-        const div = document.createElement("template");
-        div.innerHTML = arg;
-        this.text = div.content.children[0].textContent ?? "";
-        this.style = (div.content.children[0] as HTMLSpanElement).dataset?.styleName;
-      } else {
-        try {
-          const jsonInput = JSON.parse(arg);
-          if (jsonInput.text) {
-            this.text = jsonInput.text;
-          } else {
-            throw "No text";
-          }
-          if (jsonInput.style) this.style = jsonInput.style;
-        } catch {
-          this.text = arg;
+      try {
+        const jsonInput = JSON.parse(arg);
+        if (jsonInput.text) {
+          this.text = jsonInput.text;
+        } else {
+          throw "No text";
         }
+        if (jsonInput.style) this.style = jsonInput.style;
+      } catch {
+        this.text = arg;
       }
     }
     // Span element
     else if (arg instanceof HTMLSpanElement) {
-      this.text = arg.textContent?.replaceAll("\u2002", " ") ?? "";
+      this.text = arg.textContent?.replaceAll("\u00A0", " ") ?? "";
+      if (arg.classList.contains("aiev3-tb-space")) this.text = ` ${this.text}`;
       this.style = arg.dataset.styleName;
+    }
+    // Document Fragment element
+    else if (arg instanceof DocumentFragment) {
+      this.text = "";
+      arg.childNodes.forEach((child) => {
+        if (child instanceof HTMLSpanElement) {
+          this.text += child.classList.contains("aiev3-tb-space")
+            ? ` ${child.textContent}`
+            : child.textContent;
+          if (this.style && child.dataset.styleName !== this.style)
+            throw "Multiple styles in fragment";
+          else this.style = child.dataset.styleName;
+        }
+      });
+      this.text = this.text.replaceAll("\u00A0", " ");
     }
     // Text node
     else if (arg instanceof Text) {
-      this.text = arg.textContent?.replaceAll("\u2002", " ") ?? "";
+      this.text = arg.textContent?.replaceAll("\u00A0", " ") ?? "";
     }
     // Must be object
     else {
