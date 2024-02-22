@@ -1,10 +1,17 @@
 import { IMarkdownSettings, defaultMarkdownSettings } from "./markdown/MarkdownSettings";
 
+export type EditorV3TextBlockType = "text" | "at";
+
 // Class
 export class EditorV3TextBlock {
   // Variables
   text: string;
   style?: string;
+  type: EditorV3TextBlockType = "text";
+
+  get typeStyle(): string {
+    return `${this.type}:${this.style ?? ""}`;
+  }
 
   // Read only variables
   get data() {

@@ -265,18 +265,18 @@ export class EditorV3Line {
   }
 
   private _mergeBlocks() {
-    if (new Set(this.textBlocks.map((tb) => tb.style)).size < this.textBlocks.length) {
+    if (new Set(this.textBlocks.map((tb) => tb.typeStyle)).size < this.textBlocks.length) {
       const mergedBlocks: EditorV3TextBlock[] = [];
-      let lastStyle: string | null | undefined = null;
+      let lastTypeStyle: string | null = null;
       for (let _i = 0; _i < this.textBlocks.length; _i++) {
-        if (this.textBlocks[_i].style === lastStyle && mergedBlocks.length > 0) {
+        if (this.textBlocks[_i].typeStyle === lastTypeStyle && mergedBlocks.length > 0) {
           mergedBlocks[mergedBlocks.length - 1] = new EditorV3TextBlock(
             mergedBlocks[mergedBlocks.length - 1].text + this.textBlocks[_i].text,
-            lastStyle,
+            lastTypeStyle.split(":")[1],
           );
         } else {
           mergedBlocks.push(this.textBlocks[_i]);
-          lastStyle = this.textBlocks[_i].style;
+          lastTypeStyle = this.textBlocks[_i].typeStyle;
         }
       }
       if (mergedBlocks.filter((tb) => tb.text !== "").length === 0) {

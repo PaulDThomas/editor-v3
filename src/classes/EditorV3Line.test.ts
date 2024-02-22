@@ -159,7 +159,10 @@ describe("Check basic EditorV3Line", () => {
     expect(JSON.parse(testLine.jsonString)).toEqual({
       decimalAlignPercent: 60,
       textAlignment: "decimal",
-      textBlocks: [{ text: "12.34", style: "shiny" }, { text: " slow" }],
+      textBlocks: [
+        { text: "12.34", style: "shiny", type: "text" },
+        { text: " slow", type: "text" },
+      ],
     });
     expect(new EditorV3Line(testLine.jsonString)).toEqual(testLine);
 
@@ -182,10 +185,10 @@ describe("Check basic EditorV3Line", () => {
       decimalAlignPercent: 60,
       textAlignment: "decimal",
       textBlocks: [
-        { text: "12.", style: "shiny" },
-        { text: "boys" },
-        { text: "34", style: "shiny" },
-        { text: " slow treats" },
+        { text: "12.", style: "shiny", type: "text" },
+        { text: "boys", type: "text" },
+        { text: "34", style: "shiny", type: "text" },
+        { text: " slow treats", type: "text" },
       ],
     });
   });
@@ -244,52 +247,85 @@ describe("Check basic EditorV3Line", () => {
 describe("Check EditorV3Line functions", () => {
   test("upToPos", async () => {
     const line = new EditorV3Line("0123.456");
-    expect(line.upToPos(0)).toEqual([{ text: "" }]);
-    expect(line.upToPos(4)).toEqual([{ text: "0123" }]);
-    expect(line.upToPos(7)).toEqual([{ text: "0123.45" }]);
-    expect(line.upToPos(8)).toEqual([{ text: "0123.456" }]);
-    expect(line.upToPos(10)).toEqual([{ text: "0123.456" }]);
+    expect(line.upToPos(0)).toEqual([{ text: "", type: "text" }]);
+    expect(line.upToPos(4)).toEqual([{ text: "0123", type: "text" }]);
+    expect(line.upToPos(7)).toEqual([{ text: "0123.45", type: "text" }]);
+    expect(line.upToPos(8)).toEqual([{ text: "0123.456", type: "text" }]);
+    expect(line.upToPos(10)).toEqual([{ text: "0123.456", type: "text" }]);
 
     const line2 = new EditorV3Line([
       new EditorV3TextBlock("hello", "world"),
       new EditorV3TextBlock(" slow"),
     ]);
-    expect(line2.upToPos(0)).toEqual([{ text: "", style: "world" }]);
-    expect(line2.upToPos(1)).toEqual([{ text: "h", style: "world" }]);
-    expect(line2.upToPos(2)).toEqual([{ text: "he", style: "world" }]);
-    expect(line2.upToPos(3)).toEqual([{ text: "hel", style: "world" }]);
-    expect(line2.upToPos(4)).toEqual([{ text: "hell", style: "world" }]);
-    expect(line2.upToPos(5)).toEqual([{ text: "hello", style: "world" }]);
-    expect(line2.upToPos(6)).toEqual([{ text: "hello", style: "world" }, { text: " " }]);
-    expect(line2.upToPos(7)).toEqual([{ text: "hello", style: "world" }, { text: " s" }]);
-    expect(line2.upToPos(8)).toEqual([{ text: "hello", style: "world" }, { text: " sl" }]);
-    expect(line2.upToPos(9)).toEqual([{ text: "hello", style: "world" }, { text: " slo" }]);
-    expect(line2.upToPos(10)).toEqual([{ text: "hello", style: "world" }, { text: " slow" }]);
-    expect(line2.upToPos(11)).toEqual([{ text: "hello", style: "world" }, { text: " slow" }]);
+    expect(line2.upToPos(0)).toEqual([{ text: "", style: "world", type: "text" }]);
+    expect(line2.upToPos(1)).toEqual([{ text: "h", style: "world", type: "text" }]);
+    expect(line2.upToPos(2)).toEqual([{ text: "he", style: "world", type: "text" }]);
+    expect(line2.upToPos(3)).toEqual([{ text: "hel", style: "world", type: "text" }]);
+    expect(line2.upToPos(4)).toEqual([{ text: "hell", style: "world", type: "text" }]);
+    expect(line2.upToPos(5)).toEqual([{ text: "hello", style: "world", type: "text" }]);
+    expect(line2.upToPos(6)).toEqual([
+      { text: "hello", style: "world", type: "text" },
+      { text: " ", type: "text" },
+    ]);
+    expect(line2.upToPos(7)).toEqual([
+      { text: "hello", style: "world", type: "text" },
+      { text: " s", type: "text" },
+    ]);
+    expect(line2.upToPos(8)).toEqual([
+      { text: "hello", style: "world", type: "text" },
+      { text: " sl", type: "text" },
+    ]);
+    expect(line2.upToPos(9)).toEqual([
+      { text: "hello", style: "world", type: "text" },
+      { text: " slo", type: "text" },
+    ]);
+    expect(line2.upToPos(10)).toEqual([
+      { text: "hello", style: "world", type: "text" },
+      { text: " slow", type: "text" },
+    ]);
+    expect(line2.upToPos(11)).toEqual([
+      { text: "hello", style: "world", type: "text" },
+      { text: " slow", type: "text" },
+    ]);
   });
 
   test("fromPos", async () => {
     const line = new EditorV3Line("0123.456");
-    expect(line.fromPos(0)).toEqual([{ text: "0123.456" }]);
-    expect(line.fromPos(4)).toEqual([{ text: ".456" }]);
-    expect(line.fromPos(7)).toEqual([{ text: "6" }]);
-    expect(line.fromPos(8)).toEqual([{ text: "" }]);
+    expect(line.fromPos(0)).toEqual([{ text: "0123.456", type: "text" }]);
+    expect(line.fromPos(4)).toEqual([{ text: ".456", type: "text" }]);
+    expect(line.fromPos(7)).toEqual([{ text: "6", type: "text" }]);
+    expect(line.fromPos(8)).toEqual([{ text: "", type: "text" }]);
 
     const line2 = new EditorV3Line([
       new EditorV3TextBlock("hello", "world"),
       new EditorV3TextBlock(" slow"),
     ]);
-    expect(line2.fromPos(0)).toEqual([{ text: "hello", style: "world" }, { text: " slow" }]);
-    expect(line2.fromPos(1)).toEqual([{ text: "ello", style: "world" }, { text: " slow" }]);
-    expect(line2.fromPos(2)).toEqual([{ text: "llo", style: "world" }, { text: " slow" }]);
-    expect(line2.fromPos(3)).toEqual([{ text: "lo", style: "world" }, { text: " slow" }]);
-    expect(line2.fromPos(4)).toEqual([{ text: "o", style: "world" }, { text: " slow" }]);
-    expect(line2.fromPos(5)).toEqual([{ text: " slow" }]);
-    expect(line2.fromPos(6)).toEqual([{ text: "slow" }]);
-    expect(line2.fromPos(7)).toEqual([{ text: "low" }]);
-    expect(line2.fromPos(8)).toEqual([{ text: "ow" }]);
-    expect(line2.fromPos(9)).toEqual([{ text: "w" }]);
-    expect(line2.fromPos(10)).toEqual([{ text: "" }]);
+    expect(line2.fromPos(0)).toEqual([
+      { text: "hello", style: "world", type: "text" },
+      { text: " slow", type: "text" },
+    ]);
+    expect(line2.fromPos(1)).toEqual([
+      { text: "ello", style: "world", type: "text" },
+      { text: " slow", type: "text" },
+    ]);
+    expect(line2.fromPos(2)).toEqual([
+      { text: "llo", style: "world", type: "text" },
+      { text: " slow", type: "text" },
+    ]);
+    expect(line2.fromPos(3)).toEqual([
+      { text: "lo", style: "world", type: "text" },
+      { text: " slow", type: "text" },
+    ]);
+    expect(line2.fromPos(4)).toEqual([
+      { text: "o", style: "world", type: "text" },
+      { text: " slow", type: "text" },
+    ]);
+    expect(line2.fromPos(5)).toEqual([{ text: " slow", type: "text" }]);
+    expect(line2.fromPos(6)).toEqual([{ text: "slow", type: "text" }]);
+    expect(line2.fromPos(7)).toEqual([{ text: "low", type: "text" }]);
+    expect(line2.fromPos(8)).toEqual([{ text: "ow", type: "text" }]);
+    expect(line2.fromPos(9)).toEqual([{ text: "w", type: "text" }]);
+    expect(line2.fromPos(10)).toEqual([{ text: "", type: "text" }]);
   });
 
   test("subBlocks", () => {
@@ -297,50 +333,71 @@ describe("Check EditorV3Line functions", () => {
       new EditorV3TextBlock("hello", "world"),
       new EditorV3TextBlock(" slow"),
     ]);
-    expect(line2.subBlocks(1, 1)).toEqual([{ text: "", style: "world" }]);
-    expect(line2.subBlocks(1, 2)).toEqual([{ text: "e", style: "world" }]);
-    expect(line2.subBlocks(1, 3)).toEqual([{ text: "el", style: "world" }]);
-    expect(line2.subBlocks(1, 4)).toEqual([{ text: "ell", style: "world" }]);
-    expect(line2.subBlocks(1, 5)).toEqual([{ text: "ello", style: "world" }]);
-    expect(line2.subBlocks(1, 6)).toEqual([{ text: "ello", style: "world" }, { text: " " }]);
-    expect(line2.subBlocks(1, 7)).toEqual([{ text: "ello", style: "world" }, { text: " s" }]);
-    expect(line2.subBlocks(1, 8)).toEqual([{ text: "ello", style: "world" }, { text: " sl" }]);
-    expect(line2.subBlocks(1, 9)).toEqual([{ text: "ello", style: "world" }, { text: " slo" }]);
-    expect(line2.subBlocks(2, 9)).toEqual([{ text: "llo", style: "world" }, { text: " slo" }]);
-    expect(line2.subBlocks(3, 9)).toEqual([{ text: "lo", style: "world" }, { text: " slo" }]);
-    expect(line2.subBlocks(4, 9)).toEqual([{ text: "o", style: "world" }, { text: " slo" }]);
-    expect(line2.subBlocks(5, 9)).toEqual([{ text: " slo" }]);
-    expect(line2.subBlocks(6, 9)).toEqual([{ text: "slo" }]);
-    expect(line2.subBlocks(7, 9)).toEqual([{ text: "lo" }]);
-    expect(line2.subBlocks(8, 9)).toEqual([{ text: "o" }]);
-    expect(line2.subBlocks(9, 9)).toEqual([{ text: "" }]);
+    expect(line2.subBlocks(1, 1)).toEqual([{ text: "", style: "world", type: "text" }]);
+    expect(line2.subBlocks(1, 2)).toEqual([{ text: "e", style: "world", type: "text" }]);
+    expect(line2.subBlocks(1, 3)).toEqual([{ text: "el", style: "world", type: "text" }]);
+    expect(line2.subBlocks(1, 4)).toEqual([{ text: "ell", style: "world", type: "text" }]);
+    expect(line2.subBlocks(1, 5)).toEqual([{ text: "ello", style: "world", type: "text" }]);
+    expect(line2.subBlocks(1, 6)).toEqual([
+      { text: "ello", style: "world", type: "text" },
+      { text: " ", type: "text" },
+    ]);
+    expect(line2.subBlocks(1, 7)).toEqual([
+      { text: "ello", style: "world", type: "text" },
+      { text: " s", type: "text" },
+    ]);
+    expect(line2.subBlocks(1, 8)).toEqual([
+      { text: "ello", style: "world", type: "text" },
+      { text: " sl", type: "text" },
+    ]);
+    expect(line2.subBlocks(1, 9)).toEqual([
+      { text: "ello", style: "world", type: "text" },
+      { text: " slo", type: "text" },
+    ]);
+    expect(line2.subBlocks(2, 9)).toEqual([
+      { text: "llo", style: "world", type: "text" },
+      { text: " slo", type: "text" },
+    ]);
+    expect(line2.subBlocks(3, 9)).toEqual([
+      { text: "lo", style: "world", type: "text" },
+      { text: " slo", type: "text" },
+    ]);
+    expect(line2.subBlocks(4, 9)).toEqual([
+      { text: "o", style: "world", type: "text" },
+      { text: " slo", type: "text" },
+    ]);
+    expect(line2.subBlocks(5, 9)).toEqual([{ text: " slo", type: "text" }]);
+    expect(line2.subBlocks(6, 9)).toEqual([{ text: "slo", type: "text" }]);
+    expect(line2.subBlocks(7, 9)).toEqual([{ text: "lo", type: "text" }]);
+    expect(line2.subBlocks(8, 9)).toEqual([{ text: "o", type: "text" }]);
+    expect(line2.subBlocks(9, 9)).toEqual([{ text: "", type: "text" }]);
   });
 
   test("splitLine", async () => {
     const line1 = new EditorV3Line("0123.456");
     const split1 = line1.splitLine(0);
-    expect(split1?.textBlocks).toEqual([{ text: "0123.456" }]);
-    expect(line1.textBlocks).toEqual([{ text: "" }]);
+    expect(split1?.textBlocks).toEqual([{ text: "0123.456", type: "text" }]);
+    expect(line1.textBlocks).toEqual([{ text: "", type: "text" }]);
 
     const line2 = new EditorV3Line("0123.456");
     const split2 = line2.splitLine(4);
-    expect(split2?.textBlocks).toEqual([{ text: ".456" }]);
-    expect(line2.textBlocks).toEqual([{ text: "0123" }]);
+    expect(split2?.textBlocks).toEqual([{ text: ".456", type: "text" }]);
+    expect(line2.textBlocks).toEqual([{ text: "0123", type: "text" }]);
 
     const line3 = new EditorV3Line("0123.456");
     const split3 = line3.splitLine(7);
-    expect(split3?.textBlocks).toEqual([{ text: "6" }]);
-    expect(line3.textBlocks).toEqual([{ text: "0123.45" }]);
+    expect(split3?.textBlocks).toEqual([{ text: "6", type: "text" }]);
+    expect(line3.textBlocks).toEqual([{ text: "0123.45", type: "text" }]);
 
     const line4 = new EditorV3Line("0123.456");
     const split4 = line4.splitLine(8);
-    expect(split4?.textBlocks).toEqual([{ text: "" }]);
-    expect(line4.textBlocks).toEqual([{ text: "0123.456" }]);
+    expect(split4?.textBlocks).toEqual([{ text: "", type: "text" }]);
+    expect(line4.textBlocks).toEqual([{ text: "0123.456", type: "text" }]);
 
     const line5 = new EditorV3Line("0123.456");
     const split5 = line5.splitLine(9);
-    expect(split5?.textBlocks).toEqual([{ text: "" }]);
-    expect(line5.textBlocks).toEqual([{ text: "0123.456" }]);
+    expect(split5?.textBlocks).toEqual([{ text: "", type: "text" }]);
+    expect(line5.textBlocks).toEqual([{ text: "0123.456", type: "text" }]);
   });
 
   test("insertBlocks", async () => {
@@ -365,10 +422,10 @@ describe("Check EditorV3Line functions", () => {
       decimalAlignPercent: 60,
       textAlignment: "left",
       textBlocks: [
-        { text: "tree" },
-        { text: "pie", style: "lid" },
-        { text: "piehello", style: "world" },
-        { text: " slow" },
+        { text: "tree", type: "text" },
+        { text: "pie", style: "lid", type: "text" },
+        { text: "piehello", style: "world", type: "text" },
+        { text: " slow", type: "text" },
       ],
     });
   });
@@ -384,7 +441,10 @@ describe("Check EditorV3Line functions", () => {
     ]);
     line2.removeSection(4, 7);
     expect(JSON.parse(line2.jsonString)).toEqual({
-      textBlocks: [{ text: "hell", style: "world" }, { text: "low" }],
+      textBlocks: [
+        { text: "hell", style: "world", type: "text" },
+        { text: "low", type: "text" },
+      ],
       decimalAlignPercent: 60,
       textAlignment: "left",
     });
@@ -396,17 +456,35 @@ describe("Check EditorV3Line functions", () => {
       new EditorV3TextBlock(" slow"),
     ]);
     line2.deleteCharacter(4);
-    expect(line2.textBlocks).toEqual([{ text: "hell", style: "world" }, { text: " slow" }]);
+    expect(line2.textBlocks).toEqual([
+      { text: "hell", style: "world", type: "text" },
+      { text: " slow", type: "text" },
+    ]);
     line2.deleteCharacter(4);
-    expect(line2.textBlocks).toEqual([{ text: "hell", style: "world" }, { text: "slow" }]);
+    expect(line2.textBlocks).toEqual([
+      { text: "hell", style: "world", type: "text" },
+      { text: "slow", type: "text" },
+    ]);
     line2.deleteCharacter(41);
-    expect(line2.textBlocks).toEqual([{ text: "hell", style: "world" }, { text: "slow" }]);
+    expect(line2.textBlocks).toEqual([
+      { text: "hell", style: "world", type: "text" },
+      { text: "slow", type: "text" },
+    ]);
     line2.deleteCharacter(0);
-    expect(line2.textBlocks).toEqual([{ text: "ell", style: "world" }, { text: "slow" }]);
+    expect(line2.textBlocks).toEqual([
+      { text: "ell", style: "world", type: "text" },
+      { text: "slow", type: "text" },
+    ]);
     line2.deleteCharacter(6);
-    expect(line2.textBlocks).toEqual([{ text: "ell", style: "world" }, { text: "slo" }]);
+    expect(line2.textBlocks).toEqual([
+      { text: "ell", style: "world", type: "text" },
+      { text: "slo", type: "text" },
+    ]);
     line2.deleteCharacter(6);
-    expect(line2.textBlocks).toEqual([{ text: "ell", style: "world" }, { text: "slo" }]);
+    expect(line2.textBlocks).toEqual([
+      { text: "ell", style: "world", type: "text" },
+      { text: "slo", type: "text" },
+    ]);
   });
 
   test("applyStyle & removeStyle", async () => {
@@ -416,26 +494,32 @@ describe("Check EditorV3Line functions", () => {
     ]);
     line2.applyStyle("drive", 3, 6);
     expect(line2.textBlocks).toEqual([
-      { text: "hel", style: "world" },
-      { text: "lo ", style: "drive" },
-      { text: "slow" },
+      { text: "hel", style: "world", type: "text" },
+      { text: "lo ", style: "drive", type: "text" },
+      { text: "slow", type: "text" },
     ]);
     line2.applyStyle("world", 3, 4);
     expect(line2.textBlocks).toEqual([
-      { text: "hell", style: "world" },
-      { text: "o ", style: "drive" },
-      { text: "slow" },
+      { text: "hell", style: "world", type: "text" },
+      { text: "o ", style: "drive", type: "text" },
+      { text: "slow", type: "text" },
     ]);
     line2.applyStyle("caps", 0, 0);
     expect(line2.textBlocks).toEqual([
-      { text: "hell", style: "world" },
-      { text: "o ", style: "drive" },
-      { text: "slow" },
+      { text: "hell", style: "world", type: "text" },
+      { text: "o ", style: "drive", type: "text" },
+      { text: "slow", type: "text" },
     ]);
     line2.removeStyle(3, 7);
-    expect(line2.textBlocks).toEqual([{ text: "hel", style: "world" }, { text: "lo slow" }]);
+    expect(line2.textBlocks).toEqual([
+      { text: "hel", style: "world", type: "text" },
+      { text: "lo slow", type: "text" },
+    ]);
     line2.removeStyle(1, 1);
-    expect(line2.textBlocks).toEqual([{ text: "hel", style: "world" }, { text: "lo slow" }]);
+    expect(line2.textBlocks).toEqual([
+      { text: "hel", style: "world", type: "text" },
+      { text: "lo slow", type: "text" },
+    ]);
   });
 
   test("Generate markdown", async () => {

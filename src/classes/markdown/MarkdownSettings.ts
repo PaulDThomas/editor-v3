@@ -13,6 +13,8 @@ export interface IMarkdownSettings {
   calcEndTag: string;
   calcConditionSeparator: string;
   calcAndSeparator: string;
+  atStartTag: string;
+  atEndTag: string;
 }
 
 export const defaultMarkdownSettings = {
@@ -30,4 +32,6 @@ export const defaultMarkdownSettings = {
   calcEndTag: "]!]",
   calcConditionSeparator: "||",
   calcAndSeparator: "&&",
+  atStartTag: "@[",
+  atEndTag: "]",
 };

@@ -32,13 +32,13 @@ describe("Editor and functions", () => {
     const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
     expect(container.outerHTML).toEqual(
       '<div class="aiev3" id="test-editor">' +
-        '<div class="context-menu-handler" style="width: 100%; height: 100%;">' +
+        '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
         '<div id="test-editor-editable" class="aiev3-editing multiline" contenteditable="false" spellcheck="false">' +
         '<div class="aiev3-line left"><span class="aiev3-tb">34.45</span></div>' +
         '<div class="aiev3-line left"><span class="aiev3-tb">\u2009</span></div>' +
         '<div class="aiev3-line left"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x.xx</span></div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"' +
-        "></div></div></div></div>",
+        "></div></div></div></div></div>",
     );
     const firstSpan = container.querySelector("span") as HTMLSpanElement;
     await user.click(firstSpan);
@@ -91,10 +91,18 @@ describe("Editor and functions", () => {
     expect(mockSetJson).toHaveBeenCalledWith(
       JSON.stringify({
         lines: [
-          { textBlocks: [{ text: "34.4" }], textAlignment: "decimal", decimalAlignPercent: 70 },
-          { textBlocks: [{ text: "" }], textAlignment: "decimal", decimalAlignPercent: 70 },
           {
-            textBlocks: [{ text: "x.xx", style: "shiny" }],
+            textBlocks: [{ text: "34.4", type: "text" }],
+            textAlignment: "decimal",
+            decimalAlignPercent: 70,
+          },
+          {
+            textBlocks: [{ text: "", type: "text" }],
+            textAlignment: "decimal",
+            decimalAlignPercent: 70,
+          },
+          {
+            textBlocks: [{ text: "x.xx", style: "shiny", type: "text" }],
             textAlignment: "decimal",
             decimalAlignPercent: 70,
           },
@@ -123,11 +131,23 @@ describe("Editor and functions", () => {
     expect(mockSetJson).toHaveBeenLastCalledWith(
       JSON.stringify({
         lines: [
-          { textBlocks: [{ text: "" }], textAlignment: "decimal", decimalAlignPercent: 70 },
-          { textBlocks: [{ text: "4" }], textAlignment: "decimal", decimalAlignPercent: 70 },
-          { textBlocks: [{ text: "" }], textAlignment: "decimal", decimalAlignPercent: 70 },
           {
-            textBlocks: [{ text: "x.xx", style: "shiny" }],
+            textBlocks: [{ text: "", type: "text" }],
+            textAlignment: "decimal",
+            decimalAlignPercent: 70,
+          },
+          {
+            textBlocks: [{ text: "4", type: "text" }],
+            textAlignment: "decimal",
+            decimalAlignPercent: 70,
+          },
+          {
+            textBlocks: [{ text: "", type: "text" }],
+            textAlignment: "decimal",
+            decimalAlignPercent: 70,
+          },
+          {
+            textBlocks: [{ text: "x.xx", style: "shiny", type: "text" }],
             textAlignment: "decimal",
             decimalAlignPercent: 70,
           },
@@ -457,7 +477,7 @@ describe("Cut and paste", () => {
       '<div class="aiev3-line center"><span class="aiev3-tb">34</span></div>',
     );
     expect(thingCut?.getData("data/aiev3")).toEqual(
-      '[{"textBlocks":[{"text":"34"}],"textAlignment":"center","decimalAlignPercent":60}]',
+      '[{"textBlocks":[{"text":"34","type":"text"}],"textAlignment":"center","decimalAlignPercent":60}]',
     );
     fireEvent.blur(container);
     expect(mockSetText).toHaveBeenLastCalledWith(".45\n\nx.xx");
@@ -598,7 +618,7 @@ describe("Select all", () => {
       JSON.stringify({
         lines: [
           {
-            textBlocks: [{ text: "New programmer notes" }],
+            textBlocks: [{ text: "New programmer notes", type: "text" }],
             textAlignment: "left",
             decimalAlignPercent: 60,
           },
@@ -705,12 +725,13 @@ describe("Updates from above", () => {
     expect(screen.queryByText("New")).toBeInTheDocument();
     expect(screen.queryByText("<<shiny::input>>")).toBeInTheDocument();
     expect(editor.innerHTML).toEqual(
-      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
+      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
+        '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
         '<div class="aiev3-line left">' +
         '<span class="aiev3-tb">New&nbsp;</span><span class="aiev3-tb">&lt;&lt;shiny::input&gt;&gt;</span>' +
         "</div>" +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div></div>' +
-        "</div>",
+        "</div></div>",
     );
   });
 
@@ -722,12 +743,13 @@ describe("Updates from above", () => {
     const changeInput = screen.getByTestId("change-text-alignment");
     await user.click(changeInput);
     expect(editor.innerHTML).toEqual(
-      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
+      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
+        '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
         '<div class="aiev3-line center">' +
         '<span class="aiev3-tb">Before</span>' +
         "</div>" +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div></div>' +
-        "</div>",
+        "</div></div>",
     );
   });
 
@@ -739,13 +761,14 @@ describe("Updates from above", () => {
     const changeInput = screen.getByTestId("change-decimal-align-percent");
     await user.click(changeInput);
     expect(editor.innerHTML).toEqual(
-      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
+      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
+        '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
         '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span class="aiev3-tb">Before</span></span>' +
         '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;"><span class="aiev3-tb"> </span></span>' +
         "</div>" +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div></div>' +
-        "</div>",
+        "</div></div>",
     );
   });
 
@@ -757,12 +780,13 @@ describe("Updates from above", () => {
     const changeInput = screen.getByTestId("change-styles");
     await user.click(changeInput);
     expect(editor.innerHTML).toEqual(
-      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
+      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
+        '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
         '<div class="aiev3-line left">' +
         '<span class="aiev3-tb">Before</span>' +
         "</div>" +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;blue&quot;}}"></div>' +
-        "</div></div>",
+        "</div></div></div>",
     );
   });
 
@@ -775,20 +799,20 @@ describe("Updates from above", () => {
     let showMarkdown = screen.getByLabelText("Show markdown");
     await user.click(showMarkdown);
     expect(editor.innerHTML).toEqual(
-      '<div class="context-menu-handler" style="width: 100%; height: 100%;">' +
+      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
         '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
         '<div class="aiev3-markdown-line" data-text-alignment="left" data-decimal-align-percent="60">Before</div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
-        "</div></div>",
+        "</div></div></div>",
     );
     // Update text
     await user.click(screen.getByTestId("change-input"));
     expect(editor.innerHTML).toEqual(
-      '<div class="context-menu-handler" style="width: 100%; height: 100%;">' +
+      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
         '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
         '<div class="aiev3-markdown-line" data-text-alignment="left" data-decimal-align-percent="60">New &lt;&lt;shiny::input&gt;&gt;</div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
-        "</div></div>",
+        "</div></div></div>",
     );
     // Hide markdown
     fireEvent.contextMenu(editor.querySelectorAll(".aiev3-markdown-line")[0] as HTMLDivElement);
@@ -801,11 +825,11 @@ describe("Updates from above", () => {
     showMarkdown = screen.getByLabelText("Show markdown");
     await user.click(showMarkdown);
     expect(editor.innerHTML).toEqual(
-      '<div class="context-menu-handler" style="width: 100%; height: 100%;">' +
+      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
         '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
         '<div class="aiev3-markdown-line" data-text-alignment="left" data-decimal-align-percent="60">New ¬¬shiny::input&gt;&gt;</div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
-        "</div></div>",
+        "</div></div></div>",
     );
   });
 });

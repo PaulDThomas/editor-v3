@@ -554,35 +554,39 @@ export const EditorV3 = ({
         showLowMenu={spellCheck || !styleOnContextMenu}
       >
         <div
-          id={`${id}-editable`}
-          className={`aiev3-editing ${allowNewLine ? "multiline" : "singleline"}`}
+          className="aiev3-resize"
           style={styleRecalc}
-          contentEditable={
-            editable &&
-            (typeof setHtml === "function" ||
-              typeof setJson === "function" ||
-              typeof setText === "function")
-          }
-          suppressContentEditableWarning
-          role={
-            editable &&
-            (typeof setHtml === "function" ||
-              typeof setJson === "function" ||
-              typeof setText === "function")
-              ? "textbox"
-              : undefined
-          }
-          spellCheck={spellCheck}
-          ref={divRef}
-          onFocus={handleFocus}
-          onKeyUpCapture={handleKeyUp}
-          onCut={handleCopy}
-          onCopy={handleCopy}
-          onPasteCapture={handlePaste}
-          onKeyDownCapture={handleKeyDown}
-          onBlurCapture={handleBlur}
-          onFocusCapture={handleFocus}
-        />
+        >
+          <div
+            id={`${id}-editable`}
+            className={`aiev3-editing ${allowNewLine ? "multiline" : "singleline"}`}
+            contentEditable={
+              editable &&
+              (typeof setHtml === "function" ||
+                typeof setJson === "function" ||
+                typeof setText === "function")
+            }
+            suppressContentEditableWarning
+            role={
+              editable &&
+              (typeof setHtml === "function" ||
+                typeof setJson === "function" ||
+                typeof setText === "function")
+                ? "textbox"
+                : undefined
+            }
+            spellCheck={spellCheck}
+            ref={divRef}
+            onFocus={handleFocus}
+            onKeyUpCapture={handleKeyUp}
+            onCut={handleCopy}
+            onCopy={handleCopy}
+            onPasteCapture={handlePaste}
+            onKeyDownCapture={handleKeyDown}
+            onBlurCapture={handleBlur}
+            onFocusCapture={handleFocus}
+          />
+        </div>
       </ContextMenuHandler>
     </div>
   );

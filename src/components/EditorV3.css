@@ -14,16 +14,13 @@
   overflow: visible;
 }
 
-.aiev3.editing .aiev3-editing {
-  border: 1px solid black;
-  background-color: white;
+.aiev3-resize {
+  border: 1px dashed rgb(190, 190, 189);
+  border-radius: 6px;
 }
 
 .aiev3-editing {
   padding: 2px;
-  border: 1px dashed rgb(190, 190, 189);
-  border-radius: 6px;
-  overflow-wrap: break-word;
   outline: 0;
   align-content: start;
   vertical-align: top;
@@ -31,7 +28,13 @@
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  min-height: 1.2rem;
+  min-height: calc(100% - 5px);
+  height: fit-content;
+  width: calc(100% - 5px);
+}
+
+.aiev3.editing .aiev3-editing {
+  background-color: white;
 }
 
 .aiev3-line {
@@ -56,7 +59,7 @@
 .aiev3-line.left {
   display: flex;
   flex-direction: row;
-  justify-content: start;
+  justify-content: flex-start;
 }
 
 .aiev3-line.center {
@@ -101,4 +104,9 @@
 .aiev3-span-point.rhs {
   text-align: left;
   display: flex;
+}
+
+.aiev3 .at-block {
+  margin: -1px;
+  border: 1px solid black;
 }

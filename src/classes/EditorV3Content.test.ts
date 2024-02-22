@@ -22,7 +22,11 @@ describe("Check basic EditorV3Content", () => {
     testContent.styles = { shiny: { color: "pink" } };
     expect(JSON.parse(testContent.jsonString)).toEqual({
       lines: [
-        { textBlocks: [{ text: "12.34" }], textAlignment: "decimal", decimalAlignPercent: 30 },
+        {
+          textBlocks: [{ text: "12.34", type: "text" }],
+          textAlignment: "decimal",
+          decimalAlignPercent: 30,
+        },
       ],
       textAlignment: "decimal",
       decimalAlignPercent: 30,
@@ -41,11 +45,19 @@ describe("Check basic EditorV3Content", () => {
     expect(testContent.decimalAlignPercent).toEqual(80);
     expect(testContent.textAlignment).toEqual("center");
     expect(testContent.lines).toEqual([
-      { textBlocks: [{ text: "34.56" }], textAlignment: "center", decimalAlignPercent: 80 },
+      {
+        textBlocks: [{ text: "34.56", type: "text" }],
+        textAlignment: "center",
+        decimalAlignPercent: 80,
+      },
     ]);
     expect(JSON.parse(testContent.jsonString)).toEqual({
       lines: [
-        { textBlocks: [{ text: "34.56" }], textAlignment: "center", decimalAlignPercent: 80 },
+        {
+          textBlocks: [{ text: "34.56", type: "text" }],
+          textAlignment: "center",
+          decimalAlignPercent: 80,
+        },
       ],
       decimalAlignPercent: 80,
       textAlignment: "center",
@@ -80,8 +92,16 @@ describe("Check basic EditorV3Content", () => {
     expect(testContent.text).toEqual("Hello\n.World");
     expect(JSON.parse(testContent.jsonString)).toEqual({
       lines: [
-        { textBlocks: [{ text: "Hello" }], textAlignment: "left", decimalAlignPercent: 60 },
-        { textBlocks: [{ text: ".World" }], textAlignment: "left", decimalAlignPercent: 60 },
+        {
+          textBlocks: [{ text: "Hello", type: "text" }],
+          textAlignment: "left",
+          decimalAlignPercent: 60,
+        },
+        {
+          textBlocks: [{ text: ".World", type: "text" }],
+          textAlignment: "left",
+          decimalAlignPercent: 60,
+        },
       ],
       decimalAlignPercent: 60,
       textAlignment: "left",
@@ -101,8 +121,16 @@ describe("Check basic EditorV3Content", () => {
     expect(testContent.text).toEqual("Hello\n.World");
     expect(JSON.parse(testContent.jsonString)).toEqual({
       lines: [
-        { textBlocks: [{ text: "Hello" }], textAlignment: "decimal", decimalAlignPercent: 55 },
-        { textBlocks: [{ text: ".World" }], textAlignment: "decimal", decimalAlignPercent: 55 },
+        {
+          textBlocks: [{ text: "Hello", type: "text" }],
+          textAlignment: "decimal",
+          decimalAlignPercent: 55,
+        },
+        {
+          textBlocks: [{ text: ".World", type: "text" }],
+          textAlignment: "decimal",
+          decimalAlignPercent: 55,
+        },
       ],
       decimalAlignPercent: 55,
       textAlignment: "decimal",
@@ -130,10 +158,10 @@ describe("Content functions", () => {
   test("Merge and split lines", async () => {
     const testContent = new EditorV3Content("12\n34\n56");
     expect(testContent.upToPos(0, 0)).toEqual([
-      { textBlocks: [{ text: "" }], decimalAlignPercent: 60, textAlignment: "left" },
+      { textBlocks: [{ text: "", type: "text" }], decimalAlignPercent: 60, textAlignment: "left" },
     ]);
     expect(testContent.fromPos(2, 2)).toEqual([
-      { textBlocks: [{ text: "" }], decimalAlignPercent: 60, textAlignment: "left" },
+      { textBlocks: [{ text: "", type: "text" }], decimalAlignPercent: 60, textAlignment: "left" },
     ]);
     testContent.mergeLines(0);
     expect(testContent.text).toEqual("1234\n56");
@@ -371,17 +399,23 @@ describe("Content functions", () => {
       {
         decimalAlignPercent: 60,
         textAlignment: "left",
-        textBlocks: [{ text: "1" }, { text: "23", style: "shiny" }],
+        textBlocks: [
+          { text: "1", type: "text" },
+          { text: "23", style: "shiny", type: "text" },
+        ],
       },
       {
         decimalAlignPercent: 60,
         textAlignment: "left",
-        textBlocks: [{ text: "456", style: "shiny" }],
+        textBlocks: [{ text: "456", style: "shiny", type: "text" }],
       },
       {
         decimalAlignPercent: 60,
         textAlignment: "left",
-        textBlocks: [{ text: "7", style: "shiny" }, { text: "89" }],
+        textBlocks: [
+          { text: "7", style: "shiny", type: "text" },
+          { text: "89", type: "text" },
+        ],
       },
     ]);
     expect(
@@ -392,17 +426,26 @@ describe("Content functions", () => {
       {
         decimalAlignPercent: 60,
         textAlignment: "left",
-        textBlocks: [{ text: "1" }, { text: "23", style: "shiny" }],
+        textBlocks: [
+          { text: "1", type: "text" },
+          { text: "23", style: "shiny", type: "text" },
+        ],
       },
       {
         decimalAlignPercent: 60,
         textAlignment: "left",
-        textBlocks: [{ text: "45" }, { text: "6", style: "shiny" }],
+        textBlocks: [
+          { text: "45", type: "text" },
+          { text: "6", style: "shiny", type: "text" },
+        ],
       },
       {
         decimalAlignPercent: 60,
         textAlignment: "left",
-        textBlocks: [{ text: "7", style: "shiny" }, { text: "89" }],
+        textBlocks: [
+          { text: "7", type: "text", style: "shiny" },
+          { text: "89", type: "text" },
+        ],
       },
     ]);
   });

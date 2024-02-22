@@ -75,13 +75,14 @@ describe("Check basic EditorV3TextBlock", () => {
   test("Load Object", async () => {
     const obj = { text: "Hello world" };
     const testBlock = new EditorV3TextBlock(obj);
-    expect(testBlock).toEqual({ text: "Hello world" });
+    expect(testBlock).toEqual({ text: "Hello world", type: "text" });
 
     const obj2 = { text: "Hello world", style: "shiny" };
     const testBlock2 = new EditorV3TextBlock(obj2);
     expect(testBlock2).toEqual({
       text: "Hello world",
       style: "shiny",
+      type: "text",
     });
   });
 });
