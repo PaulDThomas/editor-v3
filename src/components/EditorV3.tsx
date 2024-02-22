@@ -1,4 +1,4 @@
-import { ContextMenuHandler, iMenuItem } from "@asup/context-menu";
+import { ContextMenuHandler, MenuItem } from "@asup/context-menu";
 import { isEqual } from "lodash";
 import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EditorV3Content } from "../classes/EditorV3Content";
@@ -216,9 +216,9 @@ export const EditorV3 = ({
   ]);
 
   // Set up menu items
-  const menuItems = useMemo((): iMenuItem[] => {
+  const menuItems = useMemo((): MenuItem[] => {
     if (contentProps && content) {
-      const styleMenuItem: iMenuItem = {
+      const styleMenuItem: MenuItem = {
         label: "Style",
         disabled: contentProps.showMarkdown,
         group: [

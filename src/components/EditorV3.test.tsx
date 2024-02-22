@@ -20,9 +20,9 @@ describe("Editor and functions", () => {
     const user = userEvent.setup();
     await act(async () => {
       render(
-        <div data-testid='container'>
+        <div data-testid="container">
           <EditorV3
-            id='test-editor'
+            id="test-editor"
             input={mockContent.jsonString}
             allowNewLine
           />
@@ -38,7 +38,7 @@ describe("Editor and functions", () => {
         '<div class="aiev3-line left"><span class="aiev3-tb">\u2009</span></div>' +
         '<div class="aiev3-line left"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x.xx</span></div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"' +
-        "></div></div></div> </div>",
+        "></div></div></div></div>",
     );
     const firstSpan = container.querySelector("span") as HTMLSpanElement;
     await user.click(firstSpan);
@@ -64,9 +64,9 @@ describe("Editor and functions", () => {
     const mockSetText = jest.fn();
     await act(async () => {
       render(
-        <div data-testid='container'>
+        <div data-testid="container">
           <EditorV3
-            id='test-editor'
+            id="test-editor"
             input={mockContent.jsonString}
             setJson={mockSetJson}
             setHtml={mockSetHtml}
@@ -149,9 +149,9 @@ describe("Cursor tests", () => {
     const mockSetText = jest.fn();
     await act(async () => {
       render(
-        <div data-testid='container'>
+        <div data-testid="container">
           <EditorV3
-            id='test-editor'
+            id="test-editor"
             input={mockContent.jsonString}
             setText={mockSetText}
             style={{ width: "200px" }}
@@ -253,9 +253,9 @@ describe("Menu styling - add", () => {
     const mockSetText = jest.fn();
     await act(async () => {
       render(
-        <div data-testid='container'>
+        <div data-testid="container">
           <EditorV3
-            id='test-editor'
+            id="test-editor"
             input={mockContent.jsonString}
             setText={mockSetText}
             style={{ width: "200px" }}
@@ -298,9 +298,9 @@ describe("Menu styling - change", () => {
     const mockSetText = jest.fn();
     await act(async () => {
       render(
-        <div data-testid='container'>
+        <div data-testid="container">
           <EditorV3
-            id='test-editor'
+            id="test-editor"
             input={mockContent.jsonString}
             setText={mockSetText}
             style={{ width: "200px" }}
@@ -346,9 +346,9 @@ describe("Menu styling - remove", () => {
     const mockSetText = jest.fn();
     await act(async () => {
       render(
-        <div data-testid='container'>
+        <div data-testid="container">
           <EditorV3
-            id='test-editor'
+            id="test-editor"
             input={mockContent.jsonString}
             setText={mockSetText}
             style={{ width: "200px" }}
@@ -391,9 +391,9 @@ describe("Menu styling - markdown", () => {
     const user = userEvent.setup();
     await act(async () => {
       render(
-        <div data-testid='container'>
+        <div data-testid="container">
           <EditorV3
-            id='test-editor'
+            id="test-editor"
             input={mockContent.jsonString}
             setJson={jest.fn()}
             style={{ width: "200px" }}
@@ -425,9 +425,9 @@ describe("Cut and paste", () => {
     const mockSetText = jest.fn();
     await act(async () => {
       render(
-        <div data-testid='container'>
+        <div data-testid="container">
           <EditorV3
-            id='test-editor'
+            id="test-editor"
             input={mockContent.jsonString}
             setText={mockSetText}
             style={{ width: "200px" }}
@@ -483,9 +483,9 @@ describe("Cut and paste", () => {
     const mockSetText2 = jest.fn();
     await act(async () => {
       render(
-        <div data-testid='container'>
+        <div data-testid="container">
           <EditorV3
-            id='test-editor-1'
+            id="test-editor-1"
             input={"Initial\ntext\n"}
             setText={mockSetText1}
             style={{ width: "200px" }}
@@ -493,7 +493,7 @@ describe("Cut and paste", () => {
             textAlignment={EditorV3Align.center}
           />
           <EditorV3
-            id='test-editor-2'
+            id="test-editor-2"
             input={""}
             setText={mockSetText2}
             style={{ width: "200px" }}
@@ -525,9 +525,9 @@ describe("Edge events", () => {
     const mockSetText = jest.fn();
     await act(async () => {
       render(
-        <div data-testid='container'>
+        <div data-testid="container">
           <EditorV3
-            id='test-editor'
+            id="test-editor"
             input={mockContent.jsonString}
             setText={mockSetText}
           />
@@ -544,9 +544,9 @@ describe("Edge events", () => {
     const mockSetText = jest.fn();
     await act(async () => {
       render(
-        <div data-testid='container'>
+        <div data-testid="container">
           <EditorV3
-            id='test-editor'
+            id="test-editor"
             input={mockContent.jsonString}
             setText={mockSetText}
           />
@@ -574,9 +574,9 @@ describe("Select all", () => {
     const user = userEvent.setup();
     const mockSet = jest.fn();
     render(
-      <div data-testid='container'>
+      <div data-testid="container">
         <EditorV3
-          id='programmernotes'
+          id="programmernotes"
           input={"Item 2 programmer notes"}
           textAlignment={EditorV3Align.left}
           setJson={mockSet}
@@ -615,9 +615,9 @@ describe("Undo/redo", () => {
   const TestContainer = () => {
     const [input, setInput] = useState("");
     return (
-      <div data-testid='container'>
+      <div data-testid="container">
         <EditorV3
-          id='test-editor'
+          id="test-editor"
           input={input}
           setJson={setInput}
           allowMarkdown
@@ -656,33 +656,33 @@ describe("Updates from above", () => {
     const [markdownSettings, setMarkdownSettings] = useState(defaultMarkdownSettings);
 
     return (
-      <div data-testid='container'>
+      <div data-testid="container">
         <button
-          data-testid='change-input'
+          data-testid="change-input"
           onClick={() => setInput("New <<shiny::input>>")}
         />
         <button
-          data-testid='change-text-alignment'
+          data-testid="change-text-alignment"
           onClick={() => setTextAlignment(EditorV3Align.center)}
         />
         <button
-          data-testid='change-decimal-align-percent'
+          data-testid="change-decimal-align-percent"
           onClick={() => {
             setDecimalAlignPercent(80);
             setTextAlignment(EditorV3Align.decimal);
           }}
         />
         <button
-          data-testid='change-styles'
+          data-testid="change-styles"
           onClick={() => setStyles({ shiny: { color: "blue" } })}
         />
         <button
-          data-testid='change-markdown-settings'
+          data-testid="change-markdown-settings"
           onClick={() => setMarkdownSettings({ ...defaultMarkdownSettings, styleStartTag: "¬¬" })}
         />
         <EditorV3
-          data-testid='editor'
-          id='test-editor'
+          data-testid="editor"
+          id="test-editor"
           input={input}
           setJson={setInput}
           allowMarkdown
@@ -710,7 +710,7 @@ describe("Updates from above", () => {
         '<span class="aiev3-tb">New&nbsp;</span><span class="aiev3-tb">&lt;&lt;shiny::input&gt;&gt;</span>' +
         "</div>" +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div></div>' +
-        "</div> ",
+        "</div>",
     );
   });
 
@@ -727,7 +727,7 @@ describe("Updates from above", () => {
         '<span class="aiev3-tb">Before</span>' +
         "</div>" +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div></div>' +
-        "</div> ",
+        "</div>",
     );
   });
 
@@ -745,7 +745,7 @@ describe("Updates from above", () => {
         '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;"><span class="aiev3-tb"> </span></span>' +
         "</div>" +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div></div>' +
-        "</div> ",
+        "</div>",
     );
   });
 
@@ -762,7 +762,7 @@ describe("Updates from above", () => {
         '<span class="aiev3-tb">Before</span>' +
         "</div>" +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;blue&quot;}}"></div>' +
-        "</div></div> ",
+        "</div></div>",
     );
   });
 
@@ -779,7 +779,7 @@ describe("Updates from above", () => {
         '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
         '<div class="aiev3-markdown-line" data-text-alignment="left" data-decimal-align-percent="60">Before</div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
-        "</div></div> ",
+        "</div></div>",
     );
     // Update text
     await user.click(screen.getByTestId("change-input"));
@@ -788,7 +788,7 @@ describe("Updates from above", () => {
         '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
         '<div class="aiev3-markdown-line" data-text-alignment="left" data-decimal-align-percent="60">New &lt;&lt;shiny::input&gt;&gt;</div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
-        "</div></div> ",
+        "</div></div>",
     );
     // Hide markdown
     fireEvent.contextMenu(editor.querySelectorAll(".aiev3-markdown-line")[0] as HTMLDivElement);
@@ -805,7 +805,7 @@ describe("Updates from above", () => {
         '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
         '<div class="aiev3-markdown-line" data-text-alignment="left" data-decimal-align-percent="60">New ¬¬shiny::input&gt;&gt;</div>' +
         '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
-        "</div></div> ",
+        "</div></div>",
     );
-  }, 500000);
+  });
 });
