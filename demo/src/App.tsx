@@ -25,7 +25,7 @@ export const App = (): JSX.Element => {
   );
   const [json, setJson] = useState<string>(initialValue);
   const [text, setText] = useState<string>("");
-  const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.decimal);
+  const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.left);
   const [editable, setEditable] = useState<boolean>(true);
   const [allowNewLine, setAllowNewLine] = useState<boolean>(true);
   const [decPct, setDecPct] = useState<number>(60);
@@ -41,21 +41,19 @@ export const App = (): JSX.Element => {
   };
 
   return (
-    <div className='app-holder'>
-      <div className='app-border'>
-        <div className='app-inner'>
-          <div className='row'>
-            <span className='label'>This is the input</span>
-            <span className='content debug'>
+    <div className="app-holder">
+      <div className="app-border">
+        <div className="app-inner">
+          <div className="row">
+            <span className="label">This is the input</span>
+            <span className="content">
               <EditorV3
                 id={"e1"}
                 input={json}
+                resize
                 setHtml={setHtml}
                 setText={setText}
-                setJson={(ret) => {
-                  console.log("Return JSON", ret);
-                  setJson(ret);
-                }}
+                setJson={setJson}
                 textAlignment={align}
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}
@@ -65,6 +63,7 @@ export const App = (): JSX.Element => {
                   width: "240px",
                 }}
                 spellCheck={false}
+                allowMarkdown
               />
             </span>
             <span>
@@ -78,11 +77,11 @@ export const App = (): JSX.Element => {
             </span>
           </div>
 
-          <div className='row'>
-            <span className='label'>Test config, readonly</span>
-            <span className='content'>
+          {/* <div className="row">
+            <span className="label">Test config, readonly</span>
+            <span className="content">
               <EditorV3
-                id='test-editor'
+                id="test-editor"
                 resize
                 input={JSON.stringify({
                   lines: [
@@ -103,11 +102,11 @@ export const App = (): JSX.Element => {
                 })}
               />
             </span>
-          </div>
+          </div> */}
 
-          <div className='row'>
-            <span className='label'>JSON input</span>
-            <span className='content'>
+          {/* <div className="row">
+            <span className="label">JSON input</span>
+            <span className="content">
               <EditorV3
                 id={"e2"}
                 input={input2}
@@ -127,11 +126,11 @@ export const App = (): JSX.Element => {
                 }}
               />
             </span>
-          </div>
+          </div> */}
 
-          <div className='row'>
-            <span className='label'>Text input (spelling)</span>
-            <span className='content'>
+          {/* <div className="row">
+            <span className="label">Text input (spelling)</span>
+            <span className="content">
               <EditorV3
                 id={"e3"}
                 input={input3}
@@ -148,13 +147,13 @@ export const App = (): JSX.Element => {
                 }}
               />
             </span>
-          </div>
+          </div> */}
 
           <hr />
 
-          <div className='row'>
-            <span className='label'>Allow new line</span>
-            <span className='content'>
+          <div className="row">
+            <span className="label">Allow new line</span>
+            <span className="content">
               <select
                 value={allowNewLine ? "true" : "false"}
                 onChange={(e) => {
@@ -167,9 +166,9 @@ export const App = (): JSX.Element => {
             </span>
           </div>
 
-          <div className='row'>
-            <span className='label'>Editable</span>
-            <span className='content'>
+          <div className="row">
+            <span className="label">Editable</span>
+            <span className="content">
               <select
                 value={editable ? "true" : "false"}
                 onChange={(e) => {
@@ -182,9 +181,9 @@ export const App = (): JSX.Element => {
             </span>
           </div>
 
-          <div className='row'>
-            <span className='label'>Alignment</span>
-            <span className='content'>
+          <div className="row">
+            <span className="label">Alignment</span>
+            <span className="content">
               <select
                 value={align}
                 onChange={(e) => {
@@ -204,9 +203,9 @@ export const App = (): JSX.Element => {
             </span>
           </div>
 
-          <div className='row'>
-            <span className='label'>Decimal percent</span>
-            <span className='content'>
+          <div className="row">
+            <span className="label">Decimal percent</span>
+            <span className="content">
               <input
                 type={"number"}
                 value={decPct}
@@ -217,22 +216,22 @@ export const App = (): JSX.Element => {
             </span>
           </div>
 
-          <div className='row'>
-            <span className='label'>Text</span>
-            <span className='content'>{text.replace(/\n/g, "\\n")}</span>
+          {/* <div className="row">
+            <span className="label">Text</span>
+            <span className="content">{text.replace(/\n/g, "\\n")}</span>
           </div>
-          <div className='row'>
-            <span className='label'>JSON</span>
-            <span className='content'>
+          <div className="row">
+            <span className="label">JSON</span>
+            <span className="content">
               <pre>{json === "" ? "" : JSON.stringify(JSON.parse(json), null, 2)}</pre>
             </span>
           </div>
-          <div className='row'>
-            <span className='label'>HTML</span>
-            <span className='content'>
+          <div className="row">
+            <span className="label">HTML</span>
+            <span className="content">
               <pre>{html.replace(/></g, ">\u2009<").split("\u2009").join("\n")}</pre>
             </span>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

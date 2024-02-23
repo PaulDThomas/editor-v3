@@ -11,14 +11,17 @@ describe("readV2DivElement", () => {
     expect(result.textBlocks[0].data).toEqual({
       style: undefined,
       text: "[b] CR, non-measurable disease: ",
+      type: "text",
     });
     expect(result.textBlocks[1].data).toEqual({
       style: "Optional",
       text: "Confirmed",
+      type: "text",
     });
     expect(result.textBlocks[2].data).toEqual({
       style: undefined,
       text: " CR response but subject has non-measurable disease at baseline.",
+      type: "text",
     });
   });
 
@@ -31,14 +34,17 @@ describe("readV2DivElement", () => {
     expect(result.textBlocks[0].data).toEqual({
       style: undefined,
       text: "[b] CR, non-measurable disease: ",
+      type: "text",
     });
     expect(result.textBlocks[1].data).toEqual({
       style: undefined,
       text: "Confirmed",
+      type: "text",
     });
     expect(result.textBlocks[2].data).toEqual({
       style: undefined,
       text: " CR response but subject has non-measurable disease at baseline.",
+      type: "text",
     });
   });
 
@@ -50,6 +56,7 @@ describe("readV2DivElement", () => {
     expect(result.textBlocks[0].data).toEqual({
       style: undefined,
       text: "",
+      type: "text",
     });
   });
 
@@ -62,6 +69,7 @@ describe("readV2DivElement", () => {
     expect(result.textBlocks[0].data).toEqual({
       style: undefined,
       text: "Hello world!",
+      type: "text",
     });
   });
 });

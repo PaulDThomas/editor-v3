@@ -490,14 +490,16 @@ describe("Render html text from v2 content", () => {
     const result = new EditorV3Content(textString);
     expect(result.lines.length).toEqual(3);
     expect(result.lines[0].textBlocks.map((t) => t.data)).toEqual([
-      { text: "N", style: "Notes" },
-      { text: "ote", style: "Optional" },
-      { text: "s", style: "Notes" },
-      { text: "  w", style: undefined },
+      { text: "N", style: "Notes", type: "text" },
+      { text: "ote", style: "Optional", type: "text" },
+      { text: "s", style: "Notes", type: "text" },
+      { text: "  w", style: undefined, type: "text" },
     ]);
-    expect(result.lines[1].textBlocks.map((t) => t.data)).toEqual([{ text: "", style: undefined }]);
+    expect(result.lines[1].textBlocks.map((t) => t.data)).toEqual([
+      { text: "", style: undefined, type: "text" },
+    ]);
     expect(result.lines[2].textBlocks.map((t) => t.data)).toEqual([
-      { text: "ork", style: undefined },
+      { text: "ork", style: undefined, type: "text" },
     ]);
   });
 });

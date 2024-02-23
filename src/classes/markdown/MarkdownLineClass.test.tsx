@@ -1,3 +1,4 @@
+import { MarkdownAtClass } from "./MarkdownAtClass";
 import { MarkdownLineClass } from "./MarkdownLineClass";
 import { IMarkdownSettings, defaultMarkdownSettings } from "./MarkdownSettings";
 import { MarkdownStyleClass } from "./MarkdownStyleClass";
@@ -12,9 +13,9 @@ describe("Test MarkdownLineClass", () => {
       markdownSettings: defaultMarkdownSettings,
     });
     expect(testMLC.markdownText).toBe("test");
-    expect(testMLC.toTextBlocks().map((tb) => tb.data)).toEqual([{ text: "test" }]);
+    expect(testMLC.toTextBlocks().map((tb) => tb.data)).toEqual([{ text: "test", type: "text" }]);
     // Self creation
-    expect(new MarkdownLineClass(testMLC.data)).toEqual(testMLC);
+    expect(new MarkdownLineClass(testMLC.data).data).toEqual(testMLC.data);
   });
 
   test("Initial constructor with style", async () => {
@@ -66,9 +67,9 @@ describe("Test MarkdownLineClass", () => {
       markdownSettings: defaultMarkdownSettings,
     });
     expect(testMSC.toTextBlocks().map((tb) => tb.data)).toEqual([
-      { style: "st1", text: "test1" },
-      { text: "test2" },
-      { style: "st2", text: "test3" },
+      { style: "st1", text: "test1", type: "text" },
+      { text: "test2", type: "text" },
+      { style: "st2", text: "test3", type: "text" },
     ]);
   });
 
@@ -108,5 +109,40 @@ describe("Test MarkdownLineClass", () => {
       parts: ["<st1:test>"],
       markdownSettings: defaultMarkdownSettings,
     });
+  });
+
+  test("Long style", async () => {
+    const mdstring = "<<st1::Hello large world person>> pie hollding @[shiny::@chicken@]   ";
+    const testMLC = new MarkdownLineClass({
+      line: mdstring,
+    });
+    expect(testMLC.data).toEqual({
+      parts: [
+        new MarkdownStyleClass({
+          text: "Hello large world person",
+          style: "st1",
+          startTag: "<<",
+          endTag: ">>",
+          nameEndTag: "::",
+        }),
+        " pie hollding ",
+        new MarkdownAtClass({
+          text: "@chicken",
+          style: "shiny",
+          startTag: "@[",
+          endTag: "@]",
+          nameEndTag: "::",
+        }),
+        "   ",
+      ],
+      markdownSettings: defaultMarkdownSettings,
+    });
+    expect(testMLC.markdownText).toEqual(mdstring);
+    expect(testMLC.toTextBlocks().map((tb) => tb.data)).toEqual([
+      { style: "st1", text: "Hello large world person", type: "text" },
+      { text: " pie hollding ", type: "text" },
+      { style: "shiny", text: "@chicken", type: "at" },
+      { text: "   ", type: "text" },
+    ]);
   });
 });

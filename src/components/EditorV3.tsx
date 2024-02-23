@@ -451,65 +451,61 @@ export const EditorV3 = ({
 
   const handlePaste = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
-      try {
-        if (divRef.current && contentProps) {
-          e.preventDefault();
-          e.stopPropagation();
-          const pos = getCaretPosition(divRef.current);
-          if (pos) {
-            const content = new EditorV3Content(divRef.current.innerHTML, {
-              textAlignment,
-              decimalAlignPercent,
-              styles: customStyleMap,
-            });
-            const lines: EditorV3Line[] = [];
-            const linesImport = (
-              e.clipboardData.getData("data/aiev3") !== ""
-                ? JSON.parse(e.clipboardData.getData("data/aiev3"))
-                : e.clipboardData
-                    .getData("text/plain")
-                    .split("\n")
-                    .map((t) => ({
-                      textBlocks: [{ text: t }],
-                      textAlignment,
-                      decimalAlignPercent,
-                    }))
-            ) as EditorV3LineImport[];
-            // Just text blocks if only one line is allowed
-            if (linesImport.length > 1 && !allowNewLine) {
-              const textBlocks: EditorV3TextBlock[] = linesImport
-                .flatMap((l) => l.textBlocks)
-                .map((tb) => new EditorV3TextBlock(tb));
-              lines.push(
-                new EditorV3Line(
-                  textBlocks,
-                  linesImport[0].textAlignment as EditorV3Align,
-                  linesImport[0].decimalAlignPercent,
-                ),
-              );
-            } else {
-              lines.push(...linesImport.map((l) => new EditorV3Line(JSON.stringify(l))));
-            }
-            // Splice in new data and set new content
-            content.splice(pos, lines);
-            pos.startLine = pos.startLine + lines.length - 1;
-            pos.startChar =
-              lines.length === 1
-                ? pos.startChar + lines[0].lineLength
-                : lines[lines.length - 1].lineLength;
-            setCurrentValue({
-              content,
-              pos: {
-                ...pos,
-                endLine: pos.startLine,
-                endChar: pos.startChar,
-              },
-              contentProps,
-            });
+      if (divRef.current && contentProps) {
+        e.preventDefault();
+        e.stopPropagation();
+        const pos = getCaretPosition(divRef.current);
+        if (pos) {
+          const content = new EditorV3Content(divRef.current.innerHTML, {
+            textAlignment,
+            decimalAlignPercent,
+            styles: customStyleMap,
+          });
+          const lines: EditorV3Line[] = [];
+          const linesImport = (
+            e.clipboardData.getData("data/aiev3") !== ""
+              ? JSON.parse(e.clipboardData.getData("data/aiev3"))
+              : e.clipboardData
+                  .getData("text/plain")
+                  .split("\n")
+                  .map((t) => ({
+                    textBlocks: [{ text: t }],
+                    textAlignment,
+                    decimalAlignPercent,
+                  }))
+          ) as EditorV3LineImport[];
+          // Just text blocks if only one line is allowed
+          if (linesImport.length > 1 && !allowNewLine) {
+            const textBlocks: EditorV3TextBlock[] = linesImport
+              .flatMap((l) => l.textBlocks)
+              .map((tb) => new EditorV3TextBlock(tb));
+            lines.push(
+              new EditorV3Line(
+                textBlocks,
+                linesImport[0].textAlignment as EditorV3Align,
+                linesImport[0].decimalAlignPercent,
+              ),
+            );
+          } else {
+            lines.push(...linesImport.map((l) => new EditorV3Line(JSON.stringify(l))));
           }
+          // Splice in new data and set new content
+          content.splice(pos, lines);
+          pos.startLine = pos.startLine + lines.length - 1;
+          pos.startChar =
+            lines.length === 1
+              ? pos.startChar + lines[0].lineLength
+              : lines[lines.length - 1].lineLength;
+          setCurrentValue({
+            content,
+            pos: {
+              ...pos,
+              endLine: pos.startLine,
+              endChar: pos.startChar,
+            },
+            contentProps,
+          });
         }
-      } catch (error) {
-        throw new Error(`Paste failed because: ${error}`);
       }
     },
     [

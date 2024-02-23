@@ -15,7 +15,9 @@ describe("Test readV3MarkdownElement", () => {
     const result = readV3MarkdownElement(div, defaultMarkdownSettings);
 
     // Assert the expected output
-    expect(result.textBlocks.map((tb) => tb.data)).toEqual([{ text: "Hello world!" }]);
+    expect(result.textBlocks.map((tb) => tb.data)).toEqual([
+      { text: "Hello world!", type: "text" },
+    ]);
     expect(result.decimalAlignPercent).toEqual(50);
     expect(result.textAlignment).toEqual(EditorV3Align.center);
   });
@@ -27,7 +29,7 @@ describe("Test readV3MarkdownElement", () => {
     const result = readV3MarkdownElement(div, defaultMarkdownSettings);
 
     expect(result.textBlocks.map((tb) => tb.data)).toEqual([
-      { text: "Hello world", style: "defaultStyle" },
+      { text: "Hello world", style: "defaultStyle", type: "text" },
     ]);
   });
 
@@ -40,7 +42,7 @@ describe("Test readV3MarkdownElement", () => {
     const result = readV3MarkdownElement(div, defaultMarkdownSettings);
 
     // Assert the expected output
-    expect(result.textBlocks.map((tb) => tb.data)).toEqual([{ text: "" }]);
+    expect(result.textBlocks.map((tb) => tb.data)).toEqual([{ text: "", type: "text" }]);
     expect(result.decimalAlignPercent).toEqual(60);
     expect(result.textAlignment).toEqual(EditorV3Align.left);
   });
@@ -58,9 +60,24 @@ describe("Test readV3MarkdownElement", () => {
 
     // Assert the expected output
     expect(result.textBlocks.map((tb) => tb.data)).toEqual([
-      { text: "hello", style: "st1" },
-      { text: " world " },
-      { text: "annoyed", style: "st2" },
+      { text: "hello", style: "st1", type: "text" },
+      { text: " world ", type: "text" },
+      { text: "annoyed", style: "st2", type: "text" },
+    ]);
+  });
+
+  test("React at block and styles", async () => {
+    // Create a mock HTMLDivElement with multiple styles
+    const div = document.createElement("div");
+    const s = document.createElement("span");
+    div.appendChild(s);
+    s.textContent = "@[@Hello world@] piece of @[iced::cake@]";
+    div.className = "aiev3-markdown-line";
+    const result = readV3MarkdownElement(div, defaultMarkdownSettings);
+    expect(result.textBlocks.map((tb) => tb.data)).toEqual([
+      { text: "@Hello world", type: "at" },
+      { text: " piece of ", type: "text" },
+      { text: "cake", style: "iced", type: "at" },
     ]);
   });
 });

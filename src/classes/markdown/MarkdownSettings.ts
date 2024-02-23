@@ -33,5 +33,5 @@ export const defaultMarkdownSettings = {
   calcConditionSeparator: "||",
   calcAndSeparator: "&&",
   atStartTag: "@[",
-  atEndTag: "]",
+  atEndTag: "@]",
 };

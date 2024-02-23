@@ -11,7 +11,7 @@ describe("Check basic EditorV3TextBlock", () => {
     expect(tempDiv.innerHTML).toEqual('<span class="aiev3-tb">Helloworld</span>');
     const testBlock2 = new EditorV3TextBlock("0");
     expect(testBlock2.text).toEqual("0");
-    expect(testBlock2.jsonString).toEqual('{"text":"0"}');
+    expect(testBlock2.jsonString).toEqual('{"text":"0","type":"text"}');
     const tempDiv2 = document.createElement("div");
     tempDiv2.appendChild(testBlock2.toHtml());
     expect(tempDiv2.innerHTML).toEqual('<span class="aiev3-tb">0</span>');
@@ -95,5 +95,62 @@ describe("Check markdown output on text block", () => {
   test("Markdown is correctly shown for defaultStyle", async () => {
     const testBlock = new EditorV3TextBlock({ text: "Hello world", style: "defaultStyle" });
     expect(testBlock.toMarkdown()).toEqual("<<Hello world>>");
+  });
+});
+
+describe("Check at correctly loaded, and eats its own tail", () => {
+  test("Load word", async () => {
+    const testBlock = new EditorV3TextBlock("@Hello");
+    expect(testBlock).toEqual({ text: "@Hello", type: "at" });
+    expect(testBlock.toMarkdown()).toEqual("@[@Hello@]");
+
+    const tempDiv = document.createElement("div");
+    tempDiv.appendChild(testBlock.toHtml());
+    expect(tempDiv.innerHTML).toEqual('<span class="aiev3-tb at-block">@Hello</span>');
+    expect(new EditorV3TextBlock(testBlock.toHtml())).toEqual(testBlock);
+
+    expect(testBlock.data).toEqual({ text: "@Hello", type: "at" });
+    expect(new EditorV3TextBlock(testBlock.data)).toEqual(testBlock);
+
+    expect(testBlock.jsonString).toEqual('{"text":"@Hello","type":"at"}');
+    expect(new EditorV3TextBlock(testBlock.jsonString)).toEqual(testBlock);
+  });
+
+  test("Load word with style", async () => {
+    const testBlock = new EditorV3TextBlock("@Hello", "shiny");
+    expect(testBlock).toEqual({ text: "@Hello", style: "shiny", type: "at" });
+    expect(testBlock.toMarkdown()).toEqual("@[shiny::@Hello@]");
+
+    const tempDiv = document.createElement("div");
+    tempDiv.appendChild(testBlock.toHtml());
+    expect(tempDiv.innerHTML).toEqual(
+      '<span class="aiev3-tb at-block editorv3style-shiny" data-style-name="shiny">@Hello</span>',
+    );
+    expect(new EditorV3TextBlock(testBlock.toHtml())).toEqual(testBlock);
+
+    expect(testBlock.data).toEqual({ text: "@Hello", style: "shiny", type: "at" });
+    expect(new EditorV3TextBlock(testBlock.data)).toEqual(testBlock);
+
+    expect(testBlock.jsonString).toEqual('{"text":"@Hello","style":"shiny","type":"at"}');
+    expect(new EditorV3TextBlock(testBlock.jsonString)).toEqual(testBlock);
+  });
+
+  test("Load span with style and space", async () => {
+    const testSpan = document.createElement("span");
+    testSpan.className = "editorv3style-shiny";
+    testSpan.dataset.styleName = "shiny";
+    testSpan.innerHTML = "@Hello world";
+    const testBlock = new EditorV3TextBlock(testSpan);
+
+    expect(testBlock).toEqual({ text: "@Hello world", style: "shiny", type: "at" });
+    expect(testBlock.toMarkdown()).toEqual("@[shiny::@Hello world@]");
+    expect(testBlock.typeStyle).toEqual("at:shiny");
+
+    const tempDiv = document.createElement("div");
+    tempDiv.appendChild(testBlock.toHtml());
+    expect(tempDiv.innerHTML).toEqual(
+      '<span class="aiev3-tb at-block editorv3style-shiny" data-style-name="shiny">@Hello&nbsp;world</span>',
+    );
+    expect(new EditorV3TextBlock(testBlock.toHtml())).toEqual(testBlock);
   });
 });

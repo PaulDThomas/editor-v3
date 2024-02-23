@@ -15,7 +15,7 @@ export class EditorV3TextBlock {
 
   // Read only variables
   get data() {
-    return { text: this.text, style: this.style };
+    return { text: this.text, style: this.style, type: this.type };
   }
   get jsonString(): string {
     return JSON.stringify(this.data);
@@ -26,30 +26,41 @@ export class EditorV3TextBlock {
       this.text === ""
         ? "\u2009"
         : this.text.replace(/^ /, "\u00A0").replace(/ $/, "\u00A0").replaceAll(" ", "\u00A0\uFEFF");
-    const words = text.split("\uFEFF");
     const ret = new DocumentFragment();
-    words.forEach((word) => {
+    if (this.type === "at") {
       const span = document.createElement("span");
-      span.classList.add("aiev3-tb");
-      const textNode = document.createTextNode(word);
+      span.classList.add("aiev3-tb", "at-block");
+      const textNode = document.createTextNode(text.replaceAll("\uFEFF", ""));
       span.appendChild(textNode);
       if (this.style) {
         span.classList.add(`editorv3style-${this.style}`);
         span.dataset.styleName = this.style;
       }
       ret.append(span);
-    });
+    } else {
+      const words = text.split("\uFEFF");
+      words.forEach((word) => {
+        const span = document.createElement("span");
+        span.classList.add("aiev3-tb");
+        const textNode = document.createTextNode(word);
+        span.appendChild(textNode);
+        if (this.style) {
+          span.classList.add(`editorv3style-${this.style}`);
+          span.dataset.styleName = this.style;
+        }
+        if (word.startsWith("@")) span.classList.add("at-block");
+        ret.append(span);
+      });
+    }
     return ret;
   }
   public toMarkdown(markdownSettings: IMarkdownSettings = defaultMarkdownSettings): string {
-    if (!this.style) return this.text;
-    else {
-      return `${markdownSettings.styleStartTag}${
-        this.style !== markdownSettings.defaultStyle ? this.style : ""
-      }${this.style !== markdownSettings.defaultStyle ? markdownSettings.styleNameEndTag : ""}${
-        this.text
-      }${markdownSettings.styleEndTag}`;
-    }
+    return (
+      `${this.type === "at" ? markdownSettings.atStartTag : this.style ? markdownSettings.styleStartTag : ""}` +
+      `${this.style && this.style !== markdownSettings.defaultStyle ? this.style + markdownSettings.styleNameEndTag : ""}` +
+      this.text +
+      `${this.type === "at" ? markdownSettings.atEndTag : this.style ? markdownSettings.styleEndTag : ""}`
+    );
   }
 
   // Overloads
@@ -59,7 +70,7 @@ export class EditorV3TextBlock {
       | Text
       | EditorV3TextBlock
       | DocumentFragment
-      | { text: string; style?: string }
+      | { text: string; style?: string; type?: EditorV3TextBlockType }
       | string,
     style?: string,
   ) {
@@ -109,6 +120,7 @@ export class EditorV3TextBlock {
     else {
       this.text = arg.text;
       this.style = arg.style;
+      this.type = arg.type ?? "text";
     }
 
     // Always take style if provided
@@ -116,5 +128,6 @@ export class EditorV3TextBlock {
 
     // Fix characters
     this.text = this.text.replace(/[\u2009-\u200F\uFEFF\t\r\n]/g, ""); // Remove undesirable non-printing chars
+    if (this.text.startsWith("@")) this.type = "at";
   }
 }

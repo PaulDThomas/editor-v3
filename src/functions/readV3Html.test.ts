@@ -70,4 +70,18 @@ describe("readV3Html tests", () => {
     expect(result.lines[0].textBlocks).toEqual([new EditorV3TextBlock("Hello world")]);
     expect(result.lines[1].textBlocks).toEqual([new EditorV3TextBlock("How are you?")]);
   });
+
+  test("Read in at block", async () => {
+    const text = `
+      <div class="aiev3-line center">
+        <span class="aiev3-tb at-block">@Hello world</span>
+      </div>
+      `
+      .replaceAll(/[\r\n\t]/g, "")
+      .replaceAll(/>\s{1,}</g, "><")
+      .trim();
+    const result = readV3Html(text);
+    expect(result.lines.length).toEqual(1);
+    expect(result.lines[0].textBlocks).toEqual([new EditorV3TextBlock("@Hello world")]);
+  });
 });

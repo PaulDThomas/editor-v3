@@ -1,4 +1,4 @@
-import { EditorV3TextBlock } from "./EditorV3TextBlock";
+import { EditorV3TextBlock, EditorV3TextBlockType } from "./EditorV3TextBlock";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 
 /**
@@ -46,7 +46,7 @@ export interface EditorV3ContentProps {
  * Line import object for EditorV3
  */
 export interface EditorV3LineImport {
-  textBlocks: { text: string; style?: string }[] | EditorV3TextBlock[];
+  textBlocks: { text: string; style?: string; type: EditorV3TextBlockType }[] | EditorV3TextBlock[];
   textAlignment?: string;
   decimalAlignPercent?: number;
 }
