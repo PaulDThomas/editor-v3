@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { getTextNodeAtOffset } from "./getTextNodeAtOffset";
 
 describe("Test getTextNodeAtOffset", () => {

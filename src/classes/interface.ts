@@ -32,11 +32,11 @@ export interface EditorV3LineProps {
  * @param caret Current position of the caret
  * @param styles Available styles
  * @param showMarkdown Print markdown syntax instead of rendering
+ * @param markdownSettings Settings for markdown
  */
 export interface EditorV3ContentProps {
   textAlignment?: EditorV3Align;
   decimalAlignPercent?: number;
-  caret?: EditorV3Position;
   styles?: EditorV3Styles;
   showMarkdown?: boolean;
   markdownSettings?: IMarkdownSettings;

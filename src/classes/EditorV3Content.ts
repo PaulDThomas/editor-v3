@@ -9,6 +9,7 @@ import {
 } from "./interface";
 import { IMarkdownSettings, defaultMarkdownSettings } from "./markdown/MarkdownSettings";
 import { readV3Html } from "../functions/readV3Html";
+import { MarkdownLineClass } from "./markdown/MarkdownLineClass";
 
 /**
  * Represents the content of an EditorV3 instance.
@@ -59,7 +60,12 @@ export class EditorV3Content {
   }
 
   private _markdownSettings = defaultMarkdownSettings;
-  private _showMarkdown = false;
+  get markdownSettings() {
+    return this._markdownSettings;
+  }
+  set markdownSettings(newSettings: IMarkdownSettings) {
+    this._markdownSettings = newSettings;
+  }
 
   /**
    * Current lines in the editor
@@ -84,8 +90,13 @@ export class EditorV3Content {
     return ret;
   }
 
+  /**
+   * Render Markdown in an Fragment
+   * @param markdownSettings Markdown settings, current settings by default
+   * @returns Documentfragment with rendered markdown
+   */
   public toMarkdownHtml(
-    markdownSettings: IMarkdownSettings = defaultMarkdownSettings,
+    markdownSettings: IMarkdownSettings = this._markdownSettings,
   ): DocumentFragment {
     const ret = new DocumentFragment();
     this.lines.forEach((line) => {
@@ -294,17 +305,63 @@ export class EditorV3Content {
       }
       // Remove under selected
       this.splice(newPos);
-      if (pos.isCollapsed) {
-        newPos.endLine = newPos.startLine;
-        newPos.endChar = newPos.startChar;
-      }
+      newPos.endLine = newPos.startLine;
+      newPos.endChar = newPos.startChar;
       return newPos;
     }
     return pos;
   }
 
-  public splice(pos: EditorV3Position, newLines?: EditorV3Line[]): EditorV3Line[] {
+  /**
+   * Splice, when converting everything to normal text
+   * @param pos Position in markdown
+   * @param newLines New lines (not markdown)
+   * @returns Markdown cut as lines
+   */
+  private spliceMarkdown(pos: EditorV3Position, newLines?: EditorV3Line[]): EditorV3Line[] {
+    const thisMarkdown = new EditorV3Content(
+      this.lines.map((l) => l.toMarkdown(this._markdownSettings)).join("\n"),
+    );
+    const newLinesMarkdown = newLines?.map(
+      (l) => new EditorV3Line(l.toMarkdown(this._markdownSettings)),
+    );
     if (
+      pos.startLine < thisMarkdown.lines.length &&
+      pos.startLine <= pos.endLine &&
+      !(pos.startLine === pos.endLine && pos.endChar < pos.startChar)
+    ) {
+      const ret: EditorV3Line[] = thisMarkdown.subLines(pos);
+      const u = thisMarkdown.upToPos(pos.startLine, pos.startChar);
+      const f = thisMarkdown.fromPos(pos.endLine, pos.endChar);
+      thisMarkdown.lines = [...u, ...(newLinesMarkdown ?? []), ...f];
+      // Change back from markdown
+      this.lines = thisMarkdown.lines.map(
+        (l) =>
+          new EditorV3Line(
+            new MarkdownLineClass({ line: l.lineText }).toTextBlocks(),
+            this.textAlignment,
+            this.decimalAlignPercent,
+          ),
+      );
+      this.mergeLines(
+        pos.startLine +
+          (newLines?.length ?? 0) -
+          (pos.startChar < this.lines[pos.startLine].lineLength ? 1 : 0),
+      );
+      newLines?.length && this.mergeLines(pos.startLine);
+      return ret;
+    }
+    return [];
+  }
+
+  public splice(
+    pos: EditorV3Position,
+    newLines?: EditorV3Line[],
+    asMarkdown = false,
+  ): EditorV3Line[] {
+    if (asMarkdown) {
+      return this.spliceMarkdown(pos, newLines);
+    } else if (
       pos.startLine < this.lines.length &&
       pos.startLine <= pos.endLine &&
       !(pos.startLine === pos.endLine && pos.endChar < pos.startChar)

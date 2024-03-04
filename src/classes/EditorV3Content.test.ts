@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { EditorV3Content } from "./EditorV3Content";
 import { EditorV3Line } from "./EditorV3Line";
 import { EditorV3Align } from "./interface";
@@ -434,5 +435,114 @@ describe("Render markdown text from content", () => {
     );
     // Eat your own tail
     expect(new EditorV3Content(div.innerHTML)).toEqual(testContent);
+  });
+});
+
+describe("Render html text from v2 content", () => {
+  test("Load multiple v2 lines", async () => {
+    const textString =
+      `<div classname="aie-text" data-key="2v9v5" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":1,"style":"Notes"},{"offset":4,"length":1,"style":"Notes"},{"offset":1,"length":3,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">N</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  w</div>` +
+      `<div classname="aie-text" data-key="1u61b" data-type="unstyled" data-inline-style-ranges='[]'></div>` +
+      `<div classname="aie-text" data-key="4l4fu" data-type="unstyled" data-inline-style-ranges='[]'>ork</div>`;
+    const result = new EditorV3Content(textString);
+    expect(result.lines.length).toEqual(3);
+    expect(result.lines[0].textBlocks.map((t) => t.data)).toEqual([
+      { text: "N", style: "Notes" },
+      { text: "ote", style: "Optional" },
+      { text: "s", style: "Notes" },
+      { text: "  w", style: undefined },
+    ]);
+    expect(result.lines[1].textBlocks.map((t) => t.data)).toEqual([{ text: "", style: undefined }]);
+    expect(result.lines[2].textBlocks.map((t) => t.data)).toEqual([
+      { text: "ork", style: undefined },
+    ]);
+  });
+});
+
+describe("Splice markdown tests", () => {
+  test("Bad position return empty array", async () => {
+    const testContent = new EditorV3Content("123\n456\n789");
+    const pasteContent = new EditorV3Content("abc");
+    const pos = {
+      startLine: 1,
+      startChar: 1,
+      endLine: 0,
+      endChar: 1,
+      isCollapsed: true,
+    };
+    expect(testContent.splice(pos, pasteContent.lines, true)).toEqual([]);
+    expect(testContent.text).toEqual("123\n456\n789");
+  });
+  test("Easy insert", async () => {
+    const testContent = new EditorV3Content("123\n456\n789");
+    const pasteContent = new EditorV3Content("abc");
+    const pos = {
+      startLine: 0,
+      startChar: 1,
+      endLine: 0,
+      endChar: 1,
+      isCollapsed: true,
+    };
+    testContent.splice(pos, pasteContent.lines, true);
+    expect(testContent.text).toEqual("1abc23\n456\n789");
+  });
+  test("Easy update", async () => {
+    const testContent = new EditorV3Content("123\n456\n789");
+    const pasteContent = new EditorV3Content("abc");
+    const pos = {
+      startLine: 0,
+      startChar: 1,
+      endLine: 0,
+      endChar: 2,
+      isCollapsed: false,
+    };
+    const splice = testContent.splice(pos, pasteContent.lines, true);
+    expect(testContent.text).toEqual("1abc3\n456\n789");
+    expect(splice.map((l) => l.lineText).join("\n")).toEqual("2");
+  });
+  test("Harder update", async () => {
+    const testContent = new EditorV3Content("123\n456\n789");
+    const pasteContent = new EditorV3Content("ab\nc");
+    const pos = {
+      startLine: 0,
+      startChar: 1,
+      endLine: 2,
+      endChar: 3,
+      isCollapsed: false,
+    };
+    const splice = testContent.splice(pos, pasteContent.lines, true);
+    expect(testContent.text).toEqual("1ab\nc");
+    expect(splice.map((l) => l.lineText).join("\n")).toEqual("23\n456\n789");
+  });
+  test("Splice with styles", async () => {
+    const testContent = new EditorV3Content(
+      JSON.stringify({
+        lines: [{ textBlocks: [{ text: "34.56", style: "shiny" }] }],
+        styles: { shiny: { color: "pink" }, dull: { color: "grey" } },
+        textAlignment: EditorV3Align.center,
+        decimalAlignPercent: 80,
+      }),
+    );
+    expect(testContent.toMarkdownHtml().textContent).toEqual("<<shiny::34.56>>");
+    const pasteContent = new EditorV3Line(`{"textBlocks":[{"text":"abc","style":"dull"}]}`);
+    const pos = {
+      startLine: 0,
+      startChar: 1,
+      endLine: 0,
+      endChar: 1,
+      isCollapsed: true,
+    };
+    const splice = testContent.splice(pos, [pasteContent], true);
+    expect(testContent.toMarkdownHtml().textContent).toEqual("<<<dull::abc>><shiny::34.56>>");
+    expect(testContent.text).toEqual("<abc<shiny::34.56>>");
+    expect(splice.map((l) => l.lineText).join("\n")).toEqual("");
+
+    // Change markdown settings
+    testContent.markdownSettings = {
+      ...testContent.markdownSettings,
+      styleStartTag: "¬¬",
+      styleEndTag: "^^",
+    };
+    expect(testContent.toMarkdownHtml().textContent).toEqual("<¬¬dull::abc^^<shiny::34.56>>");
   });
 });

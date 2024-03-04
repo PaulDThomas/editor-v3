@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { readV3Html } from "./readV3Html";
 import { EditorV3Align } from "../classes/interface";
 import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";

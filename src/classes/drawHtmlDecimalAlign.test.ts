@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import { drawHtmlDecimalAlign } from "./drawHtmlDecimalAlign";
 import { EditorV3TextBlock } from "./EditorV3TextBlock";
 
