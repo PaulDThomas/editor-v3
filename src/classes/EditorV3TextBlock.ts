@@ -1,3 +1,4 @@
+import { drawAt } from "../functions/drawAt";
 import { IMarkdownSettings, defaultMarkdownSettings } from "./markdown/MarkdownSettings";
 
 export type EditorV3TextBlockType = "text" | "at";
@@ -28,28 +29,23 @@ export class EditorV3TextBlock {
         : this.text.replace(/^ /, "\u00A0").replace(/ $/, "\u00A0").replaceAll(" ", "\u00A0\uFEFF");
     const ret = new DocumentFragment();
     if (this.type === "at") {
-      const span = document.createElement("span");
-      span.classList.add("aiev3-tb", "at-block");
-      const textNode = document.createTextNode(text.replaceAll("\uFEFF", ""));
-      span.appendChild(textNode);
-      if (this.style) {
-        span.classList.add(`editorv3style-${this.style}`);
-        span.dataset.styleName = this.style;
-      }
-      ret.append(span);
+      ret.append(drawAt(text, this.style));
     } else {
       const words = text.split("\uFEFF");
       words.forEach((word) => {
-        const span = document.createElement("span");
-        span.classList.add("aiev3-tb");
-        const textNode = document.createTextNode(word);
-        span.appendChild(textNode);
-        if (this.style) {
-          span.classList.add(`editorv3style-${this.style}`);
-          span.dataset.styleName = this.style;
+        if (word.startsWith("@")) {
+          ret.append(drawAt(word, this.style));
+        } else {
+          const span = document.createElement("span");
+          span.classList.add("aiev3-tb");
+          const textNode = document.createTextNode(word);
+          span.appendChild(textNode);
+          if (this.style) {
+            span.classList.add(`editorv3style-${this.style}`);
+            span.dataset.styleName = this.style;
+          }
+          ret.append(span);
         }
-        if (word.startsWith("@")) span.classList.add("at-block");
-        ret.append(span);
       });
     }
     return ret;
