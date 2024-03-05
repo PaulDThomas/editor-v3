@@ -38,7 +38,7 @@
   ],
   "scripts": {
     "build": "parcel build src/main.ts",
-    "start": "parcel demo/index.html --dist-dir demo/dist",
+    "start": "rmdir /q/s .\\.parcel-cache && parcel demo/index.html --dist-dir demo/dist",
     "prepare": "husky",
     "test": "jest",
     "test:watch": "jest --watch"

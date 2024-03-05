@@ -153,4 +153,18 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     );
     expect(new EditorV3TextBlock(testBlock.toHtml())).toEqual(testBlock);
   });
+
+  test("Create HTML with an @ in the middle", async () => {
+    const testBlock = new EditorV3TextBlock("Hello @world", "shiny");
+    // Expect text/markdown to render one block
+    expect(testBlock.toHtml().textContent).toEqual("Hello\u00A0@world");
+    expect(testBlock.toMarkdown()).toEqual("<<shiny::Hello @world>>");
+    // Expect HTML to split block into two spans
+    const tempDiv = document.createElement("div");
+    tempDiv.appendChild(testBlock.toHtml());
+    expect(tempDiv.innerHTML).toEqual(
+      '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;</span>' +
+        '<span class="aiev3-tb at-block editorv3style-shiny" data-style-name="shiny">@world</span>',
+    );
+  });
 });

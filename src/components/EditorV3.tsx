@@ -15,7 +15,6 @@ import { IMarkdownSettings, defaultMarkdownSettings } from "../classes/markdown/
 import { applyStylesToHTML } from "../functions/applyStylesToHTML";
 import { getCaretPosition } from "../functions/getCaretPosition";
 import { moveCursor } from "../functions/moveCursor";
-import { redraw } from "../functions/redraw";
 import { setCaretPosition } from "../functions/setCaretPosition";
 import { useDebounceStack } from "../hooks/useDebounceStack";
 import "./EditorV3.css";
@@ -89,7 +88,7 @@ export const EditorV3 = ({
     (ret: EditorV3State) => {
       // Redraw dummay for information
       const dummyNode = document.createElement("div");
-      redraw(dummyNode, ret.content, false, markdownSettings);
+      ret.content.redraw(dummyNode, false, markdownSettings);
       const html = dummyNode.innerHTML ?? "";
       const text = ret.content.text;
       const json = ret.content.jsonString;
@@ -106,13 +105,12 @@ export const EditorV3 = ({
   // Redraw element
   const redrawElement = useCallback((ret: EditorV3State) => {
     if (divRef.current) {
-      redraw(
+      ret.content.redraw(
         divRef.current,
-        ret.content,
         ret.contentProps.showMarkdown ?? false,
         ret.contentProps.markdownSettings ?? defaultMarkdownSettings,
+        ret.pos,
       );
-      if (ret.pos) setCaretPosition(divRef.current, ret.pos);
     }
   }, []);
   const {
@@ -581,6 +579,7 @@ export const EditorV3 = ({
             onKeyDownCapture={handleKeyDown}
             onBlurCapture={handleBlur}
             onFocusCapture={handleFocus}
+            // onMouseUpCapture={handleMouseUp}
           />
         </div>
       </ContextMenuHandler>

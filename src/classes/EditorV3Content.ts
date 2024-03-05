@@ -1,3 +1,6 @@
+import { applyStylesToHTML } from "../functions/applyStylesToHTML";
+import { readV3Html } from "../functions/readV3Html";
+import { setCaretPosition } from "../functions/setCaretPosition";
 import { EditorV3Line } from "./EditorV3Line";
 import { EditorV3TextBlock } from "./EditorV3TextBlock";
 import {
@@ -7,9 +10,8 @@ import {
   EditorV3Position,
   EditorV3Styles,
 } from "./interface";
-import { IMarkdownSettings, defaultMarkdownSettings } from "./markdown/MarkdownSettings";
-import { readV3Html } from "../functions/readV3Html";
 import { MarkdownLineClass } from "./markdown/MarkdownLineClass";
+import { IMarkdownSettings, defaultMarkdownSettings } from "./markdown/MarkdownSettings";
 
 /**
  * Represents the content of an EditorV3 instance.
@@ -408,5 +410,25 @@ export class EditorV3Content {
       }
     }
     return this;
+  }
+
+  public redraw(
+    el: Element,
+    showMarkdown: boolean,
+    markdownSettings: IMarkdownSettings,
+    pos?: EditorV3Position | null,
+  ) {
+    el.innerHTML = "";
+    if (showMarkdown) {
+      el.append(this.toMarkdownHtml(markdownSettings));
+    } else {
+      el.append(this.toHtml());
+    }
+    // Update height and styles after render
+    [...el.querySelectorAll(".aiev3-line")].forEach((line) => {
+      // Apply styles
+      applyStylesToHTML(line as HTMLDivElement, this.styles);
+    });
+    if (pos) setCaretPosition(el, pos);
   }
 }

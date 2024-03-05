@@ -219,14 +219,14 @@ export const App = (): JSX.Element => {
           {/* <div className="row">
             <span className="label">Text</span>
             <span className="content">{text.replace(/\n/g, "\\n")}</span>
-          </div>
+          </div> */}
           <div className="row">
             <span className="label">JSON</span>
             <span className="content">
               <pre>{json === "" ? "" : JSON.stringify(JSON.parse(json), null, 2)}</pre>
             </span>
           </div>
-          <div className="row">
+          {/* <div className="row">
             <span className="label">HTML</span>
             <span className="content">
               <pre>{html.replace(/></g, ">\u2009<").split("\u2009").join("\n")}</pre>
