@@ -15,9 +15,9 @@ export function setCaretPosition(el: Node, pos: EditorV3Position): EditorV3Posit
         range.setEnd(l.node, l.offset);
       }
       const sel = window.getSelection();
-      if (sel) {
-        sel?.removeAllRanges();
-        sel?.addRange(range);
+      if (sel && document.contains(range.startContainer) && document.contains(range.endContainer)) {
+        sel.removeAllRanges();
+        sel.addRange(range);
       }
     }
     const ret = el instanceof HTMLDivElement ? getCaretPosition(el) : null;
