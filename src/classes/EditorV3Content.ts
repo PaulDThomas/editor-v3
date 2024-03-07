@@ -250,6 +250,8 @@ export class EditorV3Content implements EditorV3Import {
         const r = readV3Html(input.innerHTML, props);
         this.copyImport(r);
         this._caretPosition = getCaretPosition(input);
+        if (this._caretPosition)
+          this.lines[this._caretPosition.startLine].setActiveBlock(this._caretPosition);
       } else {
         // Check for stringified class input
         const jsonInput: EditorV3Import = JSON.parse(input);
@@ -529,6 +531,10 @@ export class EditorV3Content implements EditorV3Import {
    * @param el DOM element to render inside
    */
   public redraw(el: Element) {
+    // Set active block
+    this._caretPosition &&
+      this.lines[this._caretPosition.startLine].setActiveBlock(this._caretPosition);
+    // Draw HTML
     el.innerHTML = "";
     if (this._showMarkdown) {
       el.append(this.toMarkdownHtml(this._markdownSettings));
@@ -541,9 +547,7 @@ export class EditorV3Content implements EditorV3Import {
       applyStylesToHTML(line as HTMLDivElement, this._styles);
     });
     // Set caret position
-    if (this._caretPosition) {
-      setCaretPosition(el, this._caretPosition);
-    }
+    this._caretPosition && setCaretPosition(el, this._caretPosition);
   }
 
   public handleKeydown(e: React.KeyboardEvent<HTMLDivElement>) {
@@ -582,4 +586,22 @@ export class EditorV3Content implements EditorV3Import {
       this._caretPosition = moveCursor(this, this._caretPosition, e);
     }
   }
+
+  // public handleMouseUp(e: React.MouseEvent<HTMLDivElement>) {
+  //   const pos = getCaretPosition(e.currentTarget);
+  //   if (pos) {
+  //     this._caretPosition = pos;
+  //   }
+  //   if (this._caretPosition)
+  //     this.lines[this._caretPosition.startLine].setActiveBlock(this._caretPosition);
+  // }
+
+  // public handleKeyUp(e: React.KeyboardEvent<HTMLDivElement>) {
+  //   const pos = getCaretPosition(e.currentTarget);
+  //   if (pos) {
+  //     this._caretPosition = pos;
+  //   }
+  //   if (this._caretPosition)
+  //     this.lines[this._caretPosition.startLine].setActiveBlock(this._caretPosition);
+  // }
 }

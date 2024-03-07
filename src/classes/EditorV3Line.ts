@@ -5,7 +5,12 @@ import { readV3MarkdownElement } from "../functions/readV3MarkdownElement";
 import { EditorV3ContentPropNames, defaultContentProps } from "./EditorV3Content";
 import { EditorV3TextBlock } from "./EditorV3TextBlock";
 import { drawHtmlDecimalAlign } from "./drawHtmlDecimalAlign";
-import { EditorV3Align, EditorV3ContentProps, EditorV3ContentPropsInput } from "./interface";
+import {
+  EditorV3Align,
+  EditorV3ContentProps,
+  EditorV3ContentPropsInput,
+  EditorV3Position,
+} from "./interface";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 
 export class EditorV3Line {
@@ -142,17 +147,27 @@ export class EditorV3Line {
     this._mergeBlocks();
   }
 
-  getStyleAt(char: number): string | undefined {
+  private getBlockAt(char: number): EditorV3TextBlock | undefined {
     let _counted = 0;
     for (let _i = 0; _i < this.textBlocks.length; _i++) {
       // Block containing startPos
       if (_counted <= char && _counted + this.textBlocks[_i].text.length >= char) {
-        return this.textBlocks[_i].style;
+        return this.textBlocks[_i];
       } else {
         _counted += this.textBlocks[_i].text.length;
       }
     }
     return undefined;
+  }
+
+  public getStyleAt(char: number): string | undefined {
+    return this.getBlockAt(char)?.style;
+  }
+
+  public setActiveBlock(pos: EditorV3Position) {
+    if (pos.isCollapsed) {
+      this.getBlockAt(pos.startChar)?.setActive(true);
+    }
   }
 
   public subBlocks(startPos: number, endPos?: number): EditorV3TextBlock[] {
@@ -170,12 +185,12 @@ export class EditorV3Line {
         _counted + this.textBlocks[_i].text.length >= startPos &&
         this.textBlocks[_i].text.slice(startPos - _counted, (endPos ?? Infinity) - _counted) !== ""
       ) {
-        ret.push(
-          new EditorV3TextBlock(
-            this.textBlocks[_i].text.slice(startPos - _counted, (endPos ?? Infinity) - _counted),
-            this.textBlocks[_i].style,
-          ),
+        const slicedBlock = new EditorV3TextBlock(
+          this.textBlocks[_i].text.slice(startPos - _counted, (endPos ?? Infinity) - _counted),
+          this.textBlocks[_i].style,
         );
+        if (this.textBlocks[_i].isActive) slicedBlock.setActive(true);
+        ret.push(slicedBlock);
       }
       // Block after start containing end
       else if (
@@ -183,12 +198,12 @@ export class EditorV3Line {
         endPos &&
         _counted + this.textBlocks[_i].text.length >= endPos
       ) {
-        ret.push(
-          new EditorV3TextBlock(
-            this.textBlocks[_i].text.slice(0, endPos - _counted),
-            this.textBlocks[_i].style,
-          ),
+        const slicedBlock = new EditorV3TextBlock(
+          this.textBlocks[_i].text.slice(0, endPos - _counted),
+          this.textBlocks[_i].style,
         );
+        if (this.textBlocks[_i].isActive) slicedBlock.setActive(true);
+        ret.push(slicedBlock);
       }
       // Block after start and before end
       else if (

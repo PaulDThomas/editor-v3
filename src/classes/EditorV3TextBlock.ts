@@ -12,6 +12,7 @@ export class EditorV3TextBlock {
   text: string;
   style?: string;
   type: EditorV3TextBlockType = "text";
+  isActive: boolean = false;
 
   get typeStyle(): string {
     return `${this.type}:${this.style ?? ""}`;
@@ -32,12 +33,12 @@ export class EditorV3TextBlock {
         : this.text.replace(/^ /, "\u00A0").replace(/ $/, "\u00A0").replaceAll(" ", "\u00A0\uFEFF");
     const ret = new DocumentFragment();
     if (this.type === "at") {
-      ret.append(drawAt(text, this.style));
+      ret.append(drawAt(text, this.style, this.isActive));
     } else {
       const words = text.split("\uFEFF");
       words.forEach((word) => {
         if (word.startsWith("@")) {
-          ret.append(drawAt(word, this.style));
+          ret.append(drawAt(word, this.style, this.isActive));
         } else {
           const span = document.createElement("span");
           span.classList.add("aiev3-tb");
@@ -47,6 +48,7 @@ export class EditorV3TextBlock {
             span.classList.add(`editorv3style-${this.style}`);
             span.dataset.styleName = this.style;
           }
+          if (this.isActive) span.classList.add("is-active");
           ret.append(span);
         }
       });
@@ -130,5 +132,9 @@ export class EditorV3TextBlock {
     // Fix characters
     this.text = this.text.replace(/[\u2009-\u200F\uFEFF\t\r\n]/g, ""); // Remove undesirable non-printing chars
     if (this.text.startsWith("@")) this.type = "at";
+  }
+
+  public setActive(active: boolean) {
+    this.isActive = active;
   }
 }

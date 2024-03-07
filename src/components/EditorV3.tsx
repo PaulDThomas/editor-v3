@@ -255,6 +255,18 @@ export const EditorV3 = ({
     [content, contentProps, setContent],
   );
 
+  const handleMouseUp = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (divRef.current) {
+        e.preventDefault();
+        e.stopPropagation();
+        const newContent = new EditorV3Content(divRef.current, contentProps);
+        setContent(newContent);
+      }
+    },
+    [contentProps, setContent],
+  );
+
   const handleCopy = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
       if (content && !content.showMarkdown && divRef.current) {
@@ -380,6 +392,7 @@ export const EditorV3 = ({
             onFocusCapture={handleFocus}
             onKeyDownCapture={handleKeyDown}
             onKeyUpCapture={handleKeyUp}
+            onMouseUpCapture={handleMouseUp}
             onPasteCapture={handlePaste}
           />
         </div>
