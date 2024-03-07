@@ -1,5 +1,5 @@
+import { defaultContentProps } from "../classes/EditorV3Content";
 import { EditorV3Align } from "../classes/interface";
-import { defaultMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 import { readV3MarkdownElement } from "./readV3MarkdownElement";
 
 describe("Test readV3MarkdownElement", () => {
@@ -8,25 +8,21 @@ describe("Test readV3MarkdownElement", () => {
     const div = document.createElement("div");
     div.innerText = "Hello world!";
     div.className = "aiev3-markdown-line";
-    div.dataset.decimalAlignPercent = "50";
-    div.dataset.textAlignment = EditorV3Align.center;
 
     // Call the function
-    const result = readV3MarkdownElement(div, defaultMarkdownSettings);
+    const result = readV3MarkdownElement(div, defaultContentProps);
 
     // Assert the expected output
     expect(result.textBlocks.map((tb) => tb.data)).toEqual([
       { text: "Hello world!", type: "text" },
     ]);
-    expect(result.decimalAlignPercent).toEqual(50);
-    expect(result.textAlignment).toEqual(EditorV3Align.center);
   });
 
   test("Default style", async () => {
     const div = document.createElement("div");
     div.textContent = "<<Hello world>>";
     div.className = "aiev3-markdown-line";
-    const result = readV3MarkdownElement(div, defaultMarkdownSettings);
+    const result = readV3MarkdownElement(div, defaultContentProps);
 
     expect(result.textBlocks.map((tb) => tb.data)).toEqual([
       { text: "Hello world", style: "defaultStyle", type: "text" },
@@ -39,7 +35,7 @@ describe("Test readV3MarkdownElement", () => {
     div.className = "aiev3-markdown-line";
 
     // Call the function
-    const result = readV3MarkdownElement(div, defaultMarkdownSettings);
+    const result = readV3MarkdownElement(div, defaultContentProps);
 
     // Assert the expected output
     expect(result.textBlocks.map((tb) => tb.data)).toEqual([{ text: "", type: "text" }]);
@@ -56,7 +52,7 @@ describe("Test readV3MarkdownElement", () => {
     div.className = "aiev3-markdown-line";
 
     // Call the function
-    const result = readV3MarkdownElement(div, defaultMarkdownSettings);
+    const result = readV3MarkdownElement(div, defaultContentProps);
 
     // Assert the expected output
     expect(result.textBlocks.map((tb) => tb.data)).toEqual([
@@ -73,7 +69,7 @@ describe("Test readV3MarkdownElement", () => {
     div.appendChild(s);
     s.textContent = "@[@Hello world@] piece of @[iced::cake@]";
     div.className = "aiev3-markdown-line";
-    const result = readV3MarkdownElement(div, defaultMarkdownSettings);
+    const result = readV3MarkdownElement(div, defaultContentProps);
     expect(result.textBlocks.map((tb) => tb.data)).toEqual([
       { text: "@Hello world", type: "at" },
       { text: " piece of ", type: "text" },

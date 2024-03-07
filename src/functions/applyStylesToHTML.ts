@@ -1,6 +1,6 @@
 import { EditorV3Styles } from "../classes";
 
-export const applyStylesToHTML = (line: HTMLDivElement, styles: EditorV3Styles) => {
+export const applyStylesToHTML = (line: HTMLDivElement, styles?: EditorV3Styles) => {
   [...line.querySelectorAll("span[data-style-name")].forEach((el) => {
     const span = el as HTMLSpanElement;
     if (span.dataset.styleName && styles && styles[span.dataset.styleName] !== undefined) {

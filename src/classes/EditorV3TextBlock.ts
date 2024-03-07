@@ -1,10 +1,13 @@
+import { cloneDeep } from "lodash";
 import { drawAt } from "../functions/drawAt";
-import { IMarkdownSettings, defaultMarkdownSettings } from "./markdown/MarkdownSettings";
+import { defaultContentProps } from "./EditorV3Content";
+import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 
 export type EditorV3TextBlockType = "text" | "at";
 
 // Class
 export class EditorV3TextBlock {
+  private _defaultContentProps = cloneDeep(defaultContentProps);
   // Variables
   text: string;
   style?: string;
@@ -50,7 +53,9 @@ export class EditorV3TextBlock {
     }
     return ret;
   }
-  public toMarkdown(markdownSettings: IMarkdownSettings = defaultMarkdownSettings): string {
+  public toMarkdown(
+    markdownSettings: IMarkdownSettings = this._defaultContentProps.markdownSettings,
+  ): string {
     return (
       `${this.type === "at" ? markdownSettings.atStartTag : this.style ? markdownSettings.styleStartTag : ""}` +
       `${this.style && this.style !== markdownSettings.defaultStyle ? this.style + markdownSettings.styleNameEndTag : ""}` +

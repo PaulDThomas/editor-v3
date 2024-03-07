@@ -1,12 +1,11 @@
-import { fromHtml } from "./tofromHtml";
 import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";
-import { EditorV3Align } from "../classes/interface";
+import { EditorV3Align, EditorV3ContentProps } from "../classes/interface";
 import { MarkdownLineClass } from "../classes/markdown/MarkdownLineClass";
-import { IMarkdownSettings } from "../classes/markdown/MarkdownSettings";
+import { fromHtml } from "./tofromHtml";
 
 export const readV3MarkdownElement = (
-  arg: HTMLDivElement,
-  markdownSettings: IMarkdownSettings,
+  el: HTMLDivElement,
+  contentProps: EditorV3ContentProps,
 ): {
   textBlocks: EditorV3TextBlock[];
   decimalAlignPercent: number;
@@ -18,11 +17,11 @@ export const readV3MarkdownElement = (
     textAlignment: EditorV3Align;
   } = {
     textBlocks: new MarkdownLineClass({
-      line: fromHtml(arg.innerText ?? arg.textContent ?? ""),
-      markdownSettings,
+      line: fromHtml(el.innerText ?? el.textContent ?? ""),
+      markdownSettings: contentProps.markdownSettings,
     }).toTextBlocks(),
-    decimalAlignPercent: parseFloat(arg.dataset.decimalAlignPercent ?? "60"),
-    textAlignment: (arg.dataset.textAlignment as EditorV3Align) ?? EditorV3Align.left,
+    decimalAlignPercent: contentProps.decimalAlignPercent,
+    textAlignment: contentProps.textAlignment,
   };
   // Ensure there is at least something
   if (ret.textBlocks.length === 0) ret.textBlocks = [new EditorV3TextBlock("")];

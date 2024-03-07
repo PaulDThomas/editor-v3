@@ -1,23 +1,16 @@
 import { EditorV3Position } from "../classes/interface";
 
-export function getCaretPosition(
-  element: HTMLDivElement,
-  target?: Range | null,
-): EditorV3Position | null {
+export function getCaretPosition(element: HTMLDivElement): EditorV3Position | null {
   let range: Range;
   let preCaretRange: Range;
-  if (!target) {
-    const sel = window.getSelection();
-    if (sel && sel.rangeCount > 0) {
-      range = sel.getRangeAt(0);
-      preCaretRange = range.cloneRange();
-    } else {
-      return null;
-    }
+  const sel = window.getSelection();
+  if (sel && sel.rangeCount > 0) {
+    range = sel.getRangeAt(0);
+    preCaretRange = range.cloneRange();
   } else {
-    range = target;
-    preCaretRange = target.cloneRange();
+    return null;
   }
+
   const f = (
     range.startContainer instanceof Element
       ? range.startContainer

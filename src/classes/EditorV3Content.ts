@@ -1,4 +1,7 @@
+import { cloneDeep, isEqual } from "lodash";
 import { applyStylesToHTML } from "../functions/applyStylesToHTML";
+import { getCaretPosition } from "../functions/getCaretPosition";
+import { moveCursor } from "../functions/moveCursor";
 import { readV3Html } from "../functions/readV3Html";
 import { setCaretPosition } from "../functions/setCaretPosition";
 import { EditorV3Line } from "./EditorV3Line";
@@ -6,6 +9,7 @@ import { EditorV3TextBlock } from "./EditorV3TextBlock";
 import {
   EditorV3Align,
   EditorV3ContentProps,
+  EditorV3ContentPropsInput,
   EditorV3Import,
   EditorV3Position,
   EditorV3Styles,
@@ -13,12 +17,24 @@ import {
 import { MarkdownLineClass } from "./markdown/MarkdownLineClass";
 import { IMarkdownSettings, defaultMarkdownSettings } from "./markdown/MarkdownSettings";
 
+export const defaultContentProps: EditorV3ContentProps = {
+  allowMarkdown: true,
+  allowNewLine: false,
+  decimalAlignPercent: 60,
+  markdownSettings: defaultMarkdownSettings,
+  showMarkdown: false,
+  styles: undefined,
+  textAlignment: EditorV3Align.left,
+};
+export type EditorV3ContentPropNames = keyof EditorV3ContentProps;
+
 /**
  * Represents the content of an EditorV3 instance.
  */
-export class EditorV3Content {
+export class EditorV3Content implements EditorV3Import {
+  private _defaultContentProps = cloneDeep(defaultContentProps);
   // Standard attributes
-  private _textAlignment: EditorV3Align = EditorV3Align.left;
+  private _textAlignment: EditorV3Align = this._defaultContentProps.textAlignment;
   /**
    * Current text alignment
    */
@@ -31,12 +47,12 @@ export class EditorV3Content {
    */
   set textAlignment(newTa: EditorV3Align) {
     if (newTa !== this._textAlignment) {
-      this.lines.forEach((l) => (l.textAlignment = newTa));
+      this.lines.forEach((l) => (l.contentProps.textAlignment = newTa));
       this._textAlignment = newTa;
     }
   }
 
-  private _decimalAlignPercent = 60;
+  private _decimalAlignPercent = this._defaultContentProps.decimalAlignPercent;
   /**
    * Current decimal alignment percent
    */
@@ -45,50 +61,134 @@ export class EditorV3Content {
   }
   set decimalAlignPercent(newDap: number) {
     if (newDap !== this._decimalAlignPercent) {
-      this.lines.forEach((l) => (l.decimalAlignPercent = newDap));
+      this.lines.forEach((l) => (l.contentProps.decimalAlignPercent = newDap));
       this._decimalAlignPercent = newDap;
     }
   }
 
-  private _styles: EditorV3Styles = {};
+  private _styles: EditorV3Styles | undefined = this._defaultContentProps.styles;
   /**
    * Current available styles in the editor
    */
   get styles() {
     return this._styles;
   }
-  set styles(newStyles: EditorV3Styles) {
+  set styles(newStyles: EditorV3Styles | undefined) {
     this._styles = newStyles;
   }
 
-  private _markdownSettings = defaultMarkdownSettings;
+  private _allowMarkdown = this._defaultContentProps.allowMarkdown;
+  get allowMarkdown() {
+    return this._allowMarkdown;
+  }
+  set allowMarkdown(newAllow: boolean) {
+    this._allowMarkdown = newAllow;
+  }
+  private _markdownSettings = this._defaultContentProps.markdownSettings;
   get markdownSettings() {
     return this._markdownSettings;
   }
   set markdownSettings(newSettings: IMarkdownSettings) {
     this._markdownSettings = newSettings;
   }
+  private _showMarkdown = this._defaultContentProps.showMarkdown;
+  get showMarkdown() {
+    return this._showMarkdown;
+  }
+  set showMarkdown(newShow: boolean) {
+    this._showMarkdown = newShow;
+  }
 
   /**
    * Current lines in the editor
    */
   public lines: EditorV3Line[] = [];
+  private _allowNewLine = this._defaultContentProps.allowNewLine;
+  get allowNewLine() {
+    return this._allowNewLine;
+  }
+  set allowNewLine(newAllow: boolean) {
+    this._allowNewLine = newAllow;
+  }
 
-  private _styleNode(): HTMLDivElement {
-    const sn = document.createElement("div");
-    sn.className = "aiev3-style-info";
-    sn.dataset.style = JSON.stringify(this._styles);
-    return sn;
+  /**
+   * Current caret position
+   */
+  private _caretPosition: EditorV3Position | null = null;
+  get caretPosition() {
+    return this._caretPosition;
   }
 
   // Read only attributes
+  /**
+   * Text from the element
+   */
+  get text(): string {
+    return this.lines.map((l) => l.textBlocks.map((b) => b.text).join("")).join("\n");
+  }
+
+  /**
+   * Current content properties
+   */
+  get contentProps(): EditorV3ContentProps {
+    return {
+      textAlignment: this._textAlignment,
+      decimalAlignPercent: this._decimalAlignPercent,
+      styles: this._styles,
+      allowNewLine: this._allowNewLine,
+      showMarkdown: this._showMarkdown,
+      markdownSettings: this._markdownSettings,
+      allowMarkdown: this._allowMarkdown,
+    };
+  }
+
+  /**
+   * Create a new EditorV3Content instance for this object
+   * @returns HTMLDivElement with content properties
+   */
+  private _contentPropsNode(): HTMLDivElement {
+    const cpn = document.createElement("div");
+    cpn.className = "aiev3-contents-info";
+    const datasetKeys = Object.keys(defaultContentProps) as EditorV3ContentPropNames[];
+    datasetKeys.forEach((key) => {
+      if (!isEqual(this[key], this._defaultContentProps[key])) {
+        cpn.dataset[key] = JSON.stringify(this[key]);
+      }
+    });
+    return cpn;
+  }
+
+  /**
+   * Data representation of content
+   */
+  get data(): EditorV3Import {
+    const contentProps = cloneDeep(this.contentProps);
+    const datasetKeys = Object.keys(defaultContentProps) as EditorV3ContentPropNames[];
+    datasetKeys.forEach((key) => {
+      if (isEqual(this[key], this._defaultContentProps[key])) {
+        delete contentProps[key];
+      }
+    });
+    const lines = this.lines.map((l) => ({
+      textBlocks: l.textBlocks.map((tb) => tb.data),
+    }));
+    return Object.keys(contentProps).length === 0 ? { lines } : { contentProps, lines };
+  }
+
+  /**
+   * JSON string of the content
+   */
+  get jsonString(): string {
+    return JSON.stringify(this.data);
+  }
+
   /**
    * Element to render
    */
   public toHtml(): DocumentFragment {
     const ret = new DocumentFragment();
     this.lines.forEach((l) => ret.append(l.toHtml()));
-    if (Object.keys(this._styles).length > 0) ret.append(this._styleNode());
+    ret.append(this._contentPropsNode());
     return ret;
   }
 
@@ -104,44 +204,22 @@ export class EditorV3Content {
     this.lines.forEach((line) => {
       const l = document.createElement("div");
       l.classList.add("aiev3-markdown-line");
-      l.dataset.textAlignment = this._textAlignment;
-      l.dataset.decimalAlignPercent = this._decimalAlignPercent.toString();
       const tn = document.createTextNode(line.toMarkdown(markdownSettings));
       l.append(tn);
       ret.append(l);
     });
-    if (Object.keys(this._styles).length > 0) ret.append(this._styleNode());
+    // Ensure props node indicates this is markdown
+    let revert = false;
+    if (!this._showMarkdown) {
+      revert = true;
+      this._showMarkdown = true;
+    }
+    const cpn = this._contentPropsNode();
+    ret.append(cpn);
+    if (revert) {
+      this._showMarkdown = false;
+    }
     return ret;
-  }
-
-  /**
-   * Text from the element
-   */
-  get text(): string {
-    return this.lines.map((l) => l.textBlocks.map((b) => b.text).join("")).join("\n");
-  }
-
-  /**
-   * JSON string of the content
-   */
-  get jsonString(): string {
-    return JSON.stringify({
-      lines: this.lines,
-      textAlignment: this._textAlignment,
-      decimalAlignPercent: this._decimalAlignPercent,
-      styles: this._styles,
-    });
-  }
-
-  /**
-   * Current content properties
-   */
-  get contentProps(): EditorV3ContentProps {
-    return {
-      textAlignment: this._textAlignment,
-      decimalAlignPercent: this._decimalAlignPercent,
-      styles: this._styles,
-    };
   }
 
   /**
@@ -150,44 +228,57 @@ export class EditorV3Content {
    * @param props Optional properties
    * @returns Instance of the object
    */
-  constructor(input: string, props?: EditorV3ContentProps) {
+  constructor(input: string | HTMLDivElement, props?: EditorV3ContentPropsInput) {
     // Defaults
-    this._textAlignment = props?.textAlignment ?? EditorV3Align.left;
-    this._decimalAlignPercent = props?.decimalAlignPercent ?? 60;
-    this._styles = props?.styles ?? {};
+    this._allowMarkdown =
+      props?.allowMarkdown ?? (this._defaultContentProps.allowMarkdown as boolean);
+    this._allowNewLine = props?.allowNewLine ?? (this._defaultContentProps.allowNewLine as boolean);
+    this._decimalAlignPercent =
+      props?.decimalAlignPercent ?? (this._defaultContentProps.decimalAlignPercent as number);
+    this._markdownSettings =
+      props?.markdownSettings ?? (this._defaultContentProps.markdownSettings as IMarkdownSettings);
+    this._showMarkdown = props?.showMarkdown ?? (this._defaultContentProps.showMarkdown as boolean);
+    this._styles = props?.styles ?? this._defaultContentProps.styles;
+    this._textAlignment =
+      props?.textAlignment ?? (this._defaultContentProps.textAlignment as EditorV3Align);
     this.lines = [];
 
     // Process incoming data
     try {
-      // Check for stringified class input
-      const jsonInput: EditorV3Import = JSON.parse(input);
-      if (!Array.isArray(jsonInput.lines)) throw "No lines";
-      this.copyImport(jsonInput, props);
+      if (input instanceof HTMLDivElement) {
+        // Read in HTML
+        const r = readV3Html(input.innerHTML, props);
+        this.copyImport(r);
+        this._caretPosition = getCaretPosition(input);
+      } else {
+        // Check for stringified class input
+        const jsonInput: EditorV3Import = JSON.parse(input);
+        if (!Array.isArray(jsonInput.lines)) throw "No lines";
+        this.copyImport(jsonInput);
+      }
     } catch {
       // Establish input as string
-      const inputString = input as string;
+      const inputString = (input instanceof HTMLDivElement ? input.outerHTML : input) as string;
       // Read in v3 HTML/text
-      const r = readV3Html(inputString, this._textAlignment, this._decimalAlignPercent);
-      this.copyImport(r, props);
-      return;
+      const r = readV3Html(inputString, props);
+      this.copyImport(r);
     }
   }
 
-  private copyImport(read: EditorV3Import, props?: EditorV3ContentProps): void {
-    this._textAlignment =
-      props?.textAlignment ?? (read.lines[0].textAlignment as EditorV3Align) ?? EditorV3Align.left;
-    this._decimalAlignPercent =
-      props?.decimalAlignPercent ?? read.lines[0].decimalAlignPercent ?? 60;
-    this._styles = {
-      ...this._styles,
-      ...read.styles,
-      ...props?.styles,
-    };
+  private copyImport(read: EditorV3Import, props?: EditorV3ContentPropsInput): void {
+    const useProps = props ?? read.contentProps ?? this.contentProps;
     this.lines = read.lines.map((l) =>
-      l instanceof EditorV3Line
-        ? l
-        : new EditorV3Line(JSON.stringify(l), this._textAlignment, this._decimalAlignPercent),
+      l instanceof EditorV3Line ? l : new EditorV3Line(JSON.stringify(l), useProps),
     );
+    this._allowMarkdown = useProps.allowMarkdown ?? this._defaultContentProps.allowMarkdown;
+    this._allowNewLine = useProps.allowNewLine ?? this._defaultContentProps.allowNewLine;
+    this._decimalAlignPercent =
+      useProps.decimalAlignPercent ?? this._defaultContentProps.decimalAlignPercent;
+    this._markdownSettings =
+      useProps.markdownSettings ?? this._defaultContentProps.markdownSettings;
+    this._showMarkdown = useProps.showMarkdown ?? this._defaultContentProps.showMarkdown;
+    this._styles = useProps.styles ?? this._defaultContentProps.styles;
+    this._textAlignment = useProps.textAlignment ?? this._defaultContentProps.textAlignment;
   }
 
   public subLines(pos: EditorV3Position): EditorV3Line[] {
@@ -198,13 +289,7 @@ export class EditorV3Content {
       pos.startLine < this.lines.length
     ) {
       const style = this.lines[pos.startLine].getStyleAt(pos.startChar);
-      ret.push(
-        new EditorV3Line(
-          [new EditorV3TextBlock("", style)],
-          this.textAlignment,
-          this.decimalAlignPercent,
-        ),
-      );
+      ret.push(new EditorV3Line([new EditorV3TextBlock("", style)], this.contentProps));
     }
     // Check selection contains something
     if (
@@ -220,8 +305,7 @@ export class EditorV3Content {
               pos.startChar,
               pos.startLine === pos.endLine ? pos.endChar : undefined,
             ),
-            this._textAlignment,
-            this._decimalAlignPercent,
+            this.contentProps,
           ),
         );
       }
@@ -231,13 +315,7 @@ export class EditorV3Content {
       }
       // End line to end character
       if (pos.startLine < pos.endLine && pos.endLine < this.lines.length) {
-        ret.push(
-          new EditorV3Line(
-            this.lines[pos.endLine].upToPos(pos.endChar),
-            this._textAlignment,
-            this._decimalAlignPercent,
-          ),
-        );
+        ret.push(new EditorV3Line(this.lines[pos.endLine].upToPos(pos.endChar), this.contentProps));
       }
     }
     return ret;
@@ -325,7 +403,7 @@ export class EditorV3Content {
       this.lines.map((l) => l.toMarkdown(this._markdownSettings)).join("\n"),
     );
     const newLinesMarkdown = newLines?.map(
-      (l) => new EditorV3Line(l.toMarkdown(this._markdownSettings)),
+      (l) => new EditorV3Line(l.toMarkdown(this._markdownSettings), this.contentProps),
     );
     if (
       pos.startLine < thisMarkdown.lines.length &&
@@ -341,8 +419,7 @@ export class EditorV3Content {
         (l) =>
           new EditorV3Line(
             new MarkdownLineClass({ line: l.lineText }).toTextBlocks(),
-            this.textAlignment,
-            this.decimalAlignPercent,
+            this.contentProps,
           ),
       );
       this.mergeLines(
@@ -356,12 +433,14 @@ export class EditorV3Content {
     return [];
   }
 
-  public splice(
-    pos: EditorV3Position,
-    newLines?: EditorV3Line[],
-    asMarkdown = false,
-  ): EditorV3Line[] {
-    if (asMarkdown) {
+  /**
+   * Remove a selection and optionally insert new lines
+   * @param pos Position of section to remove
+   * @param newLines Line content to insert
+   * @returns
+   */
+  public splice(pos: EditorV3Position, newLines?: EditorV3Line[]): EditorV3Line[] {
+    if (this._showMarkdown) {
       return this.spliceMarkdown(pos, newLines);
     } else if (
       pos.startLine < this.lines.length &&
@@ -373,7 +452,7 @@ export class EditorV3Content {
       const f = this.fromPos(pos.endLine, pos.endChar);
       this.lines = [
         ...u,
-        ...(newLines ? newLines.map((l) => new EditorV3Line(l.jsonString)) : []),
+        ...(newLines ? newLines.map((l) => new EditorV3Line(l.jsonString, this.contentProps)) : []),
         ...f,
       ];
       this.mergeLines(
@@ -382,53 +461,125 @@ export class EditorV3Content {
           (pos.startChar < this.lines[pos.startLine].lineLength ? 1 : 0),
       );
       newLines?.length && this.mergeLines(pos.startLine);
+      // Calculate end character position
+      const endChar =
+        !newLines || newLines.length === 0
+          ? pos.startChar
+          : newLines?.length === 1
+            ? pos.startChar + newLines[0].lineLength
+            : newLines[newLines.length - 1].lineLength;
+      // Update caret position if it is set
+      if (this._caretPosition)
+        this._caretPosition = {
+          isCollapsed: true,
+          startLine: pos.startLine + (newLines ? newLines.length - 1 : 0),
+          startChar: endChar,
+          endLine: pos.startLine + (newLines?.length ?? 0),
+          endChar: endChar,
+        };
       return ret;
     }
     return [];
   }
 
-  public applyStyle(styleName: string, pos: EditorV3Position) {
-    if (pos.startLine < this.lines.length && pos.startLine <= pos.endLine) {
-      for (let _i = pos.startLine; _i <= pos.endLine && _i < this.lines.length; _i++) {
-        this.lines[_i].applyStyle(
-          styleName,
-          _i === pos.startLine ? pos.startChar : 0,
-          _i === pos.endLine ? pos.endChar : Infinity,
-        );
+  /**
+   * Apply style to selection
+   * @param styleName Style to apply
+   * @param applyPos Position to apply style to, is missing caret position will be used
+   * @returns self
+   */
+  public applyStyle(styleName: string, applyPos?: EditorV3Position) {
+    if (applyPos || (this._caretPosition && !this._caretPosition.isCollapsed)) {
+      const pos = applyPos ?? (this._caretPosition as EditorV3Position);
+      if (pos.startLine < this.lines.length && pos.startLine <= pos.endLine) {
+        for (let _i = pos.startLine; _i <= pos.endLine && _i < this.lines.length; _i++) {
+          this.lines[_i].applyStyle(
+            styleName,
+            _i === pos.startLine ? pos.startChar : 0,
+            _i === pos.endLine ? pos.endChar : Infinity,
+          );
+        }
+        this._caretPosition = { ...pos, startLine: pos.endLine, startChar: pos.endChar };
       }
     }
     return this;
   }
 
-  public removeStyle(pos: EditorV3Position) {
-    if (pos.startLine < this.lines.length && pos.startLine <= pos.endLine) {
-      for (let _i = pos.startLine; _i <= pos.endLine && _i < this.lines.length; _i++) {
-        this.lines[_i].removeStyle(
-          _i === pos.startLine ? pos.startChar : 0,
-          _i === pos.endLine ? pos.endChar : Infinity,
-        );
+  /**
+   * Remove style from selection
+   * @returns self
+   */
+  public removeStyle(removePos?: EditorV3Position) {
+    if (removePos || (this._caretPosition && !this._caretPosition.isCollapsed)) {
+      const pos = removePos ?? (this._caretPosition as EditorV3Position);
+      if (pos.startLine < this.lines.length && pos.startLine <= pos.endLine) {
+        for (let _i = pos.startLine; _i <= pos.endLine && _i < this.lines.length; _i++) {
+          this.lines[_i].removeStyle(
+            _i === pos.startLine ? pos.startChar : 0,
+            _i === pos.endLine ? pos.endChar : Infinity,
+          );
+        }
       }
     }
     return this;
   }
 
-  public redraw(
-    el: Element,
-    showMarkdown: boolean,
-    markdownSettings: IMarkdownSettings,
-    pos?: EditorV3Position | null,
-  ) {
+  /**
+   * Update target element with conntent and set caret position
+   * @param el DOM element to render inside
+   */
+  public redraw(el: Element) {
     el.innerHTML = "";
-    if (showMarkdown) {
-      el.append(this.toMarkdownHtml(markdownSettings));
+    if (this._showMarkdown) {
+      el.append(this.toMarkdownHtml(this._markdownSettings));
     } else {
       el.append(this.toHtml());
     }
     // Update height and styles after render
     [...el.querySelectorAll(".aiev3-line")].forEach((line) => {
       // Apply styles
-      applyStylesToHTML(line as HTMLDivElement, this.styles);
+      applyStylesToHTML(line as HTMLDivElement, this._styles);
     });
-    if (pos) setCaretPosition(el, pos);
+    // Set caret position
+    if (this._caretPosition) {
+      setCaretPosition(el, this._caretPosition);
+    }
+  }
+
+  public handleKeydown(e: React.KeyboardEvent<HTMLDivElement>) {
+    // Handle delete
+    if (this._caretPosition && ["Backspace", "Delete"].includes(e.key)) {
+      e.stopPropagation();
+      e.preventDefault();
+      const newPos = this.deleteCharacter(this._caretPosition, e.key === "Backspace");
+      this._caretPosition = newPos;
+    }
+    if (this._caretPosition && this.allowNewLine && e.key === "Enter") {
+      e.stopPropagation();
+      e.preventDefault();
+      const newPos = this.splitLine(this._caretPosition);
+      this._caretPosition = newPos;
+    }
+    // Select all
+    else if (e.ctrlKey && e.code === "KeyA" && this.text !== "") {
+      e.stopPropagation();
+      e.preventDefault();
+      this._caretPosition = {
+        startLine: 0,
+        startChar: 0,
+        isCollapsed: false,
+        endLine: this.lines.length - 1,
+        endChar: this.lines[this.lines.length - 1].lineLength,
+      };
+    }
+    // Cursor movement
+    else if (
+      this._caretPosition &&
+      ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)
+    ) {
+      e.stopPropagation();
+      e.preventDefault();
+      this._caretPosition = moveCursor(this, this._caretPosition, e);
+    }
   }
 }

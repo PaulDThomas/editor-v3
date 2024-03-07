@@ -1,3 +1,5 @@
+import { cloneDeep } from "lodash";
+import { defaultContentProps } from "../EditorV3Content";
 import { EditorV3TextBlock } from "../EditorV3TextBlock";
 import { MarkdownAtClass } from "./MarkdownAtClass";
 import { IMarkdownSettings, defaultMarkdownSettings } from "./MarkdownSettings";
@@ -21,7 +23,7 @@ interface TagPosition {
 
 export class MarkdownLineClass {
   protected _parts: (string | MarkdownStyleClass | MarkdownAtClass)[] = [];
-  protected _markdownSettings: IMarkdownSettings = defaultMarkdownSettings;
+  protected _markdownSettings: IMarkdownSettings = cloneDeep(defaultContentProps).markdownSettings;
 
   get markdownText(): string {
     return this._parts

@@ -16,10 +16,10 @@ describe("Test redraw function", () => {
     const el = document.createElement("div");
     redraw(el, mockContent, true, defaultMarkdownSettings);
     expect(el.innerHTML).toEqual(
-      '<div class="aiev3-markdown-line" data-text-alignment="decimal" data-decimal-align-percent="80">34.45</div>' +
-        '<div class="aiev3-markdown-line" data-text-alignment="decimal" data-decimal-align-percent="80"></div>' +
-        '<div class="aiev3-markdown-line" data-text-alignment="decimal" data-decimal-align-percent="80">&lt;&lt;shiny::x.xx&gt;&gt;</div>' +
-        '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>',
+      '<div class="aiev3-markdown-line">34.45</div>' +
+        '<div class="aiev3-markdown-line"></div>' +
+        '<div class="aiev3-markdown-line">&lt;&lt;shiny::x.xx&gt;&gt;</div>' +
+        '<div class="aiev3-contents-info" data-decimal-align-percent="80" data-show-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}" data-text-alignment="&quot;decimal&quot;"></div>',
     );
   });
 
@@ -36,7 +36,7 @@ describe("Test redraw function", () => {
         '<div class="aiev3-line decimal">' +
         '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x</span></span>' +
         '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">.xx</span></span></div>' +
-        '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>',
+        '<div class="aiev3-contents-info" data-decimal-align-percent="80" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}" data-text-alignment="&quot;decimal&quot;"></div>',
     );
   });
 });

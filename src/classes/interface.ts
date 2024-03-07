@@ -35,11 +35,22 @@ export interface EditorV3LineProps {
  * @param markdownSettings Settings for markdown
  */
 export interface EditorV3ContentProps {
-  textAlignment?: EditorV3Align;
-  decimalAlignPercent?: number;
+  allowMarkdown: boolean;
+  allowNewLine: boolean;
+  decimalAlignPercent: number;
+  markdownSettings: IMarkdownSettings;
+  showMarkdown: boolean;
   styles?: EditorV3Styles;
-  showMarkdown?: boolean;
+  textAlignment: EditorV3Align;
+}
+export interface EditorV3ContentPropsInput {
+  allowMarkdown?: boolean;
+  allowNewLine?: boolean;
+  decimalAlignPercent?: number;
   markdownSettings?: IMarkdownSettings;
+  showMarkdown?: boolean;
+  styles?: EditorV3Styles;
+  textAlignment?: EditorV3Align;
 }
 
 /**
@@ -47,16 +58,14 @@ export interface EditorV3ContentProps {
  */
 export interface EditorV3LineImport {
   textBlocks: { text: string; style?: string; type: EditorV3TextBlockType }[] | EditorV3TextBlock[];
-  textAlignment?: string;
-  decimalAlignPercent?: number;
 }
 
 /**
  * Cpmplete import object for EditorV3
  */
-export interface EditorV3Import extends EditorV3ContentProps {
+export interface EditorV3Import {
   lines: EditorV3LineImport[];
-  styles?: EditorV3Styles;
+  contentProps?: EditorV3ContentPropsInput;
 }
 
 /**

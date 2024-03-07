@@ -67,19 +67,18 @@ describe("Check basic EditorV3TextBlock", () => {
 
   test("Load EditorV3TextBlock", async () => {
     const firstBlock = new EditorV3TextBlock("Hello world", "shiny");
-    ``;
     const testBlock = new EditorV3TextBlock(firstBlock);
-    expect(testBlock).toEqual(firstBlock);
+    expect(testBlock.data).toEqual(firstBlock.data);
   });
 
   test("Load Object", async () => {
     const obj = { text: "Hello world" };
     const testBlock = new EditorV3TextBlock(obj);
-    expect(testBlock).toEqual({ text: "Hello world", type: "text" });
+    expect(testBlock.data).toEqual({ text: "Hello world", type: "text" });
 
     const obj2 = { text: "Hello world", style: "shiny" };
     const testBlock2 = new EditorV3TextBlock(obj2);
-    expect(testBlock2).toEqual({
+    expect(testBlock2.data).toEqual({
       text: "Hello world",
       style: "shiny",
       type: "text",
@@ -101,7 +100,7 @@ describe("Check markdown output on text block", () => {
 describe("Check at correctly loaded, and eats its own tail", () => {
   test("Load word", async () => {
     const testBlock = new EditorV3TextBlock("@Hello");
-    expect(testBlock).toEqual({ text: "@Hello", type: "at" });
+    expect(testBlock.data).toEqual({ text: "@Hello", type: "at" });
     expect(testBlock.toMarkdown()).toEqual("@[@Hello@]");
 
     const tempDiv = document.createElement("div");
@@ -118,7 +117,7 @@ describe("Check at correctly loaded, and eats its own tail", () => {
 
   test("Load word with style", async () => {
     const testBlock = new EditorV3TextBlock("@Hello", "shiny");
-    expect(testBlock).toEqual({ text: "@Hello", style: "shiny", type: "at" });
+    expect(testBlock.data).toEqual({ text: "@Hello", style: "shiny", type: "at" });
     expect(testBlock.toMarkdown()).toEqual("@[shiny::@Hello@]");
 
     const tempDiv = document.createElement("div");
@@ -142,7 +141,7 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     testSpan.innerHTML = "@Hello world";
     const testBlock = new EditorV3TextBlock(testSpan);
 
-    expect(testBlock).toEqual({ text: "@Hello world", style: "shiny", type: "at" });
+    expect(testBlock.data).toEqual({ text: "@Hello world", style: "shiny", type: "at" });
     expect(testBlock.toMarkdown()).toEqual("@[shiny::@Hello world@]");
     expect(testBlock.typeStyle).toEqual("at:shiny");
 
