@@ -38,7 +38,6 @@
 }
 
 .aiev3-line {
-  min-height: 1.2rem;
   width: 100%;
 }
 
@@ -52,8 +51,7 @@
 }
 
 .aiev3-line.decimal {
-  position: relative;
-  overflow: visible;
+  display: grid;
 }
 
 .aiev3-line.left {
@@ -83,30 +81,35 @@
 }
 
 .aiev3-span-point {
-  position: absolute;
-  top: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-height: 100%;
-  height: 100%;
+  display: table-cell;
 }
 
 .aiev3-span-point > span {
-  max-height: 100%;
-  height: 100%;
   display: inline-block;
 }
 
 .aiev3-span-point.lhs {
+  align-content: end;
   text-align: right;
+  grid-column: 1;
 }
 
 .aiev3-span-point.rhs {
   text-align: left;
-  display: flex;
+  grid-column: 2;
 }
 
-.aiev3 .at-block {
-  margin: -1px;
-  border: 1px solid black;
+.aiev3 .aiev3-tb.at-block {
+  border-top: 2px dashed black;
+  border-bottom: 2px dashed black;
+  margin-top: -2px;
+  margin-bottom: -2px;
+}
+
+.aiev3 .aiev3-tb.is-active {
+  border-top: 2px solid rgba(218, 165, 32, 0.8);
+  border-bottom: 2px solid rgba(218, 165, 32, 0.8);
+  margin-top: -2px;
+  margin-bottom: -2px;
+  background-color: rgba(218, 165, 32, 0.49);
 }

@@ -106,9 +106,9 @@ describe("Check basic EditorV3Line", () => {
       { ...defaultContentProps, textAlignment: EditorV3Align.decimal },
     );
     expect(testLine.toHtml().outerHTML).toEqual(
-      '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span class="aiev3-tb">Hello&nbsp;world</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;">' +
+      '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">Hello&nbsp;world</span></span>' +
+        '<span class="aiev3-span-point rhs">' +
         '<span class="aiev3-tb">.&nbsp;</span>' +
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How&nbsp;</span>' +
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">is&nbsp;</span>' +
@@ -127,9 +127,9 @@ describe("Check basic EditorV3Line", () => {
       textAlignment: EditorV3Align.decimal,
     });
     expect(newDecimalTestLine.toHtml().outerHTML).toEqual(
-      '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span class="aiev3-tb">q</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;"><span class="aiev3-tb">\u2009</span></span>' +
+      '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">q</span></span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">\u2009</span></span>' +
         "</div>",
     );
     const testLine = new EditorV3Line("12.34", {
@@ -137,9 +137,9 @@ describe("Check basic EditorV3Line", () => {
       textAlignment: EditorV3Align.decimal,
     });
     expect(testLine.toHtml().outerHTML).toEqual(
-      '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;"><span class="aiev3-tb">12</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;"><span class="aiev3-tb">.34</span></span>' +
+      '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">12</span></span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">.34</span></span>' +
         "</div>",
     );
     expect(testLine.lineText).toEqual("12.34");
@@ -157,11 +157,11 @@ describe("Check basic EditorV3Line", () => {
     expect(testLine.contentProps.textAlignment).toEqual(EditorV3Align.decimal);
     expect(testLine.contentProps.decimalAlignPercent).toEqual(60);
     expect(testLine.toHtml().outerHTML).toEqual(
-      '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 40%; min-width: 60%;">' +
+      '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
+        '<span class="aiev3-span-point lhs">' +
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">12</span>' +
         "</span>" +
-        '<span class="aiev3-span-point rhs" style="left: 60%; min-width: 40%;">' +
+        '<span class="aiev3-span-point rhs">' +
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">.34</span>' +
         '<span class="aiev3-tb">&nbsp;slow</span>' +
         "</span>" +

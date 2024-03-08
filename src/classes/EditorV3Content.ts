@@ -586,22 +586,4 @@ export class EditorV3Content implements EditorV3Import {
       this._caretPosition = moveCursor(this, this._caretPosition, e);
     }
   }
-
-  // public handleMouseUp(e: React.MouseEvent<HTMLDivElement>) {
-  //   const pos = getCaretPosition(e.currentTarget);
-  //   if (pos) {
-  //     this._caretPosition = pos;
-  //   }
-  //   if (this._caretPosition)
-  //     this.lines[this._caretPosition.startLine].setActiveBlock(this._caretPosition);
-  // }
-
-  // public handleKeyUp(e: React.KeyboardEvent<HTMLDivElement>) {
-  //   const pos = getCaretPosition(e.currentTarget);
-  //   if (pos) {
-  //     this._caretPosition = pos;
-  //   }
-  //   if (this._caretPosition)
-  //     this.lines[this._caretPosition.startLine].setActiveBlock(this._caretPosition);
-  // }
 }

@@ -148,20 +148,20 @@ describe("Editor and functions", () => {
       ],
     });
     expect(mockSetHtml.mock.calls[2][0]).toEqual(
-      '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 30%; min-width: 70%;">\u2009</span>' +
-        '<span class="aiev3-span-point rhs" style="left: 70%; min-width: 30%;"><span class="aiev3-tb">\u2009</span></span>' +
+      '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
+        '<span class="aiev3-span-point lhs">\u2009</span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">\u2009</span></span>' +
         "</div>" +
-        '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 30%; min-width: 70%;"><span class="aiev3-tb">4</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 70%; min-width: 30%;"><span class="aiev3-tb">\u2009</span></span>' +
+        '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb is-active">4</span></span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">\u2009</span></span>' +
         "</div>" +
-        '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 30%; min-width: 70%;">\u2009</span>' +
-        '<span class="aiev3-span-point rhs" style="left: 70%; min-width: 30%;"><span class="aiev3-tb">\u2009</span></span></div>' +
-        '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 30%; min-width: 70%;"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">x</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 70%; min-width: 30%;"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">.xx</span></span>' +
+        '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
+        '<span class="aiev3-span-point lhs">\u2009</span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">\u2009</span></span></div>' +
+        '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">x</span></span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">.xx</span></span>' +
         "</div>" +
         '<div class="aiev3-contents-info" data-allow-new-line="true" data-decimal-align-percent="70" data-text-alignment="&quot;decimal&quot;"></div>',
     );
@@ -298,6 +298,8 @@ describe("Menu styling - add", () => {
     ) as HTMLDivElement;
     // Go to start of text
     await user.click(container.querySelectorAll("span")[0] as HTMLSpanElement);
+    // Check clicked span is active
+    expect(container.querySelectorAll("span")[0]).toHaveClass("is-active");
     await user.keyboard("{Control>}{Home}{/Control}{Home}{End}{Shift>}{Home}{Shift}");
     expect(getCaretPosition(container)).toEqual({
       startLine: 0,
@@ -766,9 +768,9 @@ describe("Updates from above", () => {
     expect(editor.innerHTML).toEqual(
       '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
         '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
-        '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span class="aiev3-tb">Before</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;"><span class="aiev3-tb">\u2009</span></span>' +
+        '<div class="aiev3-line decimal" style="grid-template-columns: 80% 20%;">' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">Before</span></span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">\u2009</span></span>' +
         "</div>" +
         '<div class="aiev3-contents-info" data-decimal-align-percent="80" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}" data-text-alignment="&quot;decimal&quot;"></div></div>' +
         "</div></div>",

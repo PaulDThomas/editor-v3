@@ -20,6 +20,8 @@ export const readV3DivElement = (
   // Decimal aligned
   if (arg.classList.contains("aiev3-line")) {
     if (arg.classList.contains("decimal")) {
+      const skipRead = arg.querySelectorAll(".skip-read");
+      skipRead.forEach((el) => el.remove());
       ret.textAlignment = EditorV3Align.decimal;
       ret.decimalAlignPercent =
         arg.children.length === 2 &&
@@ -27,10 +29,10 @@ export const readV3DivElement = (
         arg.children[0].style.minWidth
           ? parseFloat(arg.children[0].style.minWidth)
           : 60;
+      // This will skip the inner offcanvas span
       ret.textBlocks =
         arg.firstChild instanceof HTMLSpanElement &&
         arg.lastChild instanceof HTMLSpanElement &&
-        arg.childNodes.length === 2 &&
         arg.firstChild.classList.contains("lhs") &&
         arg.lastChild.classList.contains("rhs")
           ? [

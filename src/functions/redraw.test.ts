@@ -27,15 +27,15 @@ describe("Test redraw function", () => {
     const el = document.createElement("div");
     redraw(el, mockContent, false, defaultMarkdownSettings);
     expect(el.innerHTML).toEqual(
-      '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span class="aiev3-tb">34</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;"><span class="aiev3-tb">.45</span></span></div>' +
-        '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;">\u2009</span>' +
-        '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;"><span class="aiev3-tb">\u2009</span></span></div>' +
-        '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 20%; min-width: 80%;"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 80%; min-width: 20%;"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">.xx</span></span></div>' +
+      '<div class="aiev3-line decimal" style="grid-template-columns: 80% 20%;">' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">34</span></span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">.45</span></span></div>' +
+        '<div class="aiev3-line decimal" style="grid-template-columns: 80% 20%;">' +
+        '<span class="aiev3-span-point lhs">\u2009</span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">\u2009</span></span></div>' +
+        '<div class="aiev3-line decimal" style="grid-template-columns: 80% 20%;">' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x</span></span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">.xx</span></span></div>' +
         '<div class="aiev3-contents-info" data-decimal-align-percent="80" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}" data-text-alignment="&quot;decimal&quot;"></div>',
     );
   });
