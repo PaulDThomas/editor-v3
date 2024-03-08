@@ -2,7 +2,7 @@ import { cloneDeep, isEqual } from "lodash";
 import { readV2DivElement } from "../functions/readV2DivElement";
 import { readV3DivElement } from "../functions/readV3DivElement";
 import { readV3MarkdownElement } from "../functions/readV3MarkdownElement";
-import { EditorV3ContentPropNames, defaultContentProps } from "./EditorV3Content";
+import { defaultContentProps } from "./EditorV3Content";
 import { EditorV3TextBlock } from "./EditorV3TextBlock";
 import { drawHtmlDecimalAlign } from "./drawHtmlDecimalAlign";
 import {
@@ -46,8 +46,8 @@ export class EditorV3Line {
 
   get data() {
     const contentProps = cloneDeep(this.contentProps);
-    const datasetKeys = Object.keys(defaultContentProps) as EditorV3ContentPropNames[];
-    datasetKeys.forEach((key) => {
+    Object.keys(defaultContentProps).forEach((k) => {
+      const key = k as keyof typeof defaultContentProps;
       if (isEqual(this.contentProps[key], this._defaultContentProps[key])) {
         delete contentProps[key];
       }

@@ -26,7 +26,6 @@ export const defaultContentProps: EditorV3ContentProps = {
   styles: undefined,
   textAlignment: EditorV3Align.left,
 };
-export type EditorV3ContentPropNames = keyof EditorV3ContentProps;
 
 /**
  * Represents the content of an EditorV3 instance.
@@ -149,8 +148,8 @@ export class EditorV3Content implements EditorV3Import {
   private _contentPropsNode(): HTMLDivElement {
     const cpn = document.createElement("div");
     cpn.className = "aiev3-contents-info";
-    const datasetKeys = Object.keys(defaultContentProps) as EditorV3ContentPropNames[];
-    datasetKeys.forEach((key) => {
+    Object.keys(defaultContentProps).forEach((k) => {
+      const key = k as keyof typeof defaultContentProps;
       if (!isEqual(this[key], this._defaultContentProps[key])) {
         cpn.dataset[key] = JSON.stringify(this[key]);
       }
@@ -163,8 +162,8 @@ export class EditorV3Content implements EditorV3Import {
    */
   get data(): EditorV3Import {
     const contentProps = cloneDeep(this.contentProps);
-    const datasetKeys = Object.keys(defaultContentProps) as EditorV3ContentPropNames[];
-    datasetKeys.forEach((key) => {
+    Object.keys(defaultContentProps).forEach((k) => {
+      const key = k as keyof typeof defaultContentProps;
       if (isEqual(this[key], this._defaultContentProps[key])) {
         delete contentProps[key];
       }
