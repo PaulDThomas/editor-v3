@@ -105,7 +105,9 @@ describe("Check at correctly loaded, and eats its own tail", () => {
 
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml());
-    expect(tempDiv.innerHTML).toEqual('<span class="aiev3-tb at-block">@Hello</span>');
+    expect(tempDiv.innerHTML).toEqual(
+      '<span class="aiev3-tb at-block is-locked" data-is-locked="true">@Hello</span>',
+    );
     expect(new EditorV3TextBlock(testBlock.toHtml())).toEqual(testBlock);
 
     expect(testBlock.data).toEqual({ text: "@Hello", type: "at" });
@@ -123,7 +125,7 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml());
     expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb at-block editorv3style-shiny" data-style-name="shiny">@Hello</span>',
+      '<span class="aiev3-tb at-block is-locked editorv3style-shiny" data-is-locked="true" data-style-name="shiny">@Hello</span>',
     );
     expect(new EditorV3TextBlock(testBlock.toHtml())).toEqual(testBlock);
 
@@ -148,7 +150,7 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml());
     expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb at-block editorv3style-shiny" data-style-name="shiny">@Hello&nbsp;world</span>',
+      '<span class="aiev3-tb at-block is-locked editorv3style-shiny" data-is-locked="true" data-style-name="shiny">@Hello&nbsp;world</span>',
     );
     expect(new EditorV3TextBlock(testBlock.toHtml())).toEqual(testBlock);
   });
@@ -163,7 +165,7 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     tempDiv.appendChild(testBlock.toHtml());
     expect(tempDiv.innerHTML).toEqual(
       '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;</span>' +
-        '<span class="aiev3-tb at-block editorv3style-shiny" data-style-name="shiny">@world</span>',
+        '<span class="aiev3-tb at-block is-locked editorv3style-shiny" data-is-locked="true" data-style-name="shiny">@world</span>',
     );
   });
 });

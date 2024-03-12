@@ -505,6 +505,17 @@ describe("Splice markdown tests", () => {
     };
     expect(testContent.splice(pos, pasteContent.lines)).toEqual([]);
     expect(testContent.text).toEqual("123\n456\n789");
+    // Check markdown render when not show markdown
+    testContent.showMarkdown = false;
+    const div = document.createElement("div");
+    div.append(testContent.toMarkdownHtml());
+    expect(div.innerHTML).toEqual(
+      '<div class="aiev3-markdown-line">123</div>' +
+        '<div class="aiev3-markdown-line">456</div>' +
+        '<div class="aiev3-markdown-line">789</div>' +
+        '<div class="aiev3-contents-info" data-show-markdown="true"></div>',
+    );
+    expect(testContent.showMarkdown).toEqual(false);
   });
   test("Easy insert", async () => {
     const testContent = new EditorV3Content("123\n456\n789", {
