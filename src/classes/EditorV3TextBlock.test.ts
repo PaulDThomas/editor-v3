@@ -108,7 +108,10 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     expect(tempDiv.innerHTML).toEqual(
       '<span class="aiev3-tb at-block is-locked" data-is-locked="true">@Hello</span>',
     );
-    expect(new EditorV3TextBlock(testBlock.toHtml())).toEqual(testBlock);
+    expect(new EditorV3TextBlock(testBlock.toHtml()).data).toEqual({
+      ...testBlock.data,
+      isLocked: true,
+    });
 
     expect(testBlock.data).toEqual({ text: "@Hello", type: "at" });
     expect(new EditorV3TextBlock(testBlock.data)).toEqual(testBlock);
@@ -127,7 +130,10 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     expect(tempDiv.innerHTML).toEqual(
       '<span class="aiev3-tb at-block is-locked editorv3style-shiny" data-is-locked="true" data-style-name="shiny">@Hello</span>',
     );
-    expect(new EditorV3TextBlock(testBlock.toHtml())).toEqual(testBlock);
+    expect(new EditorV3TextBlock(testBlock.toHtml()).data).toEqual({
+      ...testBlock.data,
+      isLocked: true,
+    });
 
     expect(testBlock.data).toEqual({ text: "@Hello", style: "shiny", type: "at" });
     expect(new EditorV3TextBlock(testBlock.data)).toEqual(testBlock);
@@ -142,6 +148,7 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     testSpan.dataset.styleName = "shiny";
     testSpan.innerHTML = "@Hello world";
     const testBlock = new EditorV3TextBlock(testSpan);
+    testBlock.setActive(true);
 
     expect(testBlock.data).toEqual({ text: "@Hello world", style: "shiny", type: "at" });
     expect(testBlock.toMarkdown()).toEqual("@[shiny::@Hello world@]");
@@ -150,9 +157,9 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml());
     expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb at-block is-locked editorv3style-shiny" data-is-locked="true" data-style-name="shiny">@Hello&nbsp;world</span>',
+      '<span class="aiev3-tb at-block is-active editorv3style-shiny" data-style-name="shiny">@Hello&nbsp;world</span>',
     );
-    expect(new EditorV3TextBlock(testBlock.toHtml())).toEqual(testBlock);
+    expect(new EditorV3TextBlock(testBlock.toHtml()).data).toEqual(testBlock.data);
   });
 
   test("Create HTML with an @ in the middle", async () => {

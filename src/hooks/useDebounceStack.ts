@@ -5,13 +5,9 @@ import { Dispatch, useCallback, useEffect, useMemo, useRef, useState } from "rea
  *  Returns an object containing values/functions for using a debounced value
  *
  *  `currentValue`: Current, non-debounced value
- *
  *  `setCurrentValue`: Function to update the current value
- *
  *  `forceUpdate`: Function to force the current value to bypassing debounce
- *
  *  `undo`: Function to go back to previous version
- *
  *  `redo`: Function to go forwards to undone version
  *  `stack`: Array of all values in the stack
  *  `index`: Current index in the stack
