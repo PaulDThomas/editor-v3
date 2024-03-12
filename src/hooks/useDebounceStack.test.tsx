@@ -196,7 +196,7 @@ describe("useDebounce with React", () => {
       );
       return (
         <input
-          data-testid='inp'
+          data-testid="inp"
           value={currentValue ?? ""}
           onChange={(e) => setCurrentValue(e.target.value)}
           onBlur={() => forceUpdate()}
@@ -277,13 +277,13 @@ describe("Update to value", () => {
     return (
       <>
         <button
-          data-testid='btn'
+          data-testid="btn"
           onClick={() => setValue("after")}
         >
           Change
         </button>
         <input
-          data-testid='input'
+          data-testid="input"
           value={currentValue ?? ""}
           onChange={(e) => {
             e.preventDefault();
@@ -309,5 +309,88 @@ describe("Update to value", () => {
     expect(testControl).toHaveValue("before-");
     await act(async () => await user.click(btn));
     expect(testControl).toHaveValue("after");
+  });
+});
+
+describe("Check comparison function", () => {
+  const user = userEvent.setup({ delay: null });
+  const mockOnChange = jest.fn();
+  const mockOnDebounce = jest.fn();
+  const Tracker = (): JSX.Element => {
+    const [value, setValue] = useState<{ a: number; b: string }>({ a: 1, b: "b is 1" });
+    const { currentValue, setCurrentValue, stack, index } = useDebounceStack<{
+      a: number;
+      b: string;
+    }>(
+      value,
+      setValue,
+      0,
+      mockOnChange,
+      mockOnDebounce,
+      (oldValue, newValue) => oldValue?.b === newValue?.b,
+    );
+
+    return (
+      <>
+        <input
+          data-testid="A"
+          disabled
+          type="number"
+          value={currentValue?.a ?? 0}
+        />
+        <input
+          data-testid="B"
+          disabled
+          type="string"
+          value={currentValue?.b ?? "b is not set"}
+        />
+        <div data-testid="STACK">
+          {stack?.map((v, i) => <div key={i}>{JSON.stringify(v)}</div>)}
+        </div>
+        <input
+          data-testid="INDEX"
+          disabled
+          type="number"
+          value={index}
+        />
+        <button
+          data-testid="plus-1"
+          onClick={() => {
+            setCurrentValue({ a: value.a + 1, b: value.b });
+          }}
+        />
+        <button
+          data-testid="to-string"
+          onClick={() => setCurrentValue({ a: value.a, b: `b is ${value.a}` })}
+        />
+        <div data-testid="VALUE">{JSON.stringify(value)}</div>
+      </>
+    );
+  };
+
+  test("Should use comparison function", async () => {
+    await act(async () => render(<Tracker />));
+    await user.click(screen.getByTestId("plus-1"));
+    // First change should not update stack
+    expect(screen.getByTestId("A")).toHaveValue(2);
+    expect(screen.getByTestId("B")).toHaveValue("b is 1");
+    expect(screen.getByTestId("INDEX")).toHaveValue(0);
+    expect(screen.getByTestId("STACK")).toHaveTextContent(/{"a":2,"b":"b is 1"}/);
+    expect(mockOnChange).toHaveBeenLastCalledWith({ a: 2, b: "b is 1" }, 0, [
+      { a: 2, b: "b is 1" },
+    ]);
+    expect(mockOnDebounce).toHaveBeenLastCalledWith({ a: 2, b: "b is 1" });
+    // Second change should update stack
+    await user.click(screen.getByTestId("to-string"));
+    expect(screen.getByTestId("A")).toHaveValue(2);
+    expect(screen.getByTestId("B")).toHaveValue("b is 2");
+    expect(screen.getByTestId("INDEX")).toHaveValue(1);
+    expect(screen.getByTestId("STACK")).toHaveTextContent(/{"a":2,"b":"b is 1"}/);
+    expect(screen.getByTestId("STACK")).toHaveTextContent(/{"a":2,"b":"b is 2"}/);
+    expect(mockOnChange).toHaveBeenLastCalledWith({ a: 2, b: "b is 2" }, 1, [
+      { a: 2, b: "b is 1" },
+      { a: 2, b: "b is 2" },
+    ]);
+    expect(mockOnDebounce).toHaveBeenLastCalledWith({ a: 2, b: "b is 2" });
   });
 });
