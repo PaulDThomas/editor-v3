@@ -147,11 +147,11 @@ export class EditorV3Line {
     this._mergeBlocks();
   }
 
-  private getBlockAt(char: number): EditorV3TextBlock | undefined {
+  public getBlockAt(char: number): EditorV3TextBlock | undefined {
     let _counted = 0;
     for (let _i = 0; _i < this.textBlocks.length; _i++) {
       // Block containing startPos
-      if (_counted <= char && _counted + this.textBlocks[_i].text.length >= char) {
+      if (_counted <= char && _counted + this.textBlocks[_i].text.length > char) {
         return this.textBlocks[_i];
       } else {
         _counted += this.textBlocks[_i].text.length;
@@ -164,17 +164,20 @@ export class EditorV3Line {
     return this.getBlockAt(char)?.style;
   }
 
-  public setActiveBlock(pos: EditorV3Position) {
+  public setActiveBlock(pos: EditorV3Position): EditorV3TextBlock | undefined {
+    this.textBlocks.forEach((tb) => tb.setActive(false));
     if (pos.isCollapsed) {
-      this.getBlockAt(pos.startChar)?.setActive(true);
-    }
+      const activeBlock = this.getBlockAt(pos.startChar);
+      activeBlock?.setActive(true);
+      return activeBlock;
+    } else return undefined;
   }
 
-  public subBlocks(startPos: number, endPos?: number): EditorV3TextBlock[] {
+  public subBlocks(startPos: number, endPosOpt?: number): EditorV3TextBlock[] {
     const ret: EditorV3TextBlock[] = [];
+    const endPos = endPosOpt ?? this.lineLength;
     // Return empty styled block for start/end same
-    if (startPos >= (endPos ?? this.lineLength)) {
-      ret.push(new EditorV3TextBlock("", this.getStyleAt(startPos)));
+    if (startPos >= endPos || endPos <= 0) {
       return ret;
     }
     let _counted = 0;
@@ -183,11 +186,13 @@ export class EditorV3Line {
       if (
         _counted <= startPos &&
         _counted + this.textBlocks[_i].text.length >= startPos &&
-        this.textBlocks[_i].text.slice(startPos - _counted, (endPos ?? Infinity) - _counted) !== ""
+        this.textBlocks[_i].text.slice(startPos - _counted, endPos - _counted) !== ""
       ) {
         const slicedBlock = new EditorV3TextBlock(
-          this.textBlocks[_i].text.slice(startPos - _counted, (endPos ?? Infinity) - _counted),
+          this.textBlocks[_i].text.slice(startPos - _counted, endPos - _counted),
           this.textBlocks[_i].style,
+          this.textBlocks[_i].type,
+          this.textBlocks[_i].isLocked,
         );
         if (this.textBlocks[_i].isActive) slicedBlock.setActive(true);
         ret.push(slicedBlock);
@@ -201,20 +206,19 @@ export class EditorV3Line {
         const slicedBlock = new EditorV3TextBlock(
           this.textBlocks[_i].text.slice(0, endPos - _counted),
           this.textBlocks[_i].style,
+          this.textBlocks[_i].type,
+          this.textBlocks[_i].isLocked,
         );
         if (this.textBlocks[_i].isActive) slicedBlock.setActive(true);
         ret.push(slicedBlock);
       }
       // Block after start and before end
-      else if (
-        _counted > startPos &&
-        _counted + this.textBlocks[_i].text.length < (endPos ?? Infinity)
-      ) {
+      else if (_counted > startPos && _counted + this.textBlocks[_i].text.length < endPos) {
         ret.push(this.textBlocks[_i]);
       }
       _counted += this.textBlocks[_i].text.length;
       // Stop if the end is reached
-      if (_counted >= (endPos ?? Infinity)) break;
+      if (_counted >= endPos) break;
     }
     return ret;
   }
@@ -233,7 +237,7 @@ export class EditorV3Line {
     } else {
       const preSplit = this.upToPos(pos);
       const postSplit = this.fromPos(pos);
-      this.textBlocks = preSplit;
+      this.textBlocks = preSplit.length > 0 ? preSplit : [new EditorV3TextBlock("")];
       return new EditorV3Line(postSplit, this.contentProps);
     }
   }
@@ -301,11 +305,11 @@ export class EditorV3Line {
           lastTypeStyle = this.textBlocks[_i].typeStyle;
         }
       }
-      if (mergedBlocks.filter((tb) => tb.text !== "").length === 0) {
-        this.textBlocks = [mergedBlocks[0]];
-      } else if (mergedBlocks.filter((tb) => tb.text !== "").length < this.textBlocks.length) {
-        this.textBlocks = mergedBlocks.filter((tb) => tb.text !== "");
-      }
+      // if (mergedBlocks.filter((tb) => tb.text !== "").length === 0) {
+      //   this.textBlocks = [mergedBlocks[0]];
+      // } else if (mergedBlocks.filter((tb) => tb.text !== "").length < this.textBlocks.length) {
+      this.textBlocks = mergedBlocks.filter((tb) => tb.text !== "");
+      // }
     }
   }
 }

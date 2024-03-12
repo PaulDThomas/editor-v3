@@ -150,15 +150,15 @@ describe("Editor and functions", () => {
     expect(mockSetHtml.mock.calls[2][0]).toEqual(
       '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
         '<span class="aiev3-span-point lhs">\u2009</span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">\u2009</span></span>' +
+        '<span class="aiev3-span-point rhs">\u2009</span>' +
         "</div>" +
         '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
         '<span class="aiev3-span-point lhs"><span class="aiev3-tb is-active">4</span></span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">\u2009</span></span>' +
+        '<span class="aiev3-span-point rhs">\u2009</span>' +
         "</div>" +
         '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
         '<span class="aiev3-span-point lhs">\u2009</span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">\u2009</span></span></div>' +
+        '<span class="aiev3-span-point rhs">\u2009</span></div>' +
         '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
         '<span class="aiev3-span-point lhs"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">x</span></span>' +
         '<span class="aiev3-span-point rhs"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">.xx</span></span>' +
@@ -195,6 +195,7 @@ describe("Menu styling - add", () => {
     // Go to start of text
     await user.click(container.querySelectorAll("span")[0] as HTMLSpanElement);
     // Check clicked span is active
+    await user.keyboard("{ArrowLeft}");
     expect(container.querySelectorAll("span")[0]).toHaveClass("is-active");
     await user.keyboard("{Control>}{Home}{/Control}{Home}{End}{Shift>}{Home}{Shift}");
     expect(getCaretPosition(container)).toEqual({
@@ -666,7 +667,7 @@ describe("Updates from above", () => {
         '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
         '<div class="aiev3-line decimal" style="grid-template-columns: 80% 20%;">' +
         '<span class="aiev3-span-point lhs"><span class="aiev3-tb">Before</span></span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">\u2009</span></span>' +
+        '<span class="aiev3-span-point rhs">\u2009</span>' +
         "</div>" +
         '<div class="aiev3-contents-info" data-decimal-align-percent="80" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}" data-text-alignment="&quot;decimal&quot;"></div></div>' +
         "</div></div>",

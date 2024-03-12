@@ -130,10 +130,10 @@ describe("Check basic EditorV3Content", () => {
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line decimal" style="grid-template-columns: 55% 45%;">' +
         '<span class="aiev3-span-point lhs"><span class="aiev3-tb">Hello</span></span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">\u2009</span></span>' +
+        '<span class="aiev3-span-point rhs">\u2009</span>' +
         "</div>" +
         '<div class="aiev3-line decimal" style="grid-template-columns: 55% 45%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">\u2009</span></span>' +
+        '<span class="aiev3-span-point lhs">\u2009</span>' +
         '<span class="aiev3-span-point rhs"><span class="aiev3-tb">.World</span></span>' +
         "</div>" +
         '<div class="aiev3-contents-info" data-decimal-align-percent="55" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}" data-text-alignment="&quot;decimal&quot;"></div>',
@@ -383,7 +383,8 @@ describe("Content functions", () => {
     });
     expect(testContent.text).toEqual("123\n456\n789");
     expect(testContent.getStyleAt(1, 1)).toEqual("shiny");
-    expect(testContent.getStyleAt(0, 1)).toEqual(undefined);
+    expect(testContent.getStyleAt(0, 0)).toEqual(undefined);
+    expect(testContent.getStyleAt(2, 1)).toEqual(undefined);
     expect(JSON.parse(testContent.jsonString).lines).toEqual([
       {
         textBlocks: [

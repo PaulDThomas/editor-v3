@@ -58,42 +58,45 @@ describe("Check basic EditorV3Line", () => {
     expect(testLine.lineText).toEqual("Hello\u00a0world, How is it going?");
     expect(testLine.lineLength).toEqual(29);
     expect(testLine.contentProps).toEqual(defaultContentProps);
-    const styles: { l: number; v: string | undefined }[] = [];
-    for (let i = 0; i <= testLine.lineLength + 1; i++) {
-      styles.push({ l: i, v: testLine.getStyleAt(i) });
+    const styles: { l: number; v: string | undefined; c: string }[] = [];
+    for (let i = 0; i <= testLine.lineLength; i++) {
+      styles.push({
+        l: i,
+        v: testLine.getStyleAt(i),
+        c: testLine.subBlocks(i, Math.min(i + 1, testLine.lineLength))[0]?.text,
+      });
     }
     expect(styles).toEqual([
-      { l: 0, v: undefined },
-      { l: 1, v: undefined },
-      { l: 2, v: undefined },
-      { l: 3, v: undefined },
-      { l: 4, v: undefined },
-      { l: 5, v: undefined },
-      { l: 6, v: undefined },
-      { l: 7, v: undefined },
-      { l: 8, v: undefined },
-      { l: 9, v: undefined },
-      { l: 10, v: undefined },
-      { l: 11, v: undefined },
-      { l: 12, v: undefined },
-      { l: 13, v: undefined },
-      { l: 14, v: "shiny" },
-      { l: 15, v: "shiny" },
-      { l: 16, v: "shiny" },
-      { l: 17, v: "shiny" },
-      { l: 18, v: "shiny" },
-      { l: 19, v: "shiny" },
-      { l: 20, v: "shiny" },
-      { l: 21, v: "shiny" },
-      { l: 22, v: "shiny" },
-      { l: 23, v: "shiny" },
-      { l: 24, v: "shiny" },
-      { l: 25, v: "shiny" },
-      { l: 26, v: "shiny" },
-      { l: 27, v: "shiny" },
-      { l: 28, v: "shiny" },
-      { l: 29, v: "shiny" },
-      { l: 30, v: undefined },
+      { l: 0, v: undefined, c: "H" },
+      { l: 1, v: undefined, c: "e" },
+      { l: 2, v: undefined, c: "l" },
+      { l: 3, v: undefined, c: "l" },
+      { l: 4, v: undefined, c: "o" },
+      { l: 5, v: undefined, c: "\u00a0" },
+      { l: 6, v: undefined, c: "w" },
+      { l: 7, v: undefined, c: "o" },
+      { l: 8, v: undefined, c: "r" },
+      { l: 9, v: undefined, c: "l" },
+      { l: 10, v: undefined, c: "d" },
+      { l: 11, v: undefined, c: "," },
+      { l: 12, v: undefined, c: " " },
+      { l: 13, v: "shiny", c: "H" },
+      { l: 14, v: "shiny", c: "o" },
+      { l: 15, v: "shiny", c: "w" },
+      { l: 16, v: "shiny", c: " " },
+      { l: 17, v: "shiny", c: "i" },
+      { l: 18, v: "shiny", c: "s" },
+      { l: 19, v: "shiny", c: " " },
+      { l: 20, v: "shiny", c: "i" },
+      { l: 21, v: "shiny", c: "t" },
+      { l: 22, v: "shiny", c: " " },
+      { l: 23, v: "shiny", c: "g" },
+      { l: 24, v: "shiny", c: "o" },
+      { l: 25, v: "shiny", c: "i" },
+      { l: 26, v: "shiny", c: "n" },
+      { l: 27, v: "shiny", c: "g" },
+      { l: 28, v: "shiny", c: "?" },
+      { l: 29, v: undefined, c: undefined },
     ]);
   });
 
@@ -129,7 +132,7 @@ describe("Check basic EditorV3Line", () => {
     expect(newDecimalTestLine.toHtml().outerHTML).toEqual(
       '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
         '<span class="aiev3-span-point lhs"><span class="aiev3-tb">q</span></span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">\u2009</span></span>' +
+        '<span class="aiev3-span-point rhs">\u2009</span>' +
         "</div>",
     );
     const testLine = new EditorV3Line("12.34", {
@@ -258,7 +261,7 @@ describe("Check basic EditorV3Line", () => {
 describe("Check EditorV3Line functions", () => {
   test("upToPos", async () => {
     const line = new EditorV3Line("0123.456", defaultContentProps);
-    expect(line.upToPos(0).map((tb) => tb.data)).toEqual([{ text: "", type: "text" }]);
+    expect(line.upToPos(0).map((tb) => tb.data)).toEqual([]);
     expect(line.upToPos(4).map((tb) => tb.data)).toEqual([{ text: "0123", type: "text" }]);
     expect(line.upToPos(7).map((tb) => tb.data)).toEqual([{ text: "0123.45", type: "text" }]);
     expect(line.upToPos(8).map((tb) => tb.data)).toEqual([{ text: "0123.456", type: "text" }]);
@@ -268,9 +271,7 @@ describe("Check EditorV3Line functions", () => {
       [new EditorV3TextBlock("hello", "world"), new EditorV3TextBlock(" slow")],
       defaultContentProps,
     );
-    expect(line2.upToPos(0).map((tb) => tb.data)).toEqual([
-      { text: "", style: "world", type: "text" },
-    ]);
+    expect(line2.upToPos(0).map((tb) => tb.data)).toEqual([]);
     expect(line2.upToPos(1).map((tb) => tb.data)).toEqual([
       { text: "h", style: "world", type: "text" },
     ]);
@@ -317,7 +318,7 @@ describe("Check EditorV3Line functions", () => {
     expect(line.fromPos(0).map((tb) => tb.data)).toEqual([{ text: "0123.456", type: "text" }]);
     expect(line.fromPos(4).map((tb) => tb.data)).toEqual([{ text: ".456", type: "text" }]);
     expect(line.fromPos(7).map((tb) => tb.data)).toEqual([{ text: "6", type: "text" }]);
-    expect(line.fromPos(8).map((tb) => tb.data)).toEqual([{ text: "", type: "text" }]);
+    expect(line.fromPos(8).map((tb) => tb.data)).toEqual([]);
 
     const line2 = new EditorV3Line(
       [new EditorV3TextBlock("hello", "world"), new EditorV3TextBlock(" slow")],
@@ -348,7 +349,7 @@ describe("Check EditorV3Line functions", () => {
     expect(line2.fromPos(7).map((tb) => tb.data)).toEqual([{ text: "low", type: "text" }]);
     expect(line2.fromPos(8).map((tb) => tb.data)).toEqual([{ text: "ow", type: "text" }]);
     expect(line2.fromPos(9).map((tb) => tb.data)).toEqual([{ text: "w", type: "text" }]);
-    expect(line2.fromPos(10).map((tb) => tb.data)).toEqual([{ text: "", type: "text" }]);
+    expect(line2.fromPos(10).map((tb) => tb.data)).toEqual([]);
   });
 
   test("subBlocks", () => {
@@ -356,9 +357,7 @@ describe("Check EditorV3Line functions", () => {
       [new EditorV3TextBlock("hello", "world"), new EditorV3TextBlock(" slow")],
       defaultContentProps,
     );
-    expect(line2.subBlocks(1, 1).map((tb) => tb.data)).toEqual([
-      { text: "", style: "world", type: "text" },
-    ]);
+    expect(line2.subBlocks(1, 1).map((tb) => tb.data)).toEqual([]);
     expect(line2.subBlocks(1, 2).map((tb) => tb.data)).toEqual([
       { text: "e", style: "world", type: "text" },
     ]);
@@ -403,7 +402,7 @@ describe("Check EditorV3Line functions", () => {
     expect(line2.subBlocks(6, 9).map((tb) => tb.data)).toEqual([{ text: "slo", type: "text" }]);
     expect(line2.subBlocks(7, 9).map((tb) => tb.data)).toEqual([{ text: "lo", type: "text" }]);
     expect(line2.subBlocks(8, 9).map((tb) => tb.data)).toEqual([{ text: "o", type: "text" }]);
-    expect(line2.subBlocks(9, 9).map((tb) => tb.data)).toEqual([{ text: "", type: "text" }]);
+    expect(line2.subBlocks(9, 9).map((tb) => tb.data)).toEqual([]);
   });
 
   test("splitLine", async () => {

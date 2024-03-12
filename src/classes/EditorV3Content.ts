@@ -462,6 +462,12 @@ export class EditorV3Content implements EditorV3Import {
           (pos.startChar < this.lines[pos.startLine].lineLength ? 1 : 0),
       );
       newLines?.length && this.mergeLines(pos.startLine);
+      // Check all lines have at least 1 text block
+      this.lines.forEach((l) => {
+        if (l.textBlocks.length === 0) {
+          l.textBlocks.push(new EditorV3TextBlock("", l.getStyleAt(0)));
+        }
+      });
       // Calculate end character position
       const endChar =
         !newLines || newLines.length === 0
