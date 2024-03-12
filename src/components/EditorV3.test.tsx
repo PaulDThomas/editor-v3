@@ -8,7 +8,7 @@ import { defaultMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 import { getCaretPosition } from "../functions/getCaretPosition";
 import { EditorV3 } from "./EditorV3";
 
-export const mockContent = new EditorV3Content("34.45\n\nx.xx", {
+const mockContent = new EditorV3Content("34.45\n\nx.xx", {
   allowMarkdown: true,
   allowNewLine: false,
   decimalAlignPercent: 80,
@@ -63,53 +63,77 @@ describe("Editor and functions", () => {
   });
 
   test("Backspace and delete", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     const mockSetJson = jest.fn();
     const mockSetHtml = jest.fn();
     const mockSetText = jest.fn();
     await act(async () => {
       render(
-        <div data-testid="container">
-          <EditorV3
-            id="test-editor"
-            input={mockContent.jsonString}
-            setJson={mockSetJson}
-            setHtml={mockSetHtml}
-            setText={mockSetText}
-            style={{ width: "200px" }}
-            allowNewLine
-            decimalAlignPercent={70}
-            textAlignment={EditorV3Align.decimal}
-          />
-        </div>,
+        <EditorV3
+          data-testid="test-editor"
+          id="test-editor"
+          input={mockContent.jsonString}
+          setJson={(ret) => {
+            mockSetJson(ret);
+          }}
+          setHtml={(ret) => {
+            mockSetHtml(ret);
+          }}
+          setText={(ret) => {
+            mockSetText(ret);
+          }}
+          style={{ width: "200px" }}
+          allowNewLine
+          decimalAlignPercent={70}
+          textAlignment={EditorV3Align.decimal}
+        />,
       );
     });
-    const editor = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     let firstSpan = editor.querySelector("span") as HTMLSpanElement;
 
     await user.click(firstSpan);
-    await user.keyboard("{Control>}{ArrowUp}{/Control}{End}{Backspace}");
+    await user.keyboard("{Home}{End}{Backspace}");
     fireEvent.blur(editor);
     expect(mockSetText).toHaveBeenCalledTimes(1);
-    expect(mockSetText).toHaveBeenNthCalledWith(1, "34.4\n\nx.xx");
-    expect(JSON.parse(mockSetJson.mock.calls[0][0])).toEqual({
-      contentProps: {
-        allowNewLine: true,
-        decimalAlignPercent: 70,
-        textAlignment: "decimal",
-      },
-      lines: [
-        {
-          textBlocks: [{ text: "34.4", type: "text" }],
+    expect(mockSetText).toHaveBeenLastCalledWith("34.4\n\nx.xx");
+    expect(mockSetJson).toHaveBeenCalledTimes(1);
+    expect(mockSetJson).toHaveBeenLastCalledWith(
+      JSON.stringify({
+        contentProps: {
+          textAlignment: "decimal",
+          decimalAlignPercent: 70,
+          allowNewLine: true,
         },
-        {
-          textBlocks: [{ text: "", type: "text" }],
-        },
-        {
-          textBlocks: [{ text: "x.xx", style: "shiny", type: "text" }],
-        },
-      ],
-    });
+        lines: [
+          {
+            textBlocks: [{ text: "34.4", type: "text" }],
+          },
+          {
+            textBlocks: [{ text: "", type: "text" }],
+          },
+          {
+            textBlocks: [{ text: "x.xx", style: "shiny", type: "text" }],
+          },
+        ],
+      }),
+    );
+    expect(mockSetHtml).toHaveBeenCalledTimes(1);
+    expect(mockSetHtml).toHaveBeenLastCalledWith(
+      '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">34</span></span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">.4</span></span>' +
+        "</div>" +
+        '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
+        '<span class="aiev3-span-point lhs">\u2009</span>' +
+        '<span class="aiev3-span-point rhs">\u2009</span>' +
+        "</div>" +
+        '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">x</span></span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">.xx</span></span>' +
+        "</div>" +
+        '<div class="aiev3-contents-info" data-allow-new-line="true" data-decimal-align-percent="70" data-text-alignment="&quot;decimal&quot;"></div>',
+    );
 
     // Reacquire firstSpan
     firstSpan = editor.querySelector("span") as HTMLSpanElement;
@@ -174,43 +198,58 @@ describe("Menu styling - add", () => {
     const mockSetText = jest.fn();
     await act(async () => {
       render(
-        <div data-testid="container">
-          <EditorV3
-            id="test-editor"
-            input={mockContent.jsonString}
-            setText={mockSetText}
-            style={{ width: "200px" }}
-            textAlignment={EditorV3Align.left}
-            allowNewLine
-            customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
-            resize
-          />
-        </div>,
+        <EditorV3
+          data-testid="test-editor"
+          id="test-editor"
+          input={mockContent.jsonString}
+          setText={mockSetText}
+          style={{ width: "200px" }}
+          textAlignment={EditorV3Align.left}
+          allowNewLine
+          customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
+          resize
+        />,
       );
     });
     // Get component
-    const container = (await screen.findByTestId("container")).querySelector(
-      "#test-editor",
-    ) as HTMLDivElement;
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     // Go to start of text
-    await user.click(container.querySelectorAll("span")[0] as HTMLSpanElement);
+    await user.click(editor.querySelectorAll("span")[0] as Element);
+    await user.keyboard("{Home}{End}");
+    expect(getCaretPosition(editor)).toEqual({
+      startLine: 0,
+      startChar: 5,
+      isCollapsed: true,
+      endLine: 0,
+      endChar: 5,
+    });
+    // Need to click twice, first click normalised the value
+    await user.keyboard("{ArrowLeft}");
+    expect(getCaretPosition(editor)).toEqual({
+      startLine: 0,
+      startChar: 4,
+      isCollapsed: true,
+      endLine: 0,
+      endChar: 4,
+    });
+    expect(editor.querySelectorAll("span")[0]).toHaveClass("is-active");
     // Check clicked span is active
     await user.keyboard("{ArrowLeft}");
-    expect(container.querySelectorAll("span")[0]).toHaveClass("is-active");
+    expect(editor.querySelectorAll("span")[0]).toHaveClass("is-active");
     await user.keyboard("{Control>}{Home}{/Control}{Home}{End}{Shift>}{Home}{Shift}");
-    expect(getCaretPosition(container)).toEqual({
+    expect(getCaretPosition(editor)).toEqual({
       startLine: 0,
       startChar: 0,
       isCollapsed: false,
       endLine: 0,
       endChar: 5,
     });
-    fireEvent.contextMenu(container.querySelectorAll("span")[0] as HTMLSpanElement);
+    fireEvent.contextMenu(editor.querySelectorAll("span")[0] as HTMLSpanElement);
     const shinyItem = screen.queryByLabelText("shiny") as HTMLSpanElement;
     expect(shinyItem).toBeInTheDocument();
     fireEvent.mouseDown(shinyItem);
     await user.click(shinyItem);
-    expect(container.querySelectorAll("span")[0] as HTMLSpanElement).toHaveClass(
+    expect(editor.querySelectorAll("span")[0] as HTMLSpanElement).toHaveClass(
       "editorv3style-shiny",
     );
   });
@@ -254,13 +293,16 @@ describe("Menu styling - change", () => {
       endChar: 4,
     });
     fireEvent.contextMenu(container.querySelectorAll("span")[2] as HTMLSpanElement);
-    const shinyItem = screen.queryByLabelText("notShiny") as HTMLSpanElement;
-    expect(shinyItem).toBeInTheDocument();
-    fireEvent.mouseDown(shinyItem);
-    await user.click(shinyItem);
-    expect(container.querySelectorAll("span")[2] as HTMLSpanElement).toHaveClass(
-      "editorv3style-notShiny",
-    );
+    const notShinyMenuItem = screen.queryByLabelText("notShiny") as HTMLSpanElement;
+    expect(notShinyMenuItem).toBeInTheDocument();
+    fireEvent.mouseDown(notShinyMenuItem);
+    await user.click(notShinyMenuItem);
+    const notShinySpan = container.querySelectorAll(
+      "span.editorv3style-notShiny",
+    ) as NodeListOf<HTMLSpanElement>;
+    expect(notShinySpan.length).toEqual(1);
+    expect(notShinySpan[0]).toHaveTextContent("x.xx");
+    expect(mockSetText).toHaveBeenLastCalledWith("34.45\n\nx.xx");
   });
 });
 
@@ -270,31 +312,28 @@ describe("Menu styling - remove", () => {
     const mockSetText = jest.fn();
     await act(async () => {
       render(
-        <div data-testid="container">
-          <EditorV3
-            id="test-editor"
-            input={mockContent.jsonString}
-            setText={mockSetText}
-            style={{ width: "200px" }}
-            textAlignment={EditorV3Align.left}
-            allowNewLine
-            customStyleMap={{
-              shiny: { color: "pink", fontWeight: "700" },
-              notShiny: { color: "blue" },
-            }}
-            resize
-          />
-        </div>,
+        <EditorV3
+          data-testid="test-editor"
+          id="test-editor"
+          input={mockContent.jsonString}
+          setText={mockSetText}
+          style={{ width: "200px" }}
+          textAlignment={EditorV3Align.left}
+          allowNewLine
+          customStyleMap={{
+            shiny: { color: "pink", fontWeight: "700" },
+            notShiny: { color: "blue" },
+          }}
+          resize
+        />,
       );
     });
     // Get component
-    const container = (await screen.findByTestId("container")).querySelector(
-      "#test-editor",
-    ) as HTMLDivElement;
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     // Go to start of text
-    await user.click(container.querySelectorAll("span")[2] as HTMLSpanElement);
+    await user.click(editor.querySelectorAll("span")[2] as HTMLSpanElement);
     await user.keyboard("{End}{Shift>}{Home}{Shift}");
-    expect(getCaretPosition(container)).toEqual({
+    expect(getCaretPosition(editor)).toEqual({
       startLine: 2,
       startChar: 0,
       isCollapsed: false,
@@ -302,11 +341,19 @@ describe("Menu styling - remove", () => {
       endChar: 4,
     });
     // Click remove
-    fireEvent.contextMenu(container.querySelectorAll("span")[2]);
+    fireEvent.contextMenu(editor.querySelectorAll("span")[2]);
     expect(screen.queryByText("Remove style")).toBeInTheDocument();
     const removeStyle = screen.getByLabelText("Remove style");
     await user.click(removeStyle);
-    expect(container.querySelectorAll("span")[2]).not.toHaveClass("editorv3style-shiny");
+    expect(editor.querySelectorAll("span").length).toEqual(3);
+    expect(editor.querySelectorAll("span")[2]).not.toHaveClass("editorv3style-shiny");
+    expect(getCaretPosition(editor)).toEqual({
+      startLine: 2,
+      startChar: 4,
+      isCollapsed: true,
+      endLine: 2,
+      endChar: 4,
+    });
   });
 });
 
@@ -505,21 +552,35 @@ describe("Select all", () => {
     const user = userEvent.setup();
     const mockSet = jest.fn();
     render(
-      <div data-testid="container">
-        <EditorV3
-          id="programmernotes"
-          input={"Item 2 programmer notes"}
-          setJson={mockSet}
-        />
-      </div>,
+      <EditorV3
+        data-testid="programmernotes"
+        id="programmernotes"
+        input={"Item 2 programmer notes"}
+        setJson={mockSet}
+      />,
     );
-    const container = screen.getByTestId("container") as HTMLDivElement;
-    const box = container.querySelector("#programmernotes-editable") as HTMLDivElement;
-    expect(box).toBeInTheDocument();
-    await user.click(box);
-    await user.keyboard("{Control>}a{/Control}{Delete}");
+    const editable = screen
+      .queryByTestId("programmernotes")
+      ?.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    await user.click(editable);
+    expect(getCaretPosition(editable)).toEqual({
+      startLine: 0,
+      startChar: 0,
+      isCollapsed: false,
+      endLine: 0,
+      endChar: 23,
+    });
+    await user.keyboard("{Delete}");
+    expect(getCaretPosition(editable)).toEqual({
+      startLine: 0,
+      startChar: 0,
+      isCollapsed: true,
+      endLine: 0,
+      endChar: 0,
+    });
     await user.keyboard("New programmer notes");
-    fireEvent.blur(box);
+    fireEvent.blur(editable);
     expect(screen.getByText("New")).toBeInTheDocument();
     expect(screen.getByText("programmer")).toBeInTheDocument();
     expect(screen.getByText("notes")).toBeInTheDocument();
@@ -538,11 +599,14 @@ describe("Undo/redo", () => {
   const TestContainer = () => {
     const [input, setInput] = useState("");
     return (
-      <div data-testid="container">
+      <div>
         <EditorV3
+          data-testid="test-editor"
           id="test-editor"
           input={input}
-          setJson={setInput}
+          setJson={(ret) => {
+            setInput(ret);
+          }}
           allowMarkdown
         />
       </div>
@@ -553,9 +617,19 @@ describe("Undo/redo", () => {
     await act(async () => {
       render(<TestContainer />);
     });
-    const inputSpan = screen.queryByTestId("container")?.querySelector("span") as HTMLSpanElement;
-    expect(inputSpan).toBeInTheDocument();
-    await user.click(inputSpan);
+    const editable = screen
+      .queryByTestId("test-editor")
+      ?.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    expect(getCaretPosition(editable)).toEqual(null);
+    await user.click(editable);
+    expect(getCaretPosition(editable)).toEqual({
+      startLine: 0,
+      startChar: 0,
+      isCollapsed: true,
+      endLine: 0,
+      endChar: 0,
+    });
     await user.keyboard("added");
     expect(screen.queryByText("added")).toBeInTheDocument();
     await user.keyboard("{Control>}z{/Control}");
@@ -564,6 +638,8 @@ describe("Undo/redo", () => {
     expect(screen.queryByText("add")).toBeInTheDocument();
     await user.keyboard("{Control>}y{/Control}");
     expect(screen.queryByText("adde")).toBeInTheDocument();
+    await user.keyboard("{Control>}y{/Control}");
+    expect(screen.queryByText("added")).toBeInTheDocument();
   });
 });
 
@@ -632,7 +708,7 @@ describe("Updates from above", () => {
         '<div class="aiev3-line left">' +
         '<span class="aiev3-tb">New&nbsp;</span><span class="aiev3-tb">&lt;&lt;shiny::input&gt;&gt;</span>' +
         "</div>" +
-        '<div class="aiev3-contents-info" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div></div>' +
+        '<div class="aiev3-contents-info" data-allow-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div></div>' +
         "</div></div>",
     );
   });
@@ -650,7 +726,7 @@ describe("Updates from above", () => {
         '<div class="aiev3-line center">' +
         '<span class="aiev3-tb">Before</span>' +
         "</div>" +
-        '<div class="aiev3-contents-info" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}" data-text-alignment="&quot;center&quot;"></div></div>' +
+        '<div class="aiev3-contents-info" data-allow-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}" data-text-alignment="&quot;center&quot;"></div></div>' +
         "</div></div>",
     );
   });
@@ -669,7 +745,7 @@ describe("Updates from above", () => {
         '<span class="aiev3-span-point lhs"><span class="aiev3-tb">Before</span></span>' +
         '<span class="aiev3-span-point rhs">\u2009</span>' +
         "</div>" +
-        '<div class="aiev3-contents-info" data-decimal-align-percent="80" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}" data-text-alignment="&quot;decimal&quot;"></div></div>' +
+        '<div class="aiev3-contents-info" data-allow-markdown="true" data-decimal-align-percent="80" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}" data-text-alignment="&quot;decimal&quot;"></div></div>' +
         "</div></div>",
     );
   });
@@ -687,7 +763,7 @@ describe("Updates from above", () => {
         '<div class="aiev3-line left">' +
         '<span class="aiev3-tb">Before</span>' +
         "</div>" +
-        '<div class="aiev3-contents-info" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;blue&quot;}}"></div>' +
+        '<div class="aiev3-contents-info" data-allow-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;blue&quot;}}"></div>' +
         "</div></div></div>",
     );
   });
@@ -704,7 +780,7 @@ describe("Updates from above", () => {
       '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
         '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
         '<div class="aiev3-markdown-line">Before</div>' +
-        '<div class="aiev3-contents-info" data-show-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
+        '<div class="aiev3-contents-info" data-allow-markdown="true" data-show-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
         "</div></div></div>",
     );
     // Update text
@@ -713,7 +789,7 @@ describe("Updates from above", () => {
       '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
         '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
         '<div class="aiev3-markdown-line">New &lt;&lt;shiny::input&gt;&gt;</div>' +
-        '<div class="aiev3-contents-info" data-show-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
+        '<div class="aiev3-contents-info" data-allow-markdown="true" data-show-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
         "</div></div></div>",
     );
     // Hide markdown
@@ -729,7 +805,7 @@ describe("Updates from above", () => {
       '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
         '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
         '<div class="aiev3-markdown-line">New ¬¬shiny::input&gt;&gt;</div>' +
-        '<div class="aiev3-contents-info" data-markdown-settings="{&quot;styleStartTag&quot;:&quot;¬¬&quot;,&quot;styleNameEndTag&quot;:&quot;::&quot;,&quot;styleEndTag&quot;:&quot;>>&quot;,&quot;defaultStyle&quot;:&quot;defaultStyle&quot;,&quot;dropDownStartTag&quot;:&quot;[[&quot;,&quot;dropDownNameEndTag&quot;:&quot;::&quot;,&quot;dropDownEndTag&quot;:&quot;]]&quot;,&quot;dropDownValueSeparator&quot;:&quot;||&quot;,&quot;dropDownSelectedValueTag&quot;:&quot;**&quot;,&quot;calcStartTag&quot;:&quot;[![&quot;,&quot;calcNameEndTag&quot;:&quot;::&quot;,&quot;calcEndTag&quot;:&quot;]!]&quot;,&quot;calcConditionSeparator&quot;:&quot;||&quot;,&quot;calcAndSeparator&quot;:&quot;&amp;&amp;&quot;,&quot;atStartTag&quot;:&quot;@[&quot;,&quot;atEndTag&quot;:&quot;@]&quot;}" data-show-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
+        '<div class="aiev3-contents-info" data-allow-markdown="true" data-markdown-settings="{&quot;styleStartTag&quot;:&quot;¬¬&quot;,&quot;styleNameEndTag&quot;:&quot;::&quot;,&quot;styleEndTag&quot;:&quot;>>&quot;,&quot;defaultStyle&quot;:&quot;defaultStyle&quot;,&quot;dropDownStartTag&quot;:&quot;[[&quot;,&quot;dropDownNameEndTag&quot;:&quot;::&quot;,&quot;dropDownEndTag&quot;:&quot;]]&quot;,&quot;dropDownValueSeparator&quot;:&quot;||&quot;,&quot;dropDownSelectedValueTag&quot;:&quot;**&quot;,&quot;calcStartTag&quot;:&quot;[![&quot;,&quot;calcNameEndTag&quot;:&quot;::&quot;,&quot;calcEndTag&quot;:&quot;]!]&quot;,&quot;calcConditionSeparator&quot;:&quot;||&quot;,&quot;calcAndSeparator&quot;:&quot;&amp;&amp;&quot;,&quot;atStartTag&quot;:&quot;@[&quot;,&quot;atEndTag&quot;:&quot;@]&quot;}" data-show-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
         "</div></div></div>",
     );
   });

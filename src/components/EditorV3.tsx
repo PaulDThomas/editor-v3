@@ -2,11 +2,8 @@ import { ContextMenuHandler, MenuItem } from "@asup/context-menu";
 import { cloneDeep, isEqual } from "lodash";
 import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EditorV3Content, defaultContentProps } from "../classes/EditorV3Content";
-import { EditorV3Line } from "../classes/EditorV3Line";
-import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";
-import { EditorV3Align, EditorV3LineImport, EditorV3Styles } from "../classes/interface";
+import { EditorV3Align, EditorV3Position, EditorV3Styles } from "../classes/interface";
 import { IMarkdownSettings } from "../classes/markdown/MarkdownSettings";
-import { applyStylesToHTML } from "../functions/applyStylesToHTML";
 import { useDebounceStack } from "../hooks/useDebounceStack";
 import "./EditorV3.css";
 
@@ -27,6 +24,7 @@ interface EditorV3Props {
   styleOnContextMenu?: boolean;
   allowMarkdown?: boolean;
   markdownSettings?: IMarkdownSettings;
+  debounceMilliseconds?: number | null;
 }
 
 export const EditorV3 = ({
@@ -46,6 +44,7 @@ export const EditorV3 = ({
   resize = false,
   spellCheck = false,
   styleOnContextMenu = true,
+  debounceMilliseconds = null,
   ...rest
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
@@ -84,22 +83,36 @@ export const EditorV3 = ({
   ]);
 
   // General return function
+  const [lastInput, setLastInput] = useState<string>(input);
+  const [lastCaretPosition, setLastCaretPosition] = useState<EditorV3Position | null>(null);
+  const [lastTextSent, setLastTextSent] = useState<string>(input);
+  const [lastHtmlSent, setLastHtmlSent] = useState<string>(input);
+  const [lastJsonSent, setLastJsonSent] = useState<string>(input);
   const returnData = useCallback(
     (ret: EditorV3Content) => {
-      // Redraw dummay for information
+      // Save caret position
+      setLastCaretPosition(ret.caretPosition);
+      // Redraw dummy for information
       const dummyNode = document.createElement("div");
       ret.redraw(dummyNode);
-      const html = dummyNode.innerHTML ?? "";
       const text = ret.text;
+      if (setText && text !== lastTextSent) {
+        setText(text);
+        setLastTextSent(text);
+      }
+      const html = dummyNode.innerHTML ?? "";
+      if (setHtml && html !== lastHtmlSent) {
+        setHtml(html);
+        setLastHtmlSent(html);
+      }
       const json = ret.jsonString;
-      if (text !== input && html !== input && json !== input) {
-        setText && setText(text);
-        setHtml && setHtml(html);
-        setJson && setJson(json);
+      if (setJson && json !== lastJsonSent) {
+        setJson(json);
+        setLastJsonSent(json);
       }
       dummyNode.remove();
     },
-    [input, setHtml, setJson, setText],
+    [lastHtmlSent, lastJsonSent, lastTextSent, setHtml, setJson, setText],
   );
 
   // Redraw element, used in debounced stack as onChange callback
@@ -116,9 +129,10 @@ export const EditorV3 = ({
   } = useDebounceStack<EditorV3Content>(
     inputDecode,
     setInputDecode,
-    null,
+    debounceMilliseconds,
     redrawElement,
     returnData,
+    (oldValue, newValue) => isEqual(oldValue?.data ?? {}, newValue?.data ?? {}),
   );
 
   // Update any content properry from parent
@@ -130,14 +144,14 @@ export const EditorV3 = ({
   });
 
   // Update input from parent, need to track the last string input separately from the debounce stack
-  const [lastInput, setLastInput] = useState<string>(input);
   useEffect(() => {
     if (content && input !== lastInput) {
       const newContent = new EditorV3Content(input, contentProps);
+      newContent.caretPosition = lastCaretPosition;
       setContent(newContent);
       setLastInput(input);
     }
-  }, [content, contentProps, input, lastInput, redrawElement, setContent]);
+  }, [content, contentProps, input, lastCaretPosition, lastInput, redrawElement, setContent]);
 
   // Set up menu items
   const menuItems = useMemo((): MenuItem[] => {
@@ -190,12 +204,28 @@ export const EditorV3 = ({
   }, [allowMarkdown, content, contentProps, setContent]);
 
   // Work out backgroup colour and border
+  // Focus and blur events are container not contenteditable level events!
   const [inFocus, setInFocus] = useState<boolean>(false);
   const handleFocus = useCallback(() => {
     if (divRef.current && content) {
       setInFocus(true);
+      // Get current content
+      const newContent = new EditorV3Content(divRef.current, contentProps);
+      // Select everything
+      newContent.caretPosition = {
+        startLine: 0,
+        startChar: 0,
+        endLine: newContent.lines.length - 1,
+        endChar: newContent.lines[newContent.lines.length - 1].lineLength,
+        isCollapsed: false,
+      };
+      setContent(newContent);
     }
-  }, [content]);
+  }, [content, contentProps, setContent]);
+  const handleBlur = useCallback(() => {
+    setInFocus(false);
+    forceReturn();
+  }, [forceReturn]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -209,7 +239,16 @@ export const EditorV3 = ({
           e.stopPropagation();
           e.preventDefault();
           redo();
-        } else {
+        } else if (
+          !(
+            // Current target is locked
+            (
+              (e.target instanceof HTMLSpanElement && e.target.dataset.isLocked === "true") ||
+              // Ignore key down on metakeys
+              ["Control", "Shift", "Alt"].includes(e.key)
+            )
+          )
+        ) {
           // Get current information and update content buffer
           const newContent = new EditorV3Content(divRef.current, contentProps);
           newContent.handleKeydown(e);
@@ -223,31 +262,24 @@ export const EditorV3 = ({
   const handleKeyUp = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       // Markdown editing should not be handled
-      if (content && !content.showMarkdown) {
+      if (divRef.current && content && !content.showMarkdown) {
         // Stop handled keys
-        if (
-          [
-            "Enter",
-            "Backspace",
-            "Delete",
-            "ArrowLeft",
-            "ArrowRight",
-            "ArrowUp",
-            "ArrowDown",
-            "Home",
-            "End",
-          ].includes(e.code) ||
-          (["KeyA", "KeyY", "KeyZ"].includes(e.code) && e.ctrlKey)
-        ) {
+        if (["KeyY", "KeyZ"].includes(e.code) && e.ctrlKey) {
           e.stopPropagation();
           e.preventDefault();
           return;
         }
         // Always set new content value
-        else if (divRef.current) {
+        else if (
+          !(
+            // Ignore key up on metakeys
+            ["Control", "Shift", "Alt"].includes(e.key)
+          )
+        ) {
           e.preventDefault();
           e.stopPropagation();
           const newContent = new EditorV3Content(divRef.current, contentProps);
+          newContent.handleKeyup(e);
           setContent(newContent);
         }
       }
@@ -255,86 +287,37 @@ export const EditorV3 = ({
     [content, contentProps, setContent],
   );
 
-  const handleMouseUp = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+  // const handleMouseUp = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+  //   if (divRef.current) {
+  //     // e.preventDefault();
+  //     e.stopPropagation();
+  //     const newContent = new EditorV3Content(divRef.current, contentProps);
+  //     setLastCaretPosition(newContent.caretPosition);
+  //     setContent(newContent);
+  //   }
+  // }, []);
+
+  const handleCopy = useCallback(
+    (e: React.ClipboardEvent<HTMLDivElement>) => {
       if (divRef.current) {
-        e.preventDefault();
-        e.stopPropagation();
         const newContent = new EditorV3Content(divRef.current, contentProps);
+        newContent.handleCopy(e);
         setContent(newContent);
       }
     },
     [contentProps, setContent],
   );
 
-  const handleCopy = useCallback(
-    (e: React.ClipboardEvent<HTMLDivElement>) => {
-      if (content && !content.showMarkdown && divRef.current) {
-        e.preventDefault();
-        e.stopPropagation();
-        const newContent = new EditorV3Content(divRef.current, contentProps);
-        if (newContent.caretPosition) {
-          const toClipboard = newContent.subLines(newContent.caretPosition);
-          e.clipboardData.setData("text/plain", toClipboard.map((l) => l.lineText).join("\n"));
-          e.clipboardData.setData(
-            "text/html",
-            toClipboard
-              .map((l) => applyStylesToHTML(l.toHtml(), content.styles).outerHTML)
-              .join(""),
-          );
-          e.clipboardData.setData("data/aiev3", JSON.stringify(toClipboard.map((l) => l.data)));
-          if (e.type === "cut") {
-            newContent.splice(newContent.caretPosition);
-            setContent(newContent);
-          }
-        }
-      }
-    },
-    [content, contentProps, setContent],
-  );
-
   const handlePaste = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
       if (divRef.current) {
-        e.preventDefault();
-        e.stopPropagation();
         const newContent = new EditorV3Content(divRef.current, contentProps);
-        if (newContent.caretPosition) {
-          const lines: EditorV3Line[] = [];
-          const linesImport = (
-            e.clipboardData.getData("data/aiev3") !== ""
-              ? JSON.parse(e.clipboardData.getData("data/aiev3"))
-              : e.clipboardData
-                  .getData("text/plain")
-                  .split("\n")
-                  .map((t) => ({
-                    textBlocks: [{ text: t }],
-                  }))
-          ) as EditorV3LineImport[];
-          // Just text blocks if only one line is allowed
-          if (linesImport.length > 1 && !allowNewLine) {
-            const textBlocks: EditorV3TextBlock[] = linesImport
-              .flatMap((l) => l.textBlocks)
-              .map((tb) => new EditorV3TextBlock(tb));
-            lines.push(new EditorV3Line(textBlocks, contentProps));
-          } else {
-            lines.push(
-              ...linesImport.map((l) => new EditorV3Line(JSON.stringify(l), contentProps)),
-            );
-          }
-          // Splice in new data and set new content
-          newContent.splice(newContent.caretPosition, lines);
-          setContent(newContent);
-        }
+        newContent.handlePaste(e);
+        setContent(newContent);
       }
     },
-    [allowNewLine, contentProps, setContent],
+    [contentProps, setContent],
   );
-
-  const handleBlur = useCallback(() => {
-    setInFocus(false);
-    forceReturn();
-  }, [forceReturn]);
 
   const styleRecalc = useMemo(() => {
     const s = { ...style };
@@ -386,13 +369,11 @@ export const EditorV3 = ({
             }
             spellCheck={spellCheck}
             ref={divRef}
-            onBlurCapture={handleBlur}
             onCopyCapture={handleCopy}
             onCutCapture={handleCopy}
-            onFocusCapture={handleFocus}
             onKeyDownCapture={handleKeyDown}
             onKeyUpCapture={handleKeyUp}
-            onMouseUpCapture={handleMouseUp}
+            // onMouseUp={handleMouseUp}
             onPasteCapture={handlePaste}
           />
         </div>

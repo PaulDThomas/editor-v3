@@ -3,7 +3,19 @@ import userEvent from "@testing-library/user-event";
 import { EditorV3Align } from "../classes/interface";
 import { getCaretPosition } from "./getCaretPosition";
 import { EditorV3 } from "../components/EditorV3";
-import { mockContent } from "../components/EditorV3.test";
+import { EditorV3Content } from "../classes";
+import { defaultMarkdownSettings } from "../classes/markdown/MarkdownSettings";
+
+const mockContent = new EditorV3Content("34.45\n\nx.xx", {
+  allowMarkdown: true,
+  allowNewLine: false,
+  decimalAlignPercent: 80,
+  markdownSettings: defaultMarkdownSettings,
+  showMarkdown: false,
+  styles: { shiny: { color: "pink", fontWeight: "700" } },
+  textAlignment: EditorV3Align.decimal,
+});
+mockContent.applyStyle("shiny", { startLine: 2, startChar: 0, endLine: 2, endChar: 4 });
 
 describe("Move cursor tests", () => {
   test("Movements", async () => {

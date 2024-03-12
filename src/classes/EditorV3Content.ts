@@ -11,6 +11,7 @@ import {
   EditorV3ContentProps,
   EditorV3ContentPropsInput,
   EditorV3Import,
+  EditorV3LineImport,
   EditorV3Position,
   EditorV3Styles,
 } from "./interface";
@@ -18,7 +19,7 @@ import { MarkdownLineClass } from "./markdown/MarkdownLineClass";
 import { IMarkdownSettings, defaultMarkdownSettings } from "./markdown/MarkdownSettings";
 
 export const defaultContentProps: EditorV3ContentProps = {
-  allowMarkdown: true,
+  allowMarkdown: false,
   allowNewLine: false,
   decimalAlignPercent: 60,
   markdownSettings: defaultMarkdownSettings,
@@ -111,11 +112,23 @@ export class EditorV3Content implements EditorV3Import {
   }
 
   /**
-   * Current caret position
+   * Current caret position and lock status
    */
   private _caretPosition: EditorV3Position | null = null;
   get caretPosition() {
     return this._caretPosition;
+  }
+  set caretPosition(pos: EditorV3Position | null) {
+    this._caretPosition = pos;
+  }
+  private _isCaretLocked(pos = this._caretPosition) {
+    let ret = false;
+    if (pos) {
+      const startBlock = this.lines[pos.startLine].getBlockAt(pos.startChar);
+      const endBlock = this.lines[pos.endLine].getBlockAt(pos.endChar);
+      ret = (startBlock && startBlock.isLocked) || (endBlock && endBlock.isLocked) || false;
+    }
+    return ret;
   }
 
   // Read only attributes
@@ -249,15 +262,13 @@ export class EditorV3Content implements EditorV3Import {
         const r = readV3Html(input.innerHTML, props);
         this.copyImport(r);
         this._caretPosition = getCaretPosition(input);
-        if (this._caretPosition)
-          this.lines[this._caretPosition.startLine].setActiveBlock(this._caretPosition);
       } else {
         // Check for stringified class input
         const jsonInput: EditorV3Import = JSON.parse(input);
         if (!Array.isArray(jsonInput.lines)) throw "No lines";
         this.copyImport(jsonInput);
       }
-    } catch {
+    } catch (e) {
       // Establish input as string
       const inputString = (input instanceof HTMLDivElement ? input.outerHTML : input) as string;
       // Read in v3 HTML/text
@@ -366,7 +377,7 @@ export class EditorV3Content implements EditorV3Import {
     if (this.lines.length > pos.startLine && this.text !== "") {
       const newPos = { ...pos };
       // Move cursor if start and end are the same
-      if (pos.startLine === pos.endLine && pos.startChar === pos.endChar) {
+      if (pos.isCollapsed) {
         // Backspace at end of line
         if (backwards && pos.startLine > 0 && pos.startChar === 0) {
           newPos.startChar = this.lines[pos.startLine - 1].lineLength;
@@ -384,8 +395,8 @@ export class EditorV3Content implements EditorV3Import {
           newPos.endChar = pos.endChar + 1;
         }
       }
-      // Remove under selected
-      this.splice(newPos);
+      // Remove under caret if it is not locked
+      if (!this._isCaretLocked(pos)) this.splice(newPos);
       newPos.endLine = newPos.startLine;
       newPos.endChar = newPos.startChar;
       return newPos;
@@ -526,9 +537,30 @@ export class EditorV3Content implements EditorV3Import {
             _i === pos.endLine ? pos.endChar : Infinity,
           );
         }
+        this._caretPosition = { ...pos, startLine: pos.endLine, startChar: pos.endChar };
       }
     }
     return this;
+  }
+
+  /**
+   * Get position of block
+   * @param block Block to get position of
+   * @returns Position of block
+   */
+  public getBlockPosition(block: EditorV3TextBlock): EditorV3Position {
+    const startLine = this.lines.findIndex((l) => l.textBlocks.includes(block));
+    const blockIndex = this.lines[startLine].textBlocks.findIndex((b) => b === block);
+    const startChar = this.lines[startLine].textBlocks
+      .slice(0, blockIndex)
+      .reduce((a, b) => a + b.text.length, 0);
+    return {
+      isCollapsed: false,
+      startLine,
+      startChar,
+      endLine: startLine,
+      endChar: startChar + block.text.length,
+    };
   }
 
   /**
@@ -537,8 +569,12 @@ export class EditorV3Content implements EditorV3Import {
    */
   public redraw(el: Element) {
     // Set active block
-    this._caretPosition &&
+    const activeBlock =
+      this._caretPosition &&
       this.lines[this._caretPosition.startLine].setActiveBlock(this._caretPosition);
+    if (activeBlock?.isLocked) {
+      this._caretPosition = this.getBlockPosition(activeBlock);
+    }
     // Draw HTML
     el.innerHTML = "";
     if (this._showMarkdown) {
@@ -555,22 +591,13 @@ export class EditorV3Content implements EditorV3Import {
     this._caretPosition && setCaretPosition(el, this._caretPosition);
   }
 
+  /**
+   * Handle keydown event in the holding div
+   * @param e Handle keydown event
+   */
   public handleKeydown(e: React.KeyboardEvent<HTMLDivElement>) {
-    // Handle delete
-    if (this._caretPosition && ["Backspace", "Delete"].includes(e.key)) {
-      e.stopPropagation();
-      e.preventDefault();
-      const newPos = this.deleteCharacter(this._caretPosition, e.key === "Backspace");
-      this._caretPosition = newPos;
-    }
-    if (this._caretPosition && this.allowNewLine && e.key === "Enter") {
-      e.stopPropagation();
-      e.preventDefault();
-      const newPos = this.splitLine(this._caretPosition);
-      this._caretPosition = newPos;
-    }
     // Select all
-    else if (e.ctrlKey && e.code === "KeyA" && this.text !== "") {
+    if (e.ctrlKey && e.code === "KeyA" && this.text !== "") {
       e.stopPropagation();
       e.preventDefault();
       this._caretPosition = {
@@ -589,6 +616,111 @@ export class EditorV3Content implements EditorV3Import {
       e.stopPropagation();
       e.preventDefault();
       this._caretPosition = moveCursor(this, this._caretPosition, e);
+    }
+    // Stop key down actions if the caretPosition include an isLocked entry
+    else if (this._caretPosition && this._isCaretLocked()) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    // Handle delete
+    else if (this._caretPosition && ["Backspace", "Delete"].includes(e.key)) {
+      e.stopPropagation();
+      e.preventDefault();
+      const newPos = this.deleteCharacter(this._caretPosition, e.key === "Backspace");
+      this._caretPosition = newPos;
+    }
+    // Enter key cannot be used here
+    else if (this._caretPosition && this.allowNewLine && e.key === "Enter") {
+      e.stopPropagation();
+      e.preventDefault();
+      const newPos = this.splitLine(this._caretPosition);
+      this._caretPosition = newPos;
+    }
+  }
+
+  /**
+   * Handle keyup event in the holding div
+   * @param e Handle keyup event
+   */
+  public handleKeyup(e: React.KeyboardEvent<HTMLDivElement>) {
+    // Update caret position
+    if (this._caretPosition) {
+      this._caretPosition = getCaretPosition(e.currentTarget);
+    }
+    if (
+      [
+        "Enter",
+        "Backspace",
+        "Delete",
+        "ArrowLeft",
+        "ArrowRight",
+        "ArrowUp",
+        "ArrowDown",
+        "Home",
+        "End",
+      ].includes(e.code) ||
+      (e.ctrlKey && e.code === "KeyA")
+    ) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+  }
+
+  /**
+   * Handle copy and cut inside the holding div
+   * @param e Copy or cut event
+   */
+  public handleCopy = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (this._caretPosition) {
+      const toClipboard = this.subLines(this._caretPosition);
+      e.clipboardData.setData("text/plain", toClipboard.map((l) => l.lineText).join("\n"));
+      e.clipboardData.setData(
+        "text/html",
+        toClipboard.map((l) => applyStylesToHTML(l.toHtml(), this.styles).outerHTML).join(""),
+      );
+      e.clipboardData.setData("data/aiev3", JSON.stringify(toClipboard.map((l) => l.data)));
+      if (e.type === "cut" && !this._isCaretLocked()) {
+        this.splice(this._caretPosition);
+      }
+    }
+  };
+
+  /**
+   * Handle paste inside the holding div
+   * @param e Paste event
+   */
+  public handlePaste(e: React.ClipboardEvent<HTMLDivElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    // Check cursor is present, and is does not contain a locked block
+    if (this._caretPosition && !this._isCaretLocked()) {
+      // Get clipboard data
+      const lines: EditorV3Line[] = [];
+      const linesImport = (
+        e.clipboardData.getData("data/aiev3") !== ""
+          ? JSON.parse(e.clipboardData.getData("data/aiev3"))
+          : e.clipboardData
+              .getData("text/plain")
+              .split("\n")
+              .map((t) => ({
+                textBlocks: [{ text: t }],
+              }))
+      ) as EditorV3LineImport[];
+      // Just text blocks if only one line is allowed
+      if (linesImport.length > 1 && !this.allowNewLine) {
+        const textBlocks: EditorV3TextBlock[] = linesImport
+          .flatMap((l) => l.textBlocks)
+          .map((tb) => new EditorV3TextBlock(tb));
+        lines.push(new EditorV3Line(textBlocks, this.contentProps));
+      } else {
+        lines.push(
+          ...linesImport.map((l) => new EditorV3Line(JSON.stringify(l), this.contentProps)),
+        );
+      }
+      // Splice in new data and set new content
+      this.splice(this._caretPosition, lines);
     }
   }
 }

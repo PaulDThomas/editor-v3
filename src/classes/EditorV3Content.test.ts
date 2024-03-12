@@ -78,10 +78,10 @@ describe("Check basic EditorV3Content", () => {
 
     // Repeat as decimal
     testContent.textAlignment = EditorV3Align.decimal;
-    expect(new EditorV3Content(testContent.jsonString)).toEqual(testContent);
+    expect(new EditorV3Content(testContent.jsonString).data).toEqual(testContent.data);
     div.innerHTML = "";
     div.appendChild(testContent.toHtml());
-    expect(new EditorV3Content(div.innerHTML)).toEqual(testContent);
+    expect(new EditorV3Content(div.innerHTML).data).toEqual(testContent.data);
   });
 
   test("Load multiline string", async () => {
@@ -456,7 +456,7 @@ describe("Render markdown text from content", () => {
       `<div class="aiev3-markdown-line">1&lt;&lt;shiny::23&gt;&gt;</div>` +
         `<div class="aiev3-markdown-line">&lt;&lt;shiny::456&gt;&gt;</div>` +
         `<div class="aiev3-markdown-line">&lt;&lt;shiny::7&gt;&gt;89</div>` +
-        `<div class="aiev3-contents-info" data-allow-new-line="true" data-decimal-align-percent="80" data-show-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}" data-text-alignment="&quot;center&quot;"></div>`,
+        `<div class="aiev3-contents-info" data-allow-markdown="true" data-allow-new-line="true" data-decimal-align-percent="80" data-show-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}" data-text-alignment="&quot;center&quot;"></div>`,
     );
     // Eat your own tail
     const readDiv = new EditorV3Content(div.innerHTML);
@@ -514,7 +514,7 @@ describe("Splice markdown tests", () => {
       '<div class="aiev3-markdown-line">123</div>' +
         '<div class="aiev3-markdown-line">456</div>' +
         '<div class="aiev3-markdown-line">789</div>' +
-        '<div class="aiev3-contents-info" data-show-markdown="true"></div>',
+        '<div class="aiev3-contents-info" data-allow-markdown="true" data-show-markdown="true"></div>',
     );
     expect(testContent.showMarkdown).toEqual(false);
   });
