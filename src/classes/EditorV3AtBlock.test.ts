@@ -1,13 +1,12 @@
-import { drawAt } from "./drawAt";
+import { EditorV3AtBlock } from "./EditorV3AtBlock";
 
-describe("drawAt", () => {
+describe("EditorV3AtBlock", () => {
   test("should return a DocumentFragment with the correct structure and attributes", () => {
     const text = "Hello, world!";
     const style = "bold";
-    const isActive = true;
-    const isLocked = false;
-
-    const result = drawAt(text, style, isActive, isLocked);
+    const block = new EditorV3AtBlock({ text, style });
+    block.setActive(true);
+    const result = block.toHtml();
 
     // Check if the DocumentFragment contains a single span element
     expect(result.childNodes.length).toBe(1);
@@ -29,13 +28,12 @@ describe("drawAt", () => {
   });
 
   test("should return a DocumentFragment with the correct structure and attributes when isActive is false and isLocked is true", () => {
-    const text = "Hello,\uFEFF world!";
+    const text = "Hello, world!";
     const style = undefined;
-    const isActive = false;
-    const isLocked = true;
+    const block = new EditorV3AtBlock({ text, style, isLocked: true });
+    const result = block.toHtml();
 
     // Check if the DocumentFragment contains a single span element
-    const result = drawAt(text, style, isActive, isLocked);
     expect(result.childNodes.length).toBe(1);
     expect(result.firstChild).toBeInstanceOf(HTMLSpanElement);
 

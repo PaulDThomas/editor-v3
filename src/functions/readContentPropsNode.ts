@@ -1,5 +1,5 @@
 import { cloneDeep } from "lodash";
-import { defaultContentProps } from "../classes/EditorV3Content";
+import { defaultContentProps } from "../classes/defaultContentProps";
 import { EditorV3Align, EditorV3ContentProps } from "../classes/interface";
 
 export const readContentPropsNode = (node: HTMLDivElement): EditorV3ContentProps | undefined => {

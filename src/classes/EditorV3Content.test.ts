@@ -1,5 +1,6 @@
 /* eslint-disable quotes */
-import { EditorV3Content, defaultContentProps } from "./EditorV3Content";
+import { EditorV3Content } from "./EditorV3Content";
+import { defaultContentProps } from "./defaultContentProps";
 import { EditorV3Line } from "./EditorV3Line";
 import { EditorV3Align, EditorV3ContentPropsInput } from "./interface";
 

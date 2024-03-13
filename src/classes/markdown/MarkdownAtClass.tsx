@@ -1,4 +1,4 @@
-import { EditorV3TextBlock } from "../EditorV3TextBlock";
+import { EditorV3AtBlock } from "../EditorV3AtBlock";
 import { defaultMarkdownSettings } from "./MarkdownSettings";
 
 /**
@@ -111,7 +111,7 @@ export class MarkdownAtClass {
    * Returns the text representation of the class
    */
   public toTextBlock() {
-    return new EditorV3TextBlock({
+    return new EditorV3AtBlock({
       type: "at",
       text: this._text,
       style: this._style,

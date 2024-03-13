@@ -1,6 +1,6 @@
-import { readV3DivElement } from "./readV3DivElement";
 import { EditorV3Align } from "../classes/interface";
-import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";
+import { textBlockFactory } from "../classes/textBlockFactory";
+import { readV3DivElement } from "./readV3DivElement";
 
 describe("readV3DivElement", () => {
   test("Read decimal aligned div element", async () => {
@@ -23,7 +23,7 @@ describe("readV3DivElement", () => {
 
     const result = readV3DivElement(divElement);
 
-    expect(result.textBlocks).toEqual([new EditorV3TextBlock("123."), new EditorV3TextBlock("45")]);
+    expect(result.textBlocks).toEqual([textBlockFactory("123."), textBlockFactory("45")]);
     expect(result.decimalAlignPercent).toEqual(40);
     expect(result.textAlignment).toEqual(EditorV3Align.decimal);
   });
@@ -44,10 +44,7 @@ describe("readV3DivElement", () => {
 
     const result = readV3DivElement(divElement);
 
-    expect(result.textBlocks).toEqual([
-      new EditorV3TextBlock("Hello"),
-      new EditorV3TextBlock("World"),
-    ]);
+    expect(result.textBlocks).toEqual([textBlockFactory("Hello"), textBlockFactory("World")]);
     expect(result.decimalAlignPercent).toEqual(60);
     expect(result.textAlignment).toEqual(EditorV3Align.right);
   });
@@ -59,7 +56,7 @@ describe("readV3DivElement", () => {
     divElement.appendChild(text1);
 
     const result = readV3DivElement(divElement);
-    expect(result.textBlocks).toEqual([new EditorV3TextBlock("123.")]);
+    expect(result.textBlocks).toEqual([textBlockFactory("123.")]);
     expect(result.decimalAlignPercent).toEqual(60);
     expect(result.textAlignment).toEqual(EditorV3Align.decimal);
   });
@@ -75,7 +72,7 @@ describe("readV3DivElement", () => {
     divElement.appendChild(node2);
 
     const result = readV3DivElement(divElement);
-    expect(result.textBlocks).toEqual([new EditorV3TextBlock("123."), new EditorV3TextBlock("45")]);
+    expect(result.textBlocks).toEqual([textBlockFactory("123."), textBlockFactory("45")]);
     expect(result.decimalAlignPercent).toEqual(60);
     expect(result.textAlignment).toEqual(EditorV3Align.right);
   });
@@ -85,7 +82,7 @@ describe("readV3DivElement", () => {
 
     const result = readV3DivElement(divElement);
 
-    expect(result.textBlocks).toEqual([new EditorV3TextBlock("")]);
+    expect(result.textBlocks).toEqual([textBlockFactory("")]);
     expect(result.decimalAlignPercent).toEqual(60);
     expect(result.textAlignment).toEqual(EditorV3Align.left);
   });

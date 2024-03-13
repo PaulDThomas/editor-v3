@@ -1,7 +1,8 @@
 import { ContextMenuHandler, MenuItem } from "@asup/context-menu";
 import { cloneDeep, isEqual } from "lodash";
 import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { EditorV3Content, defaultContentProps } from "../classes/EditorV3Content";
+import { EditorV3Content } from "../classes/EditorV3Content";
+import { defaultContentProps } from "../classes/defaultContentProps";
 import { EditorV3Align, EditorV3Position, EditorV3Styles } from "../classes/interface";
 import { IMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 import { useDebounceStack } from "../hooks/useDebounceStack";

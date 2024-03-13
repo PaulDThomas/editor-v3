@@ -1,4 +1,4 @@
-import { defaultContentProps } from "../classes/EditorV3Content";
+import { defaultContentProps } from "../classes/defaultContentProps";
 import { EditorV3Line } from "../classes/EditorV3Line";
 import { EditorV3ContentPropsInput, EditorV3Import } from "../classes/interface";
 import { readContentPropsNode } from "./readContentPropsNode";

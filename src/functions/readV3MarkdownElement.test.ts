@@ -1,4 +1,4 @@
-import { defaultContentProps } from "../classes/EditorV3Content";
+import { defaultContentProps } from "classes/defaultContentProps";
 import { EditorV3Align } from "../classes/interface";
 import { readV3MarkdownElement } from "./readV3MarkdownElement";
 

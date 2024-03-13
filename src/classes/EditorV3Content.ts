@@ -16,17 +16,9 @@ import {
   EditorV3Styles,
 } from "./interface";
 import { MarkdownLineClass } from "./markdown/MarkdownLineClass";
-import { IMarkdownSettings, defaultMarkdownSettings } from "./markdown/MarkdownSettings";
-
-export const defaultContentProps: EditorV3ContentProps = {
-  allowMarkdown: false,
-  allowNewLine: false,
-  decimalAlignPercent: 60,
-  markdownSettings: defaultMarkdownSettings,
-  showMarkdown: false,
-  styles: undefined,
-  textAlignment: EditorV3Align.left,
-};
+import { IMarkdownSettings } from "./markdown/MarkdownSettings";
+import { textBlockFactory } from "./textBlockFactory";
+import { defaultContentProps } from "./defaultContentProps";
 
 /**
  * Represents the content of an EditorV3 instance.
@@ -301,7 +293,7 @@ export class EditorV3Content implements EditorV3Import {
       pos.startLine < this.lines.length
     ) {
       const style = this.lines[pos.startLine].getStyleAt(pos.startChar);
-      ret.push(new EditorV3Line([new EditorV3TextBlock("", style)], this.contentProps));
+      ret.push(new EditorV3Line([textBlockFactory("", style)], this.contentProps));
     }
     // Check selection contains something
     if (
@@ -482,7 +474,7 @@ export class EditorV3Content implements EditorV3Import {
       // Check all lines have at least 1 text block
       this.lines.forEach((l) => {
         if (l.textBlocks.length === 0) {
-          l.textBlocks.push(new EditorV3TextBlock("", l.getStyleAt(0)));
+          l.textBlocks.push(textBlockFactory("", l.getStyleAt(0)));
         }
       });
       // Calculate end character position
@@ -709,7 +701,7 @@ export class EditorV3Content implements EditorV3Import {
       if (linesImport.length > 1 && !this.allowNewLine) {
         const textBlocks: EditorV3TextBlock[] = linesImport
           .flatMap((l) => l.textBlocks)
-          .map((tb) => new EditorV3TextBlock(tb));
+          .map((tb) => textBlockFactory(tb));
         lines.push(new EditorV3Line(textBlocks, this.contentProps));
       } else {
         lines.push(

@@ -1,5 +1,5 @@
 import { cloneDeep } from "lodash";
-import { defaultContentProps } from "../EditorV3Content";
+import { defaultContentProps } from "../defaultContentProps";
 import { EditorV3TextBlock } from "../EditorV3TextBlock";
 
 /**

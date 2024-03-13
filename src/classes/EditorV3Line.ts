@@ -2,7 +2,7 @@ import { cloneDeep, isEqual } from "lodash";
 import { readV2DivElement } from "../functions/readV2DivElement";
 import { readV3DivElement } from "../functions/readV3DivElement";
 import { readV3MarkdownElement } from "../functions/readV3MarkdownElement";
-import { defaultContentProps } from "./EditorV3Content";
+import { defaultContentProps } from "./defaultContentProps";
 import { EditorV3TextBlock } from "./EditorV3TextBlock";
 import { drawHtmlDecimalAlign } from "./drawHtmlDecimalAlign";
 import {
@@ -12,9 +12,11 @@ import {
   EditorV3Position,
 } from "./interface";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
+import { textBlockFactory } from "./textBlockFactory";
+import { EditorV3AtBlock } from "./EditorV3AtBlock";
 
 export class EditorV3Line {
-  public textBlocks: EditorV3TextBlock[];
+  public textBlocks: (EditorV3TextBlock | EditorV3AtBlock)[];
   private _defaultContentProps: EditorV3ContentProps = cloneDeep(defaultContentProps);
   public contentProps: EditorV3ContentProps;
 
@@ -35,7 +37,7 @@ export class EditorV3Line {
     }
     // Need to add a space to the end of the line to allow for the cursor to be placed at the end
     if (this.textBlocks.length > 0 && this.textBlocks[this.textBlocks.length - 1].isLocked) {
-      const endBlockEl = new EditorV3TextBlock(" ").toHtml();
+      const endBlockEl = textBlockFactory(" ").toHtml();
       endBlockEl.children[0].classList.add("skip-read");
       h.append(endBlockEl);
     }
@@ -119,7 +121,7 @@ export class EditorV3Line {
           const jsonInput = JSON.parse(arg);
           if (jsonInput.textBlocks) {
             this.textBlocks = jsonInput.textBlocks.map(
-              (tb: string | { text: string; style?: string }) => new EditorV3TextBlock(tb),
+              (tb: string | { text: string; style?: string }) => textBlockFactory(tb),
             );
           } else {
             throw "No blocks";
@@ -130,7 +132,7 @@ export class EditorV3Line {
               ...jsonInput.contentProps,
             };
         } catch {
-          this.textBlocks = [new EditorV3TextBlock(arg)];
+          this.textBlocks = [textBlockFactory(arg)];
         }
       }
     } else if (Array.isArray(arg)) {
@@ -185,7 +187,7 @@ export class EditorV3Line {
         _counted + this.textBlocks[_i].text.length >= startPos &&
         this.textBlocks[_i].text.slice(startPos - _counted, endPos - _counted) !== ""
       ) {
-        const slicedBlock = new EditorV3TextBlock(
+        const slicedBlock = textBlockFactory(
           this.textBlocks[_i].text.slice(startPos - _counted, endPos - _counted),
           this.textBlocks[_i].style,
           this.textBlocks[_i].type,
@@ -200,7 +202,7 @@ export class EditorV3Line {
         endPos &&
         _counted + this.textBlocks[_i].text.length >= endPos
       ) {
-        const slicedBlock = new EditorV3TextBlock(
+        const slicedBlock = textBlockFactory(
           this.textBlocks[_i].text.slice(0, endPos - _counted),
           this.textBlocks[_i].style,
           this.textBlocks[_i].type,
@@ -235,7 +237,7 @@ export class EditorV3Line {
     } else {
       const preSplit = this.upToPos(pos);
       const postSplit = this.fromPos(pos);
-      this.textBlocks = preSplit.length > 0 ? preSplit : [new EditorV3TextBlock("")];
+      this.textBlocks = preSplit.length > 0 ? preSplit : [textBlockFactory("")];
       this._setBlockStartPositions();
       return new EditorV3Line(postSplit, this.contentProps);
     }
@@ -269,7 +271,7 @@ export class EditorV3Line {
     if (startPos < endPos) {
       this.textBlocks = [
         ...this.upToPos(startPos),
-        new EditorV3TextBlock(this.lineText.substring(startPos, endPos), styleName),
+        textBlockFactory(this.lineText.substring(startPos, endPos), styleName),
         ...this.fromPos(endPos),
       ];
       this._mergeBlocks();
@@ -281,7 +283,7 @@ export class EditorV3Line {
     if (startPos < endPos) {
       this.textBlocks = [
         ...this.upToPos(startPos),
-        new EditorV3TextBlock(this.lineText.substring(startPos, endPos)),
+        textBlockFactory(this.lineText.substring(startPos, endPos)),
         ...this.fromPos(endPos),
       ];
       this._mergeBlocks();
@@ -295,7 +297,7 @@ export class EditorV3Line {
       let lastTypeStyle: string | null = null;
       for (let _i = 0; _i < this.textBlocks.length; _i++) {
         if (this.textBlocks[_i].typeStyle === lastTypeStyle && mergedBlocks.length > 0) {
-          mergedBlocks[mergedBlocks.length - 1] = new EditorV3TextBlock(
+          mergedBlocks[mergedBlocks.length - 1] = textBlockFactory(
             mergedBlocks[mergedBlocks.length - 1].text + this.textBlocks[_i].text,
             lastTypeStyle.split(":")[1],
           );
@@ -310,17 +312,20 @@ export class EditorV3Line {
       this.textBlocks = mergedBlocks.filter((tb) => tb.text !== "");
       // }
     }
+    this._updateBlockTypes();
     this._setBlockStartPositions();
   }
 
   private _setBlockStartPositions(blocks?: EditorV3TextBlock[], initialPos: number = 0) {
     let _linePos = initialPos;
-    const tb = blocks ?? this.textBlocks;
-    tb.forEach((tb) => {
+    const tbs = blocks ?? this.textBlocks;
+    tbs.forEach((tb) => {
       tb.setLineStartPosition(_linePos);
       if (tb.lineEndPosition !== undefined) {
         _linePos = tb.lineEndPosition;
       }
     });
   }
+
+  private _updateBlockTypes() {}
 }

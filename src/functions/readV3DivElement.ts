@@ -1,15 +1,17 @@
+import { EditorV3AtBlock } from "../classes/EditorV3AtBlock";
 import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";
 import { EditorV3Align } from "../classes/interface";
+import { textBlockFactory } from "../classes/textBlockFactory";
 
 export const readV3DivElement = (
   arg: HTMLDivElement,
 ): {
-  textBlocks: EditorV3TextBlock[];
+  textBlocks: (EditorV3TextBlock | EditorV3AtBlock)[];
   decimalAlignPercent: number;
   textAlignment: EditorV3Align;
 } => {
   const ret: {
-    textBlocks: EditorV3TextBlock[];
+    textBlocks: (EditorV3TextBlock | EditorV3AtBlock)[];
     decimalAlignPercent: number;
     textAlignment: EditorV3Align;
   } = {
@@ -36,25 +38,16 @@ export const readV3DivElement = (
         arg.firstChild.classList.contains("lhs") &&
         arg.lastChild.classList.contains("rhs")
           ? [
-              ...[...(arg.firstChild as HTMLSpanElement).childNodes].map(
-                (el) =>
-                  new EditorV3TextBlock(
-                    el instanceof HTMLSpanElement || el instanceof Text ? el : "",
-                  ),
+              ...[...(arg.firstChild as HTMLSpanElement).childNodes].map((el) =>
+                textBlockFactory(el instanceof HTMLSpanElement || el instanceof Text ? el : ""),
               ),
-              ...[...(arg.lastChild as HTMLSpanElement).childNodes].map(
-                (el) =>
-                  new EditorV3TextBlock(
-                    el instanceof HTMLSpanElement || el instanceof Text ? el : "",
-                  ),
+              ...[...(arg.lastChild as HTMLSpanElement).childNodes].map((el) =>
+                textBlockFactory(el instanceof HTMLSpanElement || el instanceof Text ? el : ""),
               ),
             ].filter((tb) => tb.text !== "")
           : [
-              ...[...arg.childNodes].map(
-                (el) =>
-                  new EditorV3TextBlock(
-                    el instanceof HTMLSpanElement || el instanceof Text ? el : "",
-                  ),
+              ...[...arg.childNodes].map((el) =>
+                textBlockFactory(el instanceof HTMLSpanElement || el instanceof Text ? el : ""),
               ),
             ].filter((tb) => tb.text !== "");
     }
@@ -63,15 +56,14 @@ export const readV3DivElement = (
       const skipRead = arg.querySelectorAll(".skip-read");
       skipRead.forEach((el) => el.remove());
       ret.textBlocks = [
-        ...[...arg.childNodes].map(
-          (el) =>
-            new EditorV3TextBlock(el instanceof HTMLSpanElement || el instanceof Text ? el : ""),
+        ...[...arg.childNodes].map((el) =>
+          textBlockFactory(el instanceof HTMLSpanElement || el instanceof Text ? el : ""),
         ),
       ].filter((tb) => tb.text !== "");
       ret.textAlignment = arg.classList[1] as EditorV3Align;
     }
   }
   // Ensure there is at least something
-  if (ret.textBlocks.length === 0) ret.textBlocks = [new EditorV3TextBlock("")];
+  if (ret.textBlocks.length === 0) ret.textBlocks = [textBlockFactory("")];
   return ret;
 };

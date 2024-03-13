@@ -1,9 +1,10 @@
 import { cloneDeep } from "lodash";
-import { defaultContentProps } from "../EditorV3Content";
+import { defaultContentProps } from "../defaultContentProps";
 import { EditorV3TextBlock } from "../EditorV3TextBlock";
 import { MarkdownAtClass } from "./MarkdownAtClass";
 import { IMarkdownSettings, defaultMarkdownSettings } from "./MarkdownSettings";
 import { MarkdownStyleClass } from "./MarkdownStyleClass";
+import { textBlockFactory } from "../textBlockFactory";
 
 export interface IMarkdownLineClass {
   parts?: (string | MarkdownStyleClass | MarkdownAtClass)[];
@@ -33,7 +34,7 @@ export class MarkdownLineClass {
 
   public toTextBlocks(): EditorV3TextBlock[] {
     return this._parts.map((part) =>
-      typeof part === "string" ? new EditorV3TextBlock(part) : part.toTextBlock(),
+      typeof part === "string" ? textBlockFactory({ text: part }) : part.toTextBlock(),
     );
   }
 

@@ -1,8 +1,8 @@
 /* eslint-disable quotes */
-import { defaultContentProps } from "./EditorV3Content";
+import { defaultContentProps } from "./defaultContentProps";
 import { EditorV3Line } from "./EditorV3Line";
-import { EditorV3TextBlock } from "./EditorV3TextBlock";
 import { EditorV3Align } from "./interface";
+import { textBlockFactory } from "./textBlockFactory";
 
 describe("Check basic EditorV3Line", () => {
   test("Load string", async () => {
@@ -40,10 +40,7 @@ describe("Check basic EditorV3Line", () => {
 
   test("Load textBlocks, test getStyleAt", async () => {
     const testLine = new EditorV3Line(
-      [
-        new EditorV3TextBlock("Hello\u00A0world, "),
-        new EditorV3TextBlock("How is it going?", "shiny"),
-      ],
+      [textBlockFactory("Hello\u00A0world, "), textBlockFactory("How is it going?", "shiny")],
       defaultContentProps,
     );
     expect(testLine.toHtml().outerHTML).toEqual(
@@ -102,10 +99,7 @@ describe("Check basic EditorV3Line", () => {
 
   test("Load decimal textBlocks", async () => {
     const testLine = new EditorV3Line(
-      [
-        new EditorV3TextBlock("Hello\u00A0world. "),
-        new EditorV3TextBlock("How is it going?", "shiny"),
-      ],
+      [textBlockFactory("Hello\u00A0world. "), textBlockFactory("How is it going?", "shiny")],
       { ...defaultContentProps, textAlignment: EditorV3Align.decimal },
     );
     expect(testLine.toHtml().outerHTML).toEqual(
@@ -236,10 +230,10 @@ describe("Check basic EditorV3Line", () => {
   });
 
   test("Self equivalence for non-decimal", async () => {
-    const firstLine = new EditorV3Line(
-      [new EditorV3TextBlock("12.34"), new EditorV3TextBlock(" Hello ")],
-      { ...defaultContentProps, textAlignment: EditorV3Align.right },
-    );
+    const firstLine = new EditorV3Line([textBlockFactory("12.34"), textBlockFactory(" Hello ")], {
+      ...defaultContentProps,
+      textAlignment: EditorV3Align.right,
+    });
     expect(new EditorV3Line(firstLine.toHtml())).toEqual(firstLine);
     expect(new EditorV3Line(firstLine.toHtml().outerHTML)).toEqual(firstLine);
     expect(new EditorV3Line(firstLine.jsonString)).toEqual(firstLine);
@@ -268,7 +262,7 @@ describe("Check EditorV3Line functions", () => {
     expect(line.upToPos(10).map((tb) => tb.data)).toEqual([{ text: "0123.456", type: "text" }]);
 
     const line2 = new EditorV3Line(
-      [new EditorV3TextBlock("hello", "world"), new EditorV3TextBlock(" slow")],
+      [textBlockFactory("hello", "world"), textBlockFactory(" slow")],
       defaultContentProps,
     );
     expect(line2.upToPos(0).map((tb) => tb.data)).toEqual([]);
@@ -321,7 +315,7 @@ describe("Check EditorV3Line functions", () => {
     expect(line.fromPos(8).map((tb) => tb.data)).toEqual([]);
 
     const line2 = new EditorV3Line(
-      [new EditorV3TextBlock("hello", "world"), new EditorV3TextBlock(" slow")],
+      [textBlockFactory("hello", "world"), textBlockFactory(" slow")],
       defaultContentProps,
     );
     expect(line2.fromPos(0).map((tb) => tb.data)).toEqual([
@@ -354,7 +348,7 @@ describe("Check EditorV3Line functions", () => {
 
   test("subBlocks", () => {
     const line2 = new EditorV3Line(
-      [new EditorV3TextBlock("hello", "world"), new EditorV3TextBlock(" slow")],
+      [textBlockFactory("hello", "world"), textBlockFactory(" slow")],
       defaultContentProps,
     );
     expect(line2.subBlocks(1, 1).map((tb) => tb.data)).toEqual([]);
@@ -434,20 +428,13 @@ describe("Check EditorV3Line functions", () => {
 
   test("insertBlocks", async () => {
     const line1 = new EditorV3Line("0123.456", defaultContentProps);
-    line1.insertBlocks([new EditorV3TextBlock("hello")], 3);
+    line1.insertBlocks([textBlockFactory("hello")], 3);
     expect(line1.lineText).toEqual("012hello3.456");
     expect(line1.textBlocks.length).toEqual(1);
 
-    const line2 = new EditorV3Line([
-      new EditorV3TextBlock("hello", "world"),
-      new EditorV3TextBlock(" slow"),
-    ]);
+    const line2 = new EditorV3Line([textBlockFactory("hello", "world"), textBlockFactory(" slow")]);
     line2.insertBlocks(
-      [
-        new EditorV3TextBlock("tree"),
-        new EditorV3TextBlock("pie", "lid"),
-        new EditorV3TextBlock("pie", "world"),
-      ],
+      [textBlockFactory("tree"), textBlockFactory("pie", "lid"), textBlockFactory("pie", "world")],
       0,
     );
     expect(JSON.parse(line2.jsonString)).toEqual({
@@ -462,11 +449,11 @@ describe("Check EditorV3Line functions", () => {
 
   test("removeSection", async () => {
     const line1 = new EditorV3Line("0123.456", defaultContentProps);
-    line1.insertBlocks([new EditorV3TextBlock("hello")], 3);
+    line1.insertBlocks([textBlockFactory("hello")], 3);
     expect(line1.lineText).toEqual("012hello3.456");
     expect(line1.textBlocks.length).toEqual(1);
     const line2 = new EditorV3Line(
-      [new EditorV3TextBlock("hello", "world"), new EditorV3TextBlock(" slow")],
+      [textBlockFactory("hello", "world"), textBlockFactory(" slow")],
       defaultContentProps,
     );
     line2.removeSection(4, 7);
@@ -480,7 +467,7 @@ describe("Check EditorV3Line functions", () => {
 
   test("deleteCharacter", async () => {
     const line2 = new EditorV3Line(
-      [new EditorV3TextBlock("hello", "world"), new EditorV3TextBlock(" slow")],
+      [textBlockFactory("hello", "world"), textBlockFactory(" slow")],
       defaultContentProps,
     );
     line2.deleteCharacter(4);
@@ -517,7 +504,7 @@ describe("Check EditorV3Line functions", () => {
 
   test("applyStyle & removeStyle", async () => {
     const line2 = new EditorV3Line(
-      [new EditorV3TextBlock("hello", "world"), new EditorV3TextBlock(" slow")],
+      [textBlockFactory("hello", "world"), textBlockFactory(" slow")],
       defaultContentProps,
     );
     line2.applyStyle("drive", 3, 6);
@@ -553,9 +540,9 @@ describe("Check EditorV3Line functions", () => {
   test("Generate markdown", async () => {
     const mdLine = new EditorV3Line(
       [
-        new EditorV3TextBlock("hello", "world"),
-        new EditorV3TextBlock(" slow"),
-        new EditorV3TextBlock("and?fat", "defaultStyle"),
+        textBlockFactory("hello", "world"),
+        textBlockFactory(" slow"),
+        textBlockFactory("and?fat", "defaultStyle"),
       ],
       defaultContentProps,
     );
@@ -565,15 +552,13 @@ describe("Check EditorV3Line functions", () => {
   test("Load markdown html strings", async () => {
     const htmlString = '<div class="aiev3-markdown-line">Some html</div>';
     const testLine = new EditorV3Line(htmlString, defaultContentProps);
-    expect(testLine.textBlocks).toEqual([new EditorV3TextBlock("Some html")]);
+    expect(testLine.textBlocks).toEqual([textBlockFactory("Some html")]);
     expect(testLine.contentProps).toEqual(defaultContentProps);
 
     const htmlString2 =
       '<div class="aiev3-markdown-line">&lt;&lt;red::Hello world&gt;&gt;</span></div>';
     const testLine2 = new EditorV3Line(htmlString2, defaultContentProps);
-    expect(testLine2.textBlocks).toEqual([
-      new EditorV3TextBlock({ text: "Hello world", style: "red" }),
-    ]);
+    expect(testLine2.textBlocks).toEqual([textBlockFactory({ text: "Hello world", style: "red" })]);
   });
 
   test("Load markdown div elements", async () => {
@@ -584,10 +569,10 @@ describe("Check EditorV3Line functions", () => {
     const result = new EditorV3Line(div, defaultContentProps);
 
     expect(result.textBlocks).toEqual([
-      new EditorV3TextBlock({ text: "what", style: "st1", lineStartPosition: 0 }),
-      new EditorV3TextBlock({ text: " are you doing? ", lineStartPosition: 4 }),
-      new EditorV3TextBlock({ text: "with that", style: "defaultStyle", lineStartPosition: 20 }),
-      new EditorV3TextBlock({ text: " thing?", lineStartPosition: 29 }),
+      textBlockFactory({ text: "what", style: "st1", lineStartPosition: 0 }),
+      textBlockFactory({ text: " are you doing? ", lineStartPosition: 4 }),
+      textBlockFactory({ text: "with that", style: "defaultStyle", lineStartPosition: 20 }),
+      textBlockFactory({ text: " thing?", lineStartPosition: 29 }),
     ]);
   });
 });
@@ -620,7 +605,7 @@ describe("Read in v2 div element", () => {
 describe("Write space after at block", () => {
   test("Add skip-read after at block", async () => {
     const line = new EditorV3Line(
-      [new EditorV3TextBlock("@Hello", undefined, "at", true)],
+      [textBlockFactory("@Hello", undefined, "at", true)],
       defaultContentProps,
     );
     const div = document.createElement("div");
