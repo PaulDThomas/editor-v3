@@ -60,6 +60,8 @@ export const readV3DivElement = (
     }
     // Standard alignment
     else if (["left", "center", "right"].includes(arg.classList[1])) {
+      const skipRead = arg.querySelectorAll(".skip-read");
+      skipRead.forEach((el) => el.remove());
       ret.textBlocks = [
         ...[...arg.childNodes].map(
           (el) =>

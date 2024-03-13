@@ -11,7 +11,6 @@ export const drawAt = (
   isActive && span.classList.add("is-active");
   if (isLocked || !isActive) {
     span.classList.add("is-locked");
-    span.contentEditable = "false";
     span.dataset.isLocked = "true";
   }
   const textNode = document.createTextNode(text.replaceAll("\uFEFF", ""));

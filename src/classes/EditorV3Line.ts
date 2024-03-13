@@ -33,6 +33,12 @@ export class EditorV3Line {
     } else {
       this.textBlocks.forEach((tb) => h.append(tb.toHtml()));
     }
+    // Need to add a space to the end of the line to allow for the cursor to be placed at the end
+    if (this.textBlocks.length > 0 && this.textBlocks[this.textBlocks.length - 1].isLocked) {
+      const endBlockEl = new EditorV3TextBlock(" ").toHtml();
+      endBlockEl.children[0].classList.add("skip-read");
+      h.append(endBlockEl);
+    }
     return h;
   }
 
@@ -143,21 +149,12 @@ export class EditorV3Line {
     // Always take these if provided
     if (contentProps) this.contentProps = { ...this._defaultContentProps, ...contentProps };
 
-    // Fix and problems
+    // Fix any problems
     this._mergeBlocks();
   }
 
   public getBlockAt(char: number): EditorV3TextBlock | undefined {
-    let _counted = 0;
-    for (let _i = 0; _i < this.textBlocks.length; _i++) {
-      // Block containing startPos
-      if (_counted <= char && _counted + this.textBlocks[_i].text.length > char) {
-        return this.textBlocks[_i];
-      } else {
-        _counted += this.textBlocks[_i].text.length;
-      }
-    }
-    return undefined;
+    return this.textBlocks.find((tb) => tb.lineStartPosition <= char && tb.lineEndPosition > char);
   }
 
   public getStyleAt(char: number): string | undefined {
@@ -167,7 +164,7 @@ export class EditorV3Line {
   public setActiveBlock(pos: EditorV3Position): EditorV3TextBlock | undefined {
     this.textBlocks.forEach((tb) => tb.setActive(false));
     if (pos.isCollapsed) {
-      const activeBlock = this.getBlockAt(pos.startChar);
+      const activeBlock = this.getBlockAt(Math.max(0, pos.startChar - 1));
       activeBlock?.setActive(true);
       return activeBlock;
     } else return undefined;
@@ -220,6 +217,7 @@ export class EditorV3Line {
       // Stop if the end is reached
       if (_counted >= endPos) break;
     }
+    this._setBlockStartPositions(ret, startPos);
     return ret;
   }
 
@@ -238,6 +236,7 @@ export class EditorV3Line {
       const preSplit = this.upToPos(pos);
       const postSplit = this.fromPos(pos);
       this.textBlocks = preSplit.length > 0 ? preSplit : [new EditorV3TextBlock("")];
+      this._setBlockStartPositions();
       return new EditorV3Line(postSplit, this.contentProps);
     }
   }
@@ -311,5 +310,17 @@ export class EditorV3Line {
       this.textBlocks = mergedBlocks.filter((tb) => tb.text !== "");
       // }
     }
+    this._setBlockStartPositions();
+  }
+
+  private _setBlockStartPositions(blocks?: EditorV3TextBlock[], initialPos: number = 0) {
+    let _linePos = initialPos;
+    const tb = blocks ?? this.textBlocks;
+    tb.forEach((tb) => {
+      tb.setLineStartPosition(_linePos);
+      if (tb.lineEndPosition !== undefined) {
+        _linePos = tb.lineEndPosition;
+      }
+    });
   }
 }

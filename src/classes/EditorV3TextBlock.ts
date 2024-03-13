@@ -14,6 +14,10 @@ export class EditorV3TextBlock {
   public type: EditorV3TextBlockType = "text";
   public isActive: boolean = false;
   public isLocked: true | undefined;
+  public lineStartPosition: number = 0;
+  get lineEndPosition() {
+    return this.lineStartPosition + this.text.replaceAll("\uFEFF", "").length;
+  }
 
   get typeStyle(): string {
     return `${this.type}:${this.style ?? ""}`;
@@ -79,7 +83,13 @@ export class EditorV3TextBlock {
       | Text
       | EditorV3TextBlock
       | DocumentFragment
-      | { text: string; style?: string; type?: EditorV3TextBlockType; isLocked?: true | undefined }
+      | {
+          text: string;
+          style?: string;
+          type?: EditorV3TextBlockType;
+          isLocked?: true | undefined;
+          lineStartPosition?: number;
+        }
       | string,
     style?: string,
     type?: EditorV3TextBlockType,
@@ -100,6 +110,7 @@ export class EditorV3TextBlock {
         if (jsonInput.style) this.style = jsonInput.style;
         if (jsonInput.type) this.type = jsonInput.type;
         if (jsonInput.isLocked) this.isLocked = jsonInput.isLocked;
+        if (jsonInput.lineStartPosition) this.lineStartPosition = jsonInput.lineStartPosition;
       } catch {
         this.text = arg;
       }
@@ -157,6 +168,7 @@ export class EditorV3TextBlock {
       this.style = arg.style;
       this.type = arg.type ?? "text";
       this.isLocked = arg.isLocked;
+      this.lineStartPosition = arg.lineStartPosition ?? 0;
     }
 
     // Always take other arguments if provided
@@ -171,5 +183,9 @@ export class EditorV3TextBlock {
 
   public setActive(active: boolean) {
     this.isActive = active;
+  }
+
+  public setLineStartPosition(start: number) {
+    this.lineStartPosition = start;
   }
 }

@@ -241,12 +241,8 @@ export const EditorV3 = ({
           redo();
         } else if (
           !(
-            // Current target is locked
-            (
-              (e.target instanceof HTMLSpanElement && e.target.dataset.isLocked === "true") ||
-              // Ignore key down on metakeys
-              ["Control", "Shift", "Alt"].includes(e.key)
-            )
+            // Ignore key down on metakeys
+            ["Control", "Shift", "Alt"].includes(e.key)
           )
         ) {
           // Get current information and update content buffer
@@ -287,15 +283,18 @@ export const EditorV3 = ({
     [content, contentProps, setContent],
   );
 
-  // const handleMouseUp = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-  //   if (divRef.current) {
-  //     // e.preventDefault();
-  //     e.stopPropagation();
-  //     const newContent = new EditorV3Content(divRef.current, contentProps);
-  //     setLastCaretPosition(newContent.caretPosition);
-  //     setContent(newContent);
-  //   }
-  // }, []);
+  // const handleMouseUp = useCallback(
+  //   (e: React.MouseEvent<HTMLDivElement>) => {
+  //     if (divRef.current) {
+  //       // e.preventDefault();
+  //       e.stopPropagation();
+  //       const newContent = new EditorV3Content(divRef.current, contentProps);
+  //       setLastCaretPosition(newContent.caretPosition);
+  //       setContent(newContent);
+  //     }
+  //   },
+  //   [contentProps, setContent],
+  // );
 
   const handleCopy = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
@@ -373,7 +372,6 @@ export const EditorV3 = ({
             onCutCapture={handleCopy}
             onKeyDownCapture={handleKeyDown}
             onKeyUpCapture={handleKeyUp}
-            // onMouseUp={handleMouseUp}
             onPasteCapture={handlePaste}
           />
         </div>

@@ -56,14 +56,19 @@ export const useDebounceStack = <T>(
     (newValue: T) => {
       if (currentValueStack && !isEqual(newValue, currentValue)) {
         // Copy exising stack
-        const newStack = currentValueStack.slice(0, currentValueIndex + 1);
+        const newStack = [...currentValueStack];
+        let newIndex = currentValueIndex;
         // If there is a data match remove the previous item, this will always fail on default
-        if (comparisonFunction(currentValueStack[currentValueIndex], newValue)) newStack.pop();
-        // Add on the new value
-        newStack.push(newValue);
+        if (comparisonFunction(currentValueStack[currentValueIndex], newValue)) {
+          // Replace current value
+          newStack.splice(currentValueIndex, 1, newValue);
+        } else {
+          // Add new value, and remove all values after the current index
+          newIndex = currentValueIndex + 1;
+          newStack.splice(currentValueIndex + 1, newStack.length - currentValueIndex - 1, newValue);
+        }
         // Set return
         setCurrentValueStack(newStack);
-        const newIndex = newStack.length - 1;
         setCurrentValueIndex(newIndex);
         // Callback function
         onChange(newStack[newIndex], newIndex, newStack);

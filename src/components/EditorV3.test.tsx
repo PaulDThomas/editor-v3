@@ -121,8 +121,8 @@ describe("Editor and functions", () => {
     expect(mockSetHtml).toHaveBeenCalledTimes(1);
     expect(mockSetHtml).toHaveBeenLastCalledWith(
       '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">34</span></span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">.4</span></span>' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb is-active">34</span></span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb is-active">.4</span></span>' +
         "</div>" +
         '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
         '<span class="aiev3-span-point lhs">\u2009</span>' +
@@ -580,6 +580,15 @@ describe("Select all", () => {
       endChar: 0,
     });
     await user.keyboard("New programmer notes");
+    // Select all
+    await user.keyboard("{Control>}{a}{/Control}");
+    expect(getCaretPosition(editable)).toEqual({
+      startLine: 0,
+      startChar: 0,
+      isCollapsed: false,
+      endLine: 0,
+      endChar: 20,
+    });
     fireEvent.blur(editable);
     expect(screen.getByText("New")).toBeInTheDocument();
     expect(screen.getByText("programmer")).toBeInTheDocument();

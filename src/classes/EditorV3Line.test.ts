@@ -170,7 +170,7 @@ describe("Check basic EditorV3Line", () => {
         "</span>" +
         "</div>",
     );
-    expect(new EditorV3Line(testLine.toHtml())).toEqual(testLine);
+    expect(new EditorV3Line(testLine.toHtml()).data).toEqual(testLine.data);
     expect(JSON.parse(testLine.jsonString)).toEqual({
       contentProps: { textAlignment: "decimal" },
       textBlocks: [
@@ -251,9 +251,9 @@ describe("Check basic EditorV3Line", () => {
       ...defaultContentProps,
       textAlignment: EditorV3Align.decimal,
     });
-    // expect(new EditorV3Line(firstLine.toHtml())).toEqual(firstLine);
-    // expect(new EditorV3Line(firstLine.toHtml().outerHTML)).toEqual(firstLine);
-    // expect(new EditorV3Line(firstLine.jsonString)).toEqual(firstLine);
+    expect(new EditorV3Line(firstLine.toHtml())).toEqual(firstLine);
+    expect(new EditorV3Line(firstLine.toHtml().outerHTML)).toEqual(firstLine);
+    expect(new EditorV3Line(firstLine.jsonString)).toEqual(firstLine);
     expect(new EditorV3Line(JSON.stringify(firstLine)).data).toEqual(firstLine.data);
   });
 });
@@ -584,10 +584,10 @@ describe("Check EditorV3Line functions", () => {
     const result = new EditorV3Line(div, defaultContentProps);
 
     expect(result.textBlocks).toEqual([
-      new EditorV3TextBlock({ text: "what", style: "st1" }),
-      new EditorV3TextBlock(" are you doing? "),
-      new EditorV3TextBlock({ text: "with that", style: "defaultStyle" }),
-      new EditorV3TextBlock(" thing?"),
+      new EditorV3TextBlock({ text: "what", style: "st1", lineStartPosition: 0 }),
+      new EditorV3TextBlock({ text: " are you doing? ", lineStartPosition: 4 }),
+      new EditorV3TextBlock({ text: "with that", style: "defaultStyle", lineStartPosition: 20 }),
+      new EditorV3TextBlock({ text: " thing?", lineStartPosition: 29 }),
     ]);
   });
 });
@@ -614,5 +614,22 @@ describe("Read in v2 div element", () => {
       text: " CR response but subject has non-measurable disease at baseline.",
       type: "text",
     });
+  });
+});
+
+describe("Write space after at block", () => {
+  test("Add skip-read after at block", async () => {
+    const line = new EditorV3Line(
+      [new EditorV3TextBlock("@Hello", undefined, "at", true)],
+      defaultContentProps,
+    );
+    const div = document.createElement("div");
+    div.appendChild(line.toHtml());
+    expect(div.innerHTML).toEqual(
+      '<div class="aiev3-line left">' +
+        '<span class="aiev3-tb at-block is-locked" data-is-locked="true">@Hello</span>' +
+        '<span class="aiev3-tb skip-read">&nbsp;</span>' +
+        "</div>",
+    );
   });
 });

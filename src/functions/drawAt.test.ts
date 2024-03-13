@@ -50,7 +50,6 @@ describe("drawAt", () => {
 
     // Check if the span element has the correct content and attributes
     expect(span.textContent).toBe("Hello, world!");
-    expect(span.contentEditable).toBe("false");
     expect(span.dataset.isLocked).toBe("true");
     expect(span.dataset.styleName).not.toBeDefined();
   });
