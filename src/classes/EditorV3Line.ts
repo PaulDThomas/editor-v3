@@ -138,8 +138,8 @@ export class EditorV3Line {
         try {
           const jsonInput = JSON.parse(arg);
           if (jsonInput.textBlocks) {
-            this.textBlocks = jsonInput.textBlocks.map(
-              (tb: string | { text: string; style?: string }) => textBlockFactory(tb),
+            this.textBlocks = jsonInput.textBlocks.map((tb: string | EditorV3TextBlock) =>
+              textBlockFactory(tb),
             );
           } else {
             throw "No blocks";

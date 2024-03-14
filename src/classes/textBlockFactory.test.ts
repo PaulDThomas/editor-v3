@@ -1,5 +1,4 @@
 /* eslint-disable quotes */
-import { EditorV3TextBlock } from "./EditorV3TextBlock";
 import { textBlockFactory } from "./textBlockFactory";
 
 describe("Text block factory tests", () => {
@@ -106,7 +105,7 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml());
     expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb at-block is-locked" data-is-locked="true">@Hello</span>',
+      '<span class="aiev3-tb at-block is-locked" data-is-locked="true" data-type="at">@Hello</span>',
     );
     expect(textBlockFactory(testBlock.toHtml()).data).toEqual({
       ...testBlock.data,
@@ -128,7 +127,7 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml());
     expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb at-block is-locked editorv3style-shiny" data-is-locked="true" data-style-name="shiny">@Hello</span>',
+      '<span class="aiev3-tb at-block is-locked editorv3style-shiny" data-is-locked="true" data-style-name="shiny" data-type="at">@Hello</span>',
     );
     expect(textBlockFactory(testBlock.toHtml()).data).toEqual({
       ...testBlock.data,
@@ -157,7 +156,7 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml());
     expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb at-block is-active editorv3style-shiny" data-style-name="shiny">@Hello world</span>',
+      '<span class="aiev3-tb at-block is-active editorv3style-shiny" data-style-name="shiny" data-type="at">@Hello world</span>',
     );
     expect(textBlockFactory(testBlock.toHtml()).data).toEqual(testBlock.data);
   });

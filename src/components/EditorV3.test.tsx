@@ -819,3 +819,82 @@ describe("Updates from above", () => {
     );
   });
 });
+
+// describe("Handle events at the edge of locked blocks", () => {
+//   const user = userEvent.setup({ delay: null });
+//   const testObject = {
+//     lines: [
+//       {
+//         textBlocks: [
+//           { text: "P ", type: "text" },
+//           { text: "Me", type: "at" },
+//           { text: "E", type: "text" },
+//         ],
+//       },
+//     ],
+//   };
+//   test("ArrowLeft through a block", async () => {
+//     const mockSetJson = jest.fn();
+//     await act(async () =>
+//       render(
+//         <EditorV3
+//           data-testid="test-editor"
+//           id="test-editor"
+//           input={JSON.stringify(testObject)}
+//           setJson={mockSetJson}
+//         />,
+//       ),
+//     );
+//     const editor = screen.getByTestId("test-editor");
+//     const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
+//     expect(editable.innerHTML).toEqual(
+//       '<div class="aiev3-line left">' +
+//         '<span class="aiev3-tb">P&nbsp;</span>' +
+//         '<span class="aiev3-tb at-block is-locked" data-is-locked="true" data-type="at">Me</span>' +
+//         '<span class="aiev3-tb">E</span>' +
+//         "</div>" +
+//         '<div class="aiev3-contents-info"></div>',
+//     );
+//     await user.click(editable);
+//     await user.keyboard("{ArrowLeft}");
+//     expect(getCaretPosition(editable)).toEqual({
+//       startLine: 0,
+//       startChar: 0,
+//       isCollapsed: true,
+//       endLine: 0,
+//       endChar: 0,
+//     });
+//     await user.keyboard("{ArrowRight}{ArrowRight}");
+//     expect(getCaretPosition(editable)).toEqual({
+//       startLine: 0,
+//       startChar: 2,
+//       isCollapsed: true,
+//       endLine: 0,
+//       endChar: 2,
+//     });
+//     await user.keyboard("{ArrowRight}");
+//     expect(getCaretPosition(editable)).toEqual({
+//       startLine: 0,
+//       startChar: 2,
+//       isCollapsed: false,
+//       endLine: 0,
+//       endChar: 4,
+//     });
+//     await user.keyboard("{ArrowRight}");
+//     expect(getCaretPosition(editable)).toEqual({
+//       startLine: 0,
+//       startChar: 4,
+//       isCollapsed: true,
+//       endLine: 0,
+//       endChar: 4,
+//     });
+//     await user.keyboard("{ArrowRight}");
+//     expect(getCaretPosition(editable)).toEqual({
+//       startLine: 0,
+//       startChar: 5,
+//       isCollapsed: true,
+//       endLine: 0,
+//       endChar: 5,
+//     });
+//   });
+// });

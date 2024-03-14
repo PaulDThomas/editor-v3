@@ -14,6 +14,17 @@ export const App = (): JSX.Element => {
       blue: { color: "blue", fontWeight: 700 },
     },
   });
+  const testObject = {
+    lines: [
+      {
+        textBlocks: [
+          { text: "P ", type: "text" },
+          { text: "Me", type: "at" },
+          { text: "E", type: "text" },
+        ],
+      },
+    ],
+  };
   const [input2, setInput2] = useState<string>(
     // eslint-disable-next-line quotes
     `<div classname="aie-text" data-key="2v9v5" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":1,"style":"Notes"},{"offset":4,"length":1,"style":"Notes"},{"offset":1,"length":3,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">N</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  w</div><div classname="aie-text" data-key="1u61b" data-type="unstyled" data-inline-style-ranges='[]'></div><div classname="aie-text" data-key="4l4fu" data-type="unstyled" data-inline-style-ranges='[]'>ork</div><div classname="aie-text" data-inline-style-ranges='[{"length":12,"offset":0,"style":"Notes"}]'><spanclassname="Notes" style="color:blue;font-size:16pt">Notes  w.ork</span></div><div classname="aie-text" data-key="b84n6" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":3,"style":"Notes"},{"offset":3,"length":7,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">Not</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">es  wor</span>k</div><div classname="aie-text" data-key="4stit" data-type="unstyled" data-inline-style-ranges='[{"offset":5,"length":2,"style":"Notes"},{"offset":10,"length":1,"style":"Notes"},{"offset":7,"length":3,"style":"Editable"}]'>treez<span classname="Notes" style="color:blue;font-size:16pt"> N</span><span classname="Editable" style="color:red;font-family:courier;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  work</div><div classname="aie-text" data-key="10tu7" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":72,"style":"Notes"}]'><span classname="Notes" style="color:royalblue">The &apos;Total&apos; column is compulsory if more than 1 treatment group is used.</span></div><div classname="aie-text" data-key="frng6" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":92,"style":"Notes"}]'><span classname="Notes" style="color:royalblue">Timepoint could be days, weeks or visits. Permissable to only present selected (key) visits.</span></div>`,
@@ -48,7 +59,7 @@ export const App = (): JSX.Element => {
     <div className="app-holder">
       <div className="app-border">
         <div className="app-inner">
-          <div className="row">
+          {/* <div className="row">
             <span className="label">This is the input</span>
             <span className="content">
               <EditorV3
@@ -79,34 +90,19 @@ export const App = (): JSX.Element => {
                 Reset
               </button>
             </span>
-          </div>
+          </div> */}
 
-          {/* <div className="row">
-            <span className="label">Test config, readonly</span>
+          <div className="row">
+            <span className="label">Test config</span>
             <span className="content">
               <EditorV3
+                data-testid="test-editor"
                 id="test-editor"
-                resize
-                input={JSON.stringify({
-                  lines: [
-                    {
-                      textBlocks: [{ text: "34.56" }],
-                      textAlignment: "center",
-                      decimalAlignPercent: 80,
-                    },
-                    {
-                      textBlocks: [{ text: "x.xx", style: "shiny" }],
-                      textAlignment: "center",
-                      decimalAlignPercent: 80,
-                    },
-                  ],
-                  styles: { shiny: { color: "pink", backgroundColor: "yellow", fontWeight: 700 } },
-                  textAlignment: EditorV3Align.center,
-                  decimalAlignPercent: 80,
-                })}
+                input={JSON.stringify(testObject)}
+                setJson={setJson}
               />
             </span>
-          </div> */}
+          </div>
 
           {/* <div className="row">
             <span className="label">JSON input</span>

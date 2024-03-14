@@ -613,7 +613,7 @@ describe("Write space after at block", () => {
     div.appendChild(line.toHtml());
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line left">' +
-        '<span class="aiev3-tb at-block is-locked" data-is-locked="true">@Hello</span>' +
+        '<span class="aiev3-tb at-block is-locked" data-is-locked="true" data-type="at">@Hello</span>' +
         '<span class="aiev3-tb skip-read">&nbsp;</span>' +
         "</div>",
     );

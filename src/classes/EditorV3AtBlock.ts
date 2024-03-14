@@ -23,6 +23,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock {
       span.classList.add(`editorv3style-${this.style}`);
       span.dataset.styleName = this.style;
     }
+    span.dataset.type = "at";
     return frag;
   }
 }
