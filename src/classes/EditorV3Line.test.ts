@@ -3,6 +3,7 @@ import { defaultContentProps } from "./defaultContentProps";
 import { EditorV3Line } from "./EditorV3Line";
 import { EditorV3Align } from "./interface";
 import { textBlockFactory } from "./textBlockFactory";
+import { EditorV3AtBlock } from "./EditorV3AtBlock";
 
 describe("Check basic EditorV3Line", () => {
   test("Load string", async () => {
@@ -616,5 +617,24 @@ describe("Write space after at block", () => {
         '<span class="aiev3-tb skip-read">&nbsp;</span>' +
         "</div>",
     );
+  });
+});
+
+describe("Get word boundaries", () => {
+  test("One word", async () => {
+    const line = new EditorV3Line("Hello");
+    expect(line.words()).toEqual([{ line: -1, startChar: 0, endChar: 5, isLocked: false }]);
+    const line2 = new EditorV3Line([new EditorV3AtBlock({ text: "@Hello", isLocked: true })]);
+    expect(line2.words()).toEqual([{ line: -1, startChar: 0, endChar: 6, isLocked: true }]);
+  });
+  test("Many words", async () => {
+    const line = new EditorV3Line("");
+    expect(line.words("  What is going on \u00A0here?  ")).toEqual([
+      { line: -1, startChar: 2, endChar: 6, isLocked: false },
+      { line: -1, startChar: 7, endChar: 9, isLocked: false },
+      { line: -1, startChar: 10, endChar: 15, isLocked: false },
+      { line: -1, startChar: 16, endChar: 18, isLocked: false },
+      { line: -1, startChar: 20, endChar: 25, isLocked: false },
+    ]);
   });
 });

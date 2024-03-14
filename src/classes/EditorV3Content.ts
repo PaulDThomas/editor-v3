@@ -102,6 +102,12 @@ export class EditorV3Content implements EditorV3Import {
   set allowNewLine(newAllow: boolean) {
     this._allowNewLine = newAllow;
   }
+  get lineLengths() {
+    return this.lines.map((l) => l.lineLength);
+  }
+  get words() {
+    return this.lines.flatMap((l, ix) => l.words().map((w) => ({ ...w, line: ix })));
+  }
 
   /**
    * Current caret position and lock status

@@ -10,6 +10,7 @@ import {
   EditorV3ContentProps,
   EditorV3ContentPropsInput,
   EditorV3Position,
+  EditorV3WordPosition,
 } from "./interface";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 import { textBlockFactory } from "./textBlockFactory";
@@ -44,14 +45,23 @@ export class EditorV3Line {
     return h;
   }
 
+  /**
+   * Get the line as a text string
+   */
   get lineText(): string {
     return this.textBlocks.map((tb) => tb.text).join("");
   }
 
+  /**
+   * Get the length of the line
+   */
   get lineLength(): number {
-    return this.textBlocks.map((tb) => tb.text.length).reduce((p, c) => p + c, 0);
+    return this.lineText.length;
   }
 
+  /**
+   * Get the line as a JSON object
+   */
   get data() {
     const contentProps = cloneDeep(this.contentProps);
     Object.keys(defaultContentProps).forEach((k) => {
@@ -64,10 +74,18 @@ export class EditorV3Line {
     return Object.keys(contentProps).length === 0 ? { textBlocks } : { contentProps, textBlocks };
   }
 
+  /**
+   * Get the line as a JSON string
+   */
   get jsonString(): string {
     return JSON.stringify(this.data);
   }
 
+  /**
+   * Get a markdown string for the line
+   * @param markdownSettings Settings for the markdown string
+   * @returns The markdown for the line
+   */
   public toMarkdown(
     markdownSettings: IMarkdownSettings = this.contentProps.markdownSettings,
   ): string {
@@ -155,14 +173,29 @@ export class EditorV3Line {
     this._mergeBlocks();
   }
 
-  public getBlockAt(char: number): EditorV3TextBlock | undefined {
-    return this.textBlocks.find((tb) => tb.lineStartPosition <= char && tb.lineEndPosition > char);
+  /**
+   * Gets the block at a position
+   * @param pos The position to get the block at
+   * @returns The block at the position
+   */
+  public getBlockAt(pos: number): EditorV3TextBlock | undefined {
+    return this.textBlocks.find((tb) => tb.lineStartPosition <= pos && tb.lineEndPosition > pos);
   }
 
-  public getStyleAt(char: number): string | undefined {
-    return this.getBlockAt(char)?.style;
+  /**
+   * Gets style at a line position
+   * @param pos The position to get the style at
+   * @returns The style at the position
+   */
+  public getStyleAt(pos: number): string | undefined {
+    return this.getBlockAt(pos)?.style;
   }
 
+  /**
+   * Set one of the lines blocks to be active
+   * @param pos Sets the active block at the position
+   * @returns The active block
+   */
   public setActiveBlock(pos: EditorV3Position): EditorV3TextBlock | undefined {
     this.textBlocks.forEach((tb) => tb.setActive(false));
     if (pos.isCollapsed) {
@@ -172,6 +205,12 @@ export class EditorV3Line {
     } else return undefined;
   }
 
+  /**
+   * Get the text blocks from a position to another
+   * @param startPos Start position
+   * @param endPosOpt End position, if not provided uses the end of the line
+   * @returns Text blocks from startPos to endPos
+   */
   public subBlocks(startPos: number, endPosOpt?: number): EditorV3TextBlock[] {
     const ret: EditorV3TextBlock[] = [];
     const endPos = endPosOpt ?? this.lineLength;
@@ -223,14 +262,29 @@ export class EditorV3Line {
     return ret;
   }
 
+  /**
+   * Get the text blocks from the start of the line to a position
+   * @param pos Position to get blocks to
+   * @returns Blocks from start to pos
+   */
   public upToPos(pos: number): EditorV3TextBlock[] {
     return this.subBlocks(0, pos);
   }
 
+  /**
+   * Get the text blocks from a position to the end of the line
+   * @param pos Position to get blocks from
+   * @returns Blocks from pos to end
+   */
   public fromPos(pos: number): EditorV3TextBlock[] {
     return this.subBlocks(pos);
   }
 
+  /**
+   * Split the line into two
+   * @param pos Position to split at
+   * @returns The remainer of the line after the split
+   */
   public splitLine(pos: number): EditorV3Line {
     if (pos >= this.lineLength) {
       return new EditorV3Line("", this.contentProps);
@@ -243,6 +297,11 @@ export class EditorV3Line {
     }
   }
 
+  /**
+   * Insert text blocks into the line
+   * @param newTextBlocks Array of text blocks to insert
+   * @param pos Position to insert at
+   */
   public insertBlocks(newTextBlocks: EditorV3TextBlock[], pos: number) {
     const pre = this.upToPos(pos);
     const post = this.fromPos(pos);
@@ -250,6 +309,12 @@ export class EditorV3Line {
     this._mergeBlocks();
   }
 
+  /**
+   * Remove part of the line
+   * @param startPos Start position to remove
+   * @param endPos End position to remove (exclusive)
+   * @returns self
+   */
   public removeSection(startPos: number, endPos: number): EditorV3TextBlock[] {
     let ret: EditorV3TextBlock[] = [];
     if (startPos < endPos && startPos < this.lineLength) {
@@ -262,11 +327,23 @@ export class EditorV3Line {
     return ret;
   }
 
+  /**
+   * Delete a character from the line
+   * @param pos Character to remove
+   * @returns self
+   */
   public deleteCharacter(pos: number) {
     this.removeSection(pos, pos + 1);
     return this;
   }
 
+  /**
+   * Apply a style to a section of the line
+   * @param styleName Style to apply
+   * @param startPos Start position to apply style
+   * @param endPos End position to apply style (exclusive)
+   * @returns self
+   */
   public applyStyle(styleName: string, startPos: number, endPos: number) {
     if (startPos < endPos) {
       this.textBlocks = [
@@ -279,6 +356,12 @@ export class EditorV3Line {
     return this;
   }
 
+  /**
+   * Remove style from a section of the line
+   * @param startPos Start position to remove style
+   * @param endPos End position to remove style (exclusive)
+   * @returns self
+   */
   public removeStyle(startPos: number, endPos: number) {
     if (startPos < endPos) {
       this.textBlocks = [
@@ -291,6 +374,34 @@ export class EditorV3Line {
     return this;
   }
 
+  /**
+   * Return position of each word in the lineText
+   * @param checkText Text to check, if not provided uses this.lineText
+   * @returns Array of word positions
+   */
+  public words(checkText?: string): EditorV3WordPosition[] {
+    const text = checkText ?? this.lineText;
+    const ret: EditorV3WordPosition[] = [];
+    let _counted = 0;
+    while (_counted < text.length && text.slice(_counted).search(/\S/) > -1) {
+      const remainingText = text.slice(_counted);
+      const nextWord = remainingText.match(/\S+/);
+      if (nextWord) {
+        ret.push({
+          line: -1,
+          startChar: _counted + remainingText.search(/\S/),
+          endChar: _counted + remainingText.search(/\S/) + nextWord[0].length,
+          isLocked: (checkText === undefined && this.getBlockAt(_counted)?.isLocked) ?? false,
+        });
+        _counted += remainingText.search(/\S/) + nextWord[0].length;
+      }
+    }
+    return ret;
+  }
+
+  /**
+   * Merge blocks with the same style
+   */
   private _mergeBlocks() {
     if (new Set(this.textBlocks.map((tb) => tb.typeStyle)).size < this.textBlocks.length) {
       const mergedBlocks: EditorV3TextBlock[] = [];
@@ -306,16 +417,16 @@ export class EditorV3Line {
           lastTypeStyle = this.textBlocks[_i].typeStyle;
         }
       }
-      // if (mergedBlocks.filter((tb) => tb.text !== "").length === 0) {
-      //   this.textBlocks = [mergedBlocks[0]];
-      // } else if (mergedBlocks.filter((tb) => tb.text !== "").length < this.textBlocks.length) {
       this.textBlocks = mergedBlocks.filter((tb) => tb.text !== "");
-      // }
     }
-    this._updateBlockTypes();
     this._setBlockStartPositions();
   }
 
+  /**
+   * Update blocks with their start position
+   * @param blocks Blocks to check, if not provided uses this.textBlocks
+   * @param initialPos Start position to use
+   */
   private _setBlockStartPositions(blocks?: EditorV3TextBlock[], initialPos: number = 0) {
     let _linePos = initialPos;
     const tbs = blocks ?? this.textBlocks;
@@ -326,6 +437,4 @@ export class EditorV3Line {
       }
     });
   }
-
-  private _updateBlockTypes() {}
 }

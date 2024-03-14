@@ -41,6 +41,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     });
     return JSON.stringify(ret);
   }
+
   // Content returns
   public toHtml(): DocumentFragment {
     const text =
@@ -53,7 +54,6 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     } else {
       const words = text.split("\uFEFF");
       words.forEach((word) => {
-        // TODO: This should be moved to the factory
         const span = document.createElement("span");
         span.classList.add("aiev3-tb");
         if (word.startsWith("@")) {

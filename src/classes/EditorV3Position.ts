@@ -1,24 +1,6 @@
-/**
- * Cursor position object for EditorV3
- */
-export interface IEditorV3Position {
-  startLine: number;
-  startChar: number;
-  endLine: number;
-  endChar: number;
-  isCollapsed?: boolean;
-}
-/**
- * Word positions in the content
- */
-export interface IEditorV3WordPosition {
-  line: number;
-  startChar: number;
-  endChar: number;
-  locked: boolean;
-}
+import { EditorV3Position, EditorV3WordPosition } from "./interface";
 
-export class EditorV3Position implements IEditorV3Position {
+export class EditorV3PositionClass implements EditorV3Position {
   public initialLine: number;
   public initialChar: number;
   public focusLine: number;
@@ -48,10 +30,10 @@ export class EditorV3Position implements IEditorV3Position {
         : Math.max(this.initialChar, this.focusChar);
   }
   private lineLengths: number[];
-  private words: IEditorV3WordPosition[];
+  private words: EditorV3WordPosition[];
   private lastAction: "move" | "select" = "move";
 
-  get pos(): IEditorV3Position {
+  get pos(): EditorV3Position {
     return {
       startLine: this.startLine,
       startChar: this.startChar,
@@ -79,7 +61,7 @@ export class EditorV3Position implements IEditorV3Position {
     focusLine: number,
     focusChar: number,
     lineLengths: number[],
-    words: IEditorV3WordPosition[],
+    words: EditorV3WordPosition[],
   ) {
     this.initialLine = initialLine;
     this.initialChar = initialChar;
@@ -129,7 +111,7 @@ export class EditorV3Position implements IEditorV3Position {
       // Check if we are inside a locked block and expand
       const insideLocked = this.words.find(
         (w) =>
-          w.locked &&
+          w.isLocked &&
           w.line === this.focusLine &&
           w.startChar < this.focusChar &&
           w.endChar > this.focusChar,
@@ -185,7 +167,7 @@ export class EditorV3Position implements IEditorV3Position {
       // Check if we are inside a locked block and expand
       const insideLocked = this.words.find(
         (w) =>
-          w.locked &&
+          w.isLocked &&
           w.line === this.focusLine &&
           w.startChar < this.focusChar &&
           w.endChar > this.focusChar,
@@ -220,7 +202,7 @@ export class EditorV3Position implements IEditorV3Position {
       // Check if we are inside a locked block and expand
       const insideLocked = this.words.find(
         (w) =>
-          w.locked &&
+          w.isLocked &&
           w.line === this.focusLine &&
           w.startChar < this.focusChar &&
           w.endChar > this.focusChar,
@@ -255,7 +237,7 @@ export class EditorV3Position implements IEditorV3Position {
       // Check if we are inside a locked block and expand
       const insideLocked = this.words.find(
         (w) =>
-          w.locked &&
+          w.isLocked &&
           w.line === this.focusLine &&
           w.startChar < this.focusChar &&
           w.endChar > this.focusChar,

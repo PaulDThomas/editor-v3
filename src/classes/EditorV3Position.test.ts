@@ -1,20 +1,21 @@
 import { isEqual } from "lodash";
-import { EditorV3Position, IEditorV3Position } from "./EditorV3Position";
+import { EditorV3PositionClass } from "./EditorV3Position";
+import { EditorV3Position } from "./interface";
 
 describe("EditorV3Position tests", () => {
   const lineLengths = [10, 13, 13];
   const words = [
-    { line: 0, startChar: 0, endChar: 5, locked: false },
-    { line: 0, startChar: 5, endChar: 10, locked: true },
-    { line: 1, startChar: 0, endChar: 3, locked: true },
-    { line: 1, startChar: 3, endChar: 11, locked: false },
-    { line: 2, startChar: 0, endChar: 6, locked: false },
-    { line: 2, startChar: 7, endChar: 9, locked: true },
-    { line: 2, startChar: 9, endChar: 12, locked: true },
+    { line: 0, startChar: 0, endChar: 5, isLocked: false },
+    { line: 0, startChar: 5, endChar: 10, isLocked: true },
+    { line: 1, startChar: 0, endChar: 3, isLocked: true },
+    { line: 1, startChar: 3, endChar: 11, isLocked: false },
+    { line: 2, startChar: 0, endChar: 6, isLocked: false },
+    { line: 2, startChar: 7, endChar: 9, isLocked: true },
+    { line: 2, startChar: 9, endChar: 12, isLocked: true },
   ];
 
   test("Check initial setup", () => {
-    const position1 = new EditorV3Position(0, 0, 0, 0, lineLengths, words);
+    const position1 = new EditorV3PositionClass(0, 0, 0, 0, lineLengths, words);
     expect(position1.isCollapsed).toBe(true);
     expect(position1.startLine).toBe(0);
     expect(position1.startChar).toBe(0);
@@ -32,7 +33,7 @@ describe("EditorV3Position tests", () => {
       focusChar: 0,
       focusAt: "start",
     });
-    const position2 = new EditorV3Position(2, 5, 0, 3, lineLengths, words);
+    const position2 = new EditorV3PositionClass(2, 5, 0, 3, lineLengths, words);
     expect(position2.isCollapsed).toBe(false);
     expect(position2.startLine).toBe(0);
     expect(position2.startChar).toBe(3);
@@ -50,7 +51,7 @@ describe("EditorV3Position tests", () => {
       focusChar: 3,
       focusAt: "start",
     });
-    const position3 = new EditorV3Position(0, 5, 2, 3, lineLengths, words);
+    const position3 = new EditorV3PositionClass(0, 5, 2, 3, lineLengths, words);
     expect(position3.isCollapsed).toBe(false);
     expect(position3.startLine).toBe(0);
     expect(position3.startChar).toBe(5);
@@ -74,19 +75,19 @@ describe("EditorV3Position tests", () => {
 describe("EditorV3Position moveLeft tests", () => {
   const lineLengths = [10, 13, 13];
   const words = [
-    { line: 0, startChar: 0, endChar: 5, locked: false },
-    { line: 0, startChar: 5, endChar: 10, locked: true },
-    { line: 1, startChar: 0, endChar: 3, locked: true },
-    { line: 1, startChar: 3, endChar: 11, locked: false },
-    { line: 2, startChar: 0, endChar: 6, locked: false },
-    { line: 2, startChar: 7, endChar: 9, locked: true },
-    { line: 2, startChar: 9, endChar: 12, locked: true },
+    { line: 0, startChar: 0, endChar: 5, isLocked: false },
+    { line: 0, startChar: 5, endChar: 10, isLocked: true },
+    { line: 1, startChar: 0, endChar: 3, isLocked: true },
+    { line: 1, startChar: 3, endChar: 11, isLocked: false },
+    { line: 2, startChar: 0, endChar: 6, isLocked: false },
+    { line: 2, startChar: 7, endChar: 9, isLocked: true },
+    { line: 2, startChar: 9, endChar: 12, isLocked: true },
   ];
 
   test("moveLeft should update focusChar correctly", () => {
-    const position = new EditorV3Position(2, 13, 2, 13, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(2, 13, 2, 13, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -335,9 +336,9 @@ describe("EditorV3Position moveLeft tests", () => {
   });
 
   test("moveLeft with shiftKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(2, 13, 2, 13, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(2, 13, 2, 13, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -558,9 +559,9 @@ describe("EditorV3Position moveLeft tests", () => {
   });
 
   test("moveLeft with ctrlKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(2, 13, 2, 13, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(2, 13, 2, 13, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -606,9 +607,9 @@ describe("EditorV3Position moveLeft tests", () => {
   });
 
   test("moveLeft with ctrlKey and shiftKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(2, 13, 2, 13, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(2, 13, 2, 13, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -692,19 +693,19 @@ describe("EditorV3Position moveLeft tests", () => {
 describe("EditorV3Position moveRight tests", () => {
   const lineLengths = [10, 13, 13];
   const words = [
-    { line: 0, startChar: 0, endChar: 5, locked: false },
-    { line: 0, startChar: 5, endChar: 10, locked: true },
-    { line: 1, startChar: 0, endChar: 3, locked: true },
-    { line: 1, startChar: 3, endChar: 11, locked: false },
-    { line: 2, startChar: 0, endChar: 6, locked: false },
-    { line: 2, startChar: 7, endChar: 9, locked: true },
-    { line: 2, startChar: 9, endChar: 12, locked: true },
+    { line: 0, startChar: 0, endChar: 5, isLocked: false },
+    { line: 0, startChar: 5, endChar: 10, isLocked: true },
+    { line: 1, startChar: 0, endChar: 3, isLocked: true },
+    { line: 1, startChar: 3, endChar: 11, isLocked: false },
+    { line: 2, startChar: 0, endChar: 6, isLocked: false },
+    { line: 2, startChar: 7, endChar: 9, isLocked: true },
+    { line: 2, startChar: 9, endChar: 12, isLocked: true },
   ];
 
   test("moveRight should update focusChar correctly", () => {
-    const position = new EditorV3Position(0, 0, 0, 0, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(0, 0, 0, 0, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -953,9 +954,9 @@ describe("EditorV3Position moveRight tests", () => {
   });
 
   test("moveRight with shiftKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(0, 0, 0, 0, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(0, 0, 0, 0, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -1176,9 +1177,9 @@ describe("EditorV3Position moveRight tests", () => {
   });
 
   test("moveRight with ctrlKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(0, 0, 0, 0, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(0, 0, 0, 0, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -1273,9 +1274,9 @@ describe("EditorV3Position moveRight tests", () => {
   });
 
   test("moveRight with ctrlKey and shiftKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(0, 0, 0, 0, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(0, 0, 0, 0, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -1345,19 +1346,19 @@ describe("EditorV3Position moveRight tests", () => {
 describe("EditorV3Position moveUp tests", () => {
   const lineLengths = [10, 13, 13];
   const words = [
-    { line: 0, startChar: 0, endChar: 5, locked: false },
-    { line: 0, startChar: 5, endChar: 10, locked: true },
-    { line: 1, startChar: 0, endChar: 3, locked: true },
-    { line: 1, startChar: 3, endChar: 11, locked: false },
-    { line: 2, startChar: 0, endChar: 6, locked: false },
-    { line: 2, startChar: 7, endChar: 9, locked: true },
-    { line: 2, startChar: 9, endChar: 12, locked: true },
+    { line: 0, startChar: 0, endChar: 5, isLocked: false },
+    { line: 0, startChar: 5, endChar: 10, isLocked: true },
+    { line: 1, startChar: 0, endChar: 3, isLocked: true },
+    { line: 1, startChar: 3, endChar: 11, isLocked: false },
+    { line: 2, startChar: 0, endChar: 6, isLocked: false },
+    { line: 2, startChar: 7, endChar: 9, isLocked: true },
+    { line: 2, startChar: 9, endChar: 12, isLocked: true },
   ];
 
   test("moveUp should update focusChar correctly", () => {
-    const position = new EditorV3Position(2, 13, 2, 13, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(2, 13, 2, 13, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -1393,9 +1394,9 @@ describe("EditorV3Position moveUp tests", () => {
         isCollapsed: true,
       },
     ]);
-    const position2 = new EditorV3Position(2, 9, 2, 9, lineLengths, words);
-    const focusChars2: IEditorV3Position[] = [];
-    let lastPos2: IEditorV3Position | undefined = undefined;
+    const position2 = new EditorV3PositionClass(2, 9, 2, 9, lineLengths, words);
+    const focusChars2: EditorV3Position[] = [];
+    let lastPos2: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position2.pos, lastPos2); _ix++) {
       lastPos2 = { ...position2.pos };
       focusChars2.push(position2.pos);
@@ -1434,9 +1435,9 @@ describe("EditorV3Position moveUp tests", () => {
   });
 
   test("moveUp with shiftKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(2, 13, 2, 13, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(2, 13, 2, 13, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -1472,9 +1473,9 @@ describe("EditorV3Position moveUp tests", () => {
         isCollapsed: false,
       },
     ]);
-    const position2 = new EditorV3Position(2, 9, 2, 9, lineLengths, words);
-    const focusChars2: IEditorV3Position[] = [];
-    let lastPos2: IEditorV3Position | undefined = undefined;
+    const position2 = new EditorV3PositionClass(2, 9, 2, 9, lineLengths, words);
+    const focusChars2: EditorV3Position[] = [];
+    let lastPos2: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position2.pos, lastPos2); _ix++) {
       lastPos2 = { ...position2.pos };
       focusChars2.push(position2.pos);
@@ -1513,9 +1514,9 @@ describe("EditorV3Position moveUp tests", () => {
   });
 
   test("moveUp with ctrlKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(2, 13, 2, 13, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(2, 13, 2, 13, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -1544,9 +1545,9 @@ describe("EditorV3Position moveUp tests", () => {
         isCollapsed: true,
       },
     ]);
-    const position2 = new EditorV3Position(2, 9, 2, 9, lineLengths, words);
-    const focusChars2: IEditorV3Position[] = [];
-    let lastPos2: IEditorV3Position | undefined = undefined;
+    const position2 = new EditorV3PositionClass(2, 9, 2, 9, lineLengths, words);
+    const focusChars2: EditorV3Position[] = [];
+    let lastPos2: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position2.pos, lastPos2); _ix++) {
       lastPos2 = { ...position2.pos };
       focusChars2.push(position2.pos);
@@ -1578,9 +1579,9 @@ describe("EditorV3Position moveUp tests", () => {
   });
 
   test("moveUp with ctrlKey and shiftKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(2, 13, 2, 13, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(2, 13, 2, 13, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -1609,9 +1610,9 @@ describe("EditorV3Position moveUp tests", () => {
         isCollapsed: false,
       },
     ]);
-    const position2 = new EditorV3Position(2, 9, 2, 9, lineLengths, words);
-    const focusChars2: IEditorV3Position[] = [];
-    let lastPos2: IEditorV3Position | undefined = undefined;
+    const position2 = new EditorV3PositionClass(2, 9, 2, 9, lineLengths, words);
+    const focusChars2: EditorV3Position[] = [];
+    let lastPos2: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position2.pos, lastPos2); _ix++) {
       lastPos2 = { ...position2.pos };
       focusChars2.push(position2.pos);
@@ -1646,19 +1647,19 @@ describe("EditorV3Position moveUp tests", () => {
 describe("EditorV3Position moveDown tests", () => {
   const lineLengths = [10, 9, 13];
   const words = [
-    { line: 0, startChar: 0, endChar: 5, locked: false },
-    { line: 0, startChar: 5, endChar: 10, locked: true },
-    { line: 1, startChar: 0, endChar: 3, locked: true },
-    { line: 1, startChar: 3, endChar: 9, locked: false },
-    { line: 2, startChar: 0, endChar: 6, locked: false },
-    { line: 2, startChar: 7, endChar: 9, locked: true },
-    { line: 2, startChar: 9, endChar: 12, locked: true },
+    { line: 0, startChar: 0, endChar: 5, isLocked: false },
+    { line: 0, startChar: 5, endChar: 10, isLocked: true },
+    { line: 1, startChar: 0, endChar: 3, isLocked: true },
+    { line: 1, startChar: 3, endChar: 9, isLocked: false },
+    { line: 2, startChar: 0, endChar: 6, isLocked: false },
+    { line: 2, startChar: 7, endChar: 9, isLocked: true },
+    { line: 2, startChar: 9, endChar: 12, isLocked: true },
   ];
 
   test("moveDown should update focusChar correctly", () => {
-    const position = new EditorV3Position(0, 0, 0, 0, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(0, 0, 0, 0, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -1694,9 +1695,9 @@ describe("EditorV3Position moveDown tests", () => {
         isCollapsed: true,
       },
     ]);
-    const position2 = new EditorV3Position(0, 10, 0, 10, lineLengths, words);
-    const focusChars2: IEditorV3Position[] = [];
-    let lastPos2: IEditorV3Position | undefined = undefined;
+    const position2 = new EditorV3PositionClass(0, 10, 0, 10, lineLengths, words);
+    const focusChars2: EditorV3Position[] = [];
+    let lastPos2: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position2.pos, lastPos2); _ix++) {
       lastPos2 = { ...position2.pos };
       focusChars2.push(position2.pos);
@@ -1735,9 +1736,9 @@ describe("EditorV3Position moveDown tests", () => {
   });
 
   test("moveDown with shiftKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(0, 0, 0, 0, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(0, 0, 0, 0, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -1773,9 +1774,9 @@ describe("EditorV3Position moveDown tests", () => {
         isCollapsed: false,
       },
     ]);
-    const position2 = new EditorV3Position(0, 10, 0, 10, lineLengths, words);
-    const focusChars2: IEditorV3Position[] = [];
-    let lastPos2: IEditorV3Position | undefined = undefined;
+    const position2 = new EditorV3PositionClass(0, 10, 0, 10, lineLengths, words);
+    const focusChars2: EditorV3Position[] = [];
+    let lastPos2: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position2.pos, lastPos2); _ix++) {
       lastPos2 = { ...position2.pos };
       focusChars2.push(position2.pos);
@@ -1814,9 +1815,9 @@ describe("EditorV3Position moveDown tests", () => {
   });
 
   test("moveDown with ctrlKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(0, 0, 0, 0, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(0, 0, 0, 0, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -1845,9 +1846,9 @@ describe("EditorV3Position moveDown tests", () => {
         isCollapsed: true,
       },
     ]);
-    const position2 = new EditorV3Position(0, 10, 0, 10, lineLengths, words);
-    const focusChars2: IEditorV3Position[] = [];
-    let lastPos2: IEditorV3Position | undefined = undefined;
+    const position2 = new EditorV3PositionClass(0, 10, 0, 10, lineLengths, words);
+    const focusChars2: EditorV3Position[] = [];
+    let lastPos2: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position2.pos, lastPos2); _ix++) {
       lastPos2 = { ...position2.pos };
       focusChars2.push(position2.pos);
@@ -1879,9 +1880,9 @@ describe("EditorV3Position moveDown tests", () => {
   });
 
   test("moveDown with ctrlKey and shiftKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(0, 0, 0, 0, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(0, 0, 0, 0, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -1910,15 +1911,14 @@ describe("EditorV3Position moveDown tests", () => {
         isCollapsed: false,
       },
     ]);
-    const position2 = new EditorV3Position(0, 10, 0, 10, lineLengths, words);
-    const focusChars2: IEditorV3Position[] = [];
-    let lastPos2: IEditorV3Position | undefined = undefined;
+    const position2 = new EditorV3PositionClass(0, 10, 0, 10, lineLengths, words);
+    const focusChars2: EditorV3Position[] = [];
+    let lastPos2: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position2.pos, lastPos2); _ix++) {
       lastPos2 = { ...position2.pos };
       focusChars2.push(position2.pos);
       position2.moveDown(true, true);
     }
-    console.log(focusChars2);
     expect(focusChars2).toEqual([
       {
         startLine: 0,
@@ -1948,19 +1948,19 @@ describe("EditorV3Position moveDown tests", () => {
 describe("EditorV3Position moveHome tests", () => {
   const lineLengths = [10, 13, 13];
   const words = [
-    { line: 0, startChar: 0, endChar: 5, locked: false },
-    { line: 0, startChar: 5, endChar: 10, locked: true },
-    { line: 1, startChar: 0, endChar: 3, locked: true },
-    { line: 1, startChar: 3, endChar: 11, locked: false },
-    { line: 2, startChar: 0, endChar: 6, locked: false },
-    { line: 2, startChar: 7, endChar: 9, locked: true },
-    { line: 2, startChar: 9, endChar: 12, locked: true },
+    { line: 0, startChar: 0, endChar: 5, isLocked: false },
+    { line: 0, startChar: 5, endChar: 10, isLocked: true },
+    { line: 1, startChar: 0, endChar: 3, isLocked: true },
+    { line: 1, startChar: 3, endChar: 11, isLocked: false },
+    { line: 2, startChar: 0, endChar: 6, isLocked: false },
+    { line: 2, startChar: 7, endChar: 9, isLocked: true },
+    { line: 2, startChar: 9, endChar: 12, isLocked: true },
   ];
 
   test("moveHome should update focusChar correctly", () => {
-    const position = new EditorV3Position(2, 13, 2, 13, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(2, 13, 2, 13, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -1992,9 +1992,9 @@ describe("EditorV3Position moveHome tests", () => {
   });
 
   test("moveHome with shiftKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(2, 13, 2, 13, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(2, 13, 2, 13, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -2026,9 +2026,9 @@ describe("EditorV3Position moveHome tests", () => {
   });
 
   test("moveHome with ctrlKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(2, 13, 2, 13, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(2, 13, 2, 13, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -2053,9 +2053,9 @@ describe("EditorV3Position moveHome tests", () => {
   });
 
   test("moveHome with ctrlKey and shiftKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(2, 13, 2, 13, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(2, 13, 2, 13, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -2083,19 +2083,19 @@ describe("EditorV3Position moveHome tests", () => {
 describe("EditorV3Position moveEnd tests", () => {
   const lineLengths = [10, 9, 13];
   const words = [
-    { line: 0, startChar: 0, endChar: 5, locked: false },
-    { line: 0, startChar: 5, endChar: 10, locked: true },
-    { line: 1, startChar: 0, endChar: 3, locked: true },
-    { line: 1, startChar: 3, endChar: 8, locked: false },
-    { line: 2, startChar: 0, endChar: 6, locked: false },
-    { line: 2, startChar: 7, endChar: 9, locked: true },
-    { line: 2, startChar: 9, endChar: 12, locked: true },
+    { line: 0, startChar: 0, endChar: 5, isLocked: false },
+    { line: 0, startChar: 5, endChar: 10, isLocked: true },
+    { line: 1, startChar: 0, endChar: 3, isLocked: true },
+    { line: 1, startChar: 3, endChar: 8, isLocked: false },
+    { line: 2, startChar: 0, endChar: 6, isLocked: false },
+    { line: 2, startChar: 7, endChar: 9, isLocked: true },
+    { line: 2, startChar: 9, endChar: 12, isLocked: true },
   ];
 
   test("moveEnd should update focusChar correctly", () => {
-    const position = new EditorV3Position(0, 0, 0, 0, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(0, 0, 0, 0, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -2127,9 +2127,9 @@ describe("EditorV3Position moveEnd tests", () => {
   });
 
   test("moveEnd with shiftKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(0, 0, 0, 0, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(0, 0, 0, 0, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -2161,9 +2161,9 @@ describe("EditorV3Position moveEnd tests", () => {
   });
 
   test("moveEnd with ctrlKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(0, 0, 0, 0, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(0, 0, 0, 0, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);
@@ -2188,9 +2188,9 @@ describe("EditorV3Position moveEnd tests", () => {
   });
 
   test("moveEnd with ctrlKey and shiftKey should update focusChar correctly", () => {
-    const position = new EditorV3Position(0, 0, 0, 0, lineLengths, words);
-    const focusChars: IEditorV3Position[] = [];
-    let lastPos: IEditorV3Position | undefined = undefined;
+    const position = new EditorV3PositionClass(0, 0, 0, 0, lineLengths, words);
+    const focusChars: EditorV3Position[] = [];
+    let lastPos: EditorV3Position | undefined = undefined;
     for (let _ix = 0; _ix < 40 && !isEqual(position.pos, lastPos); _ix++) {
       lastPos = { ...position.pos };
       focusChars.push(position.pos);

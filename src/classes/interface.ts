@@ -78,3 +78,12 @@ export interface EditorV3Position {
   endChar: number;
   isCollapsed?: boolean;
 }
+/**
+ * Word positions in the content
+ */
+export interface EditorV3WordPosition {
+  line: number;
+  startChar: number;
+  endChar: number;
+  isLocked: boolean;
+}

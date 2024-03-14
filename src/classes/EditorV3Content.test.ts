@@ -487,6 +487,13 @@ describe("Render html text from v2 content", () => {
     expect(result.lines[2].textBlocks.map((t) => t.data)).toEqual([
       { text: "ork", style: undefined, type: "text" },
     ]);
+    expect(result.text).toEqual("Notes  w\n\nork");
+    expect(result.lineLengths).toEqual([8, 0, 3]);
+    expect(result.words).toEqual([
+      { line: 0, startChar: 0, endChar: 5, isLocked: false },
+      { line: 0, startChar: 7, endChar: 8, isLocked: false },
+      { line: 2, startChar: 0, endChar: 3, isLocked: false },
+    ]);
   });
 });
 
