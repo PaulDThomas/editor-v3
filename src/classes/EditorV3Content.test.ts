@@ -191,28 +191,22 @@ describe("Content functions", () => {
 
   test("Delete character", async () => {
     const testContent = new EditorV3Content("12\n34\n56");
-    testContent.deleteCharacter(
-      {
-        startLine: 0,
-        startChar: 1,
-        endLine: 0,
-        endChar: 1,
-        isCollapsed: true,
-      },
-      false,
-    );
+    testContent.deleteCharacter(false, {
+      startLine: 0,
+      startChar: 1,
+      endLine: 0,
+      endChar: 1,
+      isCollapsed: true,
+    });
     expect(testContent.text).toEqual("1\n34\n56");
 
-    testContent.deleteCharacter(
-      {
-        startLine: 0,
-        startChar: 4,
-        endLine: 0,
-        endChar: 4,
-        isCollapsed: true,
-      },
-      false,
-    );
+    testContent.deleteCharacter(false, {
+      startLine: 0,
+      startChar: 1,
+      endLine: 0,
+      endChar: 1,
+      isCollapsed: true,
+    });
     expect(testContent.text).toEqual("134\n56");
 
     testContent.splitLine({
@@ -223,53 +217,41 @@ describe("Content functions", () => {
       isCollapsed: true,
     });
     expect(testContent.text).toEqual("1\n34\n56");
-    testContent.deleteCharacter(
-      {
-        startLine: 1,
-        startChar: 0,
-        endLine: 1,
-        endChar: 2,
-        isCollapsed: false,
-      },
-      true,
-    );
+    testContent.deleteCharacter(true, {
+      startLine: 1,
+      startChar: 0,
+      endLine: 1,
+      endChar: 2,
+      isCollapsed: false,
+    });
     expect(testContent.text).toEqual("1\n\n56");
     expect(testContent.lines[1].textBlocks.length).toEqual(1);
 
-    testContent.deleteCharacter(
-      {
-        startLine: 2,
-        startChar: 0,
-        endLine: 2,
-        endChar: 0,
-        isCollapsed: true,
-      },
-      true,
-    );
+    testContent.deleteCharacter(true, {
+      startLine: 2,
+      startChar: 0,
+      endLine: 2,
+      endChar: 0,
+      isCollapsed: true,
+    });
     expect(testContent.text).toEqual("1\n56");
 
-    testContent.deleteCharacter(
-      {
-        startLine: 1,
-        startChar: 2,
-        endLine: 1,
-        endChar: 2,
-        isCollapsed: true,
-      },
-      true,
-    );
+    testContent.deleteCharacter(true, {
+      startLine: 1,
+      startChar: 2,
+      endLine: 1,
+      endChar: 2,
+      isCollapsed: true,
+    });
     expect(testContent.text).toEqual("1\n5");
 
-    testContent.deleteCharacter(
-      {
-        startLine: 2,
-        startChar: 2,
-        endLine: 1,
-        endChar: 2,
-        isCollapsed: true,
-      },
-      true,
-    );
+    testContent.deleteCharacter(true, {
+      startLine: 2,
+      startChar: 2,
+      endLine: 1,
+      endChar: 2,
+      isCollapsed: true,
+    });
     expect(testContent.text).toEqual("1\n5");
   });
 
@@ -489,8 +471,10 @@ describe("Render html text from v2 content", () => {
     ]);
     expect(result.text).toEqual("Notes  w\n\nork");
     expect(result.lineLengths).toEqual([8, 0, 3]);
-    expect(result.words).toEqual([
-      { line: 0, startChar: 0, endChar: 5, isLocked: false },
+    expect(result.wordPositions).toEqual([
+      { line: 0, startChar: 0, endChar: 1, isLocked: false },
+      { line: 0, startChar: 1, endChar: 4, isLocked: false },
+      { line: 0, startChar: 4, endChar: 5, isLocked: false },
       { line: 0, startChar: 7, endChar: 8, isLocked: false },
       { line: 2, startChar: 0, endChar: 3, isLocked: false },
     ]);

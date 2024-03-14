@@ -15,6 +15,7 @@ import {
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 import { textBlockFactory } from "./textBlockFactory";
 import { EditorV3AtBlock } from "./EditorV3AtBlock";
+import { EditorV3PositionClass } from "./EditorV3Position";
 
 export class EditorV3Line {
   public textBlocks: (EditorV3TextBlock | EditorV3AtBlock)[];
@@ -50,6 +51,15 @@ export class EditorV3Line {
    */
   get lineText(): string {
     return this.textBlocks.map((tb) => tb.text).join("");
+  }
+
+  /**
+   * Return position of each word in the lineText
+   * @param checkText Text to check, if not provided uses this.lineText
+   * @returns Array of word positions
+   */
+  get wordPositions(): EditorV3WordPosition[] {
+    return this.textBlocks.flatMap((tb) => tb.wordPositions);
   }
 
   /**
@@ -196,7 +206,9 @@ export class EditorV3Line {
    * @param pos Sets the active block at the position
    * @returns The active block
    */
-  public setActiveBlock(pos: EditorV3Position): EditorV3TextBlock | undefined {
+  public setActiveBlock(
+    pos: EditorV3Position | EditorV3PositionClass,
+  ): EditorV3TextBlock | undefined {
     this.textBlocks.forEach((tb) => tb.setActive(false));
     if (pos.isCollapsed) {
       const activeBlock = this.getBlockAt(Math.max(0, pos.startChar - 1));
@@ -372,31 +384,6 @@ export class EditorV3Line {
       this._mergeBlocks();
     }
     return this;
-  }
-
-  /**
-   * Return position of each word in the lineText
-   * @param checkText Text to check, if not provided uses this.lineText
-   * @returns Array of word positions
-   */
-  public words(checkText?: string): EditorV3WordPosition[] {
-    const text = checkText ?? this.lineText;
-    const ret: EditorV3WordPosition[] = [];
-    let _counted = 0;
-    while (_counted < text.length && text.slice(_counted).search(/\S/) > -1) {
-      const remainingText = text.slice(_counted);
-      const nextWord = remainingText.match(/\S+/);
-      if (nextWord) {
-        ret.push({
-          line: -1,
-          startChar: _counted + remainingText.search(/\S/),
-          endChar: _counted + remainingText.search(/\S/) + nextWord[0].length,
-          isLocked: (checkText === undefined && this.getBlockAt(_counted)?.isLocked) ?? false,
-        });
-        _counted += remainingText.search(/\S/) + nextWord[0].length;
-      }
-    }
-    return ret;
   }
 
   /**

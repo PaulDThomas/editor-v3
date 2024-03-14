@@ -100,6 +100,9 @@ export const App = (): JSX.Element => {
                 id="test-editor"
                 input={JSON.stringify(testObject)}
                 setJson={setJson}
+                style={{
+                  width: "240px",
+                }}
               />
             </span>
           </div>

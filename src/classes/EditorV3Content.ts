@@ -1,11 +1,12 @@
 import { cloneDeep, isEqual } from "lodash";
 import { applyStylesToHTML } from "../functions/applyStylesToHTML";
 import { getCaretPosition } from "../functions/getCaretPosition";
-import { moveCursor } from "../functions/moveCursor";
 import { readV3Html } from "../functions/readV3Html";
 import { setCaretPosition } from "../functions/setCaretPosition";
 import { EditorV3Line } from "./EditorV3Line";
+import { EditorV3PositionClass } from "./EditorV3Position";
 import { EditorV3TextBlock } from "./EditorV3TextBlock";
+import { defaultContentProps } from "./defaultContentProps";
 import {
   EditorV3Align,
   EditorV3ContentProps,
@@ -18,7 +19,6 @@ import {
 import { MarkdownLineClass } from "./markdown/MarkdownLineClass";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 import { textBlockFactory } from "./textBlockFactory";
-import { defaultContentProps } from "./defaultContentProps";
 
 /**
  * Represents the content of an EditorV3 instance.
@@ -105,19 +105,30 @@ export class EditorV3Content implements EditorV3Import {
   get lineLengths() {
     return this.lines.map((l) => l.lineLength);
   }
-  get words() {
-    return this.lines.flatMap((l, ix) => l.words().map((w) => ({ ...w, line: ix })));
+  get wordPositions() {
+    return this.lines.flatMap((l, ix) => l.wordPositions.map((w) => ({ ...w, line: ix })));
   }
 
   /**
    * Current caret position and lock status
    */
-  private _caretPosition: EditorV3Position | null = null;
-  get caretPosition() {
+  private _caretPosition: EditorV3PositionClass | null = null;
+  get caretPosition(): EditorV3Position | null {
     return this._caretPosition;
   }
   set caretPosition(pos: EditorV3Position | null) {
-    this._caretPosition = pos;
+    if (pos && !isEqual(pos, this._caretPosition?.pos)) {
+      this._caretPosition = new EditorV3PositionClass(
+        pos.startLine,
+        pos.startChar,
+        pos.endLine,
+        pos.endChar,
+        this.lineLengths,
+        this.wordPositions,
+      );
+    } else if (pos === null) {
+      this._caretPosition = null;
+    }
   }
   private _isCaretLocked(pos = this._caretPosition) {
     let ret = false;
@@ -259,7 +270,7 @@ export class EditorV3Content implements EditorV3Import {
         // Read in HTML
         const r = readV3Html(input.innerHTML, props);
         this.copyImport(r);
-        this._caretPosition = getCaretPosition(input);
+        this.caretPosition = getCaretPosition(input);
       } else {
         // Check for stringified class input
         const jsonInput: EditorV3Import = JSON.parse(input);
@@ -344,10 +355,6 @@ export class EditorV3Content implements EditorV3Import {
     });
   }
 
-  public getBlockAt(line: number, character: number): EditorV3TextBlock | undefined {
-    return line < this.lines.length ? this.lines[line].getBlockAt(character) : undefined;
-  }
-
   public getStyleAt(line: number, character: number): string | undefined {
     return line < this.lines.length ? this.lines[line].getStyleAt(character) : undefined;
   }
@@ -375,37 +382,26 @@ export class EditorV3Content implements EditorV3Import {
     }
   }
 
-  public deleteCharacter(pos: EditorV3Position, backwards: boolean): EditorV3Position {
-    if (this.lines.length > pos.startLine && this.text !== "") {
-      const newPos = { ...pos };
-      // Move cursor if start and end are the same
-      if (pos.isCollapsed) {
-        // Backspace at end of line
-        if (backwards && pos.startLine > 0 && pos.startChar === 0) {
-          newPos.startChar = this.lines[pos.startLine - 1].lineLength;
-          newPos.startLine = pos.startLine - 1;
-        }
-        // Backspace after first character
-        else if (backwards && pos.startChar > 0) {
-          newPos.startChar = pos.startChar - 1;
-        }
-        // Delete end line
-        else if (pos.endChar >= this.lines[pos.endLine].lineLength) {
-          newPos.endChar = 0;
-          newPos.endLine = pos.endLine + 1;
-        } else if (pos.endChar < this.lines[pos.endLine].lineLength) {
-          newPos.endChar = pos.endChar + 1;
-        }
-      }
-      // Expand for locked blocks
-      this.expandSelectionForLocked(newPos);
-      // Remove under caret if it is not locked
-      this.splice(newPos);
-      newPos.endLine = newPos.startLine;
-      newPos.endChar = newPos.startChar;
-      return newPos;
+  /**
+   * Delete a character or selection
+   * @param backwards Delete direction
+   * @param pos Optional caret position
+   */
+  public deleteCharacter(backwards: boolean, pos?: EditorV3Position) {
+    // Update caret position
+    if (pos) {
+      this.caretPosition = pos;
     }
-    return pos;
+    // Check caret position exists
+    if (this._caretPosition && this._caretPosition.isCollapsed) {
+      // Extend selection one place backwards
+      if (backwards) this._caretPosition?.moveLeft(true, false);
+      // Extend selection one place forwards
+      else this._caretPosition?.moveRight(true, false);
+    }
+    if (this._caretPosition) {
+      this.splice(this._caretPosition.pos);
+    }
   }
 
   /**
@@ -492,7 +488,7 @@ export class EditorV3Content implements EditorV3Import {
             : newLines[newLines.length - 1].lineLength;
       // Update caret position if it is set
       if (this._caretPosition)
-        this._caretPosition = {
+        this.caretPosition = {
           isCollapsed: true,
           startLine: pos.startLine + (newLines ? newLines.length - 1 : 0),
           startChar: endChar,
@@ -512,7 +508,7 @@ export class EditorV3Content implements EditorV3Import {
    */
   public applyStyle(styleName: string, applyPos?: EditorV3Position) {
     if (applyPos || (this._caretPosition && !this._caretPosition.isCollapsed)) {
-      const pos = applyPos ?? (this._caretPosition as EditorV3Position);
+      const pos = applyPos ?? (this._caretPosition?.pos as EditorV3Position);
       if (pos.startLine < this.lines.length && pos.startLine <= pos.endLine) {
         for (let _i = pos.startLine; _i <= pos.endLine && _i < this.lines.length; _i++) {
           this.lines[_i].applyStyle(
@@ -521,7 +517,12 @@ export class EditorV3Content implements EditorV3Import {
             _i === pos.endLine ? pos.endChar : Infinity,
           );
         }
-        this._caretPosition = { ...pos, startLine: pos.endLine, startChar: pos.endChar };
+        this.caretPosition = {
+          startLine: pos.endLine,
+          startChar: pos.endChar,
+          endLine: pos.endLine,
+          endChar: pos.endChar,
+        };
       }
     }
     return this;
@@ -533,7 +534,7 @@ export class EditorV3Content implements EditorV3Import {
    */
   public removeStyle(removePos?: EditorV3Position) {
     if (removePos || (this._caretPosition && !this._caretPosition.isCollapsed)) {
-      const pos = removePos ?? (this._caretPosition as EditorV3Position);
+      const pos = removePos ?? (this._caretPosition?.pos as EditorV3Position);
       if (pos.startLine < this.lines.length && pos.startLine <= pos.endLine) {
         for (let _i = pos.startLine; _i <= pos.endLine && _i < this.lines.length; _i++) {
           this.lines[_i].removeStyle(
@@ -541,7 +542,12 @@ export class EditorV3Content implements EditorV3Import {
             _i === pos.endLine ? pos.endChar : Infinity,
           );
         }
-        this._caretPosition = { ...pos, startLine: pos.endLine, startChar: pos.endChar };
+        this.caretPosition = {
+          startLine: pos.endLine,
+          startChar: pos.endChar,
+          endLine: pos.endLine,
+          endChar: pos.endChar,
+        };
       }
     }
     return this;
@@ -551,20 +557,20 @@ export class EditorV3Content implements EditorV3Import {
    * Expand selection to cover locked blocks already included
    * @param pos Position to expand, null for current caret position
    */
-  private expandSelectionForLocked(pos?: EditorV3Position) {
-    const ret = pos ?? this._caretPosition;
-    if (ret) {
-      // Check to expand caret over locked blocks
-      const startBlock = this.getBlockAt(ret.startLine, ret.startChar + 1);
-      if (startBlock && startBlock.isLocked) {
-        ret.startChar = startBlock.lineStartPosition;
-      }
-      const endBlock = this.getBlockAt(ret.endLine, ret.endChar - 1);
-      if (endBlock?.isLocked) {
-        ret.endChar = endBlock.lineEndPosition;
-      }
-    }
-  }
+  // private expandSelectionForLocked(pos?: EditorV3Position) {
+  //   const ret = pos ?? this._caretPosition;
+  //   if (ret) {
+  //     // Check to expand caret over locked blocks
+  //     const startBlock = this.getBlockAt(ret.startLine, ret.startChar + 1);
+  //     if (startBlock && startBlock.isLocked) {
+  //       ret.startChar = startBlock.lineStartPosition;
+  //     }
+  //     const endBlock = this.getBlockAt(ret.endLine, ret.endChar - 1);
+  //     if (endBlock?.isLocked) {
+  //       ret.endChar = endBlock.lineEndPosition;
+  //     }
+  //   }
+  // }
 
   /**
    * Update target element with conntent and set caret position
@@ -587,7 +593,6 @@ export class EditorV3Content implements EditorV3Import {
       applyStylesToHTML(line as HTMLDivElement, this._styles);
     });
     // Set caret position
-    this.expandSelectionForLocked();
     this._caretPosition && this._caretPosition && setCaretPosition(el, this._caretPosition);
   }
 
@@ -600,36 +605,61 @@ export class EditorV3Content implements EditorV3Import {
     if (e.ctrlKey && e.code === "KeyA" && this.text !== "") {
       e.stopPropagation();
       e.preventDefault();
-      this._caretPosition = {
+      this.caretPosition = {
         startLine: 0,
         startChar: 0,
-        isCollapsed: false,
         endLine: this.lines.length - 1,
         endChar: this.lines[this.lines.length - 1].lineLength,
       };
     }
     // Cursor movement
     else if (
-      this._caretPosition &&
-      ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)
+      [
+        "ArrowLeft",
+        "ArrowRight",
+        "ArrowUp",
+        "ArrowDown",
+        "Home",
+        "End",
+        "Backspace",
+        "Delete",
+      ].includes(e.key) &&
+      this._caretPosition
     ) {
       e.stopPropagation();
       e.preventDefault();
-      this._caretPosition = moveCursor(this, this._caretPosition, e);
-    }
-    // Handle delete
-    else if (this._caretPosition && ["Backspace", "Delete"].includes(e.key)) {
-      e.stopPropagation();
-      e.preventDefault();
-      const newPos = this.deleteCharacter(this._caretPosition, e.key === "Backspace");
-      this._caretPosition = newPos;
+      switch (e.key) {
+        case "ArrowLeft":
+          this._caretPosition.moveLeft(e.shiftKey, e.ctrlKey);
+          break;
+        case "ArrowRight":
+          this._caretPosition.moveRight(e.shiftKey, e.ctrlKey);
+          break;
+        case "ArrowUp":
+          this._caretPosition.moveUp(e.shiftKey, e.ctrlKey);
+          break;
+        case "ArrowDown":
+          this._caretPosition.moveDown(e.shiftKey, e.ctrlKey);
+          break;
+        case "Home":
+          this._caretPosition.moveHome(e.shiftKey, e.ctrlKey);
+          break;
+        case "End":
+          this._caretPosition.moveEnd(e.shiftKey, e.ctrlKey);
+          break;
+        case "Backspace":
+          this.deleteCharacter(true);
+          break;
+        case "Delete":
+          this.deleteCharacter(false);
+          break;
+      }
     }
     // Enter key cannot be used here
     else if (this._caretPosition && this.allowNewLine && e.key === "Enter") {
       e.stopPropagation();
       e.preventDefault();
-      const newPos = this.splitLine(this._caretPosition);
-      this._caretPosition = newPos;
+      this.caretPosition = this.splitLine(this._caretPosition);
     }
   }
 
@@ -640,7 +670,7 @@ export class EditorV3Content implements EditorV3Import {
   public handleKeyup(e: React.KeyboardEvent<HTMLDivElement>) {
     // Update caret position
     if (this._caretPosition) {
-      this._caretPosition = getCaretPosition(e.currentTarget);
+      this.caretPosition = getCaretPosition(e.currentTarget);
     }
     if (
       [

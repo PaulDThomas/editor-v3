@@ -1,6 +1,7 @@
 import { cloneDeep } from "lodash";
 import { defaultContentProps } from "./defaultContentProps";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
+import { EditorV3WordPosition } from "./interface";
 
 export type EditorV3TextBlockType = "text" | "at";
 export interface IEditorV3TextBlock {
@@ -40,6 +41,29 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
       if (ret[key] === undefined) delete ret[key];
     });
     return JSON.stringify(ret);
+  }
+  /**
+   * Get the word positions within the text block
+   * @returns Array of word positions
+   */
+  get wordPositions() {
+    const ret: EditorV3WordPosition[] = [];
+    let _counted = 0;
+    while (_counted < this.text.length && this.text.slice(_counted).search(/\S/) > -1) {
+      const remainingText = this.text.slice(_counted);
+      const nextWord = remainingText.match(/\S+/);
+      if (nextWord) {
+        ret.push({
+          line: -1,
+          startChar: this.lineStartPosition + _counted + remainingText.search(/\S/),
+          endChar:
+            this.lineStartPosition + _counted + remainingText.search(/\S/) + nextWord[0].length,
+          isLocked: this.isLocked === true,
+        });
+        _counted += remainingText.search(/\S/) + nextWord[0].length;
+      }
+    }
+    return ret;
   }
 
   // Content returns

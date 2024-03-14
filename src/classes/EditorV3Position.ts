@@ -257,7 +257,7 @@ export class EditorV3PositionClass implements EditorV3Position {
 
   public moveHome(shiftKey: boolean, ctrlKey: boolean) {
     // Move to the top line on CTRL to already at the start
-    if (ctrlKey || this.focusChar === 0) {
+    if (ctrlKey || this.startChar === 0) {
       this.focusLine = 0;
     }
     this.focusChar = 0;
@@ -266,7 +266,7 @@ export class EditorV3PositionClass implements EditorV3Position {
   }
 
   public moveEnd(shiftKey: boolean, ctrlKey: boolean) {
-    if (ctrlKey || this.focusChar === this.lineLengths[this.focusLine]) {
+    if (ctrlKey || this.endChar === this.lineLengths[this.endLine]) {
       this.focusLine = this.lineLengths.length - 1;
     }
     this.focusChar = this.lineLengths[this.focusLine];

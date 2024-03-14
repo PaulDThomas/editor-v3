@@ -17,7 +17,10 @@ export class EditorV3AtBlock extends EditorV3TextBlock {
       span.classList.add("is-locked");
       span.dataset.isLocked = "true";
     }
-    const textNode = document.createTextNode(this.text.replaceAll("\uFEFF", ""));
+    const textNode = document.createTextNode(
+      this.text.replaceAll("\uFEFF", "").replace(/^ /, "\u00A0").replace(/ $/, "\u00A0"),
+      // .replaceAll(" ", "\u00A0\uFEFF"),
+    );
     span.appendChild(textNode);
     if (this.style) {
       span.classList.add(`editorv3style-${this.style}`);

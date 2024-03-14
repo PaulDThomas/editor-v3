@@ -12,6 +12,10 @@ describe("Check basic EditorV3TextBlock", () => {
 describe("Should render an at block in the HTML", () => {
   test("Create HTML with an @ in the middle", async () => {
     const testBlock = new EditorV3TextBlock({ text: "Hello @world", style: "shiny" });
+    expect(testBlock.wordPositions).toEqual([
+      { line: -1, startChar: 0, endChar: 5, isLocked: false },
+      { line: -1, startChar: 6, endChar: 12, isLocked: false },
+    ]);
     // Expect text/markdown to render one block
     expect(testBlock.toHtml().textContent).toEqual("Hello\u00A0@world");
     expect(testBlock.toMarkdown()).toEqual("<<shiny::Hello @world>>");

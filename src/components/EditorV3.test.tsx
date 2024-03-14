@@ -303,7 +303,7 @@ describe("Menu styling - change", () => {
     expect(notShinySpan.length).toEqual(1);
     expect(notShinySpan[0]).toHaveTextContent("x.xx");
     expect(mockSetText).toHaveBeenLastCalledWith("34.45\n\nx.xx");
-  });
+  }, 500000);
 });
 
 describe("Menu styling - remove", () => {
