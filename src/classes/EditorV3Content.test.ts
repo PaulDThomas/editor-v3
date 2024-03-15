@@ -145,6 +145,36 @@ describe("Check basic EditorV3Content", () => {
 });
 
 describe("Content functions", () => {
+  test("Run check status", async () => {
+    const testContent = new EditorV3Content(
+      JSON.stringify({
+        lines: [
+          {
+            textBlocks: [
+              { text: "@Hello", type: "at", isLocked: true },
+              { text: " world", type: "text" },
+            ],
+          },
+        ],
+      }),
+    );
+    testContent.caretPosition = {
+      startLine: 0,
+      startChar: 1,
+      endLine: 0,
+      endChar: 1,
+      isCollapsed: true,
+    };
+    testContent.checkStatus();
+    expect(testContent.caretPosition).toEqual({
+      startLine: 0,
+      startChar: 0,
+      endLine: 0,
+      endChar: 6,
+      isCollapsed: false,
+    });
+  });
+
   test("Merge and split lines", async () => {
     const testContent = new EditorV3Content("12\n34\n56");
     expect(testContent.upToPos(0, 0).map((tb) => tb.data)).toEqual([

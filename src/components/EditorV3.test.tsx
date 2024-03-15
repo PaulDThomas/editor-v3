@@ -847,11 +847,8 @@ describe("Add at block and escape out", () => {
     expect(editor).toBeInTheDocument();
     const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
     expect(editable).toBeInTheDocument();
-    screen.debug();
     await user.click(editable);
-    screen.debug();
     await user.keyboard("@Hello{Escape} world");
-    screen.debug();
     fireEvent.blur(editor);
     expect(mockSetText).toHaveBeenLastCalledWith("@Hello world");
     expect(mockSetJson).toHaveBeenLastCalledWith(

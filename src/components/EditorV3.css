@@ -98,18 +98,3 @@
   text-align: left;
   grid-column: 2;
 }
-
-.aiev3 .aiev3-tb.at-block {
-  border-top: 2px dashed black;
-  border-bottom: 2px dashed black;
-  margin-top: -2px;
-  margin-bottom: -2px;
-}
-
-.aiev3 .aiev3-tb.is-active {
-  border-top: 2px solid rgba(218, 165, 32, 0.8);
-  border-bottom: 2px solid rgba(218, 165, 32, 0.8);
-  margin-top: -2px;
-  margin-bottom: -2px;
-  background-color: rgba(218, 165, 32, 0.49);
-}

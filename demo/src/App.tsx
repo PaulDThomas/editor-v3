@@ -62,13 +62,21 @@ export const App = (): JSX.Element => {
     blue: { color: "blue", fontWeight: 700 },
   };
 
+  const atList = [
+    "@hello",
+    "@world",
+    ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i).repeat(2)).map(
+      (letter) => `@${letter}${letter}`,
+    ),
+  ];
+
   return (
     <div className="app-holder">
       <div className="app-border">
         <div className="app-inner">
           <div className="row">
             <span className="label">This is the input</span>
-            <span className="content">
+            <span className="content debug">
               <EditorV3
                 id={"e1"}
                 input={json}
@@ -83,8 +91,10 @@ export const App = (): JSX.Element => {
                 customStyleMap={styleMap}
                 style={{
                   width: "240px",
+                  height: "100px",
                 }}
                 spellCheck={false}
+                // atList={atList}
               />
             </span>
             <span>
@@ -105,7 +115,6 @@ export const App = (): JSX.Element => {
                 id={"e2"}
                 input={input2}
                 setJson={(ret) => {
-                  console.log("JSON INPUT", ret);
                   setInput2(ret);
                 }}
                 allowNewLine={allowNewLine}

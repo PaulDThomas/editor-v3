@@ -28,7 +28,8 @@ describe("Check basic EditorV3Line", () => {
     });
     expect(testLine.toHtml().outerHTML).toEqual(
       '<div class="aiev3-line center">' +
-        '<span class="aiev3-tb">&nbsp;&nbsp;</span>' +
+        '<span class="aiev3-tb">&nbsp;</span>' +
+        '<span class="aiev3-tb">&nbsp;</span>' +
         '<span class="aiev3-tb">Hello&nbsp;</span>' +
         '<span class="aiev3-tb">&nbsp;</span>' +
         '<span class="aiev3-tb">world&nbsp;</span>' +
@@ -162,7 +163,8 @@ describe("Check basic EditorV3Line", () => {
         "</span>" +
         '<span class="aiev3-span-point rhs">' +
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">.34</span>' +
-        '<span class="aiev3-tb">&nbsp;slow</span>' +
+        '<span class="aiev3-tb">&nbsp;</span>' +
+        '<span class="aiev3-tb">slow</span>' +
         "</span>" +
         "</div>",
     );

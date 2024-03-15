@@ -71,7 +71,10 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     const text =
       this.text === ""
         ? "\u2009"
-        : this.text.replace(/^ /, "\u00A0").replace(/ $/, "\u00A0").replaceAll(" ", "\u00A0\uFEFF");
+        : this.text
+            .replace(/^ /, "\u00A0\uFEFF")
+            .replace(/ $/, "\u00A0")
+            .replaceAll(" ", "\u00A0\uFEFF");
     const ret = new DocumentFragment();
     if (this.type === "at") {
       throw new Error("Use EditorV3AtBlock for at blocks");

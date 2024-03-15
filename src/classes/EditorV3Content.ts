@@ -581,6 +581,25 @@ export class EditorV3Content implements EditorV3Import {
   }
 
   /**
+   * Check status of content, e.g. after a mouseUp event
+   */
+  public checkStatus() {
+    // Set active block
+    const activeBlock =
+      this._caretPosition &&
+      this.lines[this._caretPosition.focusLine].setActiveBlock(this._caretPosition);
+    // If active block is locked select all
+    if (activeBlock && activeBlock.isLocked && this._caretPosition) {
+      this.caretPosition = {
+        startLine: this._caretPosition.focusLine,
+        startChar: activeBlock.lineStartPosition,
+        endLine: this._caretPosition.focusLine,
+        endChar: activeBlock.lineEndPosition,
+      };
+    }
+  }
+
+  /**
    * Handle keydown event in the holding div
    * @param e Handle keydown event
    */

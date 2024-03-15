@@ -284,18 +284,16 @@ export const EditorV3 = ({
     [content, contentProps, setContent],
   );
 
-  // const handleMouseUp = useCallback(
-  //   (e: React.MouseEvent<HTMLDivElement>) => {
-  //     if (divRef.current) {
-  //       // e.preventDefault();
-  //       e.stopPropagation();
-  //       const newContent = new EditorV3Content(divRef.current, contentProps);
-  //       setLastCaretPosition(newContent.caretPosition);
-  //       setContent(newContent);
-  //     }
-  //   },
-  //   [contentProps, setContent],
-  // );
+  const handleMouseUp = useCallback(() => {
+    // Ensure mouse up event stack is empty before resolving this event
+    setTimeout(() => {
+      if (divRef.current && inFocus) {
+        const newContent = new EditorV3Content(divRef.current, contentProps);
+        newContent.checkStatus();
+        setContent(newContent);
+      }
+    }, 0);
+  }, [contentProps, inFocus, setContent]);
 
   const handleCopy = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
@@ -339,6 +337,7 @@ export const EditorV3 = ({
       id={id}
       onFocusCapture={handleFocus}
       onBlur={handleBlur}
+      onMouseUpCapture={handleMouseUp}
     >
       <ContextMenuHandler
         menuItems={menuItems}
