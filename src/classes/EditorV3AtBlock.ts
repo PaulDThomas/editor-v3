@@ -12,11 +12,10 @@ export class EditorV3AtBlock extends EditorV3TextBlock {
     const span = document.createElement("span");
     frag.appendChild(span);
     span.classList.add("aiev3-tb", "at-block");
-    this.isActive && span.classList.add("is-active");
     if (this.isLocked || !this.isActive) {
       span.classList.add("is-locked");
       span.dataset.isLocked = "true";
-    }
+    } else if (this.isActive) span.classList.add("is-active");
     const textNode = document.createTextNode(
       this.text.replaceAll("\uFEFF", "").replace(/^ /, "\u00A0").replace(/ $/, "\u00A0"),
       // .replaceAll(" ", "\u00A0\uFEFF"),

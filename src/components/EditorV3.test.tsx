@@ -303,7 +303,7 @@ describe("Menu styling - change", () => {
     expect(notShinySpan.length).toEqual(1);
     expect(notShinySpan[0]).toHaveTextContent("x.xx");
     expect(mockSetText).toHaveBeenLastCalledWith("34.45\n\nx.xx");
-  }, 500000);
+  });
 });
 
 describe("Menu styling - remove", () => {
@@ -820,81 +820,51 @@ describe("Updates from above", () => {
   });
 });
 
-// describe("Handle events at the edge of locked blocks", () => {
-//   const user = userEvent.setup({ delay: null });
-//   const testObject = {
-//     lines: [
-//       {
-//         textBlocks: [
-//           { text: "P ", type: "text" },
-//           { text: "Me", type: "at" },
-//           { text: "E", type: "text" },
-//         ],
-//       },
-//     ],
-//   };
-//   test("ArrowLeft through a block", async () => {
-//     const mockSetJson = jest.fn();
-//     await act(async () =>
-//       render(
-//         <EditorV3
-//           data-testid="test-editor"
-//           id="test-editor"
-//           input={JSON.stringify(testObject)}
-//           setJson={mockSetJson}
-//         />,
-//       ),
-//     );
-//     const editor = screen.getByTestId("test-editor");
-//     const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
-//     expect(editable.innerHTML).toEqual(
-//       '<div class="aiev3-line left">' +
-//         '<span class="aiev3-tb">P&nbsp;</span>' +
-//         '<span class="aiev3-tb at-block is-locked" data-is-locked="true" data-type="at">Me</span>' +
-//         '<span class="aiev3-tb">E</span>' +
-//         "</div>" +
-//         '<div class="aiev3-contents-info"></div>',
-//     );
-//     await user.click(editable);
-//     await user.keyboard("{ArrowLeft}");
-//     expect(getCaretPosition(editable)).toEqual({
-//       startLine: 0,
-//       startChar: 0,
-//       isCollapsed: true,
-//       endLine: 0,
-//       endChar: 0,
-//     });
-//     await user.keyboard("{ArrowRight}{ArrowRight}");
-//     expect(getCaretPosition(editable)).toEqual({
-//       startLine: 0,
-//       startChar: 2,
-//       isCollapsed: true,
-//       endLine: 0,
-//       endChar: 2,
-//     });
-//     await user.keyboard("{ArrowRight}");
-//     expect(getCaretPosition(editable)).toEqual({
-//       startLine: 0,
-//       startChar: 2,
-//       isCollapsed: false,
-//       endLine: 0,
-//       endChar: 4,
-//     });
-//     await user.keyboard("{ArrowRight}");
-//     expect(getCaretPosition(editable)).toEqual({
-//       startLine: 0,
-//       startChar: 4,
-//       isCollapsed: true,
-//       endLine: 0,
-//       endChar: 4,
-//     });
-//     await user.keyboard("{ArrowRight}");
-//     expect(getCaretPosition(editable)).toEqual({
-//       startLine: 0,
-//       startChar: 5,
-//       isCollapsed: true,
-//       endLine: 0,
-//       endChar: 5,
-//     });
-//   });
-// });
+describe("Add at block and escape out", () => {
+  test("Type at block", async () => {
+    const user = userEvent.setup({ delay: null });
+    const mockSetText = jest.fn();
+    const mockSetJson = jest.fn();
+    const TestEditor = () => {
+      const [input, setInput] = useState("Initial text");
+      return (
+        <EditorV3
+          data-testid="test-editor"
+          id="test-editor"
+          input={input}
+          setJson={(ret) => {
+            setInput(ret);
+            mockSetJson(ret);
+          }}
+          setText={mockSetText}
+        />
+      );
+    };
+    await act(async () => {
+      render(<TestEditor />);
+    });
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
+    expect(editor).toBeInTheDocument();
+    const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    screen.debug();
+    await user.click(editable);
+    screen.debug();
+    await user.keyboard("@Hello{Escape} world");
+    screen.debug();
+    fireEvent.blur(editor);
+    expect(mockSetText).toHaveBeenLastCalledWith("@Hello world");
+    expect(mockSetJson).toHaveBeenLastCalledWith(
+      JSON.stringify({
+        lines: [
+          {
+            textBlocks: [
+              { text: "@Hello", type: "at", isLocked: true },
+              { text: " world", type: "text" },
+            ],
+          },
+        ],
+      }),
+    );
+  });
+});

@@ -19,11 +19,12 @@ export const readV3DivElement = (
     decimalAlignPercent: 60,
     textAlignment: EditorV3Align.left,
   };
+  // Remove skip-read elements
+  const skipRead = arg.querySelectorAll(".skip-read");
+  skipRead.forEach((el) => el.remove());
   // Decimal aligned
   if (arg.classList.contains("aiev3-line")) {
     if (arg.classList.contains("decimal")) {
-      const skipRead = arg.querySelectorAll(".skip-read");
-      skipRead.forEach((el) => el.remove());
       ret.textAlignment = EditorV3Align.decimal;
       ret.decimalAlignPercent =
         arg.children.length === 2 &&
@@ -53,8 +54,6 @@ export const readV3DivElement = (
     }
     // Standard alignment
     else if (["left", "center", "right"].includes(arg.classList[1])) {
-      const skipRead = arg.querySelectorAll(".skip-read");
-      skipRead.forEach((el) => el.remove());
       ret.textBlocks = [
         ...[...arg.childNodes].map((el) =>
           textBlockFactory(el instanceof HTMLSpanElement || el instanceof Text ? el : ""),

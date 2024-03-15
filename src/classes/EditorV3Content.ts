@@ -114,7 +114,7 @@ export class EditorV3Content implements EditorV3Import {
    */
   private _caretPosition: EditorV3PositionClass | null = null;
   get caretPosition(): EditorV3Position | null {
-    return this._caretPosition;
+    return this._caretPosition?.pos ?? null;
   }
   set caretPosition(pos: EditorV3Position | null) {
     if (pos && !isEqual(pos, this._caretPosition?.pos)) {
@@ -138,6 +138,9 @@ export class EditorV3Content implements EditorV3Import {
       ret = (startBlock && startBlock.isLocked) || (endBlock && endBlock.isLocked) || false;
     }
     return ret;
+  }
+  private get _isLockable() {
+    return this.lines.some((l) => l.textBlocks.some((tb) => tb.type === "at" && !tb.isLocked));
   }
 
   // Read only attributes
@@ -554,25 +557,6 @@ export class EditorV3Content implements EditorV3Import {
   }
 
   /**
-   * Expand selection to cover locked blocks already included
-   * @param pos Position to expand, null for current caret position
-   */
-  // private expandSelectionForLocked(pos?: EditorV3Position) {
-  //   const ret = pos ?? this._caretPosition;
-  //   if (ret) {
-  //     // Check to expand caret over locked blocks
-  //     const startBlock = this.getBlockAt(ret.startLine, ret.startChar + 1);
-  //     if (startBlock && startBlock.isLocked) {
-  //       ret.startChar = startBlock.lineStartPosition;
-  //     }
-  //     const endBlock = this.getBlockAt(ret.endLine, ret.endChar - 1);
-  //     if (endBlock?.isLocked) {
-  //       ret.endChar = endBlock.lineEndPosition;
-  //     }
-  //   }
-  // }
-
-  /**
    * Update target element with conntent and set caret position
    * @param el DOM element to render inside
    */
@@ -623,6 +607,7 @@ export class EditorV3Content implements EditorV3Import {
         "End",
         "Backspace",
         "Delete",
+        "Escape",
       ].includes(e.key) &&
       this._caretPosition
     ) {
@@ -653,6 +638,15 @@ export class EditorV3Content implements EditorV3Import {
         case "Delete":
           this.deleteCharacter(false);
           break;
+        case "Escape":
+          if (this._caretPosition && this._isLockable) {
+            this.lines.forEach((l) =>
+              l.textBlocks.forEach((tb) => {
+                tb.isLocked = true;
+                tb.setActive(false);
+              }),
+            );
+          }
       }
     }
     // Enter key cannot be used here
@@ -660,6 +654,8 @@ export class EditorV3Content implements EditorV3Import {
       e.stopPropagation();
       e.preventDefault();
       this.caretPosition = this.splitLine(this._caretPosition);
+    } else if (this._caretPosition) {
+      this._caretPosition.lastAction = "keydown";
     }
   }
 
@@ -683,6 +679,7 @@ export class EditorV3Content implements EditorV3Import {
         "ArrowDown",
         "Home",
         "End",
+        "Escape",
       ].includes(e.code) ||
       (e.ctrlKey && e.code === "KeyA")
     ) {

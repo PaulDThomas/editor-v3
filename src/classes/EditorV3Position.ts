@@ -31,7 +31,8 @@ export class EditorV3PositionClass implements EditorV3Position {
   }
   private lineLengths: number[];
   private words: EditorV3WordPosition[];
-  private lastAction: "move" | "select" = "move";
+  public lastAction: "keydown" | "move" | "select" = "move";
+  public lastKey?: string = undefined;
 
   get pos(): EditorV3Position {
     return {

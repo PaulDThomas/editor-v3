@@ -617,3 +617,130 @@ describe("Splice markdown tests", () => {
     expect(testContent.toMarkdownHtml().textContent).toEqual("<¬¬dull::abc^^<shiny::34.56>>");
   });
 });
+
+describe("handleKeydown", () => {
+  test("should select all when Ctrl + A is pressed", () => {
+    const testContent = new EditorV3Content("Hello, World!");
+    const event = {
+      ctrlKey: true,
+      code: "KeyA",
+      stopPropagation: jest.fn(),
+      preventDefault: jest.fn(),
+    } as unknown as React.KeyboardEvent<HTMLDivElement>;
+
+    testContent.handleKeydown(event);
+
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(testContent.caretPosition).toEqual({
+      startLine: 0,
+      startChar: 0,
+      endLine: 0,
+      endChar: 13,
+      isCollapsed: false,
+    });
+  });
+
+  test("should handle cursor movement", () => {
+    const testContent = new EditorV3Content("Hello, World!");
+    testContent.caretPosition = {
+      startLine: 0,
+      startChar: 7,
+      endLine: 0,
+      endChar: 7,
+    };
+    const event = {
+      key: "ArrowLeft",
+      shiftKey: false,
+      ctrlKey: false,
+      stopPropagation: jest.fn(),
+      preventDefault: jest.fn(),
+    } as unknown as React.KeyboardEvent<HTMLDivElement>;
+
+    testContent.handleKeydown(event);
+
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(testContent.caretPosition).toEqual({
+      startLine: 0,
+      startChar: 6,
+      endLine: 0,
+      endChar: 6,
+      isCollapsed: true,
+    });
+  });
+
+  test("should delete character when Backspace is pressed", () => {
+    const testContent = new EditorV3Content("Hello, World!");
+    testContent.caretPosition = {
+      startLine: 0,
+      startChar: 13,
+      endLine: 0,
+      endChar: 13,
+    };
+    const event = {
+      key: "Backspace",
+      stopPropagation: jest.fn(),
+      preventDefault: jest.fn(),
+    } as unknown as React.KeyboardEvent<HTMLDivElement>;
+
+    testContent.handleKeydown(event);
+
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(testContent.text).toEqual("Hello, World");
+  });
+
+  test("should lock text blocks when Escape is pressed", () => {
+    const testContent = new EditorV3Content("@Hello, World!");
+    testContent.caretPosition = {
+      startLine: 0,
+      startChar: 13,
+      endLine: 0,
+      endChar: 13,
+    };
+    testContent.lines[0].textBlocks[0].isLocked = undefined;
+    testContent.lines[0].textBlocks[0].setActive(true);
+    const event = {
+      key: "Escape",
+      stopPropagation: jest.fn(),
+      preventDefault: jest.fn(),
+    } as unknown as React.KeyboardEvent<HTMLDivElement>;
+
+    testContent.handleKeydown(event);
+
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(testContent.lines[0].textBlocks[0].isLocked).toBe(true);
+    expect(testContent.lines[0].textBlocks[0].isActive).toBe(false);
+  });
+
+  test("should split line when Enter is pressed", () => {
+    const testContent = new EditorV3Content("Hello, World!");
+    testContent.allowNewLine = true;
+    testContent.caretPosition = {
+      startLine: 0,
+      startChar: 6,
+      endLine: 0,
+      endChar: 6,
+    };
+    const event = {
+      key: "Enter",
+      stopPropagation: jest.fn(),
+      preventDefault: jest.fn(),
+    } as unknown as React.KeyboardEvent<HTMLDivElement>;
+
+    testContent.handleKeydown(event);
+
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(testContent.text).toEqual("Hello,\n World!");
+    expect(testContent.caretPosition).toEqual({
+      startLine: 1,
+      startChar: 0,
+      endLine: 1,
+      endChar: 0,
+      isCollapsed: true,
+    });
+  });
+});

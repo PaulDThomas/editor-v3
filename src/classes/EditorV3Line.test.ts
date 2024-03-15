@@ -605,7 +605,7 @@ describe("Read in v2 div element", () => {
 });
 
 describe("Write space after at block", () => {
-  test("Add skip-read after at block", async () => {
+  test("Add empty block after at block", async () => {
     const line = new EditorV3Line(
       [textBlockFactory("@Hello", undefined, "at", true)],
       defaultContentProps,
@@ -615,7 +615,7 @@ describe("Write space after at block", () => {
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line left">' +
         '<span class="aiev3-tb at-block is-locked" data-is-locked="true" data-type="at">@Hello</span>' +
-        '<span class="aiev3-tb skip-read">&nbsp;</span>' +
+        '<span class="aiev3-tb">\u2009</span>' +
         "</div>",
     );
   });

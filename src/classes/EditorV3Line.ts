@@ -39,8 +39,8 @@ export class EditorV3Line {
     }
     // Need to add a space to the end of the line to allow for the cursor to be placed at the end
     if (this.textBlocks.length > 0 && this.textBlocks[this.textBlocks.length - 1].isLocked) {
-      const endBlockEl = textBlockFactory(" ").toHtml();
-      endBlockEl.children[0].classList.add("skip-read");
+      const endBlockEl = textBlockFactory("").toHtml();
+      // endBlockEl.children[0].classList.add("");
       h.append(endBlockEl);
     }
     return h;

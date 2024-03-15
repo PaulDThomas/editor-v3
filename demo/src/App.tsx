@@ -2,7 +2,7 @@ import { useState } from "react";
 import { EditorV3, EditorV3Align, EditorV3Styles } from "../../src/main";
 
 export const App = (): JSX.Element => {
-  const [html, setHtml] = useState<string>("");
+  // First input content
   const initialValue = JSON.stringify({
     textAlign: "left",
     lines: [
@@ -14,6 +14,12 @@ export const App = (): JSX.Element => {
       blue: { color: "blue", fontWeight: 700 },
     },
   });
+
+  const [html, setHtml] = useState<string>("");
+  const [json, setJson] = useState<string>(initialValue);
+  const [text, setText] = useState<string>("");
+
+  // Secont input content
   const testObject = {
     lines: [
       {
@@ -25,10 +31,12 @@ export const App = (): JSX.Element => {
       },
     ],
   };
-  const [input2, setInput2] = useState<string>(
+  const v2Input =
     // eslint-disable-next-line quotes
-    `<div classname="aie-text" data-key="2v9v5" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":1,"style":"Notes"},{"offset":4,"length":1,"style":"Notes"},{"offset":1,"length":3,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">N</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  w</div><div classname="aie-text" data-key="1u61b" data-type="unstyled" data-inline-style-ranges='[]'></div><div classname="aie-text" data-key="4l4fu" data-type="unstyled" data-inline-style-ranges='[]'>ork</div><div classname="aie-text" data-inline-style-ranges='[{"length":12,"offset":0,"style":"Notes"}]'><spanclassname="Notes" style="color:blue;font-size:16pt">Notes  w.ork</span></div><div classname="aie-text" data-key="b84n6" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":3,"style":"Notes"},{"offset":3,"length":7,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">Not</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">es  wor</span>k</div><div classname="aie-text" data-key="4stit" data-type="unstyled" data-inline-style-ranges='[{"offset":5,"length":2,"style":"Notes"},{"offset":10,"length":1,"style":"Notes"},{"offset":7,"length":3,"style":"Editable"}]'>treez<span classname="Notes" style="color:blue;font-size:16pt"> N</span><span classname="Editable" style="color:red;font-family:courier;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  work</div><div classname="aie-text" data-key="10tu7" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":72,"style":"Notes"}]'><span classname="Notes" style="color:royalblue">The &apos;Total&apos; column is compulsory if more than 1 treatment group is used.</span></div><div classname="aie-text" data-key="frng6" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":92,"style":"Notes"}]'><span classname="Notes" style="color:royalblue">Timepoint could be days, weeks or visits. Permissable to only present selected (key) visits.</span></div>`,
-  );
+    `<div classname="aie-text" data-key="2v9v5" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":1,"style":"Notes"},{"offset":4,"length":1,"style":"Notes"},{"offset":1,"length":3,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">N</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  w</div><div classname="aie-text" data-key="1u61b" data-type="unstyled" data-inline-style-ranges='[]'></div><div classname="aie-text" data-key="4l4fu" data-type="unstyled" data-inline-style-ranges='[]'>ork</div><div classname="aie-text" data-inline-style-ranges='[{"length":12,"offset":0,"style":"Notes"}]'><spanclassname="Notes" style="color:blue;font-size:16pt">Notes  w.ork</span></div><div classname="aie-text" data-key="b84n6" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":3,"style":"Notes"},{"offset":3,"length":7,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">Not</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">es  wor</span>k</div><div classname="aie-text" data-key="4stit" data-type="unstyled" data-inline-style-ranges='[{"offset":5,"length":2,"style":"Notes"},{"offset":10,"length":1,"style":"Notes"},{"offset":7,"length":3,"style":"Editable"}]'>treez<span classname="Notes" style="color:blue;font-size:16pt"> N</span><span classname="Editable" style="color:red;font-family:courier;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  work</div><div classname="aie-text" data-key="10tu7" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":72,"style":"Notes"}]'><span classname="Notes" style="color:royalblue">The &apos;Total&apos; column is compulsory if more than 1 treatment group is used.</span></div><div classname="aie-text" data-key="frng6" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":92,"style":"Notes"}]'><span classname="Notes" style="color:royalblue">Timepoint could be days, weeks or visits. Permissable to only present selected (key) visits.</span></div>`;
+  const [input2, setInput2] = useState<string>(JSON.stringify(testObject ?? v2Input));
+
+  // Third input content
   const [input3, setInput3] = useState<string>(
     JSON.stringify({
       textAlign: "left",
@@ -38,8 +46,7 @@ export const App = (): JSX.Element => {
       },
     }),
   );
-  const [json, setJson] = useState<string>(initialValue);
-  const [text, setText] = useState<string>("");
+
   const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.left);
   const [editable, setEditable] = useState<boolean>(true);
   const [allowNewLine, setAllowNewLine] = useState<boolean>(true);
@@ -59,7 +66,7 @@ export const App = (): JSX.Element => {
     <div className="app-holder">
       <div className="app-border">
         <div className="app-inner">
-          {/* <div className="row">
+          <div className="row">
             <span className="label">This is the input</span>
             <span className="content">
               <EditorV3
@@ -78,7 +85,6 @@ export const App = (): JSX.Element => {
                   width: "240px",
                 }}
                 spellCheck={false}
-                allowMarkdown
               />
             </span>
             <span>
@@ -90,24 +96,9 @@ export const App = (): JSX.Element => {
                 Reset
               </button>
             </span>
-          </div> */}
-
-          <div className="row">
-            <span className="label">Test config</span>
-            <span className="content">
-              <EditorV3
-                data-testid="test-editor"
-                id="test-editor"
-                input={JSON.stringify(testObject)}
-                setJson={setJson}
-                style={{
-                  width: "240px",
-                }}
-              />
-            </span>
           </div>
 
-          {/* <div className="row">
+          <div className="row">
             <span className="label">JSON input</span>
             <span className="content">
               <EditorV3
@@ -129,9 +120,9 @@ export const App = (): JSX.Element => {
                 }}
               />
             </span>
-          </div> */}
+          </div>
 
-          {/* <div className="row">
+          <div className="row">
             <span className="label">Text input (spelling)</span>
             <span className="content">
               <EditorV3
@@ -150,7 +141,7 @@ export const App = (): JSX.Element => {
                 }}
               />
             </span>
-          </div> */}
+          </div>
 
           <hr />
 
@@ -219,22 +210,22 @@ export const App = (): JSX.Element => {
             </span>
           </div>
 
-          {/* <div className="row">
+          <div className="row">
             <span className="label">Text</span>
             <span className="content">{text.replace(/\n/g, "\\n")}</span>
-          </div> */}
+          </div>
           <div className="row">
             <span className="label">JSON</span>
             <span className="content">
               <pre>{json === "" ? "" : JSON.stringify(JSON.parse(json), null, 2)}</pre>
             </span>
           </div>
-          {/* <div className="row">
+          <div className="row">
             <span className="label">HTML</span>
             <span className="content">
               <pre>{html.replace(/></g, ">\u2009<").split("\u2009").join("\n")}</pre>
             </span>
-          </div> */}
+          </div>
         </div>
       </div>
     </div>
