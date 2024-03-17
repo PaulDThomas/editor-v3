@@ -1,3 +1,4 @@
+import { EditorV3AtBlock } from "./EditorV3AtBlock";
 import { EditorV3TextBlock, EditorV3TextBlockType } from "./EditorV3TextBlock";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 
@@ -24,6 +25,11 @@ export interface EditorV3Styles {
 export interface EditorV3LineProps {
   textBlocks: EditorV3TextBlock[];
 }
+
+/**
+ * Text block class objects EditorV3
+ */
+export type EditorV3BlockClass = EditorV3TextBlock | EditorV3AtBlock;
 
 /**
  * Content object for EditorV3
@@ -86,4 +92,13 @@ export interface EditorV3WordPosition {
   startChar: number;
   endChar: number;
   isLocked: boolean;
+}
+
+/**
+ * Render properties passed down to elements
+ */
+export interface EditorV3RenderProps {
+  editableEl?: HTMLDivElement;
+  currentEl?: HTMLDivElement | HTMLSpanElement;
+  markdownSettings?: IMarkdownSettings;
 }

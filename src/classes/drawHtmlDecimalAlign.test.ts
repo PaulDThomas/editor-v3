@@ -5,7 +5,12 @@ import { textBlockFactory } from "./textBlockFactory";
 describe("Test draw decimal align function", () => {
   test("Draw with point", async () => {
     const div = document.createElement("div");
-    drawHtmlDecimalAlign(div, 40, [textBlockFactory("12.")], [textBlockFactory("34")]);
+    drawHtmlDecimalAlign(
+      { currentEl: div },
+      40,
+      [textBlockFactory("12.")],
+      [textBlockFactory("34")],
+    );
     expect(div.outerHTML).toEqual(
       '<div style="grid-template-columns: 40% 60%;">' +
         '<span class="aiev3-span-point lhs"><span class="aiev3-tb">12.</span></span>' +
@@ -15,7 +20,7 @@ describe("Test draw decimal align function", () => {
   });
   test("Draw without right", async () => {
     const div = document.createElement("div");
-    drawHtmlDecimalAlign(div, 40, [textBlockFactory("1234")], []);
+    drawHtmlDecimalAlign({ currentEl: div }, 40, [textBlockFactory("1234")], []);
     expect(div.outerHTML).toEqual(
       '<div style="grid-template-columns: 40% 60%;">' +
         '<span class="aiev3-span-point lhs"><span class="aiev3-tb">1234</span></span>' +
@@ -25,7 +30,7 @@ describe("Test draw decimal align function", () => {
   });
   test("Draw without left", async () => {
     const div = document.createElement("div");
-    drawHtmlDecimalAlign(div, 75, [], [textBlockFactory("34")]);
+    drawHtmlDecimalAlign({ currentEl: div }, 75, [], [textBlockFactory("34")]);
     expect(div.outerHTML).toEqual(
       '<div style="grid-template-columns: 75% 25%;">' +
         '<span class="aiev3-span-point lhs">\u2009</span>' +
@@ -35,7 +40,7 @@ describe("Test draw decimal align function", () => {
   });
   test("Draw empty", async () => {
     const div = document.createElement("div");
-    drawHtmlDecimalAlign(div, 35, [], []);
+    drawHtmlDecimalAlign({ currentEl: div }, 35, [], []);
     expect(div.outerHTML).toEqual(
       '<div style="grid-template-columns: 35% 65%;">' +
         '<span class="aiev3-span-point lhs">\u2009</span>' +

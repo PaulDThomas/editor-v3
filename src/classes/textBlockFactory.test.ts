@@ -6,13 +6,13 @@ describe("Text block factory tests", () => {
     const testBlock = textBlockFactory("Helloworld");
     expect(testBlock.text).toEqual("Helloworld");
     const tempDiv = document.createElement("div");
-    tempDiv.appendChild(testBlock.toHtml());
+    tempDiv.appendChild(testBlock.toHtml({}));
     expect(tempDiv.innerHTML).toEqual('<span class="aiev3-tb">Helloworld</span>');
     const testBlock2 = textBlockFactory("0");
     expect(testBlock2.text).toEqual("0");
     expect(testBlock2.jsonString).toEqual('{"text":"0","type":"text"}');
     const tempDiv2 = document.createElement("div");
-    tempDiv2.appendChild(testBlock2.toHtml());
+    tempDiv2.appendChild(testBlock2.toHtml({}));
     expect(tempDiv2.innerHTML).toEqual('<span class="aiev3-tb">0</span>');
   });
 
@@ -20,7 +20,7 @@ describe("Text block factory tests", () => {
     const testBlock = textBlockFactory("Hello world\u00a0", "shiny");
     expect(testBlock.text).toEqual("Hello world\u00a0");
     const tempDiv = document.createElement("div");
-    tempDiv.appendChild(testBlock.toHtml());
+    tempDiv.appendChild(testBlock.toHtml({}));
     expect(tempDiv.innerHTML).toEqual(
       '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;</span>' +
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">world&nbsp;</span>',
@@ -35,12 +35,12 @@ describe("Text block factory tests", () => {
     const testBlock = textBlockFactory(testSpan);
     expect(testBlock.text).toEqual("Hello world");
     const tempDiv = document.createElement("div");
-    tempDiv.appendChild(testBlock.toHtml());
+    tempDiv.appendChild(testBlock.toHtml({}));
     expect(tempDiv.innerHTML).toEqual(
       '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;</span>' +
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">world</span>',
     );
-    expect(textBlockFactory(testBlock.toHtml())).toEqual(testBlock);
+    expect(textBlockFactory(testBlock.toHtml({}))).toEqual(testBlock);
     expect(textBlockFactory(JSON.stringify(testBlock))).toEqual(testBlock);
     expect(textBlockFactory(testBlock.jsonString)).toEqual(testBlock);
   });
@@ -51,7 +51,7 @@ describe("Text block factory tests", () => {
     const testBlock = textBlockFactory(testSpan);
     expect(testBlock.text).toEqual("");
     const tempDiv = document.createElement("div");
-    tempDiv.appendChild(testBlock.toHtml());
+    tempDiv.appendChild(testBlock.toHtml({}));
     expect(tempDiv.innerHTML).toEqual('<span class="aiev3-tb">\u2009</span>');
   });
 
@@ -60,7 +60,7 @@ describe("Text block factory tests", () => {
     const testBlock = textBlockFactory(testSpan);
     expect(testBlock.text).toEqual("12.34");
     const tempDiv = document.createElement("div");
-    tempDiv.appendChild(testBlock.toHtml());
+    tempDiv.appendChild(testBlock.toHtml({}));
     expect(tempDiv.innerHTML).toEqual('<span class="aiev3-tb">12.34</span>');
   });
 
@@ -103,11 +103,11 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     expect(testBlock.toMarkdown()).toEqual("@[@Hello@]");
 
     const tempDiv = document.createElement("div");
-    tempDiv.appendChild(testBlock.toHtml());
+    tempDiv.appendChild(testBlock.toHtml({}));
     expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb at-block is-locked" data-is-locked="true" data-type="at">@Hello</span>',
+      '<span class="aiev3-tb at-block is-locked" data-type="at" data-is-locked="true">@Hello</span>',
     );
-    expect(textBlockFactory(testBlock.toHtml()).data).toEqual({
+    expect(textBlockFactory(testBlock.toHtml({})).data).toEqual({
       ...testBlock.data,
       isLocked: true,
     });
@@ -125,11 +125,11 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     expect(testBlock.toMarkdown()).toEqual("@[shiny::@Hello@]");
 
     const tempDiv = document.createElement("div");
-    tempDiv.appendChild(testBlock.toHtml());
+    tempDiv.appendChild(testBlock.toHtml({}));
     expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb at-block is-locked editorv3style-shiny" data-is-locked="true" data-style-name="shiny" data-type="at">@Hello</span>',
+      '<span class="aiev3-tb at-block editorv3style-shiny is-locked" data-type="at" data-style-name="shiny" data-is-locked="true">@Hello</span>',
     );
-    expect(textBlockFactory(testBlock.toHtml()).data).toEqual({
+    expect(textBlockFactory(testBlock.toHtml({})).data).toEqual({
       ...testBlock.data,
       isLocked: true,
     });
@@ -154,10 +154,10 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     expect(testBlock.typeStyle).toEqual("at:shiny");
 
     const tempDiv = document.createElement("div");
-    tempDiv.appendChild(testBlock.toHtml());
+    tempDiv.appendChild(testBlock.toHtml({}));
     expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb at-block is-active editorv3style-shiny" data-style-name="shiny" data-type="at">@Hello world</span>',
+      '<span class="aiev3-tb at-block editorv3style-shiny is-active" data-type="at" data-style-name="shiny">@Hello world</span>',
     );
-    expect(textBlockFactory(testBlock.toHtml()).data).toEqual(testBlock.data);
+    expect(textBlockFactory(testBlock.toHtml({})).data).toEqual(testBlock.data);
   });
 });

@@ -10,7 +10,7 @@ describe("Check basic EditorV3Content", () => {
     const testContent = new EditorV3Content("12.34");
     expect(testContent.text).toEqual("12.34");
     const div = document.createElement("div");
-    div.append(testContent.toHtml());
+    div.append(testContent.toHtml({}));
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line left"><span class="aiev3-tb">12.34</span></div>' +
         '<div class="aiev3-contents-info"></div>',
@@ -62,7 +62,7 @@ describe("Check basic EditorV3Content", () => {
       ],
     });
     const div = document.createElement("div");
-    div.append(testContent.toHtml());
+    div.append(testContent.toHtml({}));
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line center">' +
         '<span class="aiev3-tb">34.56</span>' +
@@ -81,7 +81,7 @@ describe("Check basic EditorV3Content", () => {
     testContent.textAlignment = EditorV3Align.decimal;
     expect(new EditorV3Content(testContent.jsonString).data).toEqual(testContent.data);
     div.innerHTML = "";
-    div.appendChild(testContent.toHtml());
+    div.appendChild(testContent.toHtml({}));
     expect(new EditorV3Content(div.innerHTML).data).toEqual(testContent.data);
   });
 
@@ -99,7 +99,7 @@ describe("Check basic EditorV3Content", () => {
       ],
     });
     const div = document.createElement("div");
-    div.append(testContent.toHtml());
+    div.append(testContent.toHtml({}));
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line left"><span class="aiev3-tb">Hello</span></div>' +
         '<div class="aiev3-line left"><span class="aiev3-tb">.World</span></div>' +
@@ -127,7 +127,7 @@ describe("Check basic EditorV3Content", () => {
       ],
     });
     div.innerHTML = "";
-    div.appendChild(testContent.toHtml());
+    div.appendChild(testContent.toHtml({}));
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line decimal" style="grid-template-columns: 55% 45%;">' +
         '<span class="aiev3-span-point lhs"><span class="aiev3-tb">Hello</span></span>' +
@@ -462,7 +462,7 @@ describe("Render markdown text from content", () => {
     testContent.allowMarkdown = true;
     testContent.allowNewLine = true;
     testContent.showMarkdown = true;
-    const result = testContent.toMarkdownHtml();
+    const result = testContent.toMarkdownHtml({});
     const div = document.createElement("div");
     div.append(result);
     expect(div.innerHTML).toEqual(
@@ -531,7 +531,7 @@ describe("Splice markdown tests", () => {
     // Check markdown render when not show markdown
     testContent.showMarkdown = false;
     const div = document.createElement("div");
-    div.append(testContent.toMarkdownHtml());
+    div.append(testContent.toMarkdownHtml({}));
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-markdown-line">123</div>' +
         '<div class="aiev3-markdown-line">456</div>' +
@@ -621,7 +621,7 @@ describe("Splice markdown tests", () => {
         contentProps: contentProps,
       }),
     );
-    expect(testContent.toMarkdownHtml().textContent).toEqual("<<shiny::34.56>>");
+    expect(testContent.toMarkdownHtml({}).textContent).toEqual("<<shiny::34.56>>");
     const pasteContent = new EditorV3Line(
       `{"textBlocks":[{"text":"abc","style":"dull"}]}`,
       contentProps,
@@ -634,7 +634,7 @@ describe("Splice markdown tests", () => {
       isCollapsed: true,
     };
     const splice = testContent.splice(pos, [pasteContent]);
-    expect(testContent.toMarkdownHtml().textContent).toEqual("<<<dull::abc>><shiny::34.56>>");
+    expect(testContent.toMarkdownHtml({}).textContent).toEqual("<<<dull::abc>><shiny::34.56>>");
     expect(testContent.text).toEqual("<abc<shiny::34.56>>");
     expect(splice.map((l) => l.lineText).join("\n")).toEqual("");
 
@@ -644,7 +644,7 @@ describe("Splice markdown tests", () => {
       styleStartTag: "¬¬",
       styleEndTag: "^^",
     };
-    expect(testContent.toMarkdownHtml().textContent).toEqual("<¬¬dull::abc^^<shiny::34.56>>");
+    expect(testContent.toMarkdownHtml({}).textContent).toEqual("<¬¬dull::abc^^<shiny::34.56>>");
   });
 });
 

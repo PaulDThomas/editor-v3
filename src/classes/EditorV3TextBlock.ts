@@ -1,7 +1,7 @@
 import { cloneDeep } from "lodash";
 import { defaultContentProps } from "./defaultContentProps";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
-import { EditorV3WordPosition } from "./interface";
+import { EditorV3RenderProps, EditorV3WordPosition } from "./interface";
 
 export type EditorV3TextBlockType = "text" | "at";
 export interface IEditorV3TextBlock {
@@ -67,7 +67,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
   }
 
   // Content returns
-  public toHtml(): DocumentFragment {
+  public toHtml(renderProps: EditorV3RenderProps): DocumentFragment {
     const text =
       this.text === ""
         ? "\u2009"
@@ -101,6 +101,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
         ret.append(span);
       });
     }
+    if (renderProps.currentEl) renderProps.currentEl.append(ret);
     return ret;
   }
   public toMarkdown(

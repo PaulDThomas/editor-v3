@@ -2,47 +2,53 @@ import { cloneDeep, isEqual } from "lodash";
 import { readV2DivElement } from "../functions/readV2DivElement";
 import { readV3DivElement } from "../functions/readV3DivElement";
 import { readV3MarkdownElement } from "../functions/readV3MarkdownElement";
+import { EditorV3PositionClass } from "./EditorV3Position";
 import { defaultContentProps } from "./defaultContentProps";
-import { EditorV3TextBlock } from "./EditorV3TextBlock";
 import { drawHtmlDecimalAlign } from "./drawHtmlDecimalAlign";
 import {
   EditorV3Align,
+  EditorV3BlockClass,
   EditorV3ContentProps,
   EditorV3ContentPropsInput,
   EditorV3Position,
+  EditorV3RenderProps,
   EditorV3WordPosition,
 } from "./interface";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 import { textBlockFactory } from "./textBlockFactory";
-import { EditorV3AtBlock } from "./EditorV3AtBlock";
-import { EditorV3PositionClass } from "./EditorV3Position";
 
 export class EditorV3Line {
-  public textBlocks: (EditorV3TextBlock | EditorV3AtBlock)[];
+  public textBlocks: EditorV3BlockClass[];
   private _defaultContentProps: EditorV3ContentProps = cloneDeep(defaultContentProps);
   public contentProps: EditorV3ContentProps;
 
-  // Read only variables
-  public toHtml(): HTMLDivElement {
+  /**
+   * Render current line as HTML
+   * @param renderProps Current render properties
+   * @returns
+   */
+  public toHtml(renderProps: EditorV3RenderProps): HTMLDivElement {
     const h = document.createElement("div");
+    renderProps.currentEl = h;
     h.className = `aiev3-line ${this.contentProps.textAlignment}`;
     if (this.contentProps.textAlignment === EditorV3Align.decimal) {
       const decimalPosition = this.lineText.match(/\./)?.index ?? Infinity;
       drawHtmlDecimalAlign(
-        h,
+        renderProps,
         this.contentProps.decimalAlignPercent,
         this.upToPos(decimalPosition),
         this.fromPos(decimalPosition),
       );
     } else {
-      this.textBlocks.forEach((tb) => h.append(tb.toHtml()));
+      this.textBlocks.forEach((tb) => h.append(tb.toHtml(renderProps)));
     }
     // Need to add a space to the end of the line to allow for the cursor to be placed at the end
     if (this.textBlocks.length > 0 && this.textBlocks[this.textBlocks.length - 1].isLocked) {
-      const endBlockEl = textBlockFactory("").toHtml();
+      const endBlockEl = textBlockFactory("").toHtml(renderProps);
       // endBlockEl.children[0].classList.add("");
       h.append(endBlockEl);
     }
+    if (renderProps.editableEl) renderProps.editableEl.append(h);
     return h;
   }
 
@@ -104,7 +110,7 @@ export class EditorV3Line {
 
   // Constructor
   constructor(
-    arg: string | HTMLDivElement | EditorV3TextBlock[],
+    arg: string | HTMLDivElement | EditorV3BlockClass[],
     contentProps?: EditorV3ContentPropsInput,
   ) {
     // Set defaults
@@ -148,7 +154,7 @@ export class EditorV3Line {
         try {
           const jsonInput = JSON.parse(arg);
           if (jsonInput.textBlocks) {
-            this.textBlocks = jsonInput.textBlocks.map((tb: string | EditorV3TextBlock) =>
+            this.textBlocks = jsonInput.textBlocks.map((tb: string | EditorV3BlockClass) =>
               textBlockFactory(tb),
             );
           } else {
@@ -188,7 +194,7 @@ export class EditorV3Line {
    * @param pos The position to get the block at
    * @returns The block at the position
    */
-  public getBlockAt(pos: number): EditorV3TextBlock | undefined {
+  public getBlockAt(pos: number): EditorV3BlockClass | undefined {
     return this.textBlocks.find((tb) => tb.lineStartPosition <= pos && tb.lineEndPosition > pos);
   }
 
@@ -208,7 +214,7 @@ export class EditorV3Line {
    */
   public setActiveBlock(
     pos: EditorV3Position | EditorV3PositionClass,
-  ): EditorV3TextBlock | undefined {
+  ): EditorV3BlockClass | undefined {
     this.textBlocks.forEach((tb) => tb.setActive(false));
     if (pos.isCollapsed) {
       const activeBlock = this.getBlockAt(Math.max(0, pos.startChar - 1));
@@ -223,8 +229,8 @@ export class EditorV3Line {
    * @param endPosOpt End position, if not provided uses the end of the line
    * @returns Text blocks from startPos to endPos
    */
-  public subBlocks(startPos: number, endPosOpt?: number): EditorV3TextBlock[] {
-    const ret: EditorV3TextBlock[] = [];
+  public subBlocks(startPos: number, endPosOpt?: number): EditorV3BlockClass[] {
+    const ret: EditorV3BlockClass[] = [];
     const endPos = endPosOpt ?? this.lineLength;
     // Return empty styled block for start/end same
     if (startPos >= endPos || endPos <= 0) {
@@ -279,7 +285,7 @@ export class EditorV3Line {
    * @param pos Position to get blocks to
    * @returns Blocks from start to pos
    */
-  public upToPos(pos: number): EditorV3TextBlock[] {
+  public upToPos(pos: number): EditorV3BlockClass[] {
     return this.subBlocks(0, pos);
   }
 
@@ -288,7 +294,7 @@ export class EditorV3Line {
    * @param pos Position to get blocks from
    * @returns Blocks from pos to end
    */
-  public fromPos(pos: number): EditorV3TextBlock[] {
+  public fromPos(pos: number): EditorV3BlockClass[] {
     return this.subBlocks(pos);
   }
 
@@ -314,7 +320,7 @@ export class EditorV3Line {
    * @param newTextBlocks Array of text blocks to insert
    * @param pos Position to insert at
    */
-  public insertBlocks(newTextBlocks: EditorV3TextBlock[], pos: number) {
+  public insertBlocks(newTextBlocks: EditorV3BlockClass[], pos: number) {
     const pre = this.upToPos(pos);
     const post = this.fromPos(pos);
     this.textBlocks = [...pre, ...newTextBlocks, ...post];
@@ -327,8 +333,8 @@ export class EditorV3Line {
    * @param endPos End position to remove (exclusive)
    * @returns self
    */
-  public removeSection(startPos: number, endPos: number): EditorV3TextBlock[] {
-    let ret: EditorV3TextBlock[] = [];
+  public removeSection(startPos: number, endPos: number): EditorV3BlockClass[] {
+    let ret: EditorV3BlockClass[] = [];
     if (startPos < endPos && startPos < this.lineLength) {
       const pre = this.upToPos(startPos);
       ret = this.subBlocks(startPos, endPos);
@@ -391,7 +397,7 @@ export class EditorV3Line {
    */
   private _mergeBlocks() {
     if (new Set(this.textBlocks.map((tb) => tb.typeStyle)).size < this.textBlocks.length) {
-      const mergedBlocks: EditorV3TextBlock[] = [];
+      const mergedBlocks: EditorV3BlockClass[] = [];
       let lastTypeStyle: string | null = null;
       for (let _i = 0; _i < this.textBlocks.length; _i++) {
         if (this.textBlocks[_i].typeStyle === lastTypeStyle && mergedBlocks.length > 0) {
@@ -414,7 +420,7 @@ export class EditorV3Line {
    * @param blocks Blocks to check, if not provided uses this.textBlocks
    * @param initialPos Start position to use
    */
-  private _setBlockStartPositions(blocks?: EditorV3TextBlock[], initialPos: number = 0) {
+  private _setBlockStartPositions(blocks?: EditorV3BlockClass[], initialPos: number = 0) {
     let _linePos = initialPos;
     const tbs = blocks ?? this.textBlocks;
     tbs.forEach((tb) => {

@@ -9,7 +9,7 @@ import { EditorV3TextBlock } from "./EditorV3TextBlock";
 describe("Check basic EditorV3Line", () => {
   test("Load string", async () => {
     const testLine = new EditorV3Line("Hello world");
-    expect(testLine.toHtml().outerHTML).toEqual(
+    expect(testLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line left">' +
         '<span class="aiev3-tb">Hello&nbsp;</span>' +
         '<span class="aiev3-tb">world</span>' +
@@ -26,7 +26,7 @@ describe("Check basic EditorV3Line", () => {
       textAlignment: EditorV3Align.center,
       decimalAlignPercent: 22,
     });
-    expect(testLine.toHtml().outerHTML).toEqual(
+    expect(testLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line center">' +
         '<span class="aiev3-tb">&nbsp;</span>' +
         '<span class="aiev3-tb">&nbsp;</span>' +
@@ -46,7 +46,7 @@ describe("Check basic EditorV3Line", () => {
       [textBlockFactory("Hello\u00A0world, "), textBlockFactory("How is it going?", "shiny")],
       defaultContentProps,
     );
-    expect(testLine.toHtml().outerHTML).toEqual(
+    expect(testLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line left">' +
         '<span class="aiev3-tb">Hello&nbsp;world,&nbsp;</span>' +
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How&nbsp;</span>' +
@@ -105,7 +105,7 @@ describe("Check basic EditorV3Line", () => {
       [textBlockFactory("Hello\u00A0world. "), textBlockFactory("How is it going?", "shiny")],
       { ...defaultContentProps, textAlignment: EditorV3Align.decimal },
     );
-    expect(testLine.toHtml().outerHTML).toEqual(
+    expect(testLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
         '<span class="aiev3-span-point lhs"><span class="aiev3-tb">Hello&nbsp;world</span></span>' +
         '<span class="aiev3-span-point rhs">' +
@@ -126,7 +126,7 @@ describe("Check basic EditorV3Line", () => {
       ...defaultContentProps,
       textAlignment: EditorV3Align.decimal,
     });
-    expect(newDecimalTestLine.toHtml().outerHTML).toEqual(
+    expect(newDecimalTestLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
         '<span class="aiev3-span-point lhs"><span class="aiev3-tb">q</span></span>' +
         '<span class="aiev3-span-point rhs">\u2009</span>' +
@@ -136,7 +136,7 @@ describe("Check basic EditorV3Line", () => {
       ...defaultContentProps,
       textAlignment: EditorV3Align.decimal,
     });
-    expect(testLine.toHtml().outerHTML).toEqual(
+    expect(testLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
         '<span class="aiev3-span-point lhs"><span class="aiev3-tb">12</span></span>' +
         '<span class="aiev3-span-point rhs"><span class="aiev3-tb">.34</span></span>' +
@@ -156,7 +156,7 @@ describe("Check basic EditorV3Line", () => {
     expect(testLine.lineText).toEqual("12.34 slow");
     expect(testLine.contentProps.textAlignment).toEqual(EditorV3Align.decimal);
     expect(testLine.contentProps.decimalAlignPercent).toEqual(60);
-    expect(testLine.toHtml().outerHTML).toEqual(
+    expect(testLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
         '<span class="aiev3-span-point lhs">' +
         '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">12</span>' +
@@ -168,7 +168,7 @@ describe("Check basic EditorV3Line", () => {
         "</span>" +
         "</div>",
     );
-    expect(new EditorV3Line(testLine.toHtml()).data).toEqual(testLine.data);
+    expect(new EditorV3Line(testLine.toHtml({})).data).toEqual(testLine.data);
     expect(JSON.parse(testLine.jsonString)).toEqual({
       contentProps: { textAlignment: "decimal" },
       textBlocks: [
@@ -209,7 +209,7 @@ describe("Check basic EditorV3Line", () => {
       textAlignment: EditorV3Align.right,
     });
 
-    expect(testLine.toHtml().outerHTML).toEqual(
+    expect(testLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line right"><span class="aiev3-tb">12.34</span></div>',
     );
     expect(testLine.lineText).toEqual("12.34");
@@ -221,7 +221,7 @@ describe("Check basic EditorV3Line", () => {
       '<div class="aiev3-line right"><span>12.34&nbsp;</span>wut?&nbsp;<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">5678</span></div>',
     );
 
-    expect(testLine.toHtml().outerHTML).toEqual(
+    expect(testLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line right">' +
         '<span class="aiev3-tb">12.34&nbsp;</span>' +
         '<span class="aiev3-tb">wut?&nbsp;</span>' +
@@ -238,8 +238,8 @@ describe("Check basic EditorV3Line", () => {
       ...defaultContentProps,
       textAlignment: EditorV3Align.right,
     });
-    expect(new EditorV3Line(firstLine.toHtml())).toEqual(firstLine);
-    expect(new EditorV3Line(firstLine.toHtml().outerHTML)).toEqual(firstLine);
+    expect(new EditorV3Line(firstLine.toHtml({}))).toEqual(firstLine);
+    expect(new EditorV3Line(firstLine.toHtml({}).outerHTML)).toEqual(firstLine);
     expect(new EditorV3Line(firstLine.jsonString)).toEqual(firstLine);
     expect(new EditorV3Line(JSON.stringify(firstLine))).toEqual(firstLine);
   });
@@ -249,8 +249,8 @@ describe("Check basic EditorV3Line", () => {
       ...defaultContentProps,
       textAlignment: EditorV3Align.decimal,
     });
-    expect(new EditorV3Line(firstLine.toHtml())).toEqual(firstLine);
-    expect(new EditorV3Line(firstLine.toHtml().outerHTML)).toEqual(firstLine);
+    expect(new EditorV3Line(firstLine.toHtml({}))).toEqual(firstLine);
+    expect(new EditorV3Line(firstLine.toHtml({}).outerHTML)).toEqual(firstLine);
     expect(new EditorV3Line(firstLine.jsonString)).toEqual(firstLine);
     expect(new EditorV3Line(JSON.stringify(firstLine)).data).toEqual(firstLine.data);
   });
@@ -613,10 +613,10 @@ describe("Write space after at block", () => {
       defaultContentProps,
     );
     const div = document.createElement("div");
-    div.appendChild(line.toHtml());
+    div.appendChild(line.toHtml({}));
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line left">' +
-        '<span class="aiev3-tb at-block is-locked" data-is-locked="true" data-type="at">@Hello</span>' +
+        '<span class="aiev3-tb at-block is-locked" data-type="at" data-is-locked="true">@Hello</span>' +
         '<span class="aiev3-tb">\u2009</span>' +
         "</div>",
     );

@@ -17,11 +17,11 @@ describe("Should render an at block in the HTML", () => {
       { line: -1, startChar: 6, endChar: 12, isLocked: false },
     ]);
     // Expect text/markdown to render one block
-    expect(testBlock.toHtml().textContent).toEqual("Hello\u00A0@world");
+    expect(testBlock.toHtml({}).textContent).toEqual("Hello\u00A0@world");
     expect(testBlock.toMarkdown()).toEqual("<<shiny::Hello @world>>");
     // Expect HTML to split block into two spans
     const tempDiv = document.createElement("div");
-    tempDiv.appendChild(testBlock.toHtml());
+    tempDiv.appendChild(testBlock.toHtml({}));
     expect(tempDiv.innerHTML).toEqual(
       // eslint-disable-next-line quotes
       '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;</span>' +
@@ -34,6 +34,6 @@ describe("Should render an at block in the HTML", () => {
 describe("Should throw trying to render an at block in the HTML", () => {
   test("Create HTML with an @ at the start", async () => {
     const testBlock = new EditorV3TextBlock({ text: "@Hello world", type: "at" });
-    expect(() => testBlock.toHtml()).toThrow("Use EditorV3AtBlock for at blocks");
+    expect(() => testBlock.toHtml({})).toThrow("Use EditorV3AtBlock for at blocks");
   });
 });

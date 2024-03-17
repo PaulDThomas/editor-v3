@@ -6,7 +6,7 @@ describe("EditorV3AtBlock", () => {
     const style = "bold";
     const block = new EditorV3AtBlock({ text, style });
     block.setActive(true);
-    const result = block.toHtml();
+    const result = block.toHtml({});
 
     // Check if the DocumentFragment contains a single span element
     expect(result.childNodes.length).toBe(1);
@@ -31,7 +31,7 @@ describe("EditorV3AtBlock", () => {
     const text = "Hello, world!";
     const style = undefined;
     const block = new EditorV3AtBlock({ text, style, isLocked: true });
-    const result = block.toHtml();
+    const result = block.toHtml({});
 
     // Check if the DocumentFragment contains a single span element
     expect(result.childNodes.length).toBe(1);

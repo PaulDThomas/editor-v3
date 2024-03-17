@@ -123,7 +123,7 @@ export const EditorV3 = ({
   // Create debounce stack
   const {
     currentValue: content,
-    setCurrentValue: setContent,
+    setCurrentValue,
     undo,
     redo,
     forceUpdate: forceReturn,
@@ -135,12 +135,20 @@ export const EditorV3 = ({
     returnData,
     (oldValue, newValue) => isEqual(oldValue?.data ?? {}, newValue?.data ?? {}),
   );
+  // Utility callback for debugging
+  const setContent = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    (newContent: EditorV3Content, calledFrom: string) => {
+      setCurrentValue(newContent);
+    },
+    [setCurrentValue],
+  );
 
   // Update any content properry from parent
   useEffect(() => {
     if (divRef.current && content && !isEqual(content.contentProps, contentProps)) {
       const newContent = new EditorV3Content(divRef.current, contentProps);
-      setContent(newContent);
+      setContent(newContent, "Update content props from parent");
     }
   });
 
@@ -149,7 +157,7 @@ export const EditorV3 = ({
     if (content && input !== lastInput) {
       const newContent = new EditorV3Content(input, contentProps);
       newContent.caretPosition = lastCaretPosition;
-      setContent(newContent);
+      setContent(newContent, "Update input from parent");
       setLastInput(input);
     }
   }, [content, contentProps, input, lastCaretPosition, lastInput, redrawElement, setContent]);
@@ -170,7 +178,7 @@ export const EditorV3 = ({
                     if (divRef.current) {
                       const newContent = new EditorV3Content(divRef.current, contentProps);
                       newContent.applyStyle(s);
-                      setContent(newContent);
+                      setContent(newContent, "Apply style from menu");
                     }
                   },
                 };
@@ -183,7 +191,7 @@ export const EditorV3 = ({
               if (divRef.current) {
                 const newContent = new EditorV3Content(divRef.current, contentProps);
                 newContent.removeStyle();
-                setContent(newContent);
+                setContent(newContent, "Remove style from menu");
               }
             },
           },
@@ -220,7 +228,7 @@ export const EditorV3 = ({
         endChar: newContent.lines[newContent.lines.length - 1].lineLength,
         isCollapsed: false,
       };
-      setContent(newContent);
+      setContent(newContent, "Select all on focus");
     }
   }, [content, contentProps, setContent]);
   const handleBlur = useCallback(() => {
@@ -249,7 +257,7 @@ export const EditorV3 = ({
           // Get current information and update content buffer
           const newContent = new EditorV3Content(divRef.current, contentProps);
           newContent.handleKeydown(e);
-          setContent(newContent);
+          setContent(newContent, `Handle key down: ${e.key}`);
         }
       }
     },
@@ -277,7 +285,7 @@ export const EditorV3 = ({
           e.stopPropagation();
           const newContent = new EditorV3Content(divRef.current, contentProps);
           newContent.handleKeyup(e);
-          setContent(newContent);
+          setContent(newContent, `Handle key up: ${e.key}`);
         }
       }
     },
@@ -290,7 +298,7 @@ export const EditorV3 = ({
       if (divRef.current && inFocus) {
         const newContent = new EditorV3Content(divRef.current, contentProps);
         newContent.checkStatus();
-        setContent(newContent);
+        setContent(newContent, "Handle mouse up on timeout");
       }
     }, 0);
   }, [contentProps, inFocus, setContent]);
@@ -300,7 +308,7 @@ export const EditorV3 = ({
       if (divRef.current) {
         const newContent = new EditorV3Content(divRef.current, contentProps);
         newContent.handleCopy(e);
-        setContent(newContent);
+        setContent(newContent, "Handle copy");
       }
     },
     [contentProps, setContent],
@@ -311,7 +319,7 @@ export const EditorV3 = ({
       if (divRef.current) {
         const newContent = new EditorV3Content(divRef.current, contentProps);
         newContent.handlePaste(e);
-        setContent(newContent);
+        setContent(newContent, "Handle paste");
       }
     },
     [contentProps, setContent],
@@ -336,8 +344,18 @@ export const EditorV3 = ({
       className={`aiev3${inFocus ? " editing" : ""}`}
       id={id}
       onFocusCapture={handleFocus}
-      onBlur={handleBlur}
-      onMouseUpCapture={handleMouseUp}
+      onBlur={(e) => {
+        // Check focus has moved outside this element
+        if (!e.relatedTarget || !e.currentTarget.contains(e.relatedTarget)) {
+          console.log("Handling blur event", e.target, e.relatedTarget);
+          e.preventDefault();
+          e.stopPropagation();
+          handleBlur();
+        } else {
+          console.log("Ignoring blur event", e.target, e.relatedTarget);
+        }
+      }}
+      onMouseUp={handleMouseUp}
     >
       <ContextMenuHandler
         menuItems={menuItems}

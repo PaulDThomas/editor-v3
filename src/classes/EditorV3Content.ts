@@ -5,15 +5,16 @@ import { readV3Html } from "../functions/readV3Html";
 import { setCaretPosition } from "../functions/setCaretPosition";
 import { EditorV3Line } from "./EditorV3Line";
 import { EditorV3PositionClass } from "./EditorV3Position";
-import { EditorV3TextBlock } from "./EditorV3TextBlock";
 import { defaultContentProps } from "./defaultContentProps";
 import {
   EditorV3Align,
+  EditorV3BlockClass,
   EditorV3ContentProps,
   EditorV3ContentPropsInput,
   EditorV3Import,
   EditorV3LineImport,
   EditorV3Position,
+  EditorV3RenderProps,
   EditorV3Styles,
 } from "./interface";
 import { MarkdownLineClass } from "./markdown/MarkdownLineClass";
@@ -209,10 +210,13 @@ export class EditorV3Content implements EditorV3Import {
   /**
    * Element to render
    */
-  public toHtml(): DocumentFragment {
+  public toHtml(renderProps: EditorV3RenderProps): DocumentFragment {
     const ret = new DocumentFragment();
-    this.lines.forEach((l) => ret.append(l.toHtml()));
+    // Add each line to the element
+    this.lines.forEach((l) => ret.append(l.toHtml(renderProps)));
+    // Add content properties node
     ret.append(this._contentPropsNode());
+    if (renderProps.editableEl) renderProps.editableEl.append(ret);
     return ret;
   }
 
@@ -221,10 +225,10 @@ export class EditorV3Content implements EditorV3Import {
    * @param markdownSettings Markdown settings, current settings by default
    * @returns Documentfragment with rendered markdown
    */
-  public toMarkdownHtml(
-    markdownSettings: IMarkdownSettings = this._markdownSettings,
-  ): DocumentFragment {
+  public toMarkdownHtml(renderProps: EditorV3RenderProps): DocumentFragment {
     const ret = new DocumentFragment();
+    // Use any passed markdown settings
+    const markdownSettings = renderProps.markdownSettings ?? this._markdownSettings;
     this.lines.forEach((line) => {
       const l = document.createElement("div");
       l.classList.add("aiev3-markdown-line");
@@ -243,6 +247,7 @@ export class EditorV3Content implements EditorV3Import {
     if (revert) {
       this._showMarkdown = false;
     }
+    if (renderProps.editableEl) renderProps.editableEl.append(ret);
     return ret;
   }
 
@@ -558,26 +563,26 @@ export class EditorV3Content implements EditorV3Import {
 
   /**
    * Update target element with conntent and set caret position
-   * @param el DOM element to render inside
+   * @param editableEl DOM element to render inside
    */
-  public redraw(el: Element) {
+  public redraw(editableEl: HTMLDivElement) {
     // Set active block
     this._caretPosition &&
       this.lines[this._caretPosition.startLine].setActiveBlock(this._caretPosition);
     // Draw HTML
-    el.innerHTML = "";
+    editableEl.innerHTML = "";
     if (this._showMarkdown) {
-      el.append(this.toMarkdownHtml(this._markdownSettings));
+      this.toMarkdownHtml({ editableEl, markdownSettings: this._markdownSettings });
     } else {
-      el.append(this.toHtml());
+      this.toHtml({ editableEl });
     }
     // Update height and styles after render
-    [...el.querySelectorAll(".aiev3-line")].forEach((line) => {
+    [...editableEl.querySelectorAll(".aiev3-line")].forEach((line) => {
       // Apply styles
       applyStylesToHTML(line as HTMLDivElement, this._styles);
     });
     // Set caret position
-    this._caretPosition && this._caretPosition && setCaretPosition(el, this._caretPosition);
+    this._caretPosition && this._caretPosition && setCaretPosition(editableEl, this._caretPosition);
   }
 
   /**
@@ -719,7 +724,7 @@ export class EditorV3Content implements EditorV3Import {
       e.clipboardData.setData("text/plain", toClipboard.map((l) => l.lineText).join("\n"));
       e.clipboardData.setData(
         "text/html",
-        toClipboard.map((l) => applyStylesToHTML(l.toHtml(), this.styles).outerHTML).join(""),
+        toClipboard.map((l) => applyStylesToHTML(l.toHtml({}), this.styles).outerHTML).join(""),
       );
       e.clipboardData.setData("data/aiev3", JSON.stringify(toClipboard.map((l) => l.data)));
       if (e.type === "cut" && !this._isCaretLocked()) {
@@ -751,7 +756,7 @@ export class EditorV3Content implements EditorV3Import {
       ) as EditorV3LineImport[];
       // Just text blocks if only one line is allowed
       if (linesImport.length > 1 && !this.allowNewLine) {
-        const textBlocks: EditorV3TextBlock[] = linesImport
+        const textBlocks: EditorV3BlockClass[] = linesImport
           .flatMap((l) => l.textBlocks)
           .map((tb) => textBlockFactory(tb));
         lines.push(new EditorV3Line(textBlocks, this.contentProps));
