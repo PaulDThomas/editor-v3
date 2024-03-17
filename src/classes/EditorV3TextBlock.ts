@@ -115,7 +115,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     );
   }
 
-  // Overloads
+  // Constructor
   constructor({ text, style, type, isLocked, lineStartPosition }: IEditorV3TextBlock) {
     this.text = text;
     this.style = style;
@@ -124,6 +124,26 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     this.lineStartPosition = lineStartPosition ?? 0;
   }
 
+  // // Protected functions
+  // protected fromData(arg: IEditorV3TextBlock) {
+  //   this.text = arg.text;
+  //   this.style = arg.style;
+  //   this.type = arg.type ?? "text";
+  //   this.isLocked = arg.isLocked;
+  //   this.lineStartPosition = arg.lineStartPosition ?? 0;
+  // }
+
+  // protected fromHtml(arg: HTMLSpanElement | Text) {
+  //   this.text = arg.textContent ?? "";
+  //   if (arg instanceof HTMLSpanElement) {
+  //     this.style = arg.dataset.styleName ?? "";
+  //     this.type = (arg.dataset.type ?? "text") as EditorV3TextBlockType;
+  //     this.isLocked = arg.dataset.isLocked === "true" ? true : undefined;
+  //     this.lineStartPosition = 0;
+  //   }
+  // }
+
+  // Status updated functions
   public setActive(active: boolean) {
     this.isActive = active;
   }

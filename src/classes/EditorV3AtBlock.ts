@@ -37,10 +37,10 @@ export class EditorV3AtBlock extends EditorV3TextBlock {
   // Overload html return
   public toHtml(renderProps: EditorV3RenderProps): DocumentFragment {
     // Create holder
-    const frag = new DocumentFragment();
-    if (renderProps.currentEl) renderProps.currentEl.append(frag);
+    const ret = new DocumentFragment();
+    if (renderProps.currentEl) renderProps.currentEl.append(ret);
     const span = document.createElement("span");
-    frag.appendChild(span);
+    ret.appendChild(span);
     span.classList.add("aiev3-tb", "at-block");
     span.dataset.type = "at";
 
@@ -70,87 +70,90 @@ export class EditorV3AtBlock extends EditorV3TextBlock {
     } else if (this.isActive) {
       span.classList.add("is-active");
 
-      // Add in dropdown for active element
-      if (editor) {
-        renderProps.editableEl?.addEventListener("blur", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log("@Span event blur");
-        });
-        let renderTimeout: NodeJS.Timeout | null = null;
-        const renderDropdown = () => {
-          // Double check class list
-          if (!span.classList.contains("is-locked")) {
-            // Create download
-            const dropdownDiv = document.createElement("ul");
-            dropdownDiv.classList.add("aiev3-at-dropdown", "skip-read");
-            dropdownDiv.contentEditable = "false";
-            // Add event listener
-            dropdownDiv.addEventListener("click", (e: MouseEvent) => {
-              console.log("click on dropdown menu");
-              e.preventDefault();
-              e.stopPropagation();
-              // Set long timeout to enable stack to clear
-              setTimeout(() => {
-                if (
-                  e.target instanceof HTMLElement &&
-                  e.target.classList.contains("aiev3-at-item")
-                ) {
-                  const atItem = e.target;
-                  const thisText = atItem.textContent;
-                  console.log("timed out click on dropdown item", thisText);
-                  span.textContent = thisText;
-                  span.classList.remove("is-active");
-                  span.classList.add("is-locked");
-                  span.dataset.isLocked = "true";
-                  const existingDropdowns = editor.querySelectorAll(".aiev3-at-dropdown");
-                  existingDropdowns.forEach((dropdown) => dropdown.remove());
-                }
-              }, 0);
-            });
-            // Append to editor
-            editor.appendChild(dropdownDiv);
-
-            // Position dropdown
-            const editorRect = editor.getBoundingClientRect();
-            const spanRect = span.getBoundingClientRect();
-            if (editorRect && spanRect) {
-              dropdownDiv.style.left = `${spanRect.left - editorRect.left}px`;
-              dropdownDiv.style.top = `${spanRect.bottom - editorRect.top}px`;
+      // Add in dropdown
+      let renderTimeout: NodeJS.Timeout | null = null;
+      const renderDropdown = () => {
+        // Double check class list
+        if (!span.classList.contains("is-locked")) {
+          // Create download
+          const dropdownDiv = document.createElement("ul");
+          dropdownDiv.classList.add("aiev3-at-dropdown", "skip-read");
+          dropdownDiv.contentEditable = "false";
+          // Add event listener
+          dropdownDiv.addEventListener("click", (e: MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // Set long timeout to enable stack to clear
+            const atItem = e.target;
+            if (
+              atItem &&
+              atItem instanceof HTMLElement &&
+              atItem.dataset.handler === "at-dropdown-list"
+            ) {
+              const thisText = atItem.textContent;
+              span.textContent = thisText;
+              span.classList.remove("is-active");
+              span.classList.add("is-locked");
+              span.dataset.isLocked = "true";
             }
+          });
+          // Append to editor
+          span.appendChild(dropdownDiv);
+          // Add event listener to document
+          const clickHandler = (e: MouseEvent) => {
+            const target = e.target as HTMLElement;
+            const dropdown = span.querySelector(".aiev3-at-dropdown");
+            if (dropdown && !dropdown.contains(target)) {
+              dropdown.remove();
+              span.classList.remove("is-active");
+              span.classList.add("is-locked");
+              span.dataset.isLocked = "true";
+            }
+            document.removeEventListener("click", clickHandler);
+          };
 
-            // Ad items to dropdown
-            const filteredList = this.atList.filter((atItem) =>
-              atItem.toLowerCase().includes(this.text.toLowerCase()),
-            );
-            if (filteredList.length === 0) {
-              const noItems = document.createElement("li");
-              noItems.classList.add("aiev3-at-no-items");
-              noItems.textContent = "No items found";
-              dropdownDiv.appendChild(noItems);
-            } else {
-              filteredList.slice(0, this.maxAtListLength).forEach((atItem) => {
-                const atSpan = document.createElement("li");
-                atSpan.classList.add("aiev3-at-item");
-                atSpan.textContent = atItem;
-                atSpan.dataset.handler = "at-dropdown-list";
-                dropdownDiv.appendChild(atSpan);
-              });
-              if (filteredList.length >= this.maxAtListLength) {
-                const atSpan = document.createElement("li");
-                atSpan.classList.add("aiev3-more-items");
-                atSpan.textContent = `...${filteredList.length - this.maxAtListLength} more`;
-                dropdownDiv.appendChild(atSpan);
-              }
+          document.addEventListener("click", clickHandler);
+
+          // Position dropdown
+          const spanRect = span.getBoundingClientRect();
+          const offSetRect = span.offsetParent?.getBoundingClientRect();
+          if (offSetRect && spanRect) {
+            dropdownDiv.style.left = `${spanRect.left - offSetRect.left}px`;
+            dropdownDiv.style.top = `${spanRect.bottom - offSetRect.top}px`;
+          }
+
+          // Ad items to dropdown
+          const filteredList = this.atList.filter((atItem) =>
+            atItem.toLowerCase().includes(this.text.toLowerCase()),
+          );
+          if (filteredList.length === 0) {
+            const noItems = document.createElement("li");
+            noItems.classList.add("aiev3-at-no-items");
+            noItems.textContent = "No items found";
+            dropdownDiv.appendChild(noItems);
+          } else {
+            filteredList.slice(0, this.maxAtListLength).forEach((atItem) => {
+              const atSpan = document.createElement("li");
+              atSpan.classList.add("aiev3-at-item");
+              atSpan.textContent = atItem;
+              atSpan.dataset.handler = "at-dropdown-list";
+              dropdownDiv.appendChild(atSpan);
+            });
+            if (filteredList.length >= this.maxAtListLength) {
+              const atSpan = document.createElement("li");
+              atSpan.classList.add("aiev3-more-items");
+              atSpan.textContent = `...${filteredList.length - this.maxAtListLength} more`;
+              dropdownDiv.appendChild(atSpan);
             }
           }
-        };
-        renderTimeout = null;
-        if (!renderTimeout) {
-          renderTimeout = setTimeout(renderDropdown, 100);
         }
+      };
+      renderTimeout = null;
+      if (!renderTimeout) {
+        renderTimeout = setTimeout(renderDropdown, 100);
       }
     }
-    return frag;
+    if (renderProps.currentEl) renderProps.currentEl.append(ret);
+    return ret;
   }
 }

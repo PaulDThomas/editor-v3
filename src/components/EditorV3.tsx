@@ -156,8 +156,16 @@ export const EditorV3 = ({
   useEffect(() => {
     if (content && input !== lastInput) {
       const newContent = new EditorV3Content(input, contentProps);
-      newContent.caretPosition = lastCaretPosition;
+      // Lock any at-blocks here, focus must have been lost
+      newContent.lines.forEach((l) => {
+        l.textBlocks.forEach((tb) => {
+          if (tb.type === "at") {
+            tb.isLocked = true;
+          }
+        });
+      });
       setContent(newContent, "Update input from parent");
+      newContent.caretPosition = lastCaretPosition;
       setLastInput(input);
     }
   }, [content, contentProps, input, lastCaretPosition, lastInput, redrawElement, setContent]);
@@ -344,17 +352,7 @@ export const EditorV3 = ({
       className={`aiev3${inFocus ? " editing" : ""}`}
       id={id}
       onFocusCapture={handleFocus}
-      onBlur={(e) => {
-        // Check focus has moved outside this element
-        if (!e.relatedTarget || !e.currentTarget.contains(e.relatedTarget)) {
-          console.log("Handling blur event", e.target, e.relatedTarget);
-          e.preventDefault();
-          e.stopPropagation();
-          handleBlur();
-        } else {
-          console.log("Ignoring blur event", e.target, e.relatedTarget);
-        }
-      }}
+      onBlur={handleBlur}
       onMouseUp={handleMouseUp}
     >
       <ContextMenuHandler
