@@ -2,26 +2,29 @@ import "./EditorV3AtBlock.css";
 import { EditorV3TextBlock, IEditorV3TextBlock } from "./EditorV3TextBlock";
 import { EditorV3RenderProps, EditorV3WordPosition } from "./interface";
 
-export class EditorV3AtBlock extends EditorV3TextBlock {
-  constructor(props: IEditorV3TextBlock) {
+export interface IEditorV3AtBlock extends IEditorV3TextBlock {
+  atListFunction?: (typedString: string) => Promise<string[]>;
+  maxAtListLength?: number;
+}
+
+export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlock {
+  /**
+   * Promise function that will return list of string values to display
+   * @param typedString Text entered into the block so far
+   * @returns Promise of array of strings
+   */
+  public atListFunction: (typedString: string) => Promise<string[]> = () => new Promise(() => []);
+  /**
+   * Maximum number of items to display in the returned list
+   */
+  public maxAtListLength = 10;
+
+  constructor(props: IEditorV3AtBlock) {
     super(props);
     this.type = "at";
+    if (props.atListFunction) this.atListFunction = props.atListFunction;
+    if (props.maxAtListLength) this.maxAtListLength = props.maxAtListLength;
   }
-
-  public atList: string[] = [
-    "@hello",
-    "@world",
-    ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i).repeat(2)).map(
-      (letter) => `@${letter}`,
-    ),
-    ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i).repeat(4)).map(
-      (letter) => `@${letter}`,
-    ),
-    ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i).repeat(6)).map(
-      (letter) => `@${letter}`,
-    ),
-  ];
-  public maxAtListLength = 10;
 
   get wordPositions(): EditorV3WordPosition[] {
     return [
@@ -77,8 +80,12 @@ export class EditorV3AtBlock extends EditorV3TextBlock {
         if (!span.classList.contains("is-locked")) {
           // Create download
           const dropdownDiv = document.createElement("ul");
+          // Append to editor
+          span.appendChild(dropdownDiv);
+          // Set up dropdown internals
           dropdownDiv.classList.add("aiev3-at-dropdown", "skip-read");
           dropdownDiv.contentEditable = "false";
+          dropdownDiv.innerHTML = "<li>Loading...</li>";
           // Add event listener
           dropdownDiv.addEventListener("click", (e: MouseEvent) => {
             e.preventDefault();
@@ -97,8 +104,6 @@ export class EditorV3AtBlock extends EditorV3TextBlock {
               span.dataset.isLocked = "true";
             }
           });
-          // Append to editor
-          span.appendChild(dropdownDiv);
           // Add event listener to document
           const clickHandler = (e: MouseEvent) => {
             const target = e.target as HTMLElement;
@@ -122,33 +127,42 @@ export class EditorV3AtBlock extends EditorV3TextBlock {
             dropdownDiv.style.top = `${spanRect.bottom - offSetRect.top}px`;
           }
 
-          // Ad items to dropdown
-          const filteredList = this.atList.filter((atItem) =>
-            atItem.toLowerCase().includes(this.text.toLowerCase()),
-          );
-          if (filteredList.length === 0) {
-            const noItems = document.createElement("li");
-            noItems.classList.add("aiev3-at-no-items");
-            noItems.textContent = "No items found";
-            dropdownDiv.appendChild(noItems);
-          } else {
-            filteredList.slice(0, this.maxAtListLength).forEach((atItem) => {
-              const atSpan = document.createElement("li");
-              atSpan.classList.add("aiev3-at-item");
-              atSpan.textContent = atItem;
-              atSpan.dataset.handler = "at-dropdown-list";
-              dropdownDiv.appendChild(atSpan);
-            });
-            if (filteredList.length >= this.maxAtListLength) {
-              const atSpan = document.createElement("li");
-              atSpan.classList.add("aiev3-more-items");
-              atSpan.textContent = `...${filteredList.length - this.maxAtListLength} more`;
-              dropdownDiv.appendChild(atSpan);
+          // Add items to dropdown when promise resolves
+          const atFunction = renderProps.atListFunction ?? this.atListFunction;
+          atFunction(this.text).then((resolvedAtList) => {
+            dropdownDiv.innerHTML = "";
+            if (resolvedAtList.length === 0) {
+              const noItems = document.createElement("li");
+              noItems.classList.add("aiev3-at-no-items");
+              noItems.textContent = "No items found";
+              dropdownDiv.appendChild(noItems);
+            } else {
+              resolvedAtList.slice(0, this.maxAtListLength).forEach((atItem) => {
+                const atSpan = document.createElement("li");
+                atSpan.classList.add("aiev3-at-item");
+                atSpan.textContent = atItem;
+                atSpan.dataset.handler = "at-dropdown-list";
+                dropdownDiv.appendChild(atSpan);
+              });
+              if (resolvedAtList.length >= this.maxAtListLength) {
+                const atSpan = document.createElement("li");
+                atSpan.classList.add("aiev3-more-items");
+                atSpan.textContent = `...${resolvedAtList.length - this.maxAtListLength} more`;
+                dropdownDiv.appendChild(atSpan);
+              }
             }
-          }
+          });
+          // .catch(() => {
+          //   // dropdownDiv.innerHTML = "<li>Error fetching list</li>";
+          //   dropdownDiv.innerHTML = "";
+          //   const errorItem = document.createElement("li");
+          //   errorItem.classList.add("aiev3-at-items-error");
+          //   errorItem.textContent = "Error fetching list";
+          //   dropdownDiv.appendChild(errorItem);
+          // });
         }
       };
-      renderTimeout = null;
+      // Throttle render
       if (!renderTimeout) {
         renderTimeout = setTimeout(renderDropdown, 100);
       }

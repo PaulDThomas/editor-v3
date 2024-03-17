@@ -63,6 +63,33 @@ describe("EditorV3AtBlock", () => {
 });
 
 describe("should return a DocumentFragment with a dropdown", () => {
+  const atListFunction = (typedString: string) =>
+    new Promise<string[]>((resolve) => {
+      const available = [
+        "@one",
+        "@two",
+        "@three",
+        "@four",
+        "@five",
+        "@six",
+        "@seven",
+        "@eight",
+        "@nine",
+        "@ten",
+        "@eleven",
+        "@twelve",
+        "@thirteen",
+        "@fourteen",
+        "@fifteen",
+        "@sixteen",
+        "@seventeen",
+        "@eighteen",
+        "@nineteen",
+        "@twenty",
+      ];
+      resolve(available.filter((item) => item.includes(typedString)));
+    });
+
   beforeEach(() => {
     jest.useFakeTimers();
     // Define offsetParent for HTMLElement
@@ -77,28 +104,38 @@ describe("should return a DocumentFragment with a dropdown", () => {
     jest.useRealTimers();
   });
 
-  test("Render dropdown for no objects", () => {
+  test("Render dropdown for no objects", async () => {
     const text = "@nothing";
-    const block = new EditorV3AtBlock({ text });
+    const block = new EditorV3AtBlock({ text, atListFunction });
     block.setActive(true);
     const div = document.createElement("div");
     block.toHtml({ currentEl: div });
+    // Run pending timer from the function to display the dropdown list
     jest.runAllTimers();
-    const dropDown = div.querySelector(".aiev3-at-dropdown");
-    expect(dropDown).toBeDefined();
-    expect(dropDown?.textContent).toEqual("No items found");
+    expect(div.querySelector(".aiev3-at-dropdown")).not.toBeNull();
+    expect(div.querySelector(".aiev3-at-dropdown")!.textContent).toEqual("Loading...");
+    // Add new promise to ensure all other promises are resolved
+    await Promise.resolve();
+    expect(div.querySelector(".aiev3-at-dropdown")).not.toBeNull();
+    expect(div.querySelector(".aiev3-at-dropdown")!.textContent).toEqual("No items found");
   });
 
-  test("Render dropdown for all objects", () => {
+  test("Render dropdown for all objects", async () => {
     const text = "@";
-    const block = new EditorV3AtBlock({ text });
+    const block = new EditorV3AtBlock({ text, atListFunction });
     block.setActive(true);
     const div = document.createElement("div");
-    div.style.position = "relative";
     block.toHtml({ currentEl: div });
+    // Run pending timer from the function to display the dropdown list
     jest.runAllTimers();
+    expect(div.querySelector(".aiev3-at-dropdown")).not.toBeNull();
+    expect(div.querySelector(".aiev3-at-dropdown")!.textContent).toEqual("Loading...");
+    // Add new promise to ensure all other promises are resolved
+    await Promise.resolve();
     const dropDown = div.querySelector(".aiev3-at-dropdown");
-    expect(dropDown).toBeDefined();
+    expect(dropDown).not.toBeNull();
+    expect(dropDown!.textContent).not.toEqual("Loading...");
+    expect(div.innerHTML).toMatchSnapshot();
 
     // Check dropdown click
     const items = dropDown?.querySelectorAll("li.aiev3-at-item");
@@ -110,20 +147,24 @@ describe("should return a DocumentFragment with a dropdown", () => {
     expect(div.textContent).toBe(expectedText);
   });
 
-  test("Render dropdown for all objects and click off", () => {
-    const text = "@";
-    const block = new EditorV3AtBlock({ text });
+  test("Render dropdown and click off", async () => {
+    const text = "@q";
+    const block = new EditorV3AtBlock({
+      text,
+    });
     block.setActive(true);
     const div = document.createElement("div");
-    div.style.position = "relative";
     block.toHtml({ currentEl: div });
+    // Run pending timer from the function to display the dropdown list
     jest.runAllTimers();
-    const dropDown = div.querySelector(".aiev3-at-dropdown");
-    expect(dropDown).toBeDefined();
-
+    await Promise.resolve();
     // Check outside dropdown click
     fireEvent.click(document);
     expect(div.querySelector(".aiev3-at-dropdown")).toBeNull();
-    expect(div.textContent).toBe("@");
+    expect(div.textContent).toBe("@q");
+    expect((div.querySelector(".aiev3-tb.at-block") as HTMLSpanElement)?.dataset.isLocked).toBe(
+      "true",
+    );
+    expect(div.innerHTML).toMatchSnapshot();
   });
 });

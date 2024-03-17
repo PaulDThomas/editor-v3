@@ -5,13 +5,15 @@
     "es2021": true,
     "jest": true,
     "es6": true, // This enables ES6 global variables AND ES6 syntax
-    "worker": true
+    "worker": true,
+    "jest/globals": true
   },
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
     "plugin:@typescript-eslint/recommended",
+    "plugin:jest/recommended",
     "prettier"
   ],
   "parser": "@typescript-eslint/parser",
@@ -32,7 +34,7 @@
     }
   },
   // @typescript-eslint/parser is specified as a command line argument
-  "plugins": ["react", "@typescript-eslint", "react-hooks", "prettier"],
+  "plugins": ["react", "@typescript-eslint", "react-hooks", "prettier", "jest"],
   "rules": {
     "react/react-in-jsx-scope": "off",
     "spaced-comment": "error",
@@ -40,6 +42,7 @@
     "no-duplicate-imports": "error",
     "react-hooks/rules-of-hooks": "error",
     "react-hooks/exhaustive-deps": "error",
+    "jest/no-identical-title": "error",
 
     // Other rules to warning
     "@typescript-eslint/no-unused-vars": 1,

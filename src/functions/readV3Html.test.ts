@@ -77,6 +77,6 @@ describe("readV3Html tests", () => {
       .trim();
     const result = readV3Html(text, defaultContentProps);
     expect(result.lines.length).toEqual(1);
-    expect(result.lines[0].textBlocks).toEqual([textBlockFactory("@Hello world")]);
+    expect(result.lines[0].textBlocks).toMatchSnapshot();
   });
 });

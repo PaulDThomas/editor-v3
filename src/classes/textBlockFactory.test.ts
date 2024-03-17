@@ -113,10 +113,12 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     });
 
     expect(testBlock.data).toEqual({ text: "@Hello", type: "at" });
-    expect(textBlockFactory(testBlock.data)).toEqual(testBlock);
+    expect(textBlockFactory(testBlock).data).toEqual(testBlock.data);
+    expect(textBlockFactory(testBlock)).toMatchSnapshot();
 
     expect(testBlock.jsonString).toEqual('{"text":"@Hello","type":"at"}');
-    expect(textBlockFactory(testBlock.jsonString)).toEqual(testBlock);
+    expect(textBlockFactory(testBlock.jsonString).data).toEqual(testBlock.data);
+    expect(textBlockFactory(testBlock.jsonString)).toMatchSnapshot();
   });
 
   test("Load word with style", async () => {
@@ -135,10 +137,12 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     });
 
     expect(testBlock.data).toEqual({ text: "@Hello", style: "shiny", type: "at" });
-    expect(textBlockFactory(testBlock.data)).toEqual(testBlock);
+    expect(textBlockFactory(testBlock).data).toEqual(testBlock.data);
+    expect(textBlockFactory(testBlock)).toMatchSnapshot();
 
     expect(testBlock.jsonString).toEqual('{"text":"@Hello","style":"shiny","type":"at"}');
-    expect(textBlockFactory(testBlock.jsonString)).toEqual(testBlock);
+    expect(textBlockFactory(testBlock.jsonString).data).toEqual(testBlock.data);
+    expect(textBlockFactory(testBlock.jsonString)).toMatchSnapshot();
   });
 
   test("Load span with style and space", async () => {
@@ -159,5 +163,6 @@ describe("Check at correctly loaded, and eats its own tail", () => {
       '<span class="aiev3-tb at-block editorv3style-shiny is-active" data-type="at" data-style-name="shiny">@Hello world</span>',
     );
     expect(textBlockFactory(testBlock.toHtml({})).data).toEqual(testBlock.data);
+    expect(textBlockFactory(testBlock.toHtml({}))).toMatchSnapshot();
   });
 });

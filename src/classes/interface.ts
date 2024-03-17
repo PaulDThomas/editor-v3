@@ -101,4 +101,5 @@ export interface EditorV3RenderProps {
   editableEl?: HTMLDivElement;
   currentEl?: HTMLDivElement | HTMLSpanElement;
   markdownSettings?: IMarkdownSettings;
+  atListFunction?: (typedString: string) => Promise<string[]>;
 }

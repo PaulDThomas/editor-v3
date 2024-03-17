@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`readV3Html tests Read in at block 1`] = `
+[
+  EditorV3AtBlock {
+    "_defaultContentProps": {
+      "allowMarkdown": false,
+      "allowNewLine": false,
+      "decimalAlignPercent": 60,
+      "markdownSettings": {
+        "atEndTag": "@]",
+        "atStartTag": "@[",
+        "calcAndSeparator": "&&",
+        "calcConditionSeparator": "||",
+        "calcEndTag": "]!]",
+        "calcNameEndTag": "::",
+        "calcStartTag": "[![",
+        "defaultStyle": "defaultStyle",
+        "dropDownEndTag": "]]",
+        "dropDownNameEndTag": "::",
+        "dropDownSelectedValueTag": "**",
+        "dropDownStartTag": "[[",
+        "dropDownValueSeparator": "||",
+        "styleEndTag": ">>",
+        "styleNameEndTag": "::",
+        "styleStartTag": "<<",
+      },
+      "showMarkdown": false,
+      "styles": undefined,
+      "textAlignment": "left",
+    },
+    "atListFunction": [Function],
+    "isActive": false,
+    "isLocked": undefined,
+    "lineStartPosition": 0,
+    "maxAtListLength": 10,
+    "style": undefined,
+    "text": "@Hello world",
+    "type": "at",
+  },
+]
+`;
