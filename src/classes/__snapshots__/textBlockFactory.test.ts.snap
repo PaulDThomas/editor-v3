@@ -5,6 +5,7 @@ EditorV3AtBlock {
   "_defaultContentProps": {
     "allowMarkdown": false,
     "allowNewLine": false,
+    "atListFunction": undefined,
     "decimalAlignPercent": 60,
     "markdownSettings": {
       "atEndTag": "@]",
@@ -44,6 +45,7 @@ EditorV3AtBlock {
   "_defaultContentProps": {
     "allowMarkdown": false,
     "allowNewLine": false,
+    "atListFunction": undefined,
     "decimalAlignPercent": 60,
     "markdownSettings": {
       "atEndTag": "@]",
@@ -83,6 +85,7 @@ EditorV3AtBlock {
   "_defaultContentProps": {
     "allowMarkdown": false,
     "allowNewLine": false,
+    "atListFunction": undefined,
     "decimalAlignPercent": 60,
     "markdownSettings": {
       "atEndTag": "@]",
@@ -122,6 +125,7 @@ EditorV3AtBlock {
   "_defaultContentProps": {
     "allowMarkdown": false,
     "allowNewLine": false,
+    "atListFunction": undefined,
     "decimalAlignPercent": 60,
     "markdownSettings": {
       "atEndTag": "@]",
@@ -161,6 +165,7 @@ EditorV3AtBlock {
   "_defaultContentProps": {
     "allowMarkdown": false,
     "allowNewLine": false,
+    "atListFunction": undefined,
     "decimalAlignPercent": 60,
     "markdownSettings": {
       "atEndTag": "@]",

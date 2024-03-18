@@ -26,6 +26,7 @@ interface EditorV3Props {
   allowMarkdown?: boolean;
   markdownSettings?: IMarkdownSettings;
   debounceMilliseconds?: number | null;
+  atListFunction?: (at: string) => Promise<string[]>;
 }
 
 export const EditorV3 = ({
@@ -46,6 +47,7 @@ export const EditorV3 = ({
   spellCheck = false,
   styleOnContextMenu = true,
   debounceMilliseconds = null,
+  atListFunction,
   ...rest
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
@@ -72,6 +74,7 @@ export const EditorV3 = ({
       markdownSettings,
       showMarkdown,
       textAlignment,
+      atListFunction,
     };
   }, [
     allowMarkdown,
@@ -81,6 +84,7 @@ export const EditorV3 = ({
     markdownSettings,
     showMarkdown,
     textAlignment,
+    atListFunction,
   ]);
 
   // General return function

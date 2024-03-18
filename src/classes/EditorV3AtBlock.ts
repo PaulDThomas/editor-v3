@@ -13,7 +13,8 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
    * @param typedString Text entered into the block so far
    * @returns Promise of array of strings
    */
-  public atListFunction: (typedString: string) => Promise<string[]> = () => new Promise(() => []);
+  public atListFunction: (typedString: string) => Promise<string[]> = () =>
+    new Promise((resolve) => resolve([]));
   /**
    * Maximum number of items to display in the returned list
    */

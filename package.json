@@ -54,6 +54,15 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
   },
+  "staticFiles": [
+    {
+      "staticPath": "demo/public/static",
+      "staticOutPath": "public",
+      "env": {
+        "NODE_ENV": "development"
+      }
+    }
+  ],
   "devDependencies": {
     "@parcel/packager-raw-url": "^2.7.0",
     "@parcel/packager-ts": "^2.8.3",
@@ -82,6 +91,7 @@
     "jest-watch-typeahead": "^2.2.2",
     "lint-staged": "^15.1.0",
     "parcel": "^2.7.0",
+    "parcel-reporter-static-files-copy": "^1.5.3",
     "postcss": "^8.4.18",
     "prettier": "^3.0.3",
     "process": "^0.11.10",

@@ -9,4 +9,5 @@ export const defaultContentProps: EditorV3ContentProps = {
   showMarkdown: false,
   styles: undefined,
   textAlignment: EditorV3Align.left,
+  atListFunction: undefined,
 };

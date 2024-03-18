@@ -91,6 +91,10 @@ export class EditorV3Content implements EditorV3Import {
   set showMarkdown(newShow: boolean) {
     this._showMarkdown = newShow;
   }
+  public _atListFunction: ((search: string) => Promise<string[]>) | undefined;
+  get atListFunction() {
+    return this._atListFunction;
+  }
 
   /**
    * Current lines in the editor
@@ -164,23 +168,8 @@ export class EditorV3Content implements EditorV3Import {
       showMarkdown: this._showMarkdown,
       markdownSettings: this._markdownSettings,
       allowMarkdown: this._allowMarkdown,
+      atListFunction: this.atListFunction,
     };
-  }
-
-  /**
-   * Create a new EditorV3Content instance for this object
-   * @returns HTMLDivElement with content properties
-   */
-  private _contentPropsNode(): HTMLDivElement {
-    const cpn = document.createElement("div");
-    cpn.className = "aiev3-contents-info";
-    Object.keys(defaultContentProps).forEach((k) => {
-      const key = k as keyof typeof defaultContentProps;
-      if (!isEqual(this[key], this._defaultContentProps[key])) {
-        cpn.dataset[key] = JSON.stringify(this[key]);
-      }
-    });
-    return cpn;
   }
 
   /**
@@ -190,6 +179,9 @@ export class EditorV3Content implements EditorV3Import {
     const contentProps = cloneDeep(this.contentProps);
     Object.keys(defaultContentProps).forEach((k) => {
       const key = k as keyof typeof defaultContentProps;
+      if (typeof this[key] === "function") {
+        delete contentProps[key];
+      }
       if (isEqual(this[key], this._defaultContentProps[key])) {
         delete contentProps[key];
       }
@@ -198,6 +190,22 @@ export class EditorV3Content implements EditorV3Import {
       textBlocks: l.textBlocks.map((tb) => tb.data),
     }));
     return Object.keys(contentProps).length === 0 ? { lines } : { contentProps, lines };
+  }
+
+  /**
+   * Create a new EditorV3Content instance for this object
+   * @returns HTMLDivElement with content properties
+   */
+  private _contentPropsNode(): HTMLDivElement {
+    const cpn = document.createElement("div");
+    cpn.className = "aiev3-contents-info";
+    Object.keys(this.data.contentProps ?? {})
+      .sort((a, b) => a.localeCompare(b))
+      .forEach((k) => {
+        const key = k as keyof typeof defaultContentProps;
+        cpn.dataset[key] = JSON.stringify(this[key]);
+      });
+    return cpn;
   }
 
   /**
@@ -270,6 +278,7 @@ export class EditorV3Content implements EditorV3Import {
     this._styles = props?.styles ?? this._defaultContentProps.styles;
     this._textAlignment =
       props?.textAlignment ?? (this._defaultContentProps.textAlignment as EditorV3Align);
+    this._atListFunction = props?.atListFunction;
     this.lines = [];
 
     // Process incoming data
@@ -574,7 +583,7 @@ export class EditorV3Content implements EditorV3Import {
     if (this._showMarkdown) {
       this.toMarkdownHtml({ editableEl, markdownSettings: this._markdownSettings });
     } else {
-      this.toHtml({ editableEl });
+      this.toHtml({ editableEl, atListFunction: this._atListFunction });
     }
     // Update height and styles after render
     [...editableEl.querySelectorAll(".aiev3-line")].forEach((line) => {

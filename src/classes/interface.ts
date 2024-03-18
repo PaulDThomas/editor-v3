@@ -48,6 +48,7 @@ export interface EditorV3ContentProps {
   showMarkdown: boolean;
   styles?: EditorV3Styles;
   textAlignment: EditorV3Align;
+  atListFunction?: (typedString: string) => Promise<string[]>;
 }
 export interface EditorV3ContentPropsInput {
   allowMarkdown?: boolean;
@@ -57,6 +58,7 @@ export interface EditorV3ContentPropsInput {
   showMarkdown?: boolean;
   styles?: EditorV3Styles;
   textAlignment?: EditorV3Align;
+  atListFunction?: (typedString: string) => Promise<string[]>;
 }
 
 /**

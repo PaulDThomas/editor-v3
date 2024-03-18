@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { EditorV3, EditorV3Align, EditorV3Styles } from "../../src/main";
+import { loadAvailableItems } from "./loadAvailableItems";
 
 export const App = (): JSX.Element => {
   // First input content
@@ -62,14 +63,6 @@ export const App = (): JSX.Element => {
     blue: { color: "blue", fontWeight: 700 },
   };
 
-  const atList = [
-    "@hello",
-    "@world",
-    ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i).repeat(2)).map(
-      (letter) => `@${letter}${letter}`,
-    ),
-  ];
-
   return (
     <div className="app-holder">
       <div className="app-border">
@@ -94,7 +87,7 @@ export const App = (): JSX.Element => {
                   height: "100px",
                 }}
                 spellCheck={false}
-                // atList={atList}
+                atListFunction={loadAvailableItems}
               />
             </span>
             <span>

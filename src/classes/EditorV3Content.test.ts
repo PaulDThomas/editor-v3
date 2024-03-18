@@ -1,4 +1,3 @@
-/* eslint-disable quotes */
 import { EditorV3Content } from "./EditorV3Content";
 import { defaultContentProps } from "./defaultContentProps";
 import { EditorV3Line } from "./EditorV3Line";
@@ -11,10 +10,7 @@ describe("Check basic EditorV3Content", () => {
     expect(testContent.text).toEqual("12.34");
     const div = document.createElement("div");
     div.append(testContent.toHtml({}));
-    expect(div.innerHTML).toEqual(
-      '<div class="aiev3-line left"><span class="aiev3-tb">12.34</span></div>' +
-        '<div class="aiev3-contents-info"></div>',
-    );
+    expect(div.innerHTML).toMatchSnapshot();
     expect(testContent.decimalAlignPercent).toEqual(60);
     expect(testContent.textAlignment).toEqual("left");
     testContent.textAlignment = EditorV3Align.decimal;
@@ -63,12 +59,7 @@ describe("Check basic EditorV3Content", () => {
     });
     const div = document.createElement("div");
     div.append(testContent.toHtml({}));
-    expect(div.innerHTML).toEqual(
-      '<div class="aiev3-line center">' +
-        '<span class="aiev3-tb">34.56</span>' +
-        "</div>" +
-        '<div class="aiev3-contents-info" data-decimal-align-percent="80" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}" data-text-alignment="&quot;center&quot;"></div>',
-    );
+    expect(div.innerHTML).toMatchSnapshot();
 
     // Check self equivalence
     const read1 = new EditorV3Content(testContent.jsonString);
@@ -100,11 +91,7 @@ describe("Check basic EditorV3Content", () => {
     });
     const div = document.createElement("div");
     div.append(testContent.toHtml({}));
-    expect(div.innerHTML).toEqual(
-      '<div class="aiev3-line left"><span class="aiev3-tb">Hello</span></div>' +
-        '<div class="aiev3-line left"><span class="aiev3-tb">.World</span></div>' +
-        '<div class="aiev3-contents-info"></div>',
-    );
+    expect(div.innerHTML).toMatchSnapshot();
 
     // Updates need to flow through
     testContent.decimalAlignPercent = 55;
@@ -128,17 +115,7 @@ describe("Check basic EditorV3Content", () => {
     });
     div.innerHTML = "";
     div.appendChild(testContent.toHtml({}));
-    expect(div.innerHTML).toEqual(
-      '<div class="aiev3-line decimal" style="grid-template-columns: 55% 45%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">Hello</span></span>' +
-        '<span class="aiev3-span-point rhs">\u2009</span>' +
-        "</div>" +
-        '<div class="aiev3-line decimal" style="grid-template-columns: 55% 45%;">' +
-        '<span class="aiev3-span-point lhs">\u2009</span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">.World</span></span>' +
-        "</div>" +
-        '<div class="aiev3-contents-info" data-decimal-align-percent="55" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}" data-text-alignment="&quot;decimal&quot;"></div>',
-    );
+    expect(div.innerHTML).toMatchSnapshot();
     expect(new EditorV3Content(div.innerHTML).data).toEqual(testContent.data);
     expect(new EditorV3Content(testContent.jsonString).data).toEqual(testContent.data);
   });
@@ -465,12 +442,7 @@ describe("Render markdown text from content", () => {
     const result = testContent.toMarkdownHtml({});
     const div = document.createElement("div");
     div.append(result);
-    expect(div.innerHTML).toEqual(
-      `<div class="aiev3-markdown-line">1&lt;&lt;shiny::23&gt;&gt;</div>` +
-        `<div class="aiev3-markdown-line">&lt;&lt;shiny::456&gt;&gt;</div>` +
-        `<div class="aiev3-markdown-line">&lt;&lt;shiny::7&gt;&gt;89</div>` +
-        `<div class="aiev3-contents-info" data-allow-markdown="true" data-allow-new-line="true" data-decimal-align-percent="80" data-show-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}" data-text-alignment="&quot;center&quot;"></div>`,
-    );
+    expect(div.innerHTML).toMatchSnapshot();
     // Eat your own tail
     const readDiv = new EditorV3Content(div.innerHTML);
     expect(readDiv.data).toEqual(testContent.data);
@@ -482,8 +454,11 @@ describe("Render markdown text from content", () => {
 describe("Render html text from v2 content", () => {
   test("Load multiple v2 lines", async () => {
     const textString =
+      // eslint-disable-next-line quotes
       `<div classname="aie-text" data-key="2v9v5" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":1,"style":"Notes"},{"offset":4,"length":1,"style":"Notes"},{"offset":1,"length":3,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">N</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  w</div>` +
+      // eslint-disable-next-line quotes
       `<div classname="aie-text" data-key="1u61b" data-type="unstyled" data-inline-style-ranges='[]'></div>` +
+      // eslint-disable-next-line quotes
       `<div classname="aie-text" data-key="4l4fu" data-type="unstyled" data-inline-style-ranges='[]'>ork</div>`;
     const result = new EditorV3Content(textString);
     expect(result.lines.length).toEqual(3);
@@ -532,12 +507,7 @@ describe("Splice markdown tests", () => {
     testContent.showMarkdown = false;
     const div = document.createElement("div");
     div.append(testContent.toMarkdownHtml({}));
-    expect(div.innerHTML).toEqual(
-      '<div class="aiev3-markdown-line">123</div>' +
-        '<div class="aiev3-markdown-line">456</div>' +
-        '<div class="aiev3-markdown-line">789</div>' +
-        '<div class="aiev3-contents-info" data-allow-markdown="true" data-show-markdown="true"></div>',
-    );
+    expect(div.innerHTML).toMatchSnapshot();
     expect(testContent.showMarkdown).toEqual(false);
   });
   test("Easy insert", async () => {
@@ -623,6 +593,7 @@ describe("Splice markdown tests", () => {
     );
     expect(testContent.toMarkdownHtml({}).textContent).toEqual("<<shiny::34.56>>");
     const pasteContent = new EditorV3Line(
+      // eslint-disable-next-line quotes
       `{"textBlocks":[{"text":"abc","style":"dull"}]}`,
       contentProps,
     );

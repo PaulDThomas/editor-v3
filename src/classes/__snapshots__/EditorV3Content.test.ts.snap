@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Check basic EditorV3Content Load basic string, test getters and setters 1`] = `"<div class="aiev3-line left"><span class="aiev3-tb">12.34</span></div><div class="aiev3-contents-info"></div>"`;
+
+exports[`Check basic EditorV3Content Load multiline string 1`] = `"<div class="aiev3-line left"><span class="aiev3-tb">Hello</span></div><div class="aiev3-line left"><span class="aiev3-tb">.World</span></div><div class="aiev3-contents-info"></div>"`;
+
+exports[`Check basic EditorV3Content Load multiline string 2`] = `"<div class="aiev3-line decimal" style="grid-template-columns: 55% 45%;"><span class="aiev3-span-point lhs"><span class="aiev3-tb">Hello</span></span><span class="aiev3-span-point rhs"> </span></div><div class="aiev3-line decimal" style="grid-template-columns: 55% 45%;"><span class="aiev3-span-point lhs"> </span><span class="aiev3-span-point rhs"><span class="aiev3-tb">.World</span></span></div><div class="aiev3-contents-info" data-decimal-align-percent="55" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}" data-text-alignment="&quot;decimal&quot;"></div>"`;
+
+exports[`Check basic EditorV3Content Load string with style info 1`] = `"<div class="aiev3-line center"><span class="aiev3-tb">34.56</span></div><div class="aiev3-contents-info" data-decimal-align-percent="80" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}" data-text-alignment="&quot;center&quot;"></div>"`;
+
+exports[`Render markdown text from content Render markdown text 1`] = `"<div class="aiev3-markdown-line">1&lt;&lt;shiny::23&gt;&gt;</div><div class="aiev3-markdown-line">&lt;&lt;shiny::456&gt;&gt;</div><div class="aiev3-markdown-line">&lt;&lt;shiny::7&gt;&gt;89</div><div class="aiev3-contents-info" data-allow-markdown="true" data-allow-new-line="true" data-decimal-align-percent="80" data-show-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}" data-text-alignment="&quot;center&quot;"></div>"`;
+
+exports[`Splice markdown tests Bad position return empty array 1`] = `"<div class="aiev3-markdown-line">123</div><div class="aiev3-markdown-line">456</div><div class="aiev3-markdown-line">789</div><div class="aiev3-contents-info" data-allow-markdown="true" data-show-markdown="true"></div>"`;
