@@ -75,7 +75,6 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
       span.classList.add("is-active");
 
       // Add in dropdown
-      let renderTimeout: NodeJS.Timeout | null = null;
       const renderDropdown = () => {
         // Double check class list
         if (!span.classList.contains("is-locked")) {
@@ -168,9 +167,11 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
             });
         }
       };
+
       // Throttle render
+      let renderTimeout: number | null = null;
       if (!renderTimeout) {
-        renderTimeout = setTimeout(renderDropdown, 100);
+        renderTimeout = window.setTimeout(renderDropdown, 100);
       }
     }
     if (renderProps.currentEl) renderProps.currentEl.append(ret);
