@@ -3,7 +3,13 @@ import { cloneDeep, isEqual } from "lodash";
 import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EditorV3Content } from "../classes/EditorV3Content";
 import { defaultContentProps } from "../classes/defaultContentProps";
-import { EditorV3Align, EditorV3Position, EditorV3Styles } from "../classes/interface";
+import {
+  EditorV3Align,
+  EditorV3AtListItem,
+  EditorV3ContentPropsInput,
+  EditorV3Position,
+  EditorV3Styles,
+} from "../classes/interface";
 import { IMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 import { useDebounceStack } from "../hooks/useDebounceStack";
 import "./EditorV3.css";
@@ -26,7 +32,7 @@ interface EditorV3Props {
   allowMarkdown?: boolean;
   markdownSettings?: IMarkdownSettings;
   debounceMilliseconds?: number | null;
-  atListFunction?: (at: string) => Promise<string[]>;
+  atListFunction?: (at: string) => Promise<EditorV3AtListItem<unknown>[]>;
 }
 
 export const EditorV3 = ({
@@ -65,7 +71,7 @@ export const EditorV3 = ({
     }),
   );
 
-  const contentProps = useMemo(() => {
+  const contentProps = useMemo((): EditorV3ContentPropsInput => {
     return {
       allowMarkdown,
       allowNewLine,

@@ -838,8 +838,8 @@ describe("Add at block and escape out", () => {
           }}
           setText={mockSetText}
           atListFunction={async (typedString: string) => {
-            const atList = ["@Hello", "@Lovely", "@People"];
-            return atList.filter((at) => at.toLowerCase().includes(typedString.toLowerCase()));
+            const atList = [{ text: "@Hello" }, { text: "@Lovely" }, { text: "@People" }];
+            return atList.filter((at) => at.text.toLowerCase().includes(typedString.toLowerCase()));
           }}
         />
       );

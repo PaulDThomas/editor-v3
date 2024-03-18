@@ -26,6 +26,12 @@ export interface EditorV3LineProps {
   textBlocks: EditorV3TextBlock[];
 }
 
+export interface EditorV3AtListItem<T> {
+  text: string;
+  data?: T;
+  listRender?: HTMLLIElement;
+}
+
 /**
  * Text block class objects EditorV3
  */
@@ -48,7 +54,7 @@ export interface EditorV3ContentProps {
   showMarkdown: boolean;
   styles?: EditorV3Styles;
   textAlignment: EditorV3Align;
-  atListFunction?: (typedString: string) => Promise<string[]>;
+  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<unknown>[]>;
 }
 export interface EditorV3ContentPropsInput {
   allowMarkdown?: boolean;
@@ -58,7 +64,7 @@ export interface EditorV3ContentPropsInput {
   showMarkdown?: boolean;
   styles?: EditorV3Styles;
   textAlignment?: EditorV3Align;
-  atListFunction?: (typedString: string) => Promise<string[]>;
+  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<unknown>[]>;
 }
 
 /**
@@ -103,5 +109,5 @@ export interface EditorV3RenderProps {
   editableEl?: HTMLDivElement;
   currentEl?: HTMLDivElement | HTMLSpanElement;
   markdownSettings?: IMarkdownSettings;
-  atListFunction?: (typedString: string) => Promise<string[]>;
+  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<unknown>[]>;
 }

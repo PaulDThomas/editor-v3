@@ -1,5 +1,7 @@
 import { fireEvent } from "@testing-library/dom";
 import { EditorV3AtBlock } from "./EditorV3AtBlock";
+import { EditorV3AtListItem } from "./interface";
+import { act } from "react-dom/test-utils";
 
 describe("EditorV3AtBlock", () => {
   test("should return a DocumentFragment with the correct structure and attributes", () => {
@@ -64,30 +66,32 @@ describe("EditorV3AtBlock", () => {
 
 describe("should return a DocumentFragment with a dropdown", () => {
   const atListFunction = (typedString: string) =>
-    new Promise<string[]>((resolve) => {
+    new Promise<EditorV3AtListItem<undefined>[]>((resolve) => {
       const available = [
-        "@one",
-        "@two",
-        "@three",
-        "@four",
-        "@five",
-        "@six",
-        "@seven",
-        "@eight",
-        "@nine",
-        "@ten",
-        "@eleven",
-        "@twelve",
-        "@thirteen",
-        "@fourteen",
-        "@fifteen",
-        "@sixteen",
-        "@seventeen",
-        "@eighteen",
-        "@nineteen",
-        "@twenty",
+        { text: "@one" },
+        { text: "@two" },
+        { text: "@three" },
+        { text: "@four" },
+        { text: "@five" },
+        { text: "@six" },
+        { text: "@seven" },
+        { text: "@eight" },
+        { text: "@nine" },
+        { text: "@ten" },
+        { text: "@eleven" },
+        { text: "@twelve" },
+        { text: "@thirteen" },
+        { text: "@fourteen" },
+        { text: "@fifteen" },
+        { text: "@sixteen" },
+        { text: "@seventeen" },
+        { text: "@eighteen" },
+        { text: "@nineteen" },
+        { text: "@twenty" },
       ];
-      resolve(available.filter((item) => item.includes(typedString)));
+      resolve(
+        available.filter((item) => item.text.toLowerCase().includes(typedString.toLowerCase())),
+      );
     });
 
   beforeEach(() => {
@@ -166,5 +170,28 @@ describe("should return a DocumentFragment with a dropdown", () => {
       "true",
     );
     expect(div.innerHTML).toMatchSnapshot();
+  });
+
+  test("Render error in list", async () => {
+    const text = "@some error";
+    const errorCall = jest.fn().mockRejectedValue(new Error("A bad thing happened"));
+    const block = new EditorV3AtBlock({
+      text,
+      atListFunction: errorCall,
+    });
+    block.setActive(true);
+    const div = document.createElement("div");
+    await act(async () => {
+      block.toHtml({ currentEl: div });
+      // Run pending timer from the function to display the dropdown list
+      jest.runAllTimers();
+      expect(div.querySelector(".aiev3-at-dropdown")).not.toBeNull();
+      expect(div.querySelector(".aiev3-at-dropdown")!.textContent).toEqual("Loading...");
+      // Resolve the promise in errorCall
+      expect(errorCall).toHaveBeenCalled();
+    });
+    console.log("div.innerHTML", div.innerHTML);
+    expect(div.querySelector(".aiev3-at-dropdown")).not.toBeNull();
+    expect(div.querySelector(".aiev3-at-dropdown")!.textContent).toEqual("Error fetching list");
   });
 });

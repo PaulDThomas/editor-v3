@@ -1,9 +1,9 @@
 import "./EditorV3AtBlock.css";
 import { EditorV3TextBlock, IEditorV3TextBlock } from "./EditorV3TextBlock";
-import { EditorV3RenderProps, EditorV3WordPosition } from "./interface";
+import { EditorV3AtListItem, EditorV3RenderProps, EditorV3WordPosition } from "./interface";
 
 export interface IEditorV3AtBlock extends IEditorV3TextBlock {
-  atListFunction?: (typedString: string) => Promise<string[]>;
+  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<unknown>[]>;
   maxAtListLength?: number;
 }
 
@@ -13,7 +13,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
    * @param typedString Text entered into the block so far
    * @returns Promise of array of strings
    */
-  public atListFunction: (typedString: string) => Promise<string[]> = () =>
+  public atListFunction: (typedString: string) => Promise<EditorV3AtListItem<unknown>[]> = () =>
     new Promise((resolve) => resolve([]));
   /**
    * Maximum number of items to display in the returned list
@@ -130,37 +130,38 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
 
           // Add items to dropdown when promise resolves
           const atFunction = renderProps.atListFunction ?? this.atListFunction;
-          atFunction(this.text).then((resolvedAtList) => {
-            dropdownDiv.innerHTML = "";
-            if (resolvedAtList.length === 0) {
-              const noItems = document.createElement("li");
-              noItems.classList.add("aiev3-at-no-items");
-              noItems.textContent = "No items found";
-              dropdownDiv.appendChild(noItems);
-            } else {
-              resolvedAtList.slice(0, this.maxAtListLength).forEach((atItem) => {
-                const atSpan = document.createElement("li");
-                atSpan.classList.add("aiev3-at-item");
-                atSpan.textContent = atItem;
-                atSpan.dataset.handler = "at-dropdown-list";
-                dropdownDiv.appendChild(atSpan);
-              });
-              if (resolvedAtList.length >= this.maxAtListLength) {
-                const atSpan = document.createElement("li");
-                atSpan.classList.add("aiev3-more-items");
-                atSpan.textContent = `...${resolvedAtList.length - this.maxAtListLength} more`;
-                dropdownDiv.appendChild(atSpan);
+          atFunction(this.text)
+            .then((resolvedAtList) => {
+              dropdownDiv.innerHTML = "";
+              if (resolvedAtList.length === 0) {
+                const noItems = document.createElement("li");
+                noItems.classList.add("aiev3-at-no-items");
+                noItems.textContent = "No items found";
+                dropdownDiv.appendChild(noItems);
+              } else {
+                resolvedAtList.slice(0, this.maxAtListLength).forEach((atItem) => {
+                  const atSpan = document.createElement("li");
+                  atSpan.classList.add("aiev3-at-item");
+                  atSpan.textContent = atItem.text;
+                  atSpan.dataset.handler = "at-dropdown-list";
+                  dropdownDiv.appendChild(atSpan);
+                });
+                if (resolvedAtList.length >= this.maxAtListLength) {
+                  const atSpan = document.createElement("li");
+                  atSpan.classList.add("aiev3-more-items");
+                  atSpan.textContent = `...${resolvedAtList.length - this.maxAtListLength} more`;
+                  dropdownDiv.appendChild(atSpan);
+                }
               }
-            }
-          });
-          // .catch(() => {
-          //   // dropdownDiv.innerHTML = "<li>Error fetching list</li>";
-          //   dropdownDiv.innerHTML = "";
-          //   const errorItem = document.createElement("li");
-          //   errorItem.classList.add("aiev3-at-items-error");
-          //   errorItem.textContent = "Error fetching list";
-          //   dropdownDiv.appendChild(errorItem);
-          // });
+            })
+            .catch(() => {
+              dropdownDiv.innerHTML = "";
+              const errorItem = document.createElement("li");
+              errorItem.classList.add("aiev3-at-items-error");
+              errorItem.textContent = "Error fetching list";
+              errorItem.style.color = "red";
+              dropdownDiv.appendChild(errorItem);
+            });
         }
       };
       // Throttle render

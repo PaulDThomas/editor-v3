@@ -8,6 +8,7 @@ import { EditorV3PositionClass } from "./EditorV3Position";
 import { defaultContentProps } from "./defaultContentProps";
 import {
   EditorV3Align,
+  EditorV3AtListItem,
   EditorV3BlockClass,
   EditorV3ContentProps,
   EditorV3ContentPropsInput,
@@ -91,7 +92,9 @@ export class EditorV3Content implements EditorV3Import {
   set showMarkdown(newShow: boolean) {
     this._showMarkdown = newShow;
   }
-  public _atListFunction: ((search: string) => Promise<string[]>) | undefined;
+  public _atListFunction:
+    | ((typedString: string) => Promise<EditorV3AtListItem<unknown>[]>)
+    | undefined;
   get atListFunction() {
     return this._atListFunction;
   }
