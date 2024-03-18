@@ -135,9 +135,9 @@ export class EditorV3Content implements EditorV3Import {
       this._caretPosition = null;
     }
   }
-  private _isCaretLocked(pos = this._caretPosition) {
+  public isCaretLocked(pos = this._caretPosition) {
     let ret = false;
-    if (pos) {
+    if (pos && pos.startLine >= 0 && pos.endLine < this.lines.length) {
       const startBlock = this.lines[pos.startLine].getBlockAt(pos.startChar);
       const endBlock = this.lines[pos.endLine].getBlockAt(pos.endChar);
       ret = (startBlock && startBlock.isLocked) || (endBlock && endBlock.isLocked) || false;
@@ -148,7 +148,6 @@ export class EditorV3Content implements EditorV3Import {
     return this.lines.some((l) => l.textBlocks.some((tb) => tb.type === "at" && !tb.isLocked));
   }
 
-  // Read only attributes
   /**
    * Text from the element
    */
@@ -736,7 +735,7 @@ export class EditorV3Content implements EditorV3Import {
         toClipboard.map((l) => applyStylesToHTML(l.toHtml({}), this.styles).outerHTML).join(""),
       );
       e.clipboardData.setData("data/aiev3", JSON.stringify(toClipboard.map((l) => l.data)));
-      if (e.type === "cut" && !this._isCaretLocked()) {
+      if (e.type === "cut" && !this.isCaretLocked()) {
         this.splice(this._caretPosition);
       }
     }
@@ -750,7 +749,7 @@ export class EditorV3Content implements EditorV3Import {
     e.preventDefault();
     e.stopPropagation();
     // Check cursor is present, and is does not contain a locked block
-    if (this._caretPosition && !this._isCaretLocked()) {
+    if (this._caretPosition && !this.isCaretLocked()) {
       // Get clipboard data
       const lines: EditorV3Line[] = [];
       const linesImport = (

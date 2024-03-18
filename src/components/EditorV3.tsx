@@ -185,7 +185,7 @@ export const EditorV3 = ({
             ? Object.keys(content.styles ?? {}).map((s) => {
                 return {
                   label: s,
-                  disabled: content.showMarkdown,
+                  disabled: content.showMarkdown || content.isCaretLocked(),
                   action: () => {
                     if (divRef.current) {
                       const newContent = new EditorV3Content(divRef.current, contentProps);
@@ -198,7 +198,7 @@ export const EditorV3 = ({
             : [{ label: "No styles defined", disabled: true }]),
           {
             label: "Remove style",
-            disabled: content.showMarkdown,
+            disabled: content.showMarkdown || content.isCaretLocked(),
             action: () => {
               if (divRef.current) {
                 const newContent = new EditorV3Content(divRef.current, contentProps);
