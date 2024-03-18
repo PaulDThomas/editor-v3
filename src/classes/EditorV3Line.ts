@@ -366,7 +366,10 @@ export class EditorV3Line {
     if (startPos < endPos) {
       this.textBlocks = [
         ...this.upToPos(startPos),
-        textBlockFactory(this.lineText.substring(startPos, endPos), styleName),
+        ...this.subBlocks(startPos, endPos).map((tb) => {
+          tb.style = styleName;
+          return tb;
+        }),
         ...this.fromPos(endPos),
       ];
       this._mergeBlocks();
@@ -384,7 +387,10 @@ export class EditorV3Line {
     if (startPos < endPos) {
       this.textBlocks = [
         ...this.upToPos(startPos),
-        textBlockFactory(this.lineText.substring(startPos, endPos)),
+        ...this.subBlocks(startPos, endPos).map((tb) => {
+          tb.style = undefined;
+          return tb;
+        }),
         ...this.fromPos(endPos),
       ];
       this._mergeBlocks();

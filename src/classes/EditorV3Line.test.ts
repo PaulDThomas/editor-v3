@@ -653,3 +653,30 @@ describe("Get word boundaries", () => {
     ]);
   });
 });
+
+describe("Don't destroy at block!", () => {
+  test("At block preserved", async () => {
+    const line = new EditorV3Line([
+      new EditorV3TextBlock({ text: "Who is " }),
+      new EditorV3AtBlock({ text: "@Jackie", isLocked: true }),
+      new EditorV3TextBlock({ text: ", and what is she doing there?" }),
+    ]);
+    expect(line.data).toEqual({
+      textBlocks: [
+        { text: "Who is ", type: "text" },
+        { text: "@Jackie", type: "at", isLocked: true },
+        { text: ", and what is she doing there?", type: "text" },
+      ],
+    });
+    expect(line.lineText).toEqual("Who is @Jackie, and what is she doing there?");
+    // Apply style
+    line.applyStyle("red", 0, line.lineLength);
+    expect(line.data).toEqual({
+      textBlocks: [
+        { text: "Who is ", type: "text", style: "red" },
+        { text: "@Jackie", type: "at", isLocked: true, style: "red" },
+        { text: ", and what is she doing there?", type: "text", style: "red" },
+      ],
+    });
+  });
+});
