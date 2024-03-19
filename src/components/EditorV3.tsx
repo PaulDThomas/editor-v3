@@ -101,27 +101,30 @@ export const EditorV3 = ({
   const [lastJsonSent, setLastJsonSent] = useState<string>(input);
   const returnData = useCallback(
     (ret: EditorV3Content) => {
-      // Save caret position
-      setLastCaretPosition(ret.caretPosition);
-      // Redraw dummy for information
-      const dummyNode = document.createElement("div");
-      ret.redraw(dummyNode, false);
-      const text = ret.text;
-      if (setText && text !== lastTextSent) {
-        setText(text);
-        setLastTextSent(text);
+      // Block return when there is an active at-block
+      if (!ret.lines.some((l) => l.textBlocks.some((tb) => tb.type === "at" && tb.isActive))) {
+        // Save caret position
+        setLastCaretPosition(ret.caretPosition);
+        // Redraw dummy for information
+        const dummyNode = document.createElement("div");
+        ret.redraw(dummyNode, false);
+        const text = ret.text;
+        if (setText && text !== lastTextSent) {
+          setText(text);
+          setLastTextSent(text);
+        }
+        const html = dummyNode.innerHTML ?? "";
+        if (setHtml && html !== lastHtmlSent) {
+          setHtml(html);
+          setLastHtmlSent(html);
+        }
+        const json = ret.jsonString;
+        if (setJson && json !== lastJsonSent) {
+          setJson(json);
+          setLastJsonSent(json);
+        }
+        dummyNode.remove();
       }
-      const html = dummyNode.innerHTML ?? "";
-      if (setHtml && html !== lastHtmlSent) {
-        setHtml(html);
-        setLastHtmlSent(html);
-      }
-      const json = ret.jsonString;
-      if (setJson && json !== lastJsonSent) {
-        setJson(json);
-        setLastJsonSent(json);
-      }
-      dummyNode.remove();
     },
     [lastHtmlSent, lastJsonSent, lastTextSent, setHtml, setJson, setText],
   );

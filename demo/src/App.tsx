@@ -88,6 +88,7 @@ export const App = (): JSX.Element => {
                 }}
                 spellCheck={false}
                 atListFunction={loadAvailableItems}
+                debounceMilliseconds={1000}
               />
             </span>
             <span>
