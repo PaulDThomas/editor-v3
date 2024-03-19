@@ -4,6 +4,20 @@ import { EditorV3AtListItem } from "./interface";
 import { act } from "react-dom/test-utils";
 
 describe("EditorV3AtBlock", () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    // Define offsetParent for HTMLElement
+    Object.defineProperty(HTMLElement.prototype, "offsetParent", {
+      get() {
+        return this.parentNode;
+      },
+    });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   test("should return a DocumentFragment with the correct structure and attributes", () => {
     const text = "Hello, world!";
     const style = "bold";

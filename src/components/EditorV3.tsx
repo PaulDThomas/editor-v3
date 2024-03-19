@@ -14,7 +14,7 @@ import { IMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 import { useDebounceStack } from "../hooks/useDebounceStack";
 import "./EditorV3.css";
 
-interface EditorV3Props {
+interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   id: string;
   input: string;
   editable?: boolean;
@@ -105,7 +105,7 @@ export const EditorV3 = ({
       setLastCaretPosition(ret.caretPosition);
       // Redraw dummy for information
       const dummyNode = document.createElement("div");
-      ret.redraw(dummyNode);
+      ret.redraw(dummyNode, false);
       const text = ret.text;
       if (setText && text !== lastTextSent) {
         setText(text);
@@ -127,9 +127,13 @@ export const EditorV3 = ({
   );
 
   // Redraw element, used in debounced stack as onChange callback
-  const redrawElement = useCallback((ret: EditorV3Content) => {
-    divRef.current && ret.redraw(divRef.current);
-  }, []);
+  const [inFocus, setInFocus] = useState<boolean>(false);
+  const redrawElement = useCallback(
+    (ret: EditorV3Content) => {
+      divRef.current && ret.redraw(divRef.current, inFocus);
+    },
+    [inFocus],
+  );
   // Create debounce stack
   const {
     currentValue: content,
@@ -232,7 +236,6 @@ export const EditorV3 = ({
 
   // Work out backgroup colour and border
   // Focus and blur events are container not contenteditable level events!
-  const [inFocus, setInFocus] = useState<boolean>(false);
   const handleFocus = useCallback(() => {
     if (divRef.current && content) {
       setInFocus(true);
@@ -250,9 +253,17 @@ export const EditorV3 = ({
     }
   }, [content, contentProps, setContent]);
   const handleBlur = useCallback(() => {
-    setInFocus(false);
+    if (divRef.current && content) {
+      setInFocus(false);
+      // Get current content (this should alreact be correct);
+      const newContent = new EditorV3Content(divRef.current, contentProps);
+      // Select nothing
+      newContent.caretPosition = null;
+      setContent(newContent, "Remove caret on blur");
+      setLastCaretPosition(null);
+    }
     forceReturn();
-  }, [forceReturn]);
+  }, [content, contentProps, forceReturn, setContent]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -359,11 +370,23 @@ export const EditorV3 = ({
   return (
     <div
       {...rest}
-      className={`aiev3${inFocus ? " editing" : ""}`}
+      className={`aiev3${inFocus ? " editing" : ""}${rest.className ? ` ${rest.className}` : ""}`}
       id={id}
-      onFocusCapture={handleFocus}
-      onBlur={handleBlur}
-      onMouseUp={handleMouseUp}
+      onFocusCapture={(e) => {
+        e.preventDefault();
+        rest.onFocusCapture && rest.onFocusCapture(e);
+        rest.onFocus && rest.onFocus(e);
+        handleFocus();
+      }}
+      onBlurCapture={(e) => {
+        rest.onBlurCapture && rest.onBlurCapture(e);
+        handleBlur();
+        rest.onBlur && rest.onBlur(e);
+      }}
+      onMouseUp={(e) => {
+        handleMouseUp();
+        rest.onMouseUp && rest.onMouseUp(e);
+      }}
     >
       <ContextMenuHandler
         menuItems={menuItems}

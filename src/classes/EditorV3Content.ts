@@ -576,7 +576,7 @@ export class EditorV3Content implements EditorV3Import {
    * Update target element with conntent and set caret position
    * @param editableEl DOM element to render inside
    */
-  public redraw(editableEl: HTMLDivElement) {
+  public redraw(editableEl: HTMLDivElement, focus: boolean) {
     // Set active block
     this._caretPosition &&
       this.lines[this._caretPosition.startLine].setActiveBlock(this._caretPosition);
@@ -593,7 +593,10 @@ export class EditorV3Content implements EditorV3Import {
       applyStylesToHTML(line as HTMLDivElement, this._styles);
     });
     // Set caret position
-    this._caretPosition && this._caretPosition && setCaretPosition(editableEl, this._caretPosition);
+    focus &&
+      this._caretPosition &&
+      this._caretPosition &&
+      setCaretPosition(editableEl, this._caretPosition);
   }
 
   /**
