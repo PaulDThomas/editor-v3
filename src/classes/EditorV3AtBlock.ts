@@ -149,7 +149,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
                   atSpan.dataset.text = atItem.text;
                   dropdownUl.appendChild(atSpan);
                 });
-                if (resolvedAtList.length >= this.maxAtListLength) {
+                if (resolvedAtList.length > this.maxAtListLength) {
                   const atSpan = document.createElement("li");
                   atSpan.classList.add("aiev3-more-items");
                   atSpan.textContent = `...${resolvedAtList.length - this.maxAtListLength} more`;

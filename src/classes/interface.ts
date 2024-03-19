@@ -86,6 +86,10 @@ export interface EditorV3Import {
  * Cursor position object for EditorV3
  */
 export interface EditorV3Position {
+  // initialLine: number;
+  // initialChar: number;
+  // focusLine: number;
+  // focusChar: number;
   startLine: number;
   startChar: number;
   endLine: number;

@@ -96,6 +96,7 @@ export const EditorV3 = ({
   // General return function
   const [lastInput, setLastInput] = useState<string>(input);
   const [lastCaretPosition, setLastCaretPosition] = useState<EditorV3Position | null>(null);
+  const [lastAction, setLastAction] = useState<string>("");
   const [lastTextSent, setLastTextSent] = useState<string>(input);
   const [lastHtmlSent, setLastHtmlSent] = useState<string>(input);
   const [lastJsonSent, setLastJsonSent] = useState<string>(input);
@@ -157,6 +158,7 @@ export const EditorV3 = ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (newContent: EditorV3Content, calledFrom: string) => {
       setCurrentValue(newContent);
+      setLastCaretPosition(newContent.caretPosition);
     },
     [setCurrentValue],
   );
@@ -181,11 +183,20 @@ export const EditorV3 = ({
           }
         });
       });
+      if (lastAction !== "Blur") newContent.caretPosition = lastCaretPosition;
       setContent(newContent, "Update input from parent");
-      newContent.caretPosition = lastCaretPosition;
       setLastInput(input);
     }
-  }, [content, contentProps, input, lastCaretPosition, lastInput, redrawElement, setContent]);
+  }, [
+    content,
+    contentProps,
+    input,
+    lastAction,
+    lastCaretPosition,
+    lastInput,
+    redrawElement,
+    setContent,
+  ]);
 
   // Set up menu items
   const menuItems = useMemo((): MenuItem[] => {
@@ -253,6 +264,8 @@ export const EditorV3 = ({
         isCollapsed: false,
       };
       setContent(newContent, "Select all on focus");
+      setLastCaretPosition(newContent.caretPosition);
+      setLastAction("Focus");
     }
   }, [content, contentProps, setContent]);
   const handleBlur = useCallback(() => {
@@ -264,6 +277,7 @@ export const EditorV3 = ({
       newContent.caretPosition = null;
       setContent(newContent, "Remove caret on blur");
       setLastCaretPosition(null);
+      setLastAction("Blur");
     }
     forceReturn();
   }, [content, contentProps, forceReturn, setContent]);
@@ -298,6 +312,7 @@ export const EditorV3 = ({
 
   const handleKeyUp = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
+      setLastAction("Key");
       // Markdown editing should not be handled
       if (divRef.current && content && !content.showMarkdown) {
         // Stop handled keys
