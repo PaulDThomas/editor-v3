@@ -103,6 +103,13 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
               span.classList.add("is-locked");
               span.dataset.isLocked = "true";
               dropdownUl.remove();
+              // Move cursor to end of span
+              const range = document.createRange();
+              const selection = window.getSelection();
+              range.setStartAfter(span);
+              range.collapse(true);
+              selection?.removeAllRanges();
+              selection?.addRange(range);
             }
           });
           // Add event listener to document

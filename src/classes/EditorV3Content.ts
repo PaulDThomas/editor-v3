@@ -606,6 +606,7 @@ export class EditorV3Content implements EditorV3Import {
     // Set active block
     const activeBlock =
       this._caretPosition &&
+      this._caretPosition.endChar < this.lines[this._caretPosition.endLine].lineLength &&
       this.lines[this._caretPosition.focusLine].setActiveBlock(this._caretPosition);
     // If active block is locked select all
     if (activeBlock && activeBlock.isLocked && this._caretPosition) {
