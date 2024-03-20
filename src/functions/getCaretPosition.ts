@@ -1,4 +1,4 @@
-import { EditorV3Position } from "../classes/interface";
+import { EditorV3PositionF } from "../classes/interface";
 
 const getItemPosition = (
   containerEl: HTMLDivElement,
@@ -32,12 +32,11 @@ const getItemPosition = (
  * @param element Editor element to check against
  * @returns Position of the caret
  */
-export function getCaretPosition(element: HTMLDivElement): EditorV3Position | null {
+export function getCaretPosition(element: HTMLDivElement): EditorV3PositionF | null {
   // Check a selection is present
   let range: Range;
   let preCaretRange: Range;
   const sel = window.getSelection();
-  console.log("selection", sel?.anchorNode, sel?.anchorOffset, sel?.focusNode, sel?.focusOffset);
   if (sel && sel.rangeCount > 0) {
     range = sel.getRangeAt(0);
     preCaretRange = range.cloneRange();
@@ -46,27 +45,28 @@ export function getCaretPosition(element: HTMLDivElement): EditorV3Position | nu
   }
 
   /**
-   * Get the start line and character of the caret
+   * Get the anchor line and character of the caret
    */
-  const start = getItemPosition(element, range.startContainer, range.startOffset, preCaretRange);
-  if (!start) return null;
-  const { lineIndex: startLine, charIndex: startChar } = start;
+  const anchor =
+    (sel.anchorNode && getItemPosition(element, sel.anchorNode, sel.anchorOffset, preCaretRange)) ??
+    null;
 
   /**
    * Get the end line and character of the caret
    */
-  const end = getItemPosition(element, range.endContainer, range.endOffset, preCaretRange);
-  if (!end) return null;
-  const { lineIndex: endLine, charIndex: endChar } = end;
+  const focus =
+    (sel.focusNode && getItemPosition(element, sel.focusNode, sel.focusOffset, preCaretRange)) ??
+    null;
 
   /**
    * Return the position
    */
-  return {
-    startLine,
-    startChar,
-    endLine,
-    endChar,
-    isCollapsed: startLine === endLine && startChar === endChar,
-  };
+  return anchor && focus
+    ? {
+        initialLine: anchor.lineIndex,
+        initialChar: anchor.charIndex,
+        focusLine: focus.lineIndex,
+        focusChar: focus.charIndex,
+      }
+    : null;
 }

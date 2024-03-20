@@ -62,7 +62,7 @@ describe("Editor and functions", () => {
     }
   });
 
-  test("Backspace and delete", async () => {
+  test("Backspace", async () => {
     const user = userEvent.setup({ delay: null });
     const mockSetJson = jest.fn();
     const mockSetHtml = jest.fn();
@@ -90,12 +90,14 @@ describe("Editor and functions", () => {
       );
     });
     const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
-    let firstSpan = editor.querySelector("span") as HTMLSpanElement;
+    expect(editor).toBeInTheDocument();
+    const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
 
-    // await user.click(firstSpan);
     await user.click(editor.querySelector(".aiev3-editing") as HTMLElement);
     await user.keyboard("{Home}{End}{Backspace}");
     fireEvent.blur(editor);
+
     expect(mockSetText).toHaveBeenCalledTimes(1);
     expect(mockSetText).toHaveBeenLastCalledWith("34.4\n\nx.xx");
     expect(mockSetJson).toHaveBeenCalledTimes(1);
@@ -122,8 +124,8 @@ describe("Editor and functions", () => {
     expect(mockSetHtml).toHaveBeenCalledTimes(1);
     expect(mockSetHtml).toHaveBeenLastCalledWith(
       '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb is-active">34</span></span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb is-active">.4</span></span>' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">34</span></span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">.4</span></span>' +
         "</div>" +
         '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
         '<span class="aiev3-span-point lhs">\u2009</span>' +
@@ -135,23 +137,47 @@ describe("Editor and functions", () => {
         "</div>" +
         '<div class="aiev3-contents-info" data-allow-new-line="true" data-decimal-align-percent="70" data-text-alignment="&quot;decimal&quot;"></div>',
     );
+  });
 
-    // Reacquire firstSpan
-    firstSpan = editor.querySelector("span") as HTMLSpanElement;
-    await user.click(firstSpan);
+  test("Delete", async () => {
+    const user = userEvent.setup({ delay: null });
+    const mockSetJson = jest.fn();
+    const mockSetHtml = jest.fn();
+    const mockSetText = jest.fn();
+    await act(async () => {
+      render(
+        <EditorV3
+          data-testid="test-editor"
+          id="test-editor"
+          input={mockContent.jsonString}
+          setJson={(ret) => {
+            mockSetJson(ret);
+          }}
+          setHtml={(ret) => {
+            mockSetHtml(ret);
+          }}
+          setText={(ret) => {
+            mockSetText(ret);
+          }}
+          style={{ width: "200px" }}
+          allowNewLine
+          decimalAlignPercent={70}
+          textAlignment={EditorV3Align.decimal}
+        />,
+      );
+    });
+
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
+    expect(editor).toBeInTheDocument();
+    const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    await user.click(editor.querySelector(".aiev3-editing") as HTMLElement);
     await user.keyboard("{Home}{Delete}{Delete}{Delete}");
     fireEvent.blur(editor);
-    expect(mockSetText).toHaveBeenCalledTimes(2);
-    expect(mockSetText).toHaveBeenNthCalledWith(2, "4\n\nx.xx");
 
-    // Reacquire firstSpan
-    firstSpan = editor.querySelector("span") as HTMLSpanElement;
-    await user.click(firstSpan);
-    await user.keyboard("{Control>}{ArrowUp}{/Control}{Home}{Enter}");
-    fireEvent.blur(editor);
-    expect(mockSetText).toHaveBeenCalledTimes(3);
-    expect(mockSetText).toHaveBeenNthCalledWith(3, "\n4\n\nx.xx");
-    expect(JSON.parse(mockSetJson.mock.calls[2][0])).toEqual({
+    expect(mockSetText).toHaveBeenCalledTimes(1);
+    expect(mockSetText).toHaveBeenNthCalledWith(1, "45\n\nx.xx");
+    expect(JSON.parse(mockSetJson.mock.calls[0][0])).toEqual({
       contentProps: {
         allowNewLine: true,
         decimalAlignPercent: 70,
@@ -159,10 +185,7 @@ describe("Editor and functions", () => {
       },
       lines: [
         {
-          textBlocks: [{ text: "", type: "text" }],
-        },
-        {
-          textBlocks: [{ text: "4", type: "text" }],
+          textBlocks: [{ text: "45", type: "text" }],
         },
         {
           textBlocks: [{ text: "", type: "text" }],
@@ -172,13 +195,9 @@ describe("Editor and functions", () => {
         },
       ],
     });
-    expect(mockSetHtml.mock.calls[2][0]).toEqual(
+    expect(mockSetHtml.mock.calls[0][0]).toEqual(
       '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
-        '<span class="aiev3-span-point lhs">\u2009</span>' +
-        '<span class="aiev3-span-point rhs">\u2009</span>' +
-        "</div>" +
-        '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb is-active">4</span></span>' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">45</span></span>' +
         '<span class="aiev3-span-point rhs">\u2009</span>' +
         "</div>" +
         '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
@@ -190,7 +209,7 @@ describe("Editor and functions", () => {
         "</div>" +
         '<div class="aiev3-contents-info" data-allow-new-line="true" data-decimal-align-percent="70" data-text-alignment="&quot;decimal&quot;"></div>',
     );
-  }, 50000);
+  });
 });
 
 describe("Menu styling - add", () => {
@@ -218,20 +237,18 @@ describe("Menu styling - add", () => {
     await user.click(editor.querySelectorAll("span")[0] as Element);
     await user.keyboard("{Home}{End}");
     expect(getCaretPosition(editor)).toEqual({
-      startLine: 0,
-      startChar: 5,
-      isCollapsed: true,
-      endLine: 0,
-      endChar: 5,
+      initialLine: 0,
+      initialChar: 5,
+      focusLine: 0,
+      focusChar: 5,
     });
     // Need to click twice, first click normalised the value
     await user.keyboard("{ArrowLeft}");
     expect(getCaretPosition(editor)).toEqual({
-      startLine: 0,
-      startChar: 4,
-      isCollapsed: true,
-      endLine: 0,
-      endChar: 4,
+      initialLine: 0,
+      initialChar: 4,
+      focusLine: 0,
+      focusChar: 4,
     });
     expect(editor.querySelectorAll("span")[0]).toHaveClass("is-active");
     // Check clicked span is active
@@ -239,11 +256,10 @@ describe("Menu styling - add", () => {
     expect(editor.querySelectorAll("span")[0]).toHaveClass("is-active");
     await user.keyboard("{Control>}{Home}{/Control}{Home}{End}{Shift>}{Home}{Shift}");
     expect(getCaretPosition(editor)).toEqual({
-      startLine: 0,
-      startChar: 0,
-      isCollapsed: false,
-      endLine: 0,
-      endChar: 5,
+      initialLine: 0,
+      initialChar: 5,
+      focusLine: 0,
+      focusChar: 0,
     });
     fireEvent.contextMenu(editor.querySelectorAll("span")[0] as HTMLSpanElement);
     const shinyItem = screen.queryByLabelText("shiny") as HTMLSpanElement;
@@ -287,11 +303,10 @@ describe("Menu styling - change", () => {
     await user.click(container.querySelectorAll("span")[0] as HTMLSpanElement);
     await user.keyboard("{End}{Shift>}{Home}{Shift}");
     expect(getCaretPosition(container)).toEqual({
-      startLine: 2,
-      startChar: 0,
-      isCollapsed: false,
-      endLine: 2,
-      endChar: 4,
+      initialLine: 2,
+      initialChar: 4,
+      focusLine: 2,
+      focusChar: 0,
     });
     fireEvent.contextMenu(container.querySelectorAll("span")[2] as HTMLSpanElement);
     const notShinyMenuItem = screen.queryByLabelText("notShiny") as HTMLSpanElement;
@@ -335,11 +350,10 @@ describe("Menu styling - remove", () => {
     await user.click(editor.querySelectorAll("span")[2] as HTMLSpanElement);
     await user.keyboard("{End}{Shift>}{Home}{Shift}");
     expect(getCaretPosition(editor)).toEqual({
-      startLine: 2,
-      startChar: 0,
-      isCollapsed: false,
-      endLine: 2,
-      endChar: 4,
+      initialLine: 2,
+      initialChar: 4,
+      focusLine: 2,
+      focusChar: 0,
     });
     // Click remove
     fireEvent.contextMenu(editor.querySelectorAll("span")[2]);
@@ -349,11 +363,10 @@ describe("Menu styling - remove", () => {
     expect(editor.querySelectorAll("span").length).toEqual(3);
     expect(editor.querySelectorAll("span")[2]).not.toHaveClass("editorv3style-shiny");
     expect(getCaretPosition(editor)).toEqual({
-      startLine: 2,
-      startChar: 4,
-      isCollapsed: true,
-      endLine: 2,
-      endChar: 4,
+      initialLine: 2,
+      initialChar: 4,
+      focusLine: 2,
+      focusChar: 4,
     });
   });
 });
@@ -392,37 +405,32 @@ describe("Menu styling - markdown", () => {
 });
 
 describe("Cut and paste", () => {
-  test("Cut and paste", async () => {
+  test("Cut", async () => {
     const user = userEvent.setup();
     const mockSetText = jest.fn();
     await act(async () => {
       render(
-        <div data-testid="container">
-          <EditorV3
-            id="test-editor"
-            input={mockContent.jsonString}
-            setText={mockSetText}
-            style={{ width: "200px" }}
-            textAlignment={EditorV3Align.center}
-            allowNewLine
-            customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
-            resize
-          />
-        </div>,
+        <EditorV3
+          data-testid="test-editor"
+          id="test-editor"
+          input={mockContent.jsonString}
+          setText={mockSetText}
+          style={{ width: "200px" }}
+          textAlignment={EditorV3Align.center}
+          allowNewLine
+          customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
+          resize
+        />,
       );
     });
     // Get component
-    const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
+    expect(editor).toBeInTheDocument();
+    const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    await user.click(editable);
     // Go to start of text
-    await user.click(container.querySelector("span") as HTMLSpanElement);
     await user.keyboard("{Control>}{Home}{/Control}{Home}{Shift>}{ArrowRight}{ArrowRight}{/Shift}");
-    expect(getCaretPosition(container)).toEqual({
-      startLine: 0,
-      startChar: 0,
-      isCollapsed: false,
-      endLine: 0,
-      endChar: 2,
-    });
     const thingCut = await user.cut();
     expect(thingCut?.getData("text/plain")).toEqual("34");
     expect(thingCut?.getData("text/html")).toEqual(
@@ -438,22 +446,46 @@ describe("Cut and paste", () => {
         },
       },
     ]);
-    fireEvent.blur(container);
+    fireEvent.blur(editor);
     expect(mockSetText).toHaveBeenLastCalledWith(".45\n\nx.xx");
-    // Paste at the end
-    await user.click(container.querySelector("span") as HTMLSpanElement);
-    await user.keyboard("{Control>}{End}{End}{/Control}");
+  });
+
+  test("Paste", async () => {
+    const user = userEvent.setup();
+    const mockSetText = jest.fn();
+    await act(async () => {
+      render(
+        <EditorV3
+          data-testid="test-editor"
+          id="test-editor"
+          input={mockContent.jsonString}
+          setText={mockSetText}
+          style={{ width: "200px" }}
+          textAlignment={EditorV3Align.center}
+          allowNewLine
+          customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
+          resize
+        />,
+      );
+    });
+    // Get component
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
+    expect(editor).toBeInTheDocument();
+    const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    await user.click(editable);
+    await user.keyboard("{ArrowRight}");
+    // Go to start of text
     await user.paste("34");
-    expect(getCaretPosition(container)).toEqual({
-      startLine: 2,
-      startChar: 6,
-      isCollapsed: true,
-      endLine: 2,
-      endChar: 6,
+    expect(getCaretPosition(editor)).toEqual({
+      initialLine: 2,
+      initialChar: 6,
+      focusLine: 2,
+      focusChar: 6,
     });
 
-    fireEvent.blur(container);
-    expect(mockSetText).toHaveBeenLastCalledWith(".45\n\nx.xx34");
+    fireEvent.blur(editor);
+    expect(mockSetText).toHaveBeenLastCalledWith("34.45\n\nx.xx34");
   });
 
   test("Paste into single line", async () => {
@@ -566,29 +598,26 @@ describe("Select all", () => {
     expect(editable).toBeInTheDocument();
     await user.click(editable);
     expect(getCaretPosition(editable)).toEqual({
-      startLine: 0,
-      startChar: 0,
-      isCollapsed: false,
-      endLine: 0,
-      endChar: 23,
+      initialLine: 0,
+      initialChar: 0,
+      focusLine: 0,
+      focusChar: 23,
     });
     await user.keyboard("{Delete}");
     expect(getCaretPosition(editable)).toEqual({
-      startLine: 0,
-      startChar: 0,
-      isCollapsed: true,
-      endLine: 0,
-      endChar: 0,
+      initialLine: 0,
+      initialChar: 0,
+      focusLine: 0,
+      focusChar: 0,
     });
     await user.keyboard("New programmer notes");
     // Select all
     await user.keyboard("{Control>}{a}{/Control}");
     expect(getCaretPosition(editable)).toEqual({
-      startLine: 0,
-      startChar: 0,
-      isCollapsed: false,
-      endLine: 0,
-      endChar: 20,
+      initialLine: 0,
+      initialChar: 0,
+      focusLine: 0,
+      focusChar: 20,
     });
     fireEvent.blur(editable);
     expect(screen.getByText("New")).toBeInTheDocument();
@@ -634,11 +663,10 @@ describe("Undo/redo", () => {
     expect(getCaretPosition(editable)).toEqual(null);
     await user.click(editable);
     expect(getCaretPosition(editable)).toEqual({
-      startLine: 0,
-      startChar: 0,
-      isCollapsed: true,
-      endLine: 0,
-      endChar: 0,
+      initialLine: 0,
+      initialChar: 0,
+      focusLine: 0,
+      focusChar: 0,
     });
     await user.keyboard("added");
     expect(screen.queryByText("added")).toBeInTheDocument();

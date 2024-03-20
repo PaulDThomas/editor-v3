@@ -314,7 +314,7 @@ export class EditorV3Content implements EditorV3Import {
         // Read in HTML
         const r = readV3Html(input.innerHTML, props);
         this.copyImport(r);
-        this.caretPosition = getCaretPosition(input);
+        this.caretPositionF = getCaretPosition(input);
       } else {
         // Check for stringified class input
         const jsonInput: EditorV3Import = JSON.parse(input);
@@ -628,10 +628,17 @@ export class EditorV3Content implements EditorV3Import {
       applyStylesToHTML(line as HTMLDivElement, this._styles);
     });
     // Set caret position
-    focus &&
-      this._caretPosition &&
-      this._caretPosition &&
+    if (focus && this._caretPosition) {
       setCaretPosition(editableEl, this._caretPosition);
+    }
+    // Remove window selection if not focused, but the current window selection is inside the editableEl's parent
+    if (
+      !focus &&
+      window.getSelection()?.anchorNode instanceof HTMLElement &&
+      (window.getSelection()?.anchorNode as HTMLElement).closest(".aiev3")?.contains(editableEl)
+    ) {
+      window.getSelection()?.removeAllRanges();
+    }
   }
 
   /**
@@ -740,7 +747,7 @@ export class EditorV3Content implements EditorV3Import {
   public handleKeyup(e: React.KeyboardEvent<HTMLDivElement>) {
     // Update caret position
     if (this._caretPosition) {
-      this.caretPosition = getCaretPosition(e.currentTarget);
+      this.caretPositionF = getCaretPosition(e.currentTarget);
     }
     if (
       [
@@ -759,19 +766,6 @@ export class EditorV3Content implements EditorV3Import {
     ) {
       e.stopPropagation();
       e.preventDefault();
-      // } else if (["ArrowLeft", "ArrowUp"].includes(e.code)) {
-      //   e.stopPropagation();
-      //   e.preventDefault();
-      //   if (this._caretPosition && this._caretPosition.isCollapsed === false) {
-      //     console.log("Focus to start");
-      //     this.caretPosition = {
-      //       startLine: this._caretPosition.endLine,
-      //       startChar: this._caretPosition.endChar,
-      //       endLine: this._caretPosition.startLine,
-      //       endChar: this._caretPosition.startChar,
-      //       focusAt: "start",
-      //     };
-      //   }
     }
   }
 

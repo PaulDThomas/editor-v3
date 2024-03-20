@@ -2453,3 +2453,18 @@ describe("EditorV3Position moveEnd tests", () => {
     ]);
   });
 });
+
+describe("Reverse set position", () => {
+  test("Set position with focus at start", () => {
+    const position = new EditorV3PositionClass(0, 0, 0, 0, [5, 5], []);
+    position.setCaret({
+      startLine: 0,
+      startChar: 2,
+      endLine: 1,
+      endChar: 3,
+      isCollapsed: false,
+      focusAt: "start",
+    });
+    expect(position.posF).toEqual({ initialLine: 1, initialChar: 3, focusLine: 0, focusChar: 2 });
+  });
+});

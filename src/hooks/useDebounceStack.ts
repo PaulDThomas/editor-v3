@@ -35,7 +35,7 @@ export const useDebounceStack = <T>(
 ): {
   currentValue: T | null;
   setCurrentValue: Dispatch<T>;
-  forceUpdate: () => void;
+  forceUpdate: (newValue?: T) => void;
   undo: (steps?: number) => void;
   redo: (steps?: number) => void;
   stack: T[] | null;
@@ -134,10 +134,13 @@ export const useDebounceStack = <T>(
   }, [currentValue, debounceMilliseconds, debouncedValue]);
 
   // Force update (for when there is no timer)
-  const forceUpdate = useCallback(() => {
-    debounceController.current.abort();
-    setDebouncedValue(currentValue);
-  }, [currentValue]);
+  const forceUpdate = useCallback(
+    (newValue?: T) => {
+      debounceController.current.abort();
+      setDebouncedValue(newValue ?? currentValue);
+    },
+    [currentValue],
+  );
 
   // const getObjectDiff = useCallback((obj1: unknown, obj2: unknown) => {
   //   if (typeof obj1 !== "object" || obj1 === null || typeof obj2 !== "object" || obj2 === null) {

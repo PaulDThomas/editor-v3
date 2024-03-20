@@ -35,7 +35,7 @@ interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   atListFunction?: (at: string) => Promise<EditorV3AtListItem<unknown>[]>;
 }
 
-interface EditorV3State {
+export interface EditorV3State {
   content: EditorV3Content;
   focus: boolean;
 }
@@ -114,7 +114,6 @@ export const EditorV3 = ({
         !ret.content.lines.some((l) => l.textBlocks.some((tb) => tb.type === "at" && tb.isActive))
       ) {
         // Save caret position
-        setLastCaretPosition(ret.content.caretPosition);
         // Redraw dummy for information
         const dummyNode = document.createElement("div");
         ret.content.redraw(dummyNode, false);
@@ -156,17 +155,18 @@ export const EditorV3 = ({
     debounceMilliseconds,
     redrawElement,
     returnData,
-    (oldValue, newValue) => isEqual(oldValue?.content.data ?? {}, newValue?.content.data ?? {}),
+    (oldValue, newValue) =>
+      isEqual(oldValue && [oldValue.content.data], newValue && [newValue.content.data]),
   );
   // Utility callback for debugging
   const setContent = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (newContent: EditorV3Content, calledFrom: string, focus?: boolean) => {
+    (newContent: EditorV3Content, calledFrom?: string, focus?: boolean) => {
+      // console.debug(calledFrom, newContent?.text, newContent?.caretPosition, focus);
       setLastCaretPosition(newContent.caretPosition);
-      console.log("Setting last caret position", calledFrom, newContent.caretPositionF);
       setCurrentValue({ content: newContent, focus: focus ?? state?.focus ?? false });
     },
-    [setCurrentValue, state?.focus],
+    [setCurrentValue, state],
   );
 
   // Update any content properry from parent
@@ -255,23 +255,31 @@ export const EditorV3 = ({
   }, [allowMarkdown, state, contentProps, setContent]);
 
   // Focus and blur events are container not contenteditable level events!
-  const handleFocus = useCallback(() => {
-    if (divRef.current && state) {
-      // Get current content
-      const newContent = new EditorV3Content(divRef.current, contentProps);
-      // Select everything
-      newContent.caretPosition = {
-        startLine: 0,
-        startChar: 0,
-        endLine: newContent.lines.length - 1,
-        endChar: newContent.lines[newContent.lines.length - 1].lineLength,
-        isCollapsed: false,
-      };
-      setLastAction("Focus");
-      setLastCaretPosition(newContent.caretPosition);
-      setContent(newContent, "Select all on focus", true);
-    }
-  }, [state, contentProps, setContent]);
+  const handleFocus = useCallback(
+    (e: React.FocusEvent) => {
+      if (
+        state &&
+        divRef.current &&
+        e.target instanceof Node &&
+        (divRef.current === e.target || divRef.current.contains(e.target))
+      ) {
+        // Get current content
+        const newContent = new EditorV3Content(divRef.current, contentProps);
+        // Select everything
+        newContent.caretPosition = {
+          startLine: 0,
+          startChar: 0,
+          endLine: newContent.lines.length - 1,
+          endChar: newContent.lines[newContent.lines.length - 1].lineLength,
+          isCollapsed: false,
+        };
+        setLastAction("Focus");
+        setLastCaretPosition(newContent.caretPosition);
+        setContent(newContent, "Select all on focus", true);
+      }
+    },
+    [state, contentProps, setContent],
+  );
   const handleBlur = useCallback(() => {
     if (divRef.current && state) {
       // Get current content (this should alreact be correct);
@@ -280,10 +288,9 @@ export const EditorV3 = ({
       newContent.caretPosition = null;
       setLastAction("Blur");
       setLastCaretPosition(null);
-      setContent(newContent, "Remove caret on blur", false);
+      forceReturn({ content: newContent, focus: false });
     }
-    forceReturn();
-  }, [state, contentProps, forceReturn, setContent]);
+  }, [state, contentProps, forceReturn]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -342,16 +349,24 @@ export const EditorV3 = ({
     [state, contentProps, setContent],
   );
 
-  const handleMouseUp = useCallback(() => {
-    // Ensure mouse up event stack is empty before resolving this event
-    setTimeout(() => {
-      if (divRef.current && state?.focus) {
-        const newContent = new EditorV3Content(divRef.current, contentProps);
-        newContent.checkStatus();
-        setContent(newContent, "Handle mouse up on timeout");
-      }
-    }, 0);
-  }, [contentProps, setContent, state?.focus]);
+  const handleMouseUp = useCallback(
+    (e: React.MouseEvent) => {
+      // Ensure mouse up event stack is empty before resolving this event
+      if (
+        divRef.current &&
+        e.target instanceof Node &&
+        (divRef.current === e.target || divRef.current.contains(e.target))
+      )
+        setTimeout(() => {
+          if (divRef.current && state?.focus) {
+            const newContent = new EditorV3Content(divRef.current, contentProps);
+            newContent.checkStatus();
+            setContent(newContent, "Handle mouse up on timeout");
+          }
+        }, 0);
+    },
+    [contentProps, setContent, state?.focus],
+  );
 
   const handleCopy = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
@@ -397,15 +412,18 @@ export const EditorV3 = ({
         e.preventDefault();
         rest.onFocusCapture && rest.onFocusCapture(e);
         rest.onFocus && rest.onFocus(e);
-        handleFocus();
+        handleFocus(e);
       }}
       onBlurCapture={(e) => {
         rest.onBlurCapture && rest.onBlurCapture(e);
         handleBlur();
+        window.getSelection()?.removeAllRanges();
         rest.onBlur && rest.onBlur(e);
+        e.preventDefault();
+        e.stopPropagation();
       }}
       onMouseUp={(e) => {
-        handleMouseUp();
+        handleMouseUp(e);
         rest.onMouseUp && rest.onMouseUp(e);
       }}
     >

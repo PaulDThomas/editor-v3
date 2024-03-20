@@ -152,6 +152,12 @@ describe("Content functions", () => {
       isCollapsed: false,
       focusAt: "end",
     });
+    expect(testContent.caretPositionF).toEqual({
+      initialLine: 0,
+      initialChar: 0,
+      focusLine: 0,
+      focusChar: 6,
+    });
   });
 
   test("Merge and split lines", async () => {

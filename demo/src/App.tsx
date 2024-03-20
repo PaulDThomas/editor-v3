@@ -41,7 +41,7 @@ export const App = (): JSX.Element => {
   const [input3, setInput3] = useState<string>(
     JSON.stringify({
       textAlign: "left",
-      lines: [{ text: "12.34", style: "defaultStyle" }],
+      lines: [{ text: "two words", style: "defaultStyle" }],
       styles: {
         defaultStyle: { color: "green", fontWeight: 700 },
       },
