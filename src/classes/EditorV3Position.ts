@@ -1,4 +1,5 @@
-import { EditorV3Position, EditorV3WordPosition } from "./interface";
+import { isEqual } from "lodash";
+import { EditorV3Position, EditorV3PositionF, EditorV3WordPosition } from "./interface";
 
 export class EditorV3PositionClass implements EditorV3Position {
   public initialLine: number;
@@ -41,6 +42,16 @@ export class EditorV3PositionClass implements EditorV3Position {
       endLine: this.endLine,
       endChar: this.endChar,
       isCollapsed: this.isCollapsed,
+      focusAt: this.endLine === this.focusLine && this.endChar === this.focusChar ? "end" : "start",
+    };
+  }
+
+  get posF(): EditorV3PositionF {
+    return {
+      initialLine: this.initialLine,
+      initialChar: this.initialChar,
+      focusLine: this.focusLine,
+      focusChar: this.focusChar,
     };
   }
 
@@ -51,8 +62,6 @@ export class EditorV3PositionClass implements EditorV3Position {
       initialChar: this.initialChar,
       focusLine: this.focusLine,
       focusChar: this.focusChar,
-      focusAt:
-        this.startLine === this.focusLine && this.startChar === this.focusChar ? "start" : "end",
     };
   }
 
@@ -81,6 +90,33 @@ export class EditorV3PositionClass implements EditorV3Position {
     }
   }
 
+  /**
+   * Set caret from position
+   * @param pos New position
+   */
+  public setCaret(posInput: EditorV3Position) {
+    const pos = posInput;
+    if (pos && !pos.focusAt) pos.focusAt = "end";
+    if (pos && !isEqual(pos, this.pos)) {
+      if (pos.focusAt === "end") {
+        this.initialLine = pos.startLine;
+        this.initialChar = pos.startChar;
+        this.focusLine = pos.endLine;
+        this.focusChar = pos.endChar;
+      } else {
+        this.initialLine = pos.endLine;
+        this.initialChar = pos.endChar;
+        this.focusLine = pos.startLine;
+        this.focusChar = pos.startChar;
+      }
+    }
+  }
+
+  /**
+   * Move caret left
+   * @param shiftKey Shift key pressed
+   * @param ctrlKey Control key pressed
+   */
   public moveLeft(shiftKey: boolean, ctrlKey: boolean) {
     // CTRL at the start of a line to beginning of item
     if (ctrlKey && this.focusChar === 0 && this.focusLine > 0) {
@@ -130,6 +166,11 @@ export class EditorV3PositionClass implements EditorV3Position {
     this._checkCollapse(shiftKey);
   }
 
+  /**
+   * Move caret Right
+   * @param shiftKey Shift key pressed
+   * @param ctrlKey Control key pressed
+   */
   public moveRight(shiftKey: boolean, ctrlKey: boolean) {
     // CTRL at the end of a line to end of item
     if (
@@ -186,6 +227,11 @@ export class EditorV3PositionClass implements EditorV3Position {
     this._checkCollapse(shiftKey);
   }
 
+  /**
+   * Move caret up
+   * @param shiftKey Shift key pressed
+   * @param ctrlKey Control key pressed
+   */
   public moveUp(shiftKey: boolean, ctrlKey: boolean) {
     // Already at the top
     if (this.focusLine === 0) {
@@ -221,6 +267,11 @@ export class EditorV3PositionClass implements EditorV3Position {
     this._checkCollapse(shiftKey);
   }
 
+  /**
+   * Move caret down
+   * @param shiftKey Shift key pressed
+   * @param ctrlKey Control key pressed
+   */
   public moveDown(shiftKey: boolean, ctrlKey: boolean) {
     // Already at the bottom
     if (this.focusLine === this.lineLengths.length - 1) {
@@ -256,6 +307,11 @@ export class EditorV3PositionClass implements EditorV3Position {
     this._checkCollapse(shiftKey);
   }
 
+  /**
+   * Move caret home
+   * @param shiftKey Shift key pressed
+   * @param ctrlKey Control key pressed
+   */
   public moveHome(shiftKey: boolean, ctrlKey: boolean) {
     // Move to the top line on CTRL to already at the start
     if (ctrlKey || this.startChar === 0) {
@@ -266,6 +322,11 @@ export class EditorV3PositionClass implements EditorV3Position {
     this._checkCollapse(shiftKey);
   }
 
+  /**
+   * Move caret end
+   * @param shiftKey Shift key pressed
+   * @param ctrlKey Control key pressed
+   */
   public moveEnd(shiftKey: boolean, ctrlKey: boolean) {
     if (ctrlKey || this.endChar === this.lineLengths[this.endLine]) {
       this.focusLine = this.lineLengths.length - 1;

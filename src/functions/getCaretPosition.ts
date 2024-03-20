@@ -37,6 +37,7 @@ export function getCaretPosition(element: HTMLDivElement): EditorV3Position | nu
   let range: Range;
   let preCaretRange: Range;
   const sel = window.getSelection();
+  console.log("selection", sel?.anchorNode, sel?.anchorOffset, sel?.focusNode, sel?.focusOffset);
   if (sel && sel.rangeCount > 0) {
     range = sel.getRangeAt(0);
     preCaretRange = range.cloneRange();

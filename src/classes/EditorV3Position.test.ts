@@ -31,7 +31,7 @@ describe("EditorV3Position tests", () => {
       initialChar: 0,
       focusLine: 0,
       focusChar: 0,
-      focusAt: "start",
+      focusAt: "end",
     });
     const position2 = new EditorV3PositionClass(2, 5, 0, 3, lineLengths, words);
     expect(position2.isCollapsed).toBe(false);
@@ -100,6 +100,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -107,6 +108,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 12,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -114,6 +116,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 12,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 2,
@@ -121,6 +124,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -128,6 +132,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 2,
@@ -135,6 +140,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 7,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -142,6 +148,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 6,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -149,6 +156,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 5,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -156,6 +164,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 4,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -163,6 +172,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 3,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -170,6 +180,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 2,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -177,6 +188,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 1,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -184,6 +196,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -191,6 +204,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 1,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -198,6 +212,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 1,
         endChar: 12,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -205,6 +220,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 1,
         endChar: 11,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -212,6 +228,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 1,
         endChar: 10,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -219,6 +236,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 1,
         endChar: 9,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -226,6 +244,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 1,
         endChar: 8,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -233,6 +252,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 1,
         endChar: 7,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -240,6 +260,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 1,
         endChar: 6,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -247,6 +268,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 1,
         endChar: 5,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -254,6 +276,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 1,
         endChar: 4,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -261,6 +284,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 1,
         endChar: 3,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -268,6 +292,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 1,
         endChar: 3,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -275,6 +300,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 1,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -282,6 +308,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -289,6 +316,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -296,6 +324,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 0,
         endChar: 5,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -303,6 +332,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 0,
         endChar: 4,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -310,6 +340,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 0,
         endChar: 3,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -317,6 +348,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 0,
         endChar: 2,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -324,6 +356,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 0,
         endChar: 1,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -331,6 +364,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
   });
@@ -351,6 +385,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -358,6 +393,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 2,
@@ -365,6 +401,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 2,
@@ -372,6 +409,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 2,
@@ -379,6 +417,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 2,
@@ -386,6 +425,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 2,
@@ -393,6 +433,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 2,
@@ -400,6 +441,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 2,
@@ -407,6 +449,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 2,
@@ -414,6 +457,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 2,
@@ -421,6 +465,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -428,6 +473,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -435,6 +481,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -442,6 +489,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -449,6 +497,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -456,6 +505,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -463,6 +513,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -470,6 +521,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -477,6 +529,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -484,6 +537,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -491,6 +545,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -498,6 +553,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -505,6 +561,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -512,6 +569,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -519,6 +577,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -526,6 +585,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -533,6 +593,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -540,6 +601,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -547,6 +609,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -554,6 +617,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
     ]);
   });
@@ -574,6 +638,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -581,6 +646,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -588,6 +654,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 7,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -595,6 +662,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -602,6 +670,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
   });
@@ -622,6 +691,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -629,6 +699,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 2,
@@ -636,6 +707,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 2,
@@ -643,6 +715,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -650,6 +723,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -657,6 +731,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 1,
@@ -664,6 +739,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -671,6 +747,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -678,6 +755,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -685,6 +763,7 @@ describe("EditorV3Position moveLeft tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
     ]);
   });
@@ -718,6 +797,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -725,6 +805,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 1,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -732,6 +813,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 2,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -739,6 +821,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 3,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -746,6 +829,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 4,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -753,6 +837,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 5,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -760,6 +845,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -767,6 +853,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -774,6 +861,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -781,6 +869,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 3,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -788,6 +877,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 3,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -795,6 +885,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 4,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -802,6 +893,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 5,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -809,6 +901,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 6,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -816,6 +909,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 7,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -823,6 +917,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 8,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -830,6 +925,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 9,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -837,6 +933,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 10,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -844,6 +941,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 11,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -851,6 +949,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 12,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -858,6 +957,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -865,6 +965,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -872,6 +973,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 1,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -879,6 +981,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 2,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -886,6 +989,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 3,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -893,6 +997,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 4,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -900,6 +1005,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 5,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -907,6 +1013,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 6,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -914,6 +1021,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 7,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -921,6 +1029,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -928,6 +1037,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -935,6 +1045,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 12,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -942,6 +1053,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 12,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -949,6 +1061,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
   });
@@ -969,6 +1082,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -976,6 +1090,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 1,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -983,6 +1098,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 2,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -990,6 +1106,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 3,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -997,6 +1114,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 4,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1004,6 +1122,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 5,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1011,6 +1130,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1018,6 +1138,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 0,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1025,6 +1146,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 3,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1032,6 +1154,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 4,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1039,6 +1162,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 5,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1046,6 +1170,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 6,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1053,6 +1178,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 7,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1060,6 +1186,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 8,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1067,6 +1194,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 9,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1074,6 +1202,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 10,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1081,6 +1210,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 11,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1088,6 +1218,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 12,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1095,6 +1226,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1102,6 +1234,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 0,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1109,6 +1242,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 1,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1116,6 +1250,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 2,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1123,6 +1258,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 3,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1130,6 +1266,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 4,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1137,6 +1274,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 5,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1144,6 +1282,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 6,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1151,6 +1290,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 7,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1158,6 +1298,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1165,6 +1306,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 12,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1172,6 +1314,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "end",
       },
     ]);
   });
@@ -1192,6 +1335,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1199,6 +1343,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 5,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1206,6 +1351,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -1213,6 +1359,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -1220,6 +1367,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 3,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -1227,6 +1375,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 11,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -1234,6 +1383,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -1241,6 +1391,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -1248,6 +1399,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 6,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -1255,6 +1407,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -1262,6 +1415,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 12,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -1269,6 +1423,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
   });
@@ -1289,6 +1444,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1296,6 +1452,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 5,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1303,6 +1460,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1310,6 +1468,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 0,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1317,6 +1476,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 3,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1324,6 +1484,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 11,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1331,6 +1492,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 1,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1338,6 +1500,7 @@ describe("EditorV3Position moveRight tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "end",
       },
     ]);
   });
@@ -1371,6 +1534,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -1378,6 +1542,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 1,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1385,6 +1550,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1392,6 +1558,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
     const position2 = new EditorV3PositionClass(2, 9, 2, 9, lineLengths, words);
@@ -1409,6 +1576,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -1416,6 +1584,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 1,
         endChar: 9,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1423,6 +1592,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -1430,6 +1600,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
   });
@@ -1450,6 +1621,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -1457,6 +1629,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -1464,6 +1637,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -1471,6 +1645,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
     ]);
     const position2 = new EditorV3PositionClass(2, 9, 2, 9, lineLengths, words);
@@ -1488,6 +1663,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -1495,6 +1671,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -1502,6 +1679,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -1509,6 +1687,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: false,
+        focusAt: "start",
       },
     ]);
   });
@@ -1529,6 +1708,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1536,6 +1716,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1543,6 +1724,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
     const position2 = new EditorV3PositionClass(2, 9, 2, 9, lineLengths, words);
@@ -1560,6 +1742,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1567,6 +1750,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -1574,6 +1758,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
   });
@@ -1594,6 +1779,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1601,6 +1787,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -1608,6 +1795,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
     ]);
     const position2 = new EditorV3PositionClass(2, 9, 2, 9, lineLengths, words);
@@ -1625,6 +1813,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1632,6 +1821,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -1639,6 +1829,7 @@ describe("EditorV3Position moveUp tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: false,
+        focusAt: "start",
       },
     ]);
   });
@@ -1672,6 +1863,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -1679,6 +1871,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 1,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -1686,6 +1879,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -1693,6 +1887,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
     const position2 = new EditorV3PositionClass(0, 10, 0, 10, lineLengths, words);
@@ -1710,6 +1905,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 1,
@@ -1717,6 +1913,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 1,
         endChar: 9,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -1724,6 +1921,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -1731,6 +1929,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
   });
@@ -1751,6 +1950,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1758,6 +1958,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 1,
         endChar: 0,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1765,6 +1966,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 0,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1772,6 +1974,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "end",
       },
     ]);
     const position2 = new EditorV3PositionClass(0, 10, 0, 10, lineLengths, words);
@@ -1789,6 +1992,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1796,6 +2000,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 1,
         endChar: 9,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1803,6 +2008,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 9,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1810,6 +2016,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "end",
       },
     ]);
   });
@@ -1830,6 +2037,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -1837,6 +2045,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -1844,6 +2053,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
     const position2 = new EditorV3PositionClass(0, 10, 0, 10, lineLengths, words);
@@ -1861,6 +2071,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -1868,6 +2079,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 12,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -1875,6 +2087,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
   });
@@ -1895,6 +2108,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1902,6 +2116,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 0,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1909,6 +2124,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "end",
       },
     ]);
     const position2 = new EditorV3PositionClass(0, 10, 0, 10, lineLengths, words);
@@ -1926,6 +2142,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1933,6 +2150,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 12,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1940,6 +2158,7 @@ describe("EditorV3Position moveDown tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "end",
       },
     ]);
   });
@@ -1973,6 +2192,7 @@ describe("EditorV3Position moveHome tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -1980,6 +2200,7 @@ describe("EditorV3Position moveHome tests", () => {
         endLine: 2,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -1987,6 +2208,7 @@ describe("EditorV3Position moveHome tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
   });
@@ -2007,6 +2229,7 @@ describe("EditorV3Position moveHome tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -2014,6 +2237,7 @@ describe("EditorV3Position moveHome tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
       {
         startLine: 0,
@@ -2021,6 +2245,7 @@ describe("EditorV3Position moveHome tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
     ]);
   });
@@ -2041,6 +2266,7 @@ describe("EditorV3Position moveHome tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -2048,6 +2274,7 @@ describe("EditorV3Position moveHome tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
   });
@@ -2068,6 +2295,7 @@ describe("EditorV3Position moveHome tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -2075,6 +2303,7 @@ describe("EditorV3Position moveHome tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "start",
       },
     ]);
   });
@@ -2108,6 +2337,7 @@ describe("EditorV3Position moveEnd tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -2115,6 +2345,7 @@ describe("EditorV3Position moveEnd tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -2122,6 +2353,7 @@ describe("EditorV3Position moveEnd tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
   });
@@ -2142,6 +2374,7 @@ describe("EditorV3Position moveEnd tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -2149,6 +2382,7 @@ describe("EditorV3Position moveEnd tests", () => {
         endLine: 0,
         endChar: 10,
         isCollapsed: false,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -2156,6 +2390,7 @@ describe("EditorV3Position moveEnd tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "end",
       },
     ]);
   });
@@ -2176,6 +2411,7 @@ describe("EditorV3Position moveEnd tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 2,
@@ -2183,6 +2419,7 @@ describe("EditorV3Position moveEnd tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: true,
+        focusAt: "end",
       },
     ]);
   });
@@ -2203,6 +2440,7 @@ describe("EditorV3Position moveEnd tests", () => {
         endLine: 0,
         endChar: 0,
         isCollapsed: true,
+        focusAt: "end",
       },
       {
         startLine: 0,
@@ -2210,6 +2448,7 @@ describe("EditorV3Position moveEnd tests", () => {
         endLine: 2,
         endChar: 13,
         isCollapsed: false,
+        focusAt: "end",
       },
     ]);
   });

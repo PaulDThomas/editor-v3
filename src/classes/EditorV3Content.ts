@@ -15,6 +15,7 @@ import {
   EditorV3Import,
   EditorV3LineImport,
   EditorV3Position,
+  EditorV3PositionF,
   EditorV3RenderProps,
   EditorV3Styles,
 } from "./interface";
@@ -124,18 +125,42 @@ export class EditorV3Content implements EditorV3Import {
   get caretPosition(): EditorV3Position | null {
     return this._caretPosition?.pos ?? null;
   }
-  set caretPosition(pos: EditorV3Position | null) {
-    if (pos && !isEqual(pos, this._caretPosition?.pos)) {
+  set caretPosition(posInput: EditorV3Position | null) {
+    if (posInput === null) {
+      this._caretPosition = null;
+    } else if (this._caretPosition) {
+      this._caretPosition.setCaret(posInput);
+    } else {
       this._caretPosition = new EditorV3PositionClass(
-        pos.startLine,
-        pos.startChar,
-        pos.endLine,
-        pos.endChar,
+        posInput.startLine,
+        posInput.startChar,
+        posInput.endLine,
+        posInput.endChar,
         this.lineLengths,
         this.wordPositions,
       );
-    } else if (pos === null) {
+    }
+  }
+  get caretPositionF(): EditorV3PositionF | null {
+    return this._caretPosition?.posF ?? null;
+  }
+  set caretPositionF(posInput: EditorV3PositionF | null) {
+    if (posInput === null) {
       this._caretPosition = null;
+    } else if (this._caretPosition) {
+      this._caretPosition.initialLine = posInput.initialLine;
+      this._caretPosition.initialChar = posInput.initialChar;
+      this._caretPosition.focusLine = posInput.focusLine;
+      this._caretPosition.focusChar = posInput.focusChar;
+    } else {
+      this._caretPosition = new EditorV3PositionClass(
+        posInput.initialLine,
+        posInput.initialChar,
+        posInput.focusLine,
+        posInput.focusChar,
+        this.lineLengths,
+        this.wordPositions,
+      );
     }
   }
   public isCaretLocked(pos = this._caretPosition) {
@@ -506,14 +531,24 @@ export class EditorV3Content implements EditorV3Import {
             ? pos.startChar + newLines[0].lineLength
             : newLines[newLines.length - 1].lineLength;
       // Update caret position if it is set
-      if (this._caretPosition)
-        this.caretPosition = {
-          isCollapsed: true,
-          startLine: pos.startLine + (newLines ? newLines.length - 1 : 0),
-          startChar: endChar,
-          endLine: pos.startLine + (newLines?.length ?? 0),
-          endChar: endChar,
-        };
+      // if (this._caretPosition)
+      //   this.caretPosition = {
+      //     isCollapsed: true,
+      //     startLine: pos.startLine + (newLines ? newLines.length - 1 : 0),
+      //     startChar: endChar,
+      //     endLine: pos.startLine + (newLines?.length ?? 0),
+      //     endChar: endChar,
+      //   };
+      if (this._caretPosition) {
+        this._caretPosition = new EditorV3PositionClass(
+          pos.startLine + (newLines ? newLines.length - 1 : 0),
+          endChar,
+          pos.startLine + (newLines?.length ?? 0),
+          endChar,
+          this.lineLengths,
+          this.wordPositions,
+        );
+      }
       return ret;
     }
     return [];
@@ -724,6 +759,19 @@ export class EditorV3Content implements EditorV3Import {
     ) {
       e.stopPropagation();
       e.preventDefault();
+      // } else if (["ArrowLeft", "ArrowUp"].includes(e.code)) {
+      //   e.stopPropagation();
+      //   e.preventDefault();
+      //   if (this._caretPosition && this._caretPosition.isCollapsed === false) {
+      //     console.log("Focus to start");
+      //     this.caretPosition = {
+      //       startLine: this._caretPosition.endLine,
+      //       startChar: this._caretPosition.endChar,
+      //       endLine: this._caretPosition.startLine,
+      //       endChar: this._caretPosition.startChar,
+      //       focusAt: "start",
+      //     };
+      //   }
     }
   }
 

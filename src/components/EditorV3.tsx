@@ -163,6 +163,7 @@ export const EditorV3 = ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (newContent: EditorV3Content, calledFrom: string, focus?: boolean) => {
       setLastCaretPosition(newContent.caretPosition);
+      console.log("Setting last caret position", calledFrom, newContent.caretPositionF);
       setCurrentValue({ content: newContent, focus: focus ?? state?.focus ?? false });
     },
     [setCurrentValue, state?.focus],

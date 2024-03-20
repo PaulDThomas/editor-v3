@@ -95,6 +95,13 @@ export interface EditorV3Position {
   endLine: number;
   endChar: number;
   isCollapsed?: boolean;
+  focusAt?: "start" | "end";
+}
+export interface EditorV3PositionF {
+  initialLine: number;
+  initialChar: number;
+  focusLine: number;
+  focusChar: number;
 }
 /**
  * Word positions in the content

@@ -141,6 +141,7 @@ describe("Content functions", () => {
       endLine: 0,
       endChar: 1,
       isCollapsed: true,
+      focusAt: "end",
     };
     testContent.checkStatus();
     expect(testContent.caretPosition).toEqual({
@@ -149,6 +150,7 @@ describe("Content functions", () => {
       endLine: 0,
       endChar: 6,
       isCollapsed: false,
+      focusAt: "end",
     });
   });
 
@@ -639,6 +641,7 @@ describe("handleKeydown", () => {
       endLine: 0,
       endChar: 13,
       isCollapsed: false,
+      focusAt: "end",
     });
   });
 
@@ -668,6 +671,7 @@ describe("handleKeydown", () => {
       endLine: 0,
       endChar: 6,
       isCollapsed: true,
+      focusAt: "end",
     });
   });
 
@@ -742,6 +746,7 @@ describe("handleKeydown", () => {
       endLine: 1,
       endChar: 0,
       isCollapsed: true,
+      focusAt: "end",
     });
   });
 });
