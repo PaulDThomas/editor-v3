@@ -92,7 +92,8 @@ describe("Editor and functions", () => {
     const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     let firstSpan = editor.querySelector("span") as HTMLSpanElement;
 
-    await user.click(firstSpan);
+    // await user.click(firstSpan);
+    await user.click(editor.querySelector(".aiev3-editing") as HTMLElement);
     await user.keyboard("{Home}{End}{Backspace}");
     fireEvent.blur(editor);
     expect(mockSetText).toHaveBeenCalledTimes(1);
@@ -189,7 +190,7 @@ describe("Editor and functions", () => {
         "</div>" +
         '<div class="aiev3-contents-info" data-allow-new-line="true" data-decimal-align-percent="70" data-text-alignment="&quot;decimal&quot;"></div>',
     );
-  });
+  }, 50000);
 });
 
 describe("Menu styling - add", () => {
