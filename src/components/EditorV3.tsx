@@ -32,7 +32,7 @@ interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   allowMarkdown?: boolean;
   markdownSettings?: IMarkdownSettings;
   debounceMilliseconds?: number | null;
-  atListFunction?: (at: string) => Promise<EditorV3AtListItem<unknown>[]>;
+  atListFunction?: (at: string) => Promise<EditorV3AtListItem<{ [key: string]: string }>[]>;
 }
 
 export interface EditorV3State {
@@ -459,7 +459,43 @@ export const EditorV3 = ({
             onCopyCapture={handleCopy}
             onCutCapture={handleCopy}
             onKeyDownCapture={handleKeyDown}
-            onKeyUpCapture={handleKeyUp}
+            onKeyUpCapture={(e) => {
+              // Information that leads me to believe that Jest is not simulating the keyup event in the right target
+              // if (e.target instanceof Element) {
+              //   console.log(
+              //     "Key up event",
+              //     e.code,
+              //     e.target.textContent
+              //       ?.replaceAll("\u00a0", "`")
+              //       .replaceAll("\u200c", "¬")
+              //       .replaceAll("\u2009", "%"),
+              //   );
+              //   if (e.target.textContent) {
+              //     if (e.target.textContent.match(/\u00a0(.)\u200c/)) {
+              //       e.target.textContent = e.target.textContent.replace(
+              //         /\u00a0(.)\u200c/,
+              //         "\u00a0\u200c$1",
+              //       );
+              //     }
+              //     if (e.target.textContent.match(/\u2009(.)\u200c/)) {
+              //       e.target.textContent = e.target.textContent.replace(
+              //         /\u2009(.)\u200c/,
+              //         "\u2009\u200c$1",
+              //       );
+              //     }
+              //   }
+              //   console.log(
+              //     "Key up event after replace",
+              //     e.code,
+              //     e.target.textContent
+              //       ?.replaceAll("\u00a0", "`")
+              //       .replaceAll("\u200c", "¬")
+              //       .replaceAll("\u2009", "%"),
+              //   );
+              // }
+              // console.log("e.target keyup capture", e.target);
+              handleKeyUp(e);
+            }}
             onPasteCapture={handlePaste}
           />
         </div>

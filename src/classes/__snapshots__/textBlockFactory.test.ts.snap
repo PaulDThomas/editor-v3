@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Check at correctly loaded, and eats its own tail Load span with style and space 1`] = `
+exports[`Check at correctly loaded, and eats its own tail Load at span with style, data and space 1`] = `
 EditorV3AtBlock {
   "_defaultContentProps": {
     "allowMarkdown": false,
@@ -29,9 +29,12 @@ EditorV3AtBlock {
     "styles": undefined,
     "textAlignment": "left",
   },
+  "atData": {
+    "email": "hello@world.asup.uk",
+  },
   "atListFunction": [Function],
   "isActive": false,
-  "isLocked": undefined,
+  "isLocked": true,
   "lineStartPosition": 0,
   "maxAtListLength": 10,
   "style": "shiny",
@@ -41,7 +44,7 @@ EditorV3AtBlock {
 `;
 
 exports[`Check at correctly loaded, and eats its own tail Load word 1`] = `
-EditorV3AtBlock {
+EditorV3TextBlock {
   "_defaultContentProps": {
     "allowMarkdown": false,
     "allowNewLine": false,
@@ -69,19 +72,17 @@ EditorV3AtBlock {
     "styles": undefined,
     "textAlignment": "left",
   },
-  "atListFunction": [Function],
   "isActive": false,
   "isLocked": undefined,
   "lineStartPosition": 0,
-  "maxAtListLength": 10,
   "style": undefined,
   "text": "@Hello",
-  "type": "at",
+  "type": "text",
 }
 `;
 
 exports[`Check at correctly loaded, and eats its own tail Load word 2`] = `
-EditorV3AtBlock {
+EditorV3TextBlock {
   "_defaultContentProps": {
     "allowMarkdown": false,
     "allowNewLine": false,
@@ -109,14 +110,12 @@ EditorV3AtBlock {
     "styles": undefined,
     "textAlignment": "left",
   },
-  "atListFunction": [Function],
   "isActive": false,
   "isLocked": undefined,
   "lineStartPosition": 0,
-  "maxAtListLength": 10,
   "style": undefined,
   "text": "@Hello",
-  "type": "at",
+  "type": "text",
 }
 `;
 
@@ -149,6 +148,7 @@ EditorV3AtBlock {
     "styles": undefined,
     "textAlignment": "left",
   },
+  "atData": {},
   "atListFunction": [Function],
   "isActive": false,
   "isLocked": undefined,
@@ -189,6 +189,7 @@ EditorV3AtBlock {
     "styles": undefined,
     "textAlignment": "left",
   },
+  "atData": {},
   "atListFunction": [Function],
   "isActive": false,
   "isLocked": undefined,

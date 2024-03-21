@@ -6,8 +6,12 @@ export const getTextNodeAtOffset = (
   if (el)
     for (let _i = 0; _i < el.childNodes.length && currentPos <= offset; _i++) {
       const currentNode = el.childNodes[_i] as Node;
-      if (currentPos + (currentNode?.textContent ?? "").length < offset) {
-        currentPos += (currentNode?.textContent ?? "").length;
+      // Ignore the high space characters
+      if (
+        currentPos + (currentNode?.textContent?.replace(/[\u2009-\u200f]/g, "") ?? "").length <
+        offset
+      ) {
+        currentPos += (currentNode?.textContent?.replace(/[\u2009-\u200f]/g, "") ?? "").length;
       }
       // Check for locked block
       else if (
@@ -25,7 +29,16 @@ export const getTextNodeAtOffset = (
       } else if (currentNode instanceof Element) {
         return getTextNodeAtOffset(currentNode, offset - currentPos);
       } else if (currentNode instanceof Text) {
-        return { node: currentNode, offset: offset - currentPos };
+        return {
+          node: currentNode,
+          offset:
+            offset -
+            currentPos +
+            // Add on 1 for each high space character
+            (currentNode?.textContent?.substring(0, offset - currentPos)?.split(/[\u2009-\u200f]/)
+              ?.length ?? 0) -
+            1,
+        };
       }
     }
   return null;

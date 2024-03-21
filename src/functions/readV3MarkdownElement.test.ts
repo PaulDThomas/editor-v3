@@ -71,9 +71,9 @@ describe("Test readV3MarkdownElement", () => {
     div.className = "aiev3-markdown-line";
     const result = readV3MarkdownElement(div, defaultContentProps);
     expect(result.textBlocks.map((tb) => tb.data)).toEqual([
-      { text: "@Hello world", type: "at" },
+      { text: "@Hello world", type: "at", atData: {} },
       { text: " piece of ", type: "text" },
-      { text: "cake", style: "iced", type: "at" },
+      { text: "cake", style: "iced", type: "at", atData: {} },
     ]);
   });
 });

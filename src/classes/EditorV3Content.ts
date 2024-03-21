@@ -94,7 +94,7 @@ export class EditorV3Content implements EditorV3Import {
     this._showMarkdown = newShow;
   }
   public _atListFunction:
-    | ((typedString: string) => Promise<EditorV3AtListItem<unknown>[]>)
+    | ((typedString: string) => Promise<EditorV3AtListItem<{ [key: string]: string }>[]>)
     | undefined;
   get atListFunction() {
     return this._atListFunction;
@@ -354,7 +354,7 @@ export class EditorV3Content implements EditorV3Import {
       pos.startLine < this.lines.length
     ) {
       const style = this.lines[pos.startLine].getStyleAt(pos.startChar);
-      ret.push(new EditorV3Line([textBlockFactory("", style)], this.contentProps));
+      ret.push(new EditorV3Line([textBlockFactory("", { style })], this.contentProps));
     }
     // Check selection contains something
     if (
@@ -520,7 +520,7 @@ export class EditorV3Content implements EditorV3Import {
       // Check all lines have at least 1 text block
       this.lines.forEach((l) => {
         if (l.textBlocks.length === 0) {
-          l.textBlocks.push(textBlockFactory("", l.getStyleAt(0)));
+          l.textBlocks.push(textBlockFactory("", { style: l.getStyleAt(0) }));
         }
       });
       // Calculate end character position
@@ -720,14 +720,12 @@ export class EditorV3Content implements EditorV3Import {
           this.deleteCharacter(false);
           break;
         case "Escape":
-          if (this._caretPosition && this._isLockable) {
-            this.lines.forEach((l) =>
-              l.textBlocks.forEach((tb) => {
-                tb.isLocked = true;
-                tb.setActive(false);
-              }),
-            );
-          }
+          this.lines.forEach((l) =>
+            l.textBlocks.forEach((tb) => {
+              tb.isLocked = true;
+              tb.setActive(false);
+            }),
+          );
       }
     }
     // Enter key cannot be used here

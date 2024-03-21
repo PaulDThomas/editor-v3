@@ -2,6 +2,7 @@ import { EditorV3Content } from "./EditorV3Content";
 import { defaultContentProps } from "./defaultContentProps";
 import { EditorV3Line } from "./EditorV3Line";
 import { EditorV3Align, EditorV3ContentPropsInput } from "./interface";
+import { EditorV3TextBlock } from "./EditorV3TextBlock";
 
 // Load and read tests
 describe("Check basic EditorV3Content", () => {
@@ -703,7 +704,11 @@ describe("handleKeydown", () => {
   });
 
   test("should lock text blocks when Escape is pressed", () => {
-    const testContent = new EditorV3Content("@Hello, World!");
+    const testContent = new EditorV3Content(
+      JSON.stringify({
+        lines: [{ textBlocks: [{ text: "@Hello, World!", type: "at" }] }],
+      }),
+    );
     testContent.caretPosition = {
       startLine: 0,
       startChar: 13,
