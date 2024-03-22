@@ -635,6 +635,19 @@ describe("Write space after at block", () => {
         '<span class="aiev3-tb">\u2009</span>' +
         "</div>",
     );
+    // Set active
+    const block = line.setActiveBlock({
+      startLine: 0,
+      startChar: 1,
+      endLine: 0,
+      endChar: 1,
+      isCollapsed: true,
+    });
+    if (block) block.isLocked = undefined;
+    if (block instanceof EditorV3AtBlock) block.isLocked = undefined;
+    expect(line.data).toEqual({
+      textBlocks: [{ text: "@Hello", type: "at" }],
+    });
   });
 });
 
@@ -673,13 +686,17 @@ describe("Don't destroy at block!", () => {
   test("At block preserved", async () => {
     const line = new EditorV3Line([
       new EditorV3TextBlock({ text: "Who is " }),
-      new EditorV3AtBlock({ text: "@Jackie", isLocked: true }),
+      new EditorV3AtBlock({
+        text: "@Jackie",
+        isLocked: true,
+        atData: { email: "Jackie@someEmail.com" },
+      }),
       new EditorV3TextBlock({ text: ", and what is she doing there?" }),
     ]);
     expect(line.data).toEqual({
       textBlocks: [
         { text: "Who is ", type: "text" },
-        { text: "@Jackie", type: "at", isLocked: true },
+        { text: "@Jackie", type: "at", isLocked: true, atData: { email: "Jackie@someEmail.com" } },
         { text: ", and what is she doing there?", type: "text" },
       ],
     });
@@ -689,7 +706,13 @@ describe("Don't destroy at block!", () => {
     expect(line.data).toEqual({
       textBlocks: [
         { text: "Who is ", type: "text", style: "red" },
-        { text: "@Jackie", type: "at", isLocked: true, style: "red" },
+        {
+          text: "@Jackie",
+          type: "at",
+          isLocked: true,
+          style: "red",
+          atData: { email: "Jackie@someEmail.com" },
+        },
         { text: ", and what is she doing there?", type: "text", style: "red" },
       ],
     });

@@ -86,6 +86,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
             this.style = childData.style;
             this.type = childData.type as EditorV3TextBlockType;
             this.isLocked = childData.isLocked;
+            this.lineStartPosition = childData.lineStartPosition ?? 0;
           } else {
             if (childData.type !== this.type) errors.push("Multiple types in fragment");
             if (childData.style !== this.style) errors.push("Multiple styles in fragment");

@@ -16,6 +16,7 @@ import {
 } from "./interface";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 import { textBlockFactory } from "./textBlockFactory";
+import { EditorV3TextBlockType } from "./EditorV3TextBlock";
 
 export class EditorV3Line {
   public textBlocks: EditorV3BlockClass[];
@@ -410,7 +411,10 @@ export class EditorV3Line {
         if (this.textBlocks[_i].typeStyle === lastTypeStyle && mergedBlocks.length > 0) {
           mergedBlocks[mergedBlocks.length - 1] = textBlockFactory(
             mergedBlocks[mergedBlocks.length - 1].text + this.textBlocks[_i].text,
-            { style: lastTypeStyle.split(":")[1] },
+            {
+              type: lastTypeStyle.split(":")[0] as EditorV3TextBlockType,
+              style: lastTypeStyle.split(":")[1],
+            },
           );
         } else {
           mergedBlocks.push(this.textBlocks[_i]);
