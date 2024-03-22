@@ -111,7 +111,7 @@ export const textBlockFactory = (
   }
 
   // Fix characters
-  factory.text = factory.text.replace(/[\u2009-\u200F\uFEFF\t\r\n]/g, ""); // Remove undesirable non-printing chars
+  factory.text = factory.text.replace(/[\u2009-\u200F\t\r\n]/g, ""); // Remove undesirable non-printing chars
   if (factory.text.startsWith("@")) factory.type = "at";
 
   // Return appropriate class

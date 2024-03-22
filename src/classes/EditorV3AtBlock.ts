@@ -104,7 +104,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
 
     // Add Text node
     const textNode = document.createTextNode(
-      this.text.replaceAll("\uFEFF", "").replace(/^ /, "\u00A0").replace(/ $/, "\u00A0"),
+      this.text.replaceAll("\u200c", "").replace(/^ /, "\u00A0").replace(/ $/, "\u00A0"),
     );
 
     span.appendChild(textNode);
