@@ -431,7 +431,7 @@ export class EditorV3Line {
     let _linePos = initialPos;
     const tbs = blocks ?? this.textBlocks;
     tbs.forEach((tb) => {
-      tb.setLineStartPosition(_linePos);
+      tb.lineStartPosition = _linePos;
       if (tb.lineEndPosition !== undefined) {
         _linePos = tb.lineEndPosition;
       }

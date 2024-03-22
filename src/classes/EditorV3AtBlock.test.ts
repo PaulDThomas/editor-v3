@@ -325,5 +325,36 @@ describe("should return a DocumentFragment with a dropdown", () => {
     expect(div.querySelector(".aiev3-at-item")).toBeNull();
     expect(div.textContent).toBe("aa");
     expect(div.innerHTML).toMatchSnapshot();
+
+    // Check data
+    const readBack = new EditorV3AtBlock(div.children[0] as HTMLSpanElement);
+    expect(readBack.data).toEqual({
+      text: "aa",
+      type: "at",
+      isLocked: true,
+      style: undefined,
+      atData: {
+        email: "aa@0.com",
+      },
+    });
+
+    // Eat your own tail
+    expect(new EditorV3AtBlock(readBack.data).data).toEqual(readBack.data);
+    expect(new EditorV3AtBlock(readBack.toHtml({})).data).toEqual(readBack.data);
+  });
+});
+
+describe("EditorV3AtBlock errors", () => {
+  test("should throw an error from an empty document fragment", async () => {
+    expect(() => {
+      new EditorV3AtBlock(document.createDocumentFragment());
+    }).toThrow("EditorV3AtBlock:Constructor: DocumentFragment must have 1 child node");
+  });
+  test("should throw an error from an unknown node type", async () => {
+    const frag = new DocumentFragment();
+    frag.appendChild(new Text("Bad text!"));
+    expect(() => {
+      new EditorV3AtBlock(frag);
+    }).toThrow("EditorV3AtBlock:Constructor: DocumentFragment child node must be HTMLSpanElement");
   });
 });

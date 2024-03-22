@@ -52,7 +52,10 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     ];
   }
 
-  constructor(arg: IEditorV3AtBlock, forcedParams?: IEditorV3AtBlockOptionalParams) {
+  constructor(
+    arg: IEditorV3AtBlock | HTMLSpanElement | DocumentFragment,
+    forcedParams?: IEditorV3AtBlockOptionalParams,
+  ) {
     // Usual text block constructor
     super(arg, forcedParams);
     // Force type

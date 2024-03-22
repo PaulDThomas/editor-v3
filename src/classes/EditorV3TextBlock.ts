@@ -69,12 +69,49 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
   }
 
   // Constructor
-  constructor(arg: IEditorV3TextBlock, forcedParams?: IEditorV3TextBlockOptionalParams) {
-    this.text = arg.text;
-    this.style = arg.style;
-    this.type = arg.type ?? "text";
-    this.isLocked = arg.isLocked;
-    this.lineStartPosition = arg.lineStartPosition ?? 0;
+  constructor(
+    arg: IEditorV3TextBlock | HTMLSpanElement | DocumentFragment,
+    forcedParams?: IEditorV3TextBlockOptionalParams,
+  ) {
+    // Document Fragment processing
+    if (arg instanceof DocumentFragment) {
+      this.text = "";
+      const errors: string[] = [];
+      arg.childNodes.forEach((child, ix) => {
+        if (child instanceof Text || child instanceof HTMLSpanElement) {
+          const childData = this.fromHtml(child);
+          // Set parameters
+          if (ix === 0) {
+            this.text = childData.text;
+            this.style = childData.style;
+            this.type = childData.type as EditorV3TextBlockType;
+            this.isLocked = childData.isLocked;
+          } else {
+            if (childData.type !== this.type) errors.push("Multiple types in fragment");
+            if (childData.style !== this.style) errors.push("Multiple styles in fragment");
+            if (childData.isLocked !== this.isLocked) errors.push("Multiple isLocked in fragment");
+            this.text += childData.text;
+          }
+        } else errors.push("Unknown node type in fragment");
+      });
+      if (errors.length > 0) throw new Error("EditorV3TextBlock:Constructor:" + errors.join(", "));
+    }
+    // Span or Text element processing
+    else if (arg instanceof HTMLSpanElement || arg instanceof Text) {
+      const spanData = this.fromHtml(arg);
+      this.text = spanData.text ?? "";
+      this.style = spanData.style;
+      this.type = (spanData.type ?? "text") as EditorV3TextBlockType;
+      this.isLocked = spanData.isLocked;
+    }
+    // Object processing
+    else {
+      this.text = arg.text.replaceAll(/[\r\n\t]/g, "");
+      this.style = arg.style;
+      this.type = arg.type ?? "text";
+      this.isLocked = arg.isLocked;
+      this.lineStartPosition = arg.lineStartPosition ?? 0;
+    }
     // Forced any parameters
     if (forcedParams) {
       if (forcedParams.style) this.style = forcedParams.style;
@@ -82,6 +119,26 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
       if (forcedParams.lineStartPosition) this.lineStartPosition = forcedParams.lineStartPosition;
     }
     if (this.type === undefined) this.type = "text";
+  }
+
+  // Protected functions
+  private fromHtml(arg: HTMLSpanElement | Text): IEditorV3TextBlock {
+    const text = (arg.textContent ?? "")
+      .replaceAll(/\u00a0/g, " ")
+      .replaceAll(/[\u2009-\u200f]/g, "");
+    const spanData: IEditorV3TextBlock = {
+      text,
+      style: arg instanceof HTMLSpanElement ? arg.dataset.styleName : undefined,
+      type: (arg instanceof HTMLSpanElement ? arg.dataset.type : "text") as EditorV3TextBlockType,
+      isLocked:
+        arg instanceof HTMLSpanElement && arg.dataset.isLocked === "true" ? true : undefined,
+    };
+    return spanData;
+  }
+
+  // Status updated functions
+  public setActive(active: boolean) {
+    this.isActive = active;
   }
 
   // Content returns
@@ -135,33 +192,5 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
       this.text +
       `${this.type === "at" ? markdownSettings.atEndTag : this.style ? markdownSettings.styleEndTag : ""}`
     );
-  }
-
-  // // Protected functions
-  // protected fromData(arg: IEditorV3TextBlock) {
-  //   this.text = arg.text;
-  //   this.style = arg.style;
-  //   this.type = arg.type ?? "text";
-  //   this.isLocked = arg.isLocked;
-  //   this.lineStartPosition = arg.lineStartPosition ?? 0;
-  // }
-
-  // protected fromHtml(arg: HTMLSpanElement | Text) {
-  //   this.text = arg.textContent ?? "";
-  //   if (arg instanceof HTMLSpanElement) {
-  //     this.style = arg.dataset.styleName ?? "";
-  //     this.type = (arg.dataset.type ?? "text") as EditorV3TextBlockType;
-  //     this.isLocked = arg.dataset.isLocked === "true" ? true : undefined;
-  //     this.lineStartPosition = 0;
-  //   }
-  // }
-
-  // Status updated functions
-  public setActive(active: boolean) {
-    this.isActive = active;
-  }
-
-  public setLineStartPosition(start: number) {
-    this.lineStartPosition = start;
   }
 }
