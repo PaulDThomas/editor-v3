@@ -246,9 +246,11 @@ export class EditorV3Line {
       ) {
         const slicedBlock = textBlockFactory(
           this.textBlocks[_i].text.slice(startPos - _counted, endPos - _counted),
-          this.textBlocks[_i].style,
-          this.textBlocks[_i].type,
-          this.textBlocks[_i].isLocked,
+          {
+            style: this.textBlocks[_i].style,
+            type: this.textBlocks[_i].type,
+            isLocked: this.textBlocks[_i].isLocked,
+          },
         );
         if (this.textBlocks[_i].isActive) slicedBlock.setActive(true);
         ret.push(slicedBlock);
@@ -259,12 +261,11 @@ export class EditorV3Line {
         endPos &&
         _counted + this.textBlocks[_i].text.length >= endPos
       ) {
-        const slicedBlock = textBlockFactory(
-          this.textBlocks[_i].text.slice(0, endPos - _counted),
-          this.textBlocks[_i].style,
-          this.textBlocks[_i].type,
-          this.textBlocks[_i].isLocked,
-        );
+        const slicedBlock = textBlockFactory(this.textBlocks[_i].text.slice(0, endPos - _counted), {
+          style: this.textBlocks[_i].style,
+          type: this.textBlocks[_i].type,
+          isLocked: this.textBlocks[_i].isLocked,
+        });
         if (this.textBlocks[_i].isActive) slicedBlock.setActive(true);
         ret.push(slicedBlock);
       }
@@ -409,7 +410,7 @@ export class EditorV3Line {
         if (this.textBlocks[_i].typeStyle === lastTypeStyle && mergedBlocks.length > 0) {
           mergedBlocks[mergedBlocks.length - 1] = textBlockFactory(
             mergedBlocks[mergedBlocks.length - 1].text + this.textBlocks[_i].text,
-            lastTypeStyle.split(":")[1],
+            { style: lastTypeStyle.split(":")[1] },
           );
         } else {
           mergedBlocks.push(this.textBlocks[_i]);

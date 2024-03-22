@@ -26,7 +26,7 @@ describe("Should render an at block in the HTML", () => {
       // eslint-disable-next-line quotes
       '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;</span>' +
         // eslint-disable-next-line quotes
-        '<span class="aiev3-tb at-block is-locked editorv3style-shiny" data-is-locked="true" data-style-name="shiny">@world</span>',
+        '<span class="aiev3-tb at-block is-locked editorv3style-shiny" data-type="at" data-is-locked="true" data-style-name="shiny">@world</span>',
     );
   });
 });

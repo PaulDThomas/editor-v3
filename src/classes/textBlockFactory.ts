@@ -1,23 +1,31 @@
-import { EditorV3AtBlock } from "./EditorV3AtBlock";
-import { EditorV3TextBlock, EditorV3TextBlockType } from "./EditorV3TextBlock";
+import {
+  EditorV3AtBlock,
+  IEditorV3AtBlock,
+  IEditorV3AtBlockOptionalParams,
+} from "./EditorV3AtBlock";
+import {
+  EditorV3TextBlockType,
+  EditorV3TextBlock,
+  IEditorV3TextBlock,
+  IEditorV3TextBlockOptionalParams,
+} from "./EditorV3TextBlock";
 
+/**
+ *  Factory function to direct text block creation
+ * @param arg Block data/element
+ * @param forcedParams Parameters to force
+ * @returns EditorV3TextBlock | EditorV3AtBlock
+ */
 export const textBlockFactory = (
   arg:
     | HTMLSpanElement
     | Text
     | EditorV3TextBlock
     | DocumentFragment
-    | {
-        text: string;
-        style?: string;
-        type?: EditorV3TextBlockType;
-        isLocked?: true | undefined;
-        lineStartPosition?: number;
-      }
+    | IEditorV3TextBlock
+    | IEditorV3AtBlock
     | string,
-  style?: string,
-  type?: EditorV3TextBlockType,
-  isLocked?: true | undefined,
+  forcedParams?: IEditorV3TextBlockOptionalParams | IEditorV3AtBlockOptionalParams,
 ): EditorV3TextBlock | EditorV3AtBlock => {
   // Initial
   const factory: {
@@ -102,19 +110,14 @@ export const textBlockFactory = (
     factory.lineStartPosition = arg.lineStartPosition ?? 0;
   }
 
-  // Always take other arguments if provided
-  if (style) factory.style = style;
-  if (type) factory.type = type;
-  if (isLocked) factory.isLocked = isLocked;
-
   // Fix characters
   factory.text = factory.text.replace(/[\u2009-\u200F\uFEFF\t\r\n]/g, ""); // Remove undesirable non-printing chars
   if (factory.text.startsWith("@")) factory.type = "at";
 
   // Return appropriate class
   if (factory.type === "at") {
-    return new EditorV3AtBlock(factory);
+    return new EditorV3AtBlock(factory, forcedParams as IEditorV3AtBlockOptionalParams);
   } else {
-    return new EditorV3TextBlock(factory);
+    return new EditorV3TextBlock(factory, forcedParams as IEditorV3TextBlockOptionalParams);
   }
 };

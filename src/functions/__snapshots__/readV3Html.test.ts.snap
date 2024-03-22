@@ -30,6 +30,7 @@ exports[`readV3Html tests Read in at block 1`] = `
       "styles": undefined,
       "textAlignment": "left",
     },
+    "atData": {},
     "atListFunction": [Function],
     "isActive": false,
     "isLocked": undefined,

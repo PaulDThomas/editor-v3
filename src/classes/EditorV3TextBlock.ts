@@ -4,19 +4,21 @@ import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 import { EditorV3RenderProps, EditorV3WordPosition } from "./interface";
 
 export type EditorV3TextBlockType = "text" | "at";
-export interface IEditorV3TextBlock {
-  text: string;
+export interface IEditorV3TextBlockOptionalParams {
   style?: string;
   type?: EditorV3TextBlockType;
   isLocked?: true | undefined;
   lineStartPosition?: number;
+}
+export interface IEditorV3TextBlock extends IEditorV3TextBlockOptionalParams {
+  text: string;
 }
 
 // Class
 export class EditorV3TextBlock implements IEditorV3TextBlock {
   private _defaultContentProps = cloneDeep(defaultContentProps);
   // Variables
-  public text: string;
+  public text: string = "";
   public style?: string;
   public type: EditorV3TextBlockType = "text";
   public isActive: boolean = false;
@@ -31,7 +33,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
   }
 
   // Read only variables
-  get data() {
+  get data(): IEditorV3TextBlock {
     return { text: this.text, style: this.style, type: this.type, isLocked: this.isLocked };
   }
   get jsonString(): string {
@@ -66,6 +68,22 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     return ret;
   }
 
+  // Constructor
+  constructor(arg: IEditorV3TextBlock, forcedParams?: IEditorV3TextBlockOptionalParams) {
+    this.text = arg.text;
+    this.style = arg.style;
+    this.type = arg.type ?? "text";
+    this.isLocked = arg.isLocked;
+    this.lineStartPosition = arg.lineStartPosition ?? 0;
+    // Forced any parameters
+    if (forcedParams) {
+      if (forcedParams.style) this.style = forcedParams.style;
+      if (forcedParams.isLocked) this.isLocked = forcedParams.isLocked;
+      if (forcedParams.lineStartPosition) this.lineStartPosition = forcedParams.lineStartPosition;
+    }
+    if (this.type === undefined) this.type = "text";
+  }
+
   // Content returns
   public toHtml(renderProps: EditorV3RenderProps): DocumentFragment {
     const text =
@@ -80,26 +98,30 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
       throw new Error("Use EditorV3AtBlock for at blocks");
     } else {
       const words = text.split("\uFEFF");
-      words.forEach((word) => {
-        const span = document.createElement("span");
-        span.classList.add("aiev3-tb");
-        if (word.startsWith("@")) {
-          span.classList.add("at-block");
-          if (this.isActive) span.classList.add("is-active");
-          else {
-            span.classList.add("is-locked");
-            span.dataset.isLocked = "true";
+      words
+        .filter((w) => w !== "")
+        .forEach((word) => {
+          const span = document.createElement("span");
+          span.classList.add("aiev3-tb");
+          if (word.startsWith("@")) {
+            span.classList.add("at-block");
+            span.dataset.type = "at";
+            // Always lock non-active at blocks
+            if (this.isActive) span.classList.add("is-active");
+            else {
+              span.classList.add("is-locked");
+              span.dataset.isLocked = "true";
+            }
           }
-        }
-        const textNode = document.createTextNode(word);
-        span.appendChild(textNode);
-        if (this.style) {
-          span.classList.add(`editorv3style-${this.style}`);
-          span.dataset.styleName = this.style;
-        }
-        if (this.isActive) span.classList.add("is-active");
-        ret.append(span);
-      });
+          const textNode = document.createTextNode(word);
+          span.appendChild(textNode);
+          if (this.style) {
+            span.classList.add(`editorv3style-${this.style}`);
+            span.dataset.styleName = this.style;
+          }
+          if (this.isActive) span.classList.add("is-active");
+          ret.append(span);
+        });
     }
     if (renderProps.currentEl) renderProps.currentEl.append(ret);
     return ret;
@@ -113,15 +135,6 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
       this.text +
       `${this.type === "at" ? markdownSettings.atEndTag : this.style ? markdownSettings.styleEndTag : ""}`
     );
-  }
-
-  // Constructor
-  constructor({ text, style, type, isLocked, lineStartPosition }: IEditorV3TextBlock) {
-    this.text = text;
-    this.style = style;
-    this.type = type ?? "text";
-    this.isLocked = isLocked;
-    this.lineStartPosition = lineStartPosition ?? 0;
   }
 
   // // Protected functions
