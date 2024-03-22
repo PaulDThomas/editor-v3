@@ -32,7 +32,7 @@ interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   allowMarkdown?: boolean;
   markdownSettings?: IMarkdownSettings;
   debounceMilliseconds?: number | null;
-  atListFunction?: (at: string) => Promise<EditorV3AtListItem<unknown>[]>;
+  atListFunction?: (at: string) => Promise<EditorV3AtListItem<{ [key: string]: string }>[]>;
 }
 
 export interface EditorV3State {

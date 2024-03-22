@@ -1,5 +1,5 @@
-import { EditorV3AtBlock } from "./EditorV3AtBlock";
-import { EditorV3TextBlock, EditorV3TextBlockType } from "./EditorV3TextBlock";
+import { EditorV3AtBlock, IEditorV3AtBlock } from "./EditorV3AtBlock";
+import { EditorV3TextBlock, IEditorV3TextBlock } from "./EditorV3TextBlock";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 
 /**
@@ -26,7 +26,7 @@ export interface EditorV3LineProps {
   textBlocks: EditorV3TextBlock[];
 }
 
-export interface EditorV3AtListItem<T> {
+export interface EditorV3AtListItem<T extends { [key: string]: string }> {
   text: string;
   data?: T;
   listRender?: HTMLLIElement;
@@ -54,7 +54,9 @@ export interface EditorV3ContentProps {
   showMarkdown: boolean;
   styles?: EditorV3Styles;
   textAlignment: EditorV3Align;
-  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<unknown>[]>;
+  atListFunction?: (
+    typedString: string,
+  ) => Promise<EditorV3AtListItem<{ [key: string]: string }>[]>;
 }
 export interface EditorV3ContentPropsInput {
   allowMarkdown?: boolean;
@@ -64,14 +66,16 @@ export interface EditorV3ContentPropsInput {
   showMarkdown?: boolean;
   styles?: EditorV3Styles;
   textAlignment?: EditorV3Align;
-  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<unknown>[]>;
+  atListFunction?: (
+    typedString: string,
+  ) => Promise<EditorV3AtListItem<{ [key: string]: string }>[]>;
 }
 
 /**
  * Line import object for EditorV3
  */
 export interface EditorV3LineImport {
-  textBlocks: { text: string; style?: string; type: EditorV3TextBlockType }[] | EditorV3TextBlock[];
+  textBlocks: (IEditorV3AtBlock | IEditorV3TextBlock)[];
 }
 
 /**
@@ -86,10 +90,6 @@ export interface EditorV3Import {
  * Cursor position object for EditorV3
  */
 export interface EditorV3Position {
-  // initialLine: number;
-  // initialChar: number;
-  // focusLine: number;
-  // focusChar: number;
   startLine: number;
   startChar: number;
   endLine: number;
@@ -120,5 +120,8 @@ export interface EditorV3RenderProps {
   editableEl?: HTMLDivElement;
   currentEl?: HTMLDivElement | HTMLSpanElement;
   markdownSettings?: IMarkdownSettings;
-  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<unknown>[]>;
+  atListFunction?: (
+    typedString: string,
+  ) => Promise<EditorV3AtListItem<{ [key: string]: string }>[]>;
+  doNotSplitWordSpans?: boolean;
 }

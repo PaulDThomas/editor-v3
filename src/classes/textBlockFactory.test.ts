@@ -17,7 +17,7 @@ describe("Text block factory tests", () => {
   });
 
   test("Load string with style", async () => {
-    const testBlock = textBlockFactory("Hello world\u00a0", "shiny");
+    const testBlock = textBlockFactory("Hello world\u00a0", { style: "shiny" });
     expect(testBlock.text).toEqual("Hello world\u00a0");
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml({}));
@@ -65,7 +65,7 @@ describe("Text block factory tests", () => {
   });
 
   test("Load EditorV3TextBlock", async () => {
-    const firstBlock = textBlockFactory("Hello world", "shiny");
+    const firstBlock = textBlockFactory("Hello world", { style: "shiny" });
     const testBlock = textBlockFactory(firstBlock);
     expect(testBlock.data).toEqual(firstBlock.data);
   });
@@ -122,8 +122,13 @@ describe("Check at correctly loaded, and eats its own tail", () => {
   });
 
   test("Load word with style", async () => {
-    const testBlock = textBlockFactory("@Hello", "shiny");
-    expect(testBlock.data).toEqual({ text: "@Hello", style: "shiny", type: "at" });
+    const testBlock = textBlockFactory({ type: "at", text: "@Hello" }, { style: "shiny" });
+    expect(testBlock.data).toEqual({
+      text: "@Hello",
+      style: "shiny",
+      type: "at",
+      isLocked: undefined,
+    });
     expect(testBlock.toMarkdown()).toEqual("@[shiny::@Hello@]");
 
     const tempDiv = document.createElement("div");
