@@ -13,8 +13,8 @@ describe("Test draw decimal align function", () => {
     );
     expect(div.outerHTML).toEqual(
       '<div style="grid-template-columns: 40% 60%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">12.\u200c</span></span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">34\u200c</span></span>' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">12.</span></span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">34</span></span>' +
         "</div>",
     );
   });
@@ -23,7 +23,7 @@ describe("Test draw decimal align function", () => {
     drawHtmlDecimalAlign({ currentEl: div }, 40, [textBlockFactory("1234")], []);
     expect(div.outerHTML).toEqual(
       '<div style="grid-template-columns: 40% 60%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">1234\u200c</span></span>' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">1234</span></span>' +
         '<span class="aiev3-span-point rhs">\u2009</span>' +
         "</div>",
     );
@@ -34,7 +34,7 @@ describe("Test draw decimal align function", () => {
     expect(div.outerHTML).toEqual(
       '<div style="grid-template-columns: 75% 25%;">' +
         '<span class="aiev3-span-point lhs">\u2009</span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">34\u200c</span></span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">34</span></span>' +
         "</div>",
     );
   });

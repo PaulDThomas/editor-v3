@@ -16,7 +16,6 @@ import {
 } from "./interface";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 import { textBlockFactory } from "./textBlockFactory";
-import { EditorV3TextBlockType } from "./EditorV3TextBlock";
 
 export class EditorV3Line {
   public textBlocks: EditorV3BlockClass[];
@@ -247,11 +246,9 @@ export class EditorV3Line {
       ) {
         const slicedBlock = textBlockFactory(
           this.textBlocks[_i].text.slice(startPos - _counted, endPos - _counted),
-          {
-            style: this.textBlocks[_i].style,
-            type: this.textBlocks[_i].type,
-            isLocked: this.textBlocks[_i].isLocked,
-          },
+          this.textBlocks[_i].style,
+          this.textBlocks[_i].type,
+          this.textBlocks[_i].isLocked,
         );
         if (this.textBlocks[_i].isActive) slicedBlock.setActive(true);
         ret.push(slicedBlock);
@@ -262,11 +259,12 @@ export class EditorV3Line {
         endPos &&
         _counted + this.textBlocks[_i].text.length >= endPos
       ) {
-        const slicedBlock = textBlockFactory(this.textBlocks[_i].text.slice(0, endPos - _counted), {
-          style: this.textBlocks[_i].style,
-          type: this.textBlocks[_i].type,
-          isLocked: this.textBlocks[_i].isLocked,
-        });
+        const slicedBlock = textBlockFactory(
+          this.textBlocks[_i].text.slice(0, endPos - _counted),
+          this.textBlocks[_i].style,
+          this.textBlocks[_i].type,
+          this.textBlocks[_i].isLocked,
+        );
         if (this.textBlocks[_i].isActive) slicedBlock.setActive(true);
         ret.push(slicedBlock);
       }
@@ -411,10 +409,7 @@ export class EditorV3Line {
         if (this.textBlocks[_i].typeStyle === lastTypeStyle && mergedBlocks.length > 0) {
           mergedBlocks[mergedBlocks.length - 1] = textBlockFactory(
             mergedBlocks[mergedBlocks.length - 1].text + this.textBlocks[_i].text,
-            {
-              type: lastTypeStyle.split(":")[0] as EditorV3TextBlockType,
-              style: lastTypeStyle.split(":")[1],
-            },
+            lastTypeStyle.split(":")[1],
           );
         } else {
           mergedBlocks.push(this.textBlocks[_i]);
@@ -435,7 +430,7 @@ export class EditorV3Line {
     let _linePos = initialPos;
     const tbs = blocks ?? this.textBlocks;
     tbs.forEach((tb) => {
-      tb.lineStartPosition = _linePos;
+      tb.setLineStartPosition(_linePos);
       if (tb.lineEndPosition !== undefined) {
         _linePos = tb.lineEndPosition;
       }

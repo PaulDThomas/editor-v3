@@ -66,7 +66,6 @@ describe("Test MarkdownAtClass", () => {
       text: "@moreContent",
       style: "st1",
       type: "at",
-      atData: {},
     });
   });
 

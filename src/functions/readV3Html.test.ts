@@ -69,7 +69,7 @@ describe("readV3Html tests", () => {
   test("Read in at block", async () => {
     const text = `
       <div class="aiev3-line left">
-        <span class="aiev3-tb at-block" data-type="at">@Hello world</span>
+        <span class="aiev3-tb at-block">@Hello world</span>
       </div>
       `
       .replaceAll(/[\r\n\t]/g, "")

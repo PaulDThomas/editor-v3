@@ -45,12 +45,12 @@ export const readV3DivElement = (
               ...[...(arg.lastChild as HTMLSpanElement).childNodes].map((el) =>
                 textBlockFactory(el instanceof HTMLSpanElement || el instanceof Text ? el : ""),
               ),
-            ].filter((tb) => tb.text !== "" && tb.text !== "\u2009")
+            ].filter((tb) => tb.text !== "")
           : [
               ...[...arg.childNodes].map((el) =>
                 textBlockFactory(el instanceof HTMLSpanElement || el instanceof Text ? el : ""),
               ),
-            ].filter((tb) => tb.text !== "" && tb.text !== "\u2009");
+            ].filter((tb) => tb.text !== "");
     }
     // Standard alignment
     else if (["left", "center", "right"].includes(arg.classList[1])) {

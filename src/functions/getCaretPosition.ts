@@ -23,7 +23,7 @@ const getItemPosition = (
   // Get the character number by checking the text content
   targetRange.selectNodeContents(line);
   targetRange.setEnd(targetNode, offset);
-  const charIndex = targetRange.toString().replace(/[\u2009-\u200f]/g, "").length;
+  const charIndex = targetRange.toString().replace(/[\u2009-\u200F]/, "").length;
   return { lineIndex, charIndex };
 };
 

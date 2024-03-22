@@ -28,9 +28,7 @@ export const readV2DivElement = (
         // If span has style
         if (child.attributes.length > 0 && child.attributes[0].name === "classname") {
           // Add text block with style
-          const newBlbock = textBlockFactory(child.textContent, {
-            style: child.attributes[0].value,
-          });
+          const newBlbock = textBlockFactory(child.textContent, child.attributes[0].value);
           ret.textBlocks.push(newBlbock);
         }
         // If span has no style

@@ -11,8 +11,8 @@ describe("Check basic EditorV3Line", () => {
     const testLine = new EditorV3Line("Hello world");
     expect(testLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line left">' +
-        '<span class="aiev3-tb">Hello&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb">world\u200c</span>' +
+        '<span class="aiev3-tb">Hello&nbsp;</span>' +
+        '<span class="aiev3-tb">world</span>' +
         "</div>",
     );
     expect(testLine.lineText).toEqual("Hello world");
@@ -28,12 +28,12 @@ describe("Check basic EditorV3Line", () => {
     });
     expect(testLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line center">' +
-        '<span class="aiev3-tb">&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb">&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb">Hello&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb">&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb">world&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb">&nbsp;\u200c</span>' +
+        '<span class="aiev3-tb">&nbsp;</span>' +
+        '<span class="aiev3-tb">&nbsp;</span>' +
+        '<span class="aiev3-tb">Hello&nbsp;</span>' +
+        '<span class="aiev3-tb">&nbsp;</span>' +
+        '<span class="aiev3-tb">world&nbsp;</span>' +
+        '<span class="aiev3-tb">&nbsp;</span>' +
         "</div>",
     );
     expect(testLine.lineText).toEqual("  Hello  world  ");
@@ -43,19 +43,16 @@ describe("Check basic EditorV3Line", () => {
 
   test("Load textBlocks, test getStyleAt", async () => {
     const testLine = new EditorV3Line(
-      [
-        textBlockFactory("Hello\u00A0world, "),
-        textBlockFactory("How is it going?", { style: "shiny" }),
-      ],
+      [textBlockFactory("Hello\u00A0world, "), textBlockFactory("How is it going?", "shiny")],
       defaultContentProps,
     );
     expect(testLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line left">' +
-        '<span class="aiev3-tb">Hello&nbsp;world,&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">is&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">it&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">going?\u200c</span>' +
+        '<span class="aiev3-tb">Hello&nbsp;world,&nbsp;</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How&nbsp;</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">is&nbsp;</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">it&nbsp;</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">going?</span>' +
         "</div>",
     );
     expect(testLine.lineText).toEqual("Hello\u00a0world, How is it going?");
@@ -105,21 +102,18 @@ describe("Check basic EditorV3Line", () => {
 
   test("Load decimal textBlocks", async () => {
     const testLine = new EditorV3Line(
-      [
-        textBlockFactory("Hello\u00A0world. "),
-        textBlockFactory("How is it going?", { style: "shiny" }),
-      ],
+      [textBlockFactory("Hello\u00A0world. "), textBlockFactory("How is it going?", "shiny")],
       { ...defaultContentProps, textAlignment: EditorV3Align.decimal },
     );
     expect(testLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">Hello&nbsp;world\u200c</span></span>' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">Hello&nbsp;world</span></span>' +
         '<span class="aiev3-span-point rhs">' +
-        '<span class="aiev3-tb">.&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">is&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">it&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">going?\u200c</span>' +
+        '<span class="aiev3-tb">.&nbsp;</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How&nbsp;</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">is&nbsp;</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">it&nbsp;</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">going?</span>' +
         "</span>" +
         "</div>",
     );
@@ -134,7 +128,7 @@ describe("Check basic EditorV3Line", () => {
     });
     expect(newDecimalTestLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">q\u200c</span></span>' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">q</span></span>' +
         '<span class="aiev3-span-point rhs">\u2009</span>' +
         "</div>",
     );
@@ -144,8 +138,8 @@ describe("Check basic EditorV3Line", () => {
     });
     expect(testLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">12\u200c</span></span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">.34\u200c</span></span>' +
+        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">12</span></span>' +
+        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">.34</span></span>' +
         "</div>",
     );
     expect(testLine.lineText).toEqual("12.34");
@@ -165,12 +159,12 @@ describe("Check basic EditorV3Line", () => {
     expect(testLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
         '<span class="aiev3-span-point lhs">' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">12\u200c</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">12</span>' +
         "</span>" +
         '<span class="aiev3-span-point rhs">' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">.34\u200c</span>' +
-        '<span class="aiev3-tb">&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb">slow\u200c</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">.34</span>' +
+        '<span class="aiev3-tb">&nbsp;</span>' +
+        '<span class="aiev3-tb">slow</span>' +
         "</span>" +
         "</div>",
     );
@@ -216,7 +210,7 @@ describe("Check basic EditorV3Line", () => {
     });
 
     expect(testLine.toHtml({}).outerHTML).toEqual(
-      '<div class="aiev3-line right"><span class="aiev3-tb">12.34\u200c</span></div>',
+      '<div class="aiev3-line right"><span class="aiev3-tb">12.34</span></div>',
     );
     expect(testLine.lineText).toEqual("12.34");
     expect(testLine.contentProps.textAlignment).toEqual(EditorV3Align.right);
@@ -229,11 +223,12 @@ describe("Check basic EditorV3Line", () => {
 
     expect(testLine.toHtml({}).outerHTML).toEqual(
       '<div class="aiev3-line right">' +
-        '<span class="aiev3-tb">12.34&nbsp;wut?&nbsp;\u200c</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">5678\u200c</span>' +
+        '<span class="aiev3-tb">12.34&nbsp;</span>' +
+        '<span class="aiev3-tb">wut?&nbsp;</span>' +
+        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">5678</span>' +
         "</div>",
     );
-    expect(testLine.lineText).toEqual("12.34\u00a0wut? 5678");
+    expect(testLine.lineText).toEqual("12.34 wut? 5678");
     expect(testLine.contentProps.textAlignment).toEqual(EditorV3Align.right);
     expect(testLine.contentProps.decimalAlignPercent).toEqual(60);
   });
@@ -271,7 +266,7 @@ describe("Check EditorV3Line functions", () => {
     expect(line.upToPos(10).map((tb) => tb.data)).toEqual([{ text: "0123.456", type: "text" }]);
 
     const line2 = new EditorV3Line(
-      [textBlockFactory("hello", { style: "world" }), textBlockFactory(" slow")],
+      [textBlockFactory("hello", "world"), textBlockFactory(" slow")],
       defaultContentProps,
     );
     expect(line2.upToPos(0).map((tb) => tb.data)).toEqual([]);
@@ -324,7 +319,7 @@ describe("Check EditorV3Line functions", () => {
     expect(line.fromPos(8).map((tb) => tb.data)).toEqual([]);
 
     const line2 = new EditorV3Line(
-      [textBlockFactory("hello", { style: "world" }), textBlockFactory(" slow")],
+      [textBlockFactory("hello", "world"), textBlockFactory(" slow")],
       defaultContentProps,
     );
     expect(line2.fromPos(0).map((tb) => tb.data)).toEqual([
@@ -357,7 +352,7 @@ describe("Check EditorV3Line functions", () => {
 
   test("subBlocks", () => {
     const line2 = new EditorV3Line(
-      [textBlockFactory("hello", { style: "world" }), textBlockFactory(" slow")],
+      [textBlockFactory("hello", "world"), textBlockFactory(" slow")],
       defaultContentProps,
     );
     expect(line2.subBlocks(1, 1).map((tb) => tb.data)).toEqual([]);
@@ -441,16 +436,9 @@ describe("Check EditorV3Line functions", () => {
     expect(line1.lineText).toEqual("012hello3.456");
     expect(line1.textBlocks.length).toEqual(1);
 
-    const line2 = new EditorV3Line([
-      textBlockFactory("hello", { style: "world" }),
-      textBlockFactory(" slow"),
-    ]);
+    const line2 = new EditorV3Line([textBlockFactory("hello", "world"), textBlockFactory(" slow")]);
     line2.insertBlocks(
-      [
-        textBlockFactory("tree"),
-        textBlockFactory("pie", { style: "lid" }),
-        textBlockFactory("pie", { style: "world" }),
-      ],
+      [textBlockFactory("tree"), textBlockFactory("pie", "lid"), textBlockFactory("pie", "world")],
       0,
     );
     expect(JSON.parse(line2.jsonString)).toEqual({
@@ -469,7 +457,7 @@ describe("Check EditorV3Line functions", () => {
     expect(line1.lineText).toEqual("012hello3.456");
     expect(line1.textBlocks.length).toEqual(1);
     const line2 = new EditorV3Line(
-      [textBlockFactory("hello", { style: "world" }), textBlockFactory(" slow")],
+      [textBlockFactory("hello", "world"), textBlockFactory(" slow")],
       defaultContentProps,
     );
     line2.removeSection(4, 7);
@@ -483,7 +471,7 @@ describe("Check EditorV3Line functions", () => {
 
   test("deleteCharacter", async () => {
     const line2 = new EditorV3Line(
-      [textBlockFactory("hello", { style: "world" }), textBlockFactory(" slow")],
+      [textBlockFactory("hello", "world"), textBlockFactory(" slow")],
       defaultContentProps,
     );
     line2.deleteCharacter(4);
@@ -520,7 +508,7 @@ describe("Check EditorV3Line functions", () => {
 
   test("applyStyle & removeStyle", async () => {
     const line2 = new EditorV3Line(
-      [textBlockFactory("hello", { style: "world" }), textBlockFactory(" slow")],
+      [textBlockFactory("hello", "world"), textBlockFactory(" slow")],
       defaultContentProps,
     );
     line2.applyStyle("drive", 3, 6);
@@ -556,9 +544,9 @@ describe("Check EditorV3Line functions", () => {
   test("Generate markdown", async () => {
     const mdLine = new EditorV3Line(
       [
-        textBlockFactory("hello", { style: "world" }),
+        textBlockFactory("hello", "world"),
         textBlockFactory(" slow"),
-        textBlockFactory("and?fat", { style: "defaultStyle" }),
+        textBlockFactory("and?fat", "defaultStyle"),
       ],
       defaultContentProps,
     );
@@ -619,33 +607,19 @@ describe("Read in v2 div element", () => {
 });
 
 describe("Write space after at block", () => {
-  test("Ensure empty block after at block and set active", async () => {
-    const line = new EditorV3Line([
-      textBlockFactory({ text: "@Hello", type: "at" }, { isLocked: true }),
-    ]);
-    expect(line.data).toEqual({
-      textBlocks: [{ text: "@Hello", type: "at", isLocked: true, atData: {} }],
-    });
+  test("Add empty block after at block", async () => {
+    const line = new EditorV3Line(
+      [textBlockFactory("@Hello", undefined, "at", true)],
+      defaultContentProps,
+    );
     const div = document.createElement("div");
     div.appendChild(line.toHtml({}));
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line left">' +
         '<span class="aiev3-tb at-block is-locked" data-type="at" data-is-locked="true">@Hello</span>' +
-        '<span class="aiev3-tb">\u2009\u200c</span>' +
+        '<span class="aiev3-tb">\u2009</span>' +
         "</div>",
     );
-    // Set active
-    const block = line.setActiveBlock({
-      startLine: 0,
-      startChar: 1,
-      endLine: 0,
-      endChar: 1,
-      isCollapsed: true,
-    });
-    if (block instanceof EditorV3AtBlock) block.isLocked = undefined;
-    expect(line.data).toEqual({
-      textBlocks: [{ text: "@Hello", type: "at", atData: {} }],
-    });
   });
 });
 
@@ -684,17 +658,13 @@ describe("Don't destroy at block!", () => {
   test("At block preserved", async () => {
     const line = new EditorV3Line([
       new EditorV3TextBlock({ text: "Who is " }),
-      new EditorV3AtBlock({
-        text: "@Jackie",
-        isLocked: true,
-        atData: { email: "Jackie@someEmail.com" },
-      }),
+      new EditorV3AtBlock({ text: "@Jackie", isLocked: true }),
       new EditorV3TextBlock({ text: ", and what is she doing there?" }),
     ]);
     expect(line.data).toEqual({
       textBlocks: [
         { text: "Who is ", type: "text" },
-        { text: "@Jackie", type: "at", isLocked: true, atData: { email: "Jackie@someEmail.com" } },
+        { text: "@Jackie", type: "at", isLocked: true },
         { text: ", and what is she doing there?", type: "text" },
       ],
     });
@@ -704,13 +674,7 @@ describe("Don't destroy at block!", () => {
     expect(line.data).toEqual({
       textBlocks: [
         { text: "Who is ", type: "text", style: "red" },
-        {
-          text: "@Jackie",
-          type: "at",
-          isLocked: true,
-          style: "red",
-          atData: { email: "Jackie@someEmail.com" },
-        },
+        { text: "@Jackie", type: "at", isLocked: true, style: "red" },
         { text: ", and what is she doing there?", type: "text", style: "red" },
       ],
     });

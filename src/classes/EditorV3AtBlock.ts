@@ -1,20 +1,11 @@
 import "./EditorV3AtBlock.css";
-import {
-  EditorV3TextBlock,
-  IEditorV3TextBlock,
-  IEditorV3TextBlockOptionalParams,
-} from "./EditorV3TextBlock";
+import { EditorV3TextBlock, IEditorV3TextBlock } from "./EditorV3TextBlock";
 import { EditorV3AtListItem, EditorV3RenderProps, EditorV3WordPosition } from "./interface";
 
-export interface IEditorV3AtBlockOptionalParams extends IEditorV3TextBlockOptionalParams {
-  atListFunction?: (
-    typedString: string,
-  ) => Promise<EditorV3AtListItem<{ [key: string]: string }>[]>;
+export interface IEditorV3AtBlock extends IEditorV3TextBlock {
+  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<unknown>[]>;
   maxAtListLength?: number;
-  atData?: { [key: string]: string };
 }
-
-export interface IEditorV3AtBlock extends IEditorV3TextBlock, IEditorV3AtBlockOptionalParams {}
 
 export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlock {
   /**
@@ -22,25 +13,18 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
    * @param typedString Text entered into the block so far
    * @returns Promise of array of strings
    */
-  public atListFunction: (
-    typedString: string,
-  ) => Promise<EditorV3AtListItem<{ [key: string]: string }>[]> = () =>
+  public atListFunction: (typedString: string) => Promise<EditorV3AtListItem<unknown>[]> = () =>
     new Promise((resolve) => resolve([]));
   /**
    * Maximum number of items to display in the returned list
    */
   public maxAtListLength = 10;
 
-  public atData: { [key: string]: string } = {};
-
-  get data() {
-    return {
-      text: this.text,
-      style: this.style,
-      type: this.type,
-      isLocked: this.isLocked,
-      atData: this.atData,
-    };
+  constructor(props: IEditorV3AtBlock) {
+    super(props);
+    this.type = "at";
+    if (props.atListFunction) this.atListFunction = props.atListFunction;
+    if (props.maxAtListLength) this.maxAtListLength = props.maxAtListLength;
   }
 
   get wordPositions(): EditorV3WordPosition[] {
@@ -54,49 +38,6 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     ];
   }
 
-  constructor(
-    arg: IEditorV3AtBlock | HTMLSpanElement | DocumentFragment,
-    forcedParams?: IEditorV3AtBlockOptionalParams,
-  ) {
-    // Usual text block constructor
-    super(arg, forcedParams);
-    // Force type
-    this.type = "at";
-    // Check for at specific information
-    if (arg instanceof HTMLSpanElement) {
-      this.furtherHtml(arg);
-    } else if (arg instanceof DocumentFragment) {
-      if (arg.childNodes.length !== 1)
-        throw new Error("EditorV3AtBlock:Constructor: DocumentFragment must have 1 child node");
-      else if (!(arg.childNodes[0] instanceof HTMLSpanElement))
-        throw new Error(
-          "EditorV3AtBlock:Constructor: DocumentFragment child node must be HTMLSpanElement",
-        );
-      this.furtherHtml(arg.childNodes[0] as HTMLSpanElement);
-    } else {
-      if (arg.atListFunction) this.atListFunction = arg.atListFunction;
-      if (arg.maxAtListLength) this.maxAtListLength = arg.maxAtListLength;
-      if (arg.atData) {
-        this.atData = arg.atData;
-      }
-    }
-    // Force any parameters
-    if (forcedParams) {
-      if (forcedParams.atListFunction) this.atListFunction = forcedParams.atListFunction;
-      if (forcedParams.maxAtListLength) this.maxAtListLength = forcedParams.maxAtListLength;
-      if (forcedParams.atData) this.atData = forcedParams.atData;
-    }
-  }
-
-  private furtherHtml(arg: HTMLSpanElement) {
-    // Copy dataset to atFactory
-    Object.keys(arg.dataset).forEach((key) => {
-      if (!["styleName", "isLocked", "type", "text", "lineStartPosition"].includes(key)) {
-        this.atData[key] = arg.dataset[key] as string;
-      }
-    });
-  }
-
   // Overload html return
   public toHtml(renderProps: EditorV3RenderProps): DocumentFragment {
     // Create holder
@@ -108,7 +49,9 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     span.dataset.type = "at";
 
     // Add Text node
-    const textNode = document.createTextNode(this.text.replaceAll(" ", "\u00a0\u200c"));
+    const textNode = document.createTextNode(
+      this.text.replaceAll("\uFEFF", "").replace(/^ /, "\u00A0").replace(/ $/, "\u00A0"),
+    );
 
     span.appendChild(textNode);
     // Add style
@@ -120,7 +63,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     // Delete any existing dropdown on render
     const editor = renderProps.editableEl?.closest(".aiev3") as HTMLDivElement | null;
     if (editor) {
-      const existingDropdowns = editor.querySelectorAll("ul.aiev3-at-dropdown-list");
+      const existingDropdowns = editor.querySelectorAll(".aiev3-at-item");
       existingDropdowns.forEach((dropdown) => dropdown.remove());
     }
 
@@ -128,11 +71,6 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     if (this.isLocked || !this.isActive) {
       span.classList.add("is-locked");
       span.dataset.isLocked = "true";
-      // Add any other data items from the at item
-      this.atData &&
-        Object.keys(this.atData).forEach((key) => {
-          span.dataset[key] = (this.atData as { [key: string]: string })[key] as string;
-        });
     } else if (this.isActive) {
       span.classList.add("is-active");
 
@@ -159,21 +97,11 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
               atItem instanceof HTMLElement &&
               atItem.classList.contains("aiev3-at-item")
             ) {
-              // Update span
               const thisText = atItem.textContent;
               span.textContent = atItem.dataset.text ?? thisText;
               span.classList.remove("is-active");
               span.classList.add("is-locked");
               span.dataset.isLocked = "true";
-              // Copy any other data from the atItem
-              if (atItem.dataset) {
-                Object.keys(atItem.dataset)
-                  .filter((key) => !["isLocked", "text"].includes(key))
-                  .forEach((key) => {
-                    span.dataset[key] = atItem.dataset[key];
-                  });
-              }
-              // Remove dropdown
               dropdownUl.remove();
               // Move cursor to end of span
               const range = document.createRange();
@@ -226,22 +154,8 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
                   if (atSpan.textContent === "" || !atSpan.textContent)
                     atSpan.textContent = atItem.text;
                   atSpan.dataset.text = atItem.text;
-                  // Add in data from atItem
-                  if (atItem.data) {
-                    Object.keys(atItem.data).forEach((key) => {
-                      if (
-                        typeof (atItem.data as { [key: string]: string })[
-                          key as keyof typeof atItem.data
-                        ] === "string"
-                      )
-                        atSpan.dataset[key] = (atItem.data as { [key: string]: string })[
-                          key as keyof typeof atItem.data
-                        ] as string;
-                    });
-                  }
                   dropdownUl.appendChild(atSpan);
                 });
-                // Add in more items list item
                 if (resolvedAtList.length > this.maxAtListLength) {
                   const atSpan = document.createElement("li");
                   atSpan.classList.add("aiev3-more-items");
@@ -251,7 +165,6 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
               }
             })
             .catch(() => {
-              // For when something goes wrong
               dropdownUl.innerHTML = "";
               const errorItem = document.createElement("li");
               errorItem.classList.add("aiev3-at-items-error");
@@ -268,9 +181,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
         renderTimeout = window.setTimeout(renderDropdown, 100);
       }
     }
-    // Add to current element if specified
     if (renderProps.currentEl) renderProps.currentEl.append(ret);
-    // Always return
     return ret;
   }
 }

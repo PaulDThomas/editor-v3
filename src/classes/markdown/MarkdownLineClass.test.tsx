@@ -141,7 +141,7 @@ describe("Test MarkdownLineClass", () => {
     expect(testMLC.toTextBlocks().map((tb) => tb.data)).toEqual([
       { style: "st1", text: "Hello large world person", type: "text" },
       { text: " pie hollding ", type: "text" },
-      { style: "shiny", text: "@chicken", type: "at", atData: {} },
+      { style: "shiny", text: "@chicken", type: "at" },
       { text: "   ", type: "text" },
     ]);
   });

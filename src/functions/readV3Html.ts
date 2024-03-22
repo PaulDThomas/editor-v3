@@ -50,7 +50,7 @@ export const readV3Html = (
   // Everything else is just text(ish)
   else {
     ret.lines = text
-      .replace(/[\u2009-\u200f\r\t]/g, "") // Undesirable non-printing chars
+      .replace(/[\u2009-\u200F\uFEFF\r\t]/g, "") // Undesirable non-printing chars
       .replaceAll("</div><div", "</div>\n<div")
       .split("\n")
       .map((l) => new EditorV3Line(l, contentProps));
