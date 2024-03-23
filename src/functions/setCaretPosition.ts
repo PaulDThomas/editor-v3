@@ -1,3 +1,4 @@
+import { EditorV3TextBlock } from "../classes";
 import { EditorV3PositionClass } from "../classes/EditorV3Position";
 import { EditorV3PositionF } from "../classes/interface";
 import { getCaretPosition } from "./getCaretPosition";
@@ -18,6 +19,23 @@ export function setCaretPosition(el: Node, pos: EditorV3PositionClass): EditorV3
       const sel = window.getSelection();
       if (sel && document.contains(range.startContainer) && document.contains(range.endContainer)) {
         sel.removeAllRanges();
+        // First character on the line needs to be before a locked section
+        if (
+          range.startContainer === range.endContainer &&
+          range.startOffset === 0 &&
+          range.endOffset === 0 &&
+          range.startContainer instanceof Text &&
+          range.startContainer.parentElement instanceof HTMLSpanElement &&
+          range.startContainer.parentElement.classList.contains("is-locked")
+        ) {
+          const emptyTextBlock = new EditorV3TextBlock({ text: "\u200d" });
+          const newSpan = emptyTextBlock.toHtml({}).childNodes[0] as HTMLSpanElement;
+          // Add newTextNode before the locked span
+          range.startContainer.parentElement.before(newSpan);
+          range.setStart(newSpan, 0);
+          range.setEnd(newSpan, 0);
+        }
+        // Backwards selection
         if (pos.data.focusAt === "start") {
           sel.setBaseAndExtent(
             range.endContainer,
@@ -25,7 +43,9 @@ export function setCaretPosition(el: Node, pos: EditorV3PositionClass): EditorV3
             range.startContainer,
             range.startOffset,
           );
-        } else {
+        }
+        // Normal selection
+        else {
           sel.addRange(range);
         }
       }

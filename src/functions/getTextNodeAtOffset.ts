@@ -12,7 +12,8 @@ export const getTextNodeAtOffset = (
       // Check for locked block
       else if (
         currentNode instanceof HTMLSpanElement &&
-        currentNode.classList.contains("is-locked")
+        currentNode.classList.contains("is-locked") &&
+        offset !== 0
       ) {
         const nextSibling = currentNode.nextSibling;
         if (nextSibling instanceof Text) {

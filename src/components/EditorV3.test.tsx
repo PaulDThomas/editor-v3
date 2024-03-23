@@ -898,3 +898,96 @@ describe("Add at block and escape out", () => {
     );
   });
 });
+
+describe("Move left to start over at block", () => {
+  test("Arrow left", async () => {
+    const user = userEvent.setup({ delay: null });
+    const mockSetJson = jest.fn();
+    const TestEditor = () => {
+      const [input, setInput] = useState(
+        JSON.stringify({
+          lines: [
+            {
+              textBlocks: [
+                {
+                  text: "@initial",
+                  type: "at",
+                  isLocked: true,
+                },
+                {
+                  text: " thing ",
+                  type: "text",
+                },
+                {
+                  text: "@here",
+                  type: "at",
+                },
+              ],
+            },
+          ],
+        }),
+      );
+      return (
+        <EditorV3
+          data-testid="test-editor"
+          id="test-editor"
+          input={input}
+          setJson={(ret) => {
+            setInput(ret);
+            mockSetJson(ret);
+          }}
+          atListFunction={async (typedString: string) => {
+            const atList = [{ text: "@Hello" }, { text: "@Lovely" }, { text: "@People" }];
+            return atList.filter((at) => at.text.toLowerCase().includes(typedString.toLowerCase()));
+          }}
+        />
+      );
+    };
+    await act(async () => {
+      render(<TestEditor />);
+    });
+    screen.debug();
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
+    expect(editor).toBeInTheDocument();
+    const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    expect(screen).toMatchSnapshot();
+    await user.click(editable);
+    expect(getCaretPosition(editable)).toEqual({
+      initialLine: 0,
+      initialChar: 0,
+      focusLine: 0,
+      focusChar: 20,
+    });
+    await user.keyboard("{Home}");
+    expect(getCaretPosition(editable)).toEqual({
+      initialLine: 0,
+      initialChar: 0,
+      focusLine: 0,
+      focusChar: 0,
+    });
+    screen.debug();
+    await user.keyboard("@Hello{Escape}{ArrowLeft}{ArrowLeft} world ");
+    screen.debug();
+    expect(getCaretPosition(editable)).toEqual({
+      initialLine: 0,
+      initialChar: 7,
+      focusLine: 0,
+      focusChar: 7,
+    });
+    fireEvent.blur(editor);
+    expect(JSON.parse(mockSetJson.mock.calls[0][0])).toEqual({
+      lines: [
+        {
+          textBlocks: [
+            { text: " world ", type: "text" },
+            { text: "@Hello", type: "at", isLocked: true },
+            { text: "@Initial", type: "at", isLocked: true },
+            { text: " thing ", type: "text" },
+            { text: "@here", type: "at", isLocked: true },
+          ],
+        },
+      ],
+    });
+  }, 500000);
+});
