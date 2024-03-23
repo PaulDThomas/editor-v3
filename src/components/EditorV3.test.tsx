@@ -946,12 +946,11 @@ describe("Move left to start over at block", () => {
     await act(async () => {
       render(<TestEditor />);
     });
-    screen.debug();
     const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     expect(editor).toBeInTheDocument();
     const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
     expect(editable).toBeInTheDocument();
-    expect(screen).toMatchSnapshot();
+    expect(screen.queryByTestId("test-editor")).toMatchSnapshot();
     await user.click(editable);
     expect(getCaretPosition(editable)).toEqual({
       initialLine: 0,
@@ -966,9 +965,7 @@ describe("Move left to start over at block", () => {
       focusLine: 0,
       focusChar: 0,
     });
-    screen.debug();
     await user.keyboard("@Hello{Escape}{ArrowLeft}{ArrowLeft} world ");
-    screen.debug();
     expect(getCaretPosition(editable)).toEqual({
       initialLine: 0,
       initialChar: 7,
@@ -982,7 +979,7 @@ describe("Move left to start over at block", () => {
           textBlocks: [
             { text: " world ", type: "text" },
             { text: "@Hello", type: "at", isLocked: true },
-            { text: "@Initial", type: "at", isLocked: true },
+            { text: "@initial", type: "at", isLocked: true },
             { text: " thing ", type: "text" },
             { text: "@here", type: "at", isLocked: true },
           ],

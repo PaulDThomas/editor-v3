@@ -113,7 +113,6 @@ export const EditorV3 = ({
       if (
         !ret.content.lines.some((l) => l.textBlocks.some((tb) => tb.type === "at" && tb.isActive))
       ) {
-        // Save caret position
         // Redraw dummy for information
         const dummyNode = document.createElement("div");
         ret.content.redraw(dummyNode, false);
@@ -140,6 +139,7 @@ export const EditorV3 = ({
 
   // Redraw element, used in debounced stack as onChange callback
   const redrawElement = useCallback((ret: EditorV3State) => {
+    // console.debug("Redraw element", ret.content.lines[0].textBlocks.map((tb) => tb.text).join("|"));
     divRef.current && ret.content.redraw(divRef.current, ret.focus);
   }, []);
   // Create debounce stack
@@ -162,7 +162,7 @@ export const EditorV3 = ({
   const setContent = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (newContent: EditorV3Content, calledFrom?: string, focus?: boolean) => {
-      // console.debug(calledFrom, newContent?.text, newContent?.caretPosition, focus);
+      // console.debug(calledFrom, newContent.data.lines[0].textBlocks.map((tb) => tb.text).join("|"));
       setLastCaretPosition(newContent.caretPosition);
       setCurrentValue({ content: newContent, focus: focus ?? state?.focus ?? false });
     },
@@ -346,7 +346,7 @@ export const EditorV3 = ({
         }
       }
     },
-    [state, contentProps, setContent],
+    [contentProps, setContent, state],
   );
 
   const handleMouseUp = useCallback(
@@ -358,14 +358,14 @@ export const EditorV3 = ({
         (divRef.current === e.target || divRef.current.contains(e.target))
       )
         setTimeout(() => {
-          if (divRef.current && state?.focus) {
+          if (divRef.current) {
             const newContent = new EditorV3Content(divRef.current, contentProps);
             newContent.checkStatus();
             setContent(newContent, "Handle mouse up on timeout");
           }
         }, 0);
     },
-    [contentProps, setContent, state?.focus],
+    [contentProps, setContent],
   );
 
   const handleCopy = useCallback(

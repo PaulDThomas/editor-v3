@@ -401,14 +401,18 @@ export class EditorV3Line {
   }
 
   /**
-   * Merge blocks with the same style
+   * Merge blocks with the same style, that are not locked
    */
   private _mergeBlocks() {
     if (new Set(this.textBlocks.map((tb) => tb.typeStyle)).size < this.textBlocks.length) {
       const mergedBlocks: EditorV3BlockClass[] = [];
       let lastTypeStyle: string | null = null;
       for (let _i = 0; _i < this.textBlocks.length; _i++) {
-        if (this.textBlocks[_i].typeStyle === lastTypeStyle && mergedBlocks.length > 0) {
+        if (
+          !this.textBlocks[_i].isLocked &&
+          this.textBlocks[_i].typeStyle === lastTypeStyle &&
+          mergedBlocks.length > 0
+        ) {
           mergedBlocks[mergedBlocks.length - 1] = textBlockFactory(
             mergedBlocks[mergedBlocks.length - 1].text + this.textBlocks[_i].text,
             {

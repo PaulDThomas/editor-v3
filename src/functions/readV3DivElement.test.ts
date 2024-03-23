@@ -86,4 +86,27 @@ describe("readV3DivElement", () => {
     expect(result.decimalAlignPercent).toEqual(60);
     expect(result.textAlignment).toEqual(EditorV3Align.left);
   });
+
+  test("Read div containing at block", async () => {
+    const divElement = document.createElement("div");
+    divElement.classList.add("aiev3-line", "left");
+
+    const atBlock = document.createElement("span");
+    atBlock.classList.add("aiev3-tb", "at-block");
+    atBlock.dataset.type = "at";
+    atBlock.dataset.isLocked = "true";
+    atBlock.dataset.email = "some@email";
+    const atBlockText = document.createTextNode("at");
+    atBlock.appendChild(atBlockText);
+    divElement.appendChild(atBlock);
+
+    const result = readV3DivElement(divElement);
+
+    expect(result.textBlocks[0].data).toEqual({
+      text: "at",
+      type: "at",
+      isLocked: true,
+      atData: { email: "some@email" },
+    });
+  });
 });

@@ -128,6 +128,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     if (this.isLocked || !this.isActive) {
       span.classList.add("is-locked");
       span.dataset.isLocked = "true";
+      span.contentEditable = "false";
       // Add any other data items from the at item
       this.atData &&
         Object.keys(this.atData).forEach((key) => {
