@@ -467,7 +467,7 @@ describe("Check EditorV3Line functions", () => {
       ],
       0,
     );
-    expect(JSON.parse(line2.jsonString)).toEqual({
+    expect(line2.data).toEqual({
       textBlocks: [
         { text: "tree", type: "text" },
         { text: "pie", style: "lid", type: "text" },
@@ -490,7 +490,7 @@ describe("Check EditorV3Line functions", () => {
       defaultContentProps,
     );
     line2.removeSection(4, 7);
-    expect(JSON.parse(line2.jsonString)).toEqual({
+    expect(line2.data).toEqual({
       textBlocks: [
         { text: "hell", style: "world", type: "text" },
         { text: "low", type: "text" },

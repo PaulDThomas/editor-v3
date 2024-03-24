@@ -230,13 +230,6 @@ export class EditorV3Content implements IEditorV3 {
   }
 
   /**
-   * JSON string of the content
-   */
-  get jsonString(): string {
-    return JSON.stringify(this.data);
-  }
-
-  /**
    * Element to render
    */
   public toHtml(renderProps: EditorV3RenderProps): DocumentFragment {
@@ -286,22 +279,7 @@ export class EditorV3Content implements IEditorV3 {
    * @param props Optional properties
    * @returns Instance of the object
    */
-  constructor(arg: string | HTMLDivElement | IEditorV3, props?: EditorV3ContentPropsInput) {
-    // Defaults
-    this._allowMarkdown =
-      props?.allowMarkdown ?? (this._defaultContentProps.allowMarkdown as boolean);
-    this._allowNewLine = props?.allowNewLine ?? (this._defaultContentProps.allowNewLine as boolean);
-    this._decimalAlignPercent =
-      props?.decimalAlignPercent ?? (this._defaultContentProps.decimalAlignPercent as number);
-    this._markdownSettings =
-      props?.markdownSettings ?? (this._defaultContentProps.markdownSettings as IMarkdownSettings);
-    this._showMarkdown = props?.showMarkdown ?? (this._defaultContentProps.showMarkdown as boolean);
-    this._styles = props?.styles ?? this._defaultContentProps.styles;
-    this._textAlignment =
-      props?.textAlignment ?? (this._defaultContentProps.textAlignment as EditorV3Align);
-    this._atListFunction = props?.atListFunction;
-    this.lines = [];
-
+  constructor(arg?: string | HTMLDivElement | IEditorV3, props?: EditorV3ContentPropsInput) {
     // Process incoming data
     try {
       if (arg instanceof HTMLDivElement) {
@@ -316,10 +294,10 @@ export class EditorV3Content implements IEditorV3 {
         this._copyImport(jsonInput);
       }
       // Interface input
-      else {
-        this.lines = arg.lines.map((l) =>
-          l instanceof EditorV3Line ? l : new EditorV3Line(l, this.data.contentProps),
-        );
+      else if (arg !== undefined) {
+        this._copyImport(arg);
+      } else {
+        this.lines = [new EditorV3Line()];
       }
     } catch (e) {
       // Establish input as string
@@ -328,6 +306,24 @@ export class EditorV3Content implements IEditorV3 {
       const r = readV3Html(inputString, props);
       this._copyImport(r);
     }
+
+    // Forced parameters
+    if (props) {
+      this._updateProps(props);
+      this.lines.map((l) => (l.contentProps = this.contentProps));
+    }
+  }
+
+  private _updateProps(props: EditorV3ContentPropsInput) {
+    if (props.allowMarkdown !== undefined) this._allowMarkdown = props.allowMarkdown;
+    if (props.allowNewLine !== undefined) this._allowNewLine = props.allowNewLine;
+    if (props.decimalAlignPercent !== undefined)
+      this._decimalAlignPercent = props.decimalAlignPercent;
+    if (props.markdownSettings !== undefined) this._markdownSettings = props.markdownSettings;
+    if (props.showMarkdown !== undefined) this._showMarkdown = props.showMarkdown;
+    if (props.styles !== undefined) this._styles = props.styles;
+    if (props.textAlignment !== undefined) this._textAlignment = props.textAlignment;
+    if (props.atListFunction !== undefined) this._atListFunction = props.atListFunction;
   }
 
   /* c8 ignore start */
@@ -339,20 +335,24 @@ export class EditorV3Content implements IEditorV3 {
   }
   /* c8 ignore end */
 
-  private _copyImport(read: IEditorV3, props?: EditorV3ContentPropsInput): void {
-    const useProps = props ?? read.contentProps ?? this.contentProps;
+  private _copyImport(read: IEditorV3): void {
     this.lines = read.lines.map((l) =>
-      l instanceof EditorV3Line ? l : new EditorV3Line(l, useProps),
+      l instanceof EditorV3Line ? l : new EditorV3Line(l, read.contentProps),
     );
-    this._allowMarkdown = useProps.allowMarkdown ?? this._defaultContentProps.allowMarkdown;
-    this._allowNewLine = useProps.allowNewLine ?? this._defaultContentProps.allowNewLine;
-    this._decimalAlignPercent =
-      useProps.decimalAlignPercent ?? this._defaultContentProps.decimalAlignPercent;
-    this._markdownSettings =
-      useProps.markdownSettings ?? this._defaultContentProps.markdownSettings;
-    this._showMarkdown = useProps.showMarkdown ?? this._defaultContentProps.showMarkdown;
-    this._styles = useProps.styles ?? this._defaultContentProps.styles;
-    this._textAlignment = useProps.textAlignment ?? this._defaultContentProps.textAlignment;
+    read.contentProps && this._updateProps(read.contentProps);
+  }
+
+  public loadString(arg: string) {
+    try {
+      // Check for stringified class input
+      const jsonInput: IEditorV3 = JSON.parse(arg);
+      if (!Array.isArray(jsonInput.lines)) throw "No lines";
+      this._copyImport(jsonInput);
+    } catch {
+      // Read in v3 HTML/text
+      const r = readV3Html(arg);
+      this._copyImport(r);
+    }
   }
 
   public subLines(pos: EditorV3Position): EditorV3Line[] {

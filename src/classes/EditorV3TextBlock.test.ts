@@ -14,7 +14,7 @@ describe("Check basic EditorV3TextBlock", () => {
     expect(testBlock.lineEndPosition).toEqual(21);
     expect(testBlock.typeStyle).toEqual("text:shiny");
     // eslint-disable-next-line quotes
-    expect(testBlock.jsonString).toEqual('{"text":"Hello world","style":"shiny","type":"text"}');
+    expect(testBlock.data).toEqual({ text: "Hello world", style: "shiny", type: "text" });
     // Eat your own tail
     expect(new EditorV3TextBlock(testBlock).data).toEqual(testBlock.data);
     expect(new EditorV3TextBlock(testBlock.data).data).toEqual(testBlock.data);

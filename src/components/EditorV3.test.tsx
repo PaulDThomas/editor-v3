@@ -1,9 +1,8 @@
-/* eslint-disable quotes */
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { EditorV3Content } from "../classes/EditorV3Content";
-import { EditorV3Align } from "../classes/interface";
+import { EditorV3Align, IEditorV3 } from "../classes/interface";
 import { defaultMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 import { getCaretPosition } from "../functions/getCaretPosition";
 import { EditorV3 } from "./EditorV3";
@@ -27,24 +26,16 @@ describe("Editor and functions", () => {
         <div data-testid="container">
           <EditorV3
             id="test-editor"
-            input={mockContent.jsonString}
+            input={mockContent}
             customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
             allowNewLine
+            textAlignment={EditorV3Align.left}
           />
         </div>,
       );
     });
     const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
-    expect(container.outerHTML).toEqual(
-      '<div class="aiev3" id="test-editor">' +
-        '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
-        '<div id="test-editor-editable" class="aiev3-editing multiline" contenteditable="false" spellcheck="false">' +
-        '<div class="aiev3-line left"><span class="aiev3-tb">34.45</span></div>' +
-        '<div class="aiev3-line left"><span class="aiev3-tb">\u2009</span></div>' +
-        '<div class="aiev3-line left"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny" style="color: pink; font-weight: 700;">x.xx</span></div>' +
-        '<div class="aiev3-contents-info" data-allow-new-line="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"' +
-        "></div></div></div></div></div>",
-    );
+    expect(container.outerHTML).toMatchSnapshot();
     const firstSpan = container.querySelector("span") as HTMLSpanElement;
     await user.click(firstSpan);
     fireEvent.keyDown(firstSpan, { key: "Home" });
@@ -64,20 +55,16 @@ describe("Editor and functions", () => {
 
   test("Backspace", async () => {
     const user = userEvent.setup({ delay: null });
-    const mockSetJson = jest.fn();
-    const mockSetHtml = jest.fn();
+    const mockSetObject = jest.fn();
     const mockSetText = jest.fn();
     await act(async () => {
       render(
         <EditorV3
           data-testid="test-editor"
           id="test-editor"
-          input={mockContent.jsonString}
-          setJson={(ret) => {
-            mockSetJson(ret);
-          }}
-          setHtml={(ret) => {
-            mockSetHtml(ret);
+          input={mockContent}
+          setObject={(ret) => {
+            mockSetObject(ret);
           }}
           setText={(ret) => {
             mockSetText(ret);
@@ -100,61 +87,40 @@ describe("Editor and functions", () => {
 
     expect(mockSetText).toHaveBeenCalledTimes(1);
     expect(mockSetText).toHaveBeenLastCalledWith("34.4\n\nx.xx");
-    expect(mockSetJson).toHaveBeenCalledTimes(1);
-    expect(mockSetJson).toHaveBeenLastCalledWith(
-      JSON.stringify({
-        contentProps: {
-          textAlignment: "decimal",
-          decimalAlignPercent: 70,
-          allowNewLine: true,
+    expect(mockSetObject).toHaveBeenCalledTimes(1);
+    expect(mockSetObject).toHaveBeenLastCalledWith({
+      contentProps: {
+        textAlignment: "decimal",
+        decimalAlignPercent: 70,
+        allowNewLine: true,
+      },
+      lines: [
+        {
+          textBlocks: [{ text: "34.4", type: "text" }],
         },
-        lines: [
-          {
-            textBlocks: [{ text: "34.4", type: "text" }],
-          },
-          {
-            textBlocks: [{ text: "", type: "text" }],
-          },
-          {
-            textBlocks: [{ text: "x.xx", style: "shiny", type: "text" }],
-          },
-        ],
-      }),
-    );
-    expect(mockSetHtml).toHaveBeenCalledTimes(1);
-    expect(mockSetHtml).toHaveBeenLastCalledWith(
-      '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">34</span></span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">.4</span></span>' +
-        "</div>" +
-        '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
-        '<span class="aiev3-span-point lhs">\u2009</span>' +
-        '<span class="aiev3-span-point rhs">\u2009</span>' +
-        "</div>" +
-        '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">x</span></span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">.xx</span></span>' +
-        "</div>" +
-        '<div class="aiev3-contents-info" data-allow-new-line="true" data-decimal-align-percent="70" data-text-alignment="&quot;decimal&quot;"></div>',
-    );
+        {
+          textBlocks: [{ text: "", type: "text" }],
+        },
+        {
+          textBlocks: [{ text: "x.xx", style: "shiny", type: "text" }],
+        },
+      ],
+    });
+    expect(editor.outerHTML).toMatchSnapshot();
   });
 
   test("Delete", async () => {
     const user = userEvent.setup({ delay: null });
-    const mockSetJson = jest.fn();
-    const mockSetHtml = jest.fn();
+    const mockSetObject = jest.fn();
     const mockSetText = jest.fn();
     await act(async () => {
       render(
         <EditorV3
           data-testid="test-editor"
           id="test-editor"
-          input={mockContent.jsonString}
-          setJson={(ret) => {
-            mockSetJson(ret);
-          }}
-          setHtml={(ret) => {
-            mockSetHtml(ret);
+          input={mockContent}
+          setObject={(ret) => {
+            mockSetObject(ret);
           }}
           setText={(ret) => {
             mockSetText(ret);
@@ -177,7 +143,7 @@ describe("Editor and functions", () => {
 
     expect(mockSetText).toHaveBeenCalledTimes(1);
     expect(mockSetText).toHaveBeenNthCalledWith(1, "45\n\nx.xx");
-    expect(JSON.parse(mockSetJson.mock.calls[0][0])).toEqual({
+    expect(mockSetObject.mock.calls[0][0]).toEqual({
       contentProps: {
         allowNewLine: true,
         decimalAlignPercent: 70,
@@ -195,20 +161,7 @@ describe("Editor and functions", () => {
         },
       ],
     });
-    expect(mockSetHtml.mock.calls[0][0]).toEqual(
-      '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">45</span></span>' +
-        '<span class="aiev3-span-point rhs">\u2009</span>' +
-        "</div>" +
-        '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
-        '<span class="aiev3-span-point lhs">\u2009</span>' +
-        '<span class="aiev3-span-point rhs">\u2009</span></div>' +
-        '<div class="aiev3-line decimal" style="grid-template-columns: 70% 30%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">x</span></span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">.xx</span></span>' +
-        "</div>" +
-        '<div class="aiev3-contents-info" data-allow-new-line="true" data-decimal-align-percent="70" data-text-alignment="&quot;decimal&quot;"></div>',
-    );
+    expect(editor.outerHTML).toMatchSnapshot();
   });
 });
 
@@ -221,7 +174,7 @@ describe("Menu styling - add", () => {
         <EditorV3
           data-testid="test-editor"
           id="test-editor"
-          input={mockContent.jsonString}
+          input={mockContent}
           setText={mockSetText}
           style={{ width: "200px" }}
           textAlignment={EditorV3Align.left}
@@ -281,7 +234,7 @@ describe("Menu styling - change", () => {
         <div data-testid="container">
           <EditorV3
             id="test-editor"
-            input={mockContent.jsonString}
+            input={mockContent}
             setText={mockSetText}
             style={{ width: "200px" }}
             textAlignment={EditorV3Align.left}
@@ -318,7 +271,7 @@ describe("Menu styling - change", () => {
     ) as NodeListOf<HTMLSpanElement>;
     expect(notShinySpan.length).toEqual(1);
     expect(notShinySpan[0]).toHaveTextContent("x.xx");
-    expect(mockSetText).toHaveBeenLastCalledWith("34.45\n\nx.xx");
+    expect(mockSetText).not.toHaveBeenCalled();
   });
 });
 
@@ -331,7 +284,7 @@ describe("Menu styling - remove", () => {
         <EditorV3
           data-testid="test-editor"
           id="test-editor"
-          input={mockContent.jsonString}
+          input={mockContent}
           setText={mockSetText}
           style={{ width: "200px" }}
           textAlignment={EditorV3Align.left}
@@ -379,8 +332,8 @@ describe("Menu styling - markdown", () => {
         <div data-testid="container">
           <EditorV3
             id="test-editor"
-            input={mockContent.jsonString}
-            setJson={jest.fn()}
+            input={mockContent}
+            setObject={jest.fn()}
             style={{ width: "200px" }}
             allowNewLine
             customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
@@ -413,7 +366,7 @@ describe("Cut and paste", () => {
         <EditorV3
           data-testid="test-editor"
           id="test-editor"
-          input={mockContent.jsonString}
+          input={mockContent}
           setText={mockSetText}
           style={{ width: "200px" }}
           textAlignment={EditorV3Align.center}
@@ -434,7 +387,12 @@ describe("Cut and paste", () => {
     const thingCut = await user.cut();
     expect(thingCut?.getData("text/plain")).toEqual("34");
     expect(thingCut?.getData("text/html")).toEqual(
-      '<div class="aiev3-line center"><span class="aiev3-tb">34</span></div>',
+      `<div class="aiev3-line center">
+        <span class="aiev3-tb">34</span>
+      </div>`
+        .replaceAll(/[\r\n\t]/g, "")
+        .replaceAll(/>\s{2,}</g, "><")
+        .trim(),
     );
     expect(JSON.parse(thingCut?.getData("data/aiev3") ?? "{}")).toEqual([
       {
@@ -458,7 +416,7 @@ describe("Cut and paste", () => {
         <EditorV3
           data-testid="test-editor"
           id="test-editor"
-          input={mockContent.jsonString}
+          input={mockContent}
           setText={mockSetText}
           style={{ width: "200px" }}
           textAlignment={EditorV3Align.center}
@@ -539,7 +497,7 @@ describe("Edge events", () => {
         <div data-testid="container">
           <EditorV3
             id="test-editor"
-            input={mockContent.jsonString}
+            input={mockContent}
             setText={mockSetText}
           />
         </div>,
@@ -558,7 +516,7 @@ describe("Edge events", () => {
         <div data-testid="container">
           <EditorV3
             id="test-editor"
-            input={mockContent.jsonString}
+            input={mockContent}
             setText={mockSetText}
           />
         </div>,
@@ -589,7 +547,7 @@ describe("Select all", () => {
         data-testid="programmernotes"
         id="programmernotes"
         input={"Item 2 programmer notes"}
-        setJson={mockSet}
+        setObject={mockSet}
       />,
     );
     const editable = screen
@@ -624,7 +582,7 @@ describe("Select all", () => {
     expect(screen.getByText("programmer")).toBeInTheDocument();
     expect(screen.getByText("notes")).toBeInTheDocument();
     expect(mockSet).toHaveBeenCalledTimes(1);
-    expect(JSON.parse(mockSet.mock.calls[0])).toEqual({
+    expect(mockSet.mock.calls[0][0]).toEqual({
       lines: [
         {
           textBlocks: [{ text: "New programmer notes", type: "text" }],
@@ -636,14 +594,14 @@ describe("Select all", () => {
 
 describe("Undo/redo", () => {
   const TestContainer = () => {
-    const [input, setInput] = useState("");
+    const [input, setInput] = useState<IEditorV3>(new EditorV3Content());
     return (
       <div>
         <EditorV3
           data-testid="test-editor"
           id="test-editor"
           input={input}
-          setJson={(ret) => {
+          setObject={(ret) => {
             setInput(ret);
           }}
           allowMarkdown
@@ -720,7 +678,7 @@ describe("Updates from above", () => {
           data-testid="editor"
           id="test-editor"
           input={input}
-          setJson={setInput}
+          setText={setInput}
           allowMarkdown
           textAlignment={textAlignment}
           decimalAlignPercent={decimalAlignPercent}
@@ -740,15 +698,7 @@ describe("Updates from above", () => {
     await user.click(changeInput);
     expect(screen.queryByText("New")).toBeInTheDocument();
     expect(screen.queryByText("<<shiny::input>>")).toBeInTheDocument();
-    expect(editor.innerHTML).toEqual(
-      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
-        '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
-        '<div class="aiev3-line left">' +
-        '<span class="aiev3-tb">New&nbsp;</span><span class="aiev3-tb">&lt;&lt;shiny::input&gt;&gt;</span>' +
-        "</div>" +
-        '<div class="aiev3-contents-info" data-allow-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div></div>' +
-        "</div></div>",
-    );
+    expect(editor.outerHTML).toMatchSnapshot();
   });
 
   test("Change alignment", async () => {
@@ -758,15 +708,7 @@ describe("Updates from above", () => {
     expect(screen.queryByText("Before")).toBeInTheDocument();
     const changeInput = screen.getByTestId("change-text-alignment");
     await user.click(changeInput);
-    expect(editor.innerHTML).toEqual(
-      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
-        '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
-        '<div class="aiev3-line center">' +
-        '<span class="aiev3-tb">Before</span>' +
-        "</div>" +
-        '<div class="aiev3-contents-info" data-allow-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}" data-text-alignment="&quot;center&quot;"></div></div>' +
-        "</div></div>",
-    );
+    expect(editor.outerHTML).toMatchSnapshot();
   });
 
   test("Change decimal align percent", async () => {
@@ -776,16 +718,7 @@ describe("Updates from above", () => {
     expect(screen.queryByText("Before")).toBeInTheDocument();
     const changeInput = screen.getByTestId("change-decimal-align-percent");
     await user.click(changeInput);
-    expect(editor.innerHTML).toEqual(
-      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
-        '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
-        '<div class="aiev3-line decimal" style="grid-template-columns: 80% 20%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">Before</span></span>' +
-        '<span class="aiev3-span-point rhs">\u2009</span>' +
-        "</div>" +
-        '<div class="aiev3-contents-info" data-allow-markdown="true" data-decimal-align-percent="80" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}" data-text-alignment="&quot;decimal&quot;"></div></div>' +
-        "</div></div>",
-    );
+    expect(editor.outerHTML).toMatchSnapshot();
   });
 
   test("Change styles", async () => {
@@ -795,15 +728,7 @@ describe("Updates from above", () => {
     expect(screen.queryByText("Before")).toBeInTheDocument();
     const changeInput = screen.getByTestId("change-styles");
     await user.click(changeInput);
-    expect(editor.innerHTML).toEqual(
-      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
-        '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
-        '<div class="aiev3-line left">' +
-        '<span class="aiev3-tb">Before</span>' +
-        "</div>" +
-        '<div class="aiev3-contents-info" data-allow-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;blue&quot;}}"></div>' +
-        "</div></div></div>",
-    );
+    expect(editor.outerHTML).toMatchSnapshot();
   });
 
   test("Change markdown settings", async () => {
@@ -814,22 +739,10 @@ describe("Updates from above", () => {
     fireEvent.contextMenu(editor.querySelectorAll("span")[0] as HTMLSpanElement);
     let showMarkdown = screen.getByLabelText("Show markdown");
     await user.click(showMarkdown);
-    expect(editor.innerHTML).toEqual(
-      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
-        '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
-        '<div class="aiev3-markdown-line">Before</div>' +
-        '<div class="aiev3-contents-info" data-allow-markdown="true" data-show-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
-        "</div></div></div>",
-    );
+    expect(editor.outerHTML).toMatchSnapshot();
     // Update text
     await user.click(screen.getByTestId("change-input"));
-    expect(editor.innerHTML).toEqual(
-      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
-        '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
-        '<div class="aiev3-markdown-line">New &lt;&lt;shiny::input&gt;&gt;</div>' +
-        '<div class="aiev3-contents-info" data-allow-markdown="true" data-show-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
-        "</div></div></div>",
-    );
+    expect(editor.outerHTML).toMatchSnapshot();
     // Hide markdown
     fireEvent.contextMenu(editor.querySelectorAll(".aiev3-markdown-line")[0] as HTMLDivElement);
     const hideMarkdown = screen.getByLabelText("Hide markdown");
@@ -839,13 +752,7 @@ describe("Updates from above", () => {
     fireEvent.contextMenu(editor.querySelectorAll("span")[0] as HTMLSpanElement);
     showMarkdown = screen.getByLabelText("Show markdown");
     await user.click(showMarkdown);
-    expect(editor.innerHTML).toEqual(
-      '<div class="context-menu-handler" style="width: 100%; height: 100%;"><div class="aiev3-resize">' +
-        '<div id="test-editor-editable" class="aiev3-editing singleline" contenteditable="true" role="textbox" spellcheck="false">' +
-        '<div class="aiev3-markdown-line">New ¬¬shiny::input&gt;&gt;</div>' +
-        '<div class="aiev3-contents-info" data-allow-markdown="true" data-markdown-settings="{&quot;styleStartTag&quot;:&quot;¬¬&quot;,&quot;styleNameEndTag&quot;:&quot;::&quot;,&quot;styleEndTag&quot;:&quot;>>&quot;,&quot;defaultStyle&quot;:&quot;defaultStyle&quot;,&quot;dropDownStartTag&quot;:&quot;[[&quot;,&quot;dropDownNameEndTag&quot;:&quot;::&quot;,&quot;dropDownEndTag&quot;:&quot;]]&quot;,&quot;dropDownValueSeparator&quot;:&quot;||&quot;,&quot;dropDownSelectedValueTag&quot;:&quot;**&quot;,&quot;calcStartTag&quot;:&quot;[![&quot;,&quot;calcNameEndTag&quot;:&quot;::&quot;,&quot;calcEndTag&quot;:&quot;]!]&quot;,&quot;calcConditionSeparator&quot;:&quot;||&quot;,&quot;calcAndSeparator&quot;:&quot;&amp;&amp;&quot;,&quot;atStartTag&quot;:&quot;@[&quot;,&quot;atEndTag&quot;:&quot;@]&quot;}" data-show-markdown="true" data-styles="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;,&quot;fontWeight&quot;:&quot;700&quot;}}"></div>' +
-        "</div></div></div>",
-    );
+    expect(editor.outerHTML).toMatchSnapshot();
   });
 });
 
@@ -853,17 +760,17 @@ describe("Add at block and escape out", () => {
   test("Type at block", async () => {
     const user = userEvent.setup({ delay: null });
     const mockSetText = jest.fn();
-    const mockSetJson = jest.fn();
+    const mockSetObject = jest.fn();
     const TestEditor = () => {
-      const [input, setInput] = useState("Initial text");
+      const [input, setInput] = useState<IEditorV3>(new EditorV3Content("Initial text"));
       return (
         <EditorV3
           data-testid="test-editor"
           id="test-editor"
           input={input}
-          setJson={(ret) => {
+          setObject={(ret) => {
             setInput(ret);
-            mockSetJson(ret);
+            mockSetObject(ret);
           }}
           setText={mockSetText}
           atListFunction={async (typedString: string) => {
@@ -884,57 +791,53 @@ describe("Add at block and escape out", () => {
     await user.keyboard("@Hello{Escape} world");
     fireEvent.blur(editor);
     expect(mockSetText).toHaveBeenLastCalledWith("@Hello world");
-    expect(mockSetJson).toHaveBeenLastCalledWith(
-      JSON.stringify({
-        lines: [
-          {
-            textBlocks: [
-              { text: "@Hello", type: "at", isLocked: true },
-              { text: " world", type: "text" },
-            ],
-          },
-        ],
-      }),
-    );
+    expect(mockSetObject).toHaveBeenLastCalledWith({
+      lines: [
+        {
+          textBlocks: [
+            { text: "@Hello", type: "at", isLocked: true },
+            { text: " world", type: "text" },
+          ],
+        },
+      ],
+    });
   });
 });
 
 describe("Move left to start over at block", () => {
   test("Arrow left", async () => {
     const user = userEvent.setup({ delay: null });
-    const mockSetJson = jest.fn();
+    const mockSetObject = jest.fn();
     const TestEditor = () => {
-      const [input, setInput] = useState(
-        JSON.stringify({
-          lines: [
-            {
-              textBlocks: [
-                {
-                  text: "@initial",
-                  type: "at",
-                  isLocked: true,
-                },
-                {
-                  text: " thing ",
-                  type: "text",
-                },
-                {
-                  text: "@here",
-                  type: "at",
-                },
-              ],
-            },
-          ],
-        }),
-      );
+      const [input, setInput] = useState<IEditorV3>({
+        lines: [
+          {
+            textBlocks: [
+              {
+                text: "@initial",
+                type: "at",
+                isLocked: true,
+              },
+              {
+                text: " thing ",
+                type: "text",
+              },
+              {
+                text: "@here",
+                type: "at",
+              },
+            ],
+          },
+        ],
+      });
       return (
         <EditorV3
           data-testid="test-editor"
           id="test-editor"
           input={input}
-          setJson={(ret) => {
+          setObject={(ret) => {
             setInput(ret);
-            mockSetJson(ret);
+            mockSetObject(ret);
           }}
           atListFunction={async (typedString: string) => {
             const atList = [{ text: "@Hello" }, { text: "@Lovely" }, { text: "@People" }];
@@ -973,7 +876,7 @@ describe("Move left to start over at block", () => {
       focusChar: 7,
     });
     fireEvent.blur(editor);
-    expect(JSON.parse(mockSetJson.mock.calls[0][0])).toEqual({
+    expect(mockSetObject.mock.calls[0][0]).toEqual({
       lines: [
         {
           textBlocks: [
@@ -990,39 +893,37 @@ describe("Move left to start over at block", () => {
 
   test("Remove at block between spaces", async () => {
     const user = userEvent.setup({ delay: null });
-    const mockSetJson = jest.fn();
+    const mockSetObject = jest.fn();
     const TestEditor = () => {
-      const [input, setInput] = useState(
-        JSON.stringify({
-          lines: [
-            {
-              textBlocks: [
-                {
-                  text: "0 ",
-                  type: "text",
-                },
-                {
-                  text: "@hello",
-                  type: "at",
-                  isLocked: true,
-                },
-                {
-                  text: "  world",
-                  type: "text",
-                },
-              ],
-            },
-          ],
-        }),
-      );
+      const [input, setInput] = useState<IEditorV3>({
+        lines: [
+          {
+            textBlocks: [
+              {
+                text: "0 ",
+                type: "text",
+              },
+              {
+                text: "@hello",
+                type: "at",
+                isLocked: true,
+              },
+              {
+                text: "  world",
+                type: "text",
+              },
+            ],
+          },
+        ],
+      });
       return (
         <EditorV3
           data-testid="test-editor"
           id="test-editor"
           input={input}
-          setJson={(ret) => {
+          setObject={(ret) => {
             setInput(ret);
-            mockSetJson(ret);
+            mockSetObject(ret);
           }}
           atListFunction={async (typedString: string) => {
             const atList = [{ text: "@Hello" }, { text: "@Lovely" }, { text: "@People" }];

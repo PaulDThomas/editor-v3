@@ -36,14 +36,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
   get data(): IEditorV3TextBlock {
     return { text: this.text, style: this.style, type: this.type, isLocked: this.isLocked };
   }
-  get jsonString(): string {
-    const ret = cloneDeep(this.data);
-    Object.keys(ret).forEach((k) => {
-      const key = k as keyof typeof ret;
-      if (ret[key] === undefined) delete ret[key];
-    });
-    return JSON.stringify(ret);
-  }
+
   /**
    * Get the word positions within the text block
    * @returns Array of word positions
@@ -70,7 +63,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
 
   // Constructor
   constructor(
-    arg: IEditorV3TextBlock | HTMLSpanElement | DocumentFragment,
+    arg?: IEditorV3TextBlock | HTMLSpanElement | DocumentFragment,
     forcedParams?: IEditorV3TextBlockOptionalParams,
   ) {
     // Document Fragment processing
@@ -107,11 +100,11 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     }
     // Object processing
     else {
-      this.text = arg.text.replaceAll(/[\r\n\t]/g, "");
-      this.style = arg.style;
-      this.type = arg.type ?? "text";
-      this.isLocked = arg.isLocked;
-      this.lineStartPosition = arg.lineStartPosition ?? 0;
+      this.text = arg?.text.replaceAll(/[\r\n\t]/g, "") ?? "";
+      this.style = arg?.style;
+      this.type = arg?.type ?? "text";
+      this.isLocked = arg?.isLocked;
+      this.lineStartPosition = arg?.lineStartPosition ?? 0;
     }
     // Forced any parameters
     if (forcedParams) {

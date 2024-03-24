@@ -12,7 +12,7 @@ describe("Text block factory tests", () => {
     expect(tempDiv.innerHTML).toEqual('<span class="aiev3-tb">Helloworld</span>');
     const testBlock2 = textBlockFactory({ text: "0" });
     expect(testBlock2.text).toEqual("0");
-    expect(testBlock2.jsonString).toEqual('{"text":"0","type":"text"}');
+    expect(testBlock2.data).toEqual({ text: "0", type: "text" });
     const tempDiv2 = document.createElement("div");
     tempDiv2.appendChild(testBlock2.toHtml({}));
     expect(tempDiv2.innerHTML).toEqual('<span class="aiev3-tb">0</span>');
@@ -44,7 +44,6 @@ describe("Text block factory tests", () => {
     );
     expect(textBlockFactory(testBlock.toHtml({}))).toEqual(testBlock);
     expect(textBlockFactory(testBlock)).toEqual(testBlock);
-    expect(textBlockFactory(JSON.parse(testBlock.jsonString))).toEqual(testBlock);
   });
 
   test("Load span with no content", async () => {
@@ -119,9 +118,8 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     expect(textBlockFactory(testBlock).data).toEqual(testBlock.data);
     expect(textBlockFactory(testBlock)).toMatchSnapshot();
 
-    expect(testBlock.jsonString).toEqual('{"text":"@Hello","type":"at"}');
-    expect(textBlockFactory(JSON.parse(testBlock.jsonString)).data).toEqual(testBlock.data);
-    expect(textBlockFactory(JSON.parse(testBlock.jsonString))).toMatchSnapshot();
+    expect(testBlock.data).toEqual({ text: "@Hello", type: "at" });
+    expect(textBlockFactory(testBlock).data).toEqual(testBlock.data);
   });
 
   test("Load with with spaces", async () => {
@@ -165,10 +163,6 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     expect(testBlock.data).toEqual({ text: "@Hello", style: "shiny", type: "at" });
     expect(textBlockFactory(testBlock).data).toEqual(testBlock.data);
     expect(textBlockFactory(testBlock)).toMatchSnapshot();
-
-    expect(testBlock.jsonString).toEqual('{"text":"@Hello","style":"shiny","type":"at"}');
-    expect(textBlockFactory(JSON.parse(testBlock.jsonString)).data).toEqual(testBlock.data);
-    expect(textBlockFactory(JSON.parse(testBlock.jsonString))).toMatchSnapshot();
   });
 
   test("Load span with style and space", async () => {

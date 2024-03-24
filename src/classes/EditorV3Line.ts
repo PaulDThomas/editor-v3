@@ -2,7 +2,7 @@ import { cloneDeep, isEqual } from "lodash";
 import { readV3DivElement } from "../functions/readV3DivElement";
 import { readV3MarkdownElement } from "../functions/readV3MarkdownElement";
 import { EditorV3PositionClass } from "./EditorV3Position";
-import { EditorV3TextBlockType } from "./EditorV3TextBlock";
+import { EditorV3TextBlock, EditorV3TextBlockType } from "./EditorV3TextBlock";
 import { defaultContentProps } from "./defaultContentProps";
 import { drawHtmlDecimalAlign } from "./drawHtmlDecimalAlign";
 import {
@@ -92,13 +92,6 @@ export class EditorV3Line implements IEditorV3Line {
   }
 
   /**
-   * Get the line as a JSON string
-   */
-  get jsonString(): string {
-    return JSON.stringify(this.data);
-  }
-
-  /**
    * Get a markdown string for the line
    * @param markdownSettings Settings for the markdown string
    * @returns The markdown for the line
@@ -111,7 +104,7 @@ export class EditorV3Line implements IEditorV3Line {
 
   // Constructor
   constructor(
-    arg: IEditorV3Line | HTMLDivElement | EditorV3BlockClass[],
+    arg?: IEditorV3Line | HTMLDivElement | EditorV3BlockClass[],
     contentProps?: EditorV3ContentPropsInput,
   ) {
     // Set defaults
@@ -183,8 +176,10 @@ export class EditorV3Line implements IEditorV3Line {
     } else if (Array.isArray(arg)) {
       this.textBlocks = arg;
     } else {
-      this.textBlocks = arg.textBlocks.map((tb) => textBlockFactory(tb));
-      this.contentProps = { ...this.contentProps, ...arg.contentProps };
+      this.textBlocks = arg?.textBlocks.map((tb) => textBlockFactory(tb)) ?? [
+        new EditorV3TextBlock(),
+      ];
+      this.contentProps = { ...this.contentProps, ...arg?.contentProps };
     }
 
     // Always take these if provided

@@ -10,6 +10,7 @@ import {
   EditorV3ContentPropsInput,
   EditorV3Position,
   EditorV3Styles,
+  IEditorV3,
 } from "../classes/interface";
 import { IMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 import { useDebounceStack } from "../hooks/useDebounceStack";
@@ -17,11 +18,10 @@ import "./EditorV3.css";
 
 interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   id: string;
-  input: string;
+  input: string | IEditorV3;
   editable?: boolean;
-  setHtml?: (ret: string) => void;
   setText?: (ret: string) => void;
-  setJson?: (ret: string) => void;
+  setObject?: (ret: IEditorV3) => void;
   customStyleMap?: EditorV3Styles;
   allowNewLine?: boolean;
   textAlignment?: EditorV3Align;
@@ -46,8 +46,7 @@ export const EditorV3 = ({
   input,
   editable = true,
   setText,
-  setHtml,
-  setJson,
+  setObject,
   style,
   allowMarkdown = cloneDeep(defaultContentProps.allowMarkdown),
   allowNewLine = cloneDeep(defaultContentProps.allowNewLine),
@@ -67,6 +66,7 @@ export const EditorV3 = ({
   const [showMarkdown, setShowMarkdown] = useState<boolean>(false);
   const [inputDecode, setInputDecode] = useState<EditorV3State>({
     content: new EditorV3Content(input, {
+      ...defaultContentProps,
       textAlignment,
       decimalAlignPercent,
       styles: customStyleMap,
@@ -80,6 +80,7 @@ export const EditorV3 = ({
 
   const contentProps = useMemo((): EditorV3ContentPropsInput => {
     return {
+      ...defaultContentProps,
       allowMarkdown,
       allowNewLine,
       decimalAlignPercent,
@@ -101,12 +102,19 @@ export const EditorV3 = ({
   ]);
 
   // General return function
-  const [lastInput, setLastInput] = useState<string>(input);
+  const [lastInput, setLastInput] = useState<string | IEditorV3>(input);
   const [lastCaretPosition, setLastCaretPosition] = useState<EditorV3Position | null>(null);
   const [lastAction, setLastAction] = useState<"Focus" | "Blur" | "Key" | "">("");
-  const [lastTextSent, setLastTextSent] = useState<string>(input);
-  const [lastHtmlSent, setLastHtmlSent] = useState<string>(input);
-  const [lastJsonSent, setLastJsonSent] = useState<string>(input);
+  const [lastTextSent, setLastTextSent] = useState<string>(
+    typeof input === "object"
+      ? input.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("")).join("\n")
+      : input,
+  );
+  const [lastObjectSent, setLastObjectSent] = useState<IEditorV3>(
+    typeof input === "object"
+      ? input
+      : { lines: input.split("\n").map((l) => ({ textBlocks: [{ text: l }] })) },
+  );
 
   const returnData = useCallback(
     (ret: EditorV3State) => {
@@ -122,20 +130,14 @@ export const EditorV3 = ({
           setText(text);
           setLastTextSent(text);
         }
-        const html = dummyNode.innerHTML ?? "";
-        if (setHtml && html !== lastHtmlSent) {
-          setHtml(html);
-          setLastHtmlSent(html);
-        }
-        const json = ret.content.jsonString;
-        if (setJson && json !== lastJsonSent) {
-          setJson(json);
-          setLastJsonSent(json);
+        if (setObject && !isEqual(ret.content.data, lastObjectSent)) {
+          setObject(ret.content.data);
+          setLastObjectSent(ret.content.data);
         }
         dummyNode.remove();
       }
     },
-    [lastHtmlSent, lastJsonSent, lastTextSent, setHtml, setJson, setText],
+    [lastObjectSent, lastTextSent, setObject, setText],
   );
 
   // Redraw element, used in debounced stack as onChange callback
@@ -468,17 +470,11 @@ export const EditorV3 = ({
             id={`${id}-editable`}
             className={`aiev3-editing ${allowNewLine ? "multiline" : "singleline"}`}
             contentEditable={
-              editable &&
-              (typeof setHtml === "function" ||
-                typeof setJson === "function" ||
-                typeof setText === "function")
+              editable && (typeof setObject === "function" || typeof setText === "function")
             }
             suppressContentEditableWarning
             role={
-              editable &&
-              (typeof setHtml === "function" ||
-                typeof setJson === "function" ||
-                typeof setText === "function")
+              editable && (typeof setObject === "function" || typeof setText === "function")
                 ? "textbox"
                 : undefined
             }

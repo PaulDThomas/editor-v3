@@ -19,7 +19,7 @@ describe("Check basic EditorV3Content", () => {
     testContent.decimalAlignPercent = 30;
     expect(testContent.decimalAlignPercent).toEqual(30);
     testContent.styles = { shiny: { color: "pink" } };
-    expect(JSON.parse(testContent.jsonString)).toEqual({
+    expect(testContent.data).toEqual({
       lines: [
         {
           textBlocks: [{ text: "12.34", type: "text" }],
@@ -50,7 +50,7 @@ describe("Check basic EditorV3Content", () => {
         textBlocks: [{ text: "34.56", type: "text" }],
       },
     ]);
-    expect(JSON.parse(testContent.jsonString)).toEqual({
+    expect(testContent.data).toEqual({
       contentProps: testProps,
       lines: [
         {
@@ -63,7 +63,7 @@ describe("Check basic EditorV3Content", () => {
     expect(div.innerHTML).toMatchSnapshot();
 
     // Check self equivalence
-    const read1 = new EditorV3Content(testContent.jsonString);
+    const read1 = new EditorV3Content(testContent.data);
     expect(read1.data).toEqual(testContent.data);
     const read2 = new EditorV3Content(div);
     expect(read2.data).toEqual(testContent.data);
@@ -71,7 +71,7 @@ describe("Check basic EditorV3Content", () => {
 
     // Repeat as decimal
     testContent.textAlignment = EditorV3Align.decimal;
-    expect(new EditorV3Content(testContent.jsonString).data).toEqual(testContent.data);
+    expect(new EditorV3Content(testContent).data).toEqual(testContent.data);
     div.innerHTML = "";
     div.appendChild(testContent.toHtml({}));
     expect(new EditorV3Content(div.innerHTML).data).toEqual(testContent.data);
@@ -80,7 +80,7 @@ describe("Check basic EditorV3Content", () => {
   test("Load multiline string", async () => {
     const testContent = new EditorV3Content("Hello\n.World\u2009");
     expect(testContent.text).toEqual("Hello\n.World");
-    expect(JSON.parse(testContent.jsonString)).toEqual({
+    expect(testContent.data).toEqual({
       lines: [
         {
           textBlocks: [{ text: "Hello", type: "text" }],
@@ -99,7 +99,7 @@ describe("Check basic EditorV3Content", () => {
     testContent.styles = { shiny: { color: "pink" } };
     testContent.textAlignment = EditorV3Align.decimal;
     expect(testContent.text).toEqual("Hello\n.World");
-    expect(JSON.parse(testContent.jsonString)).toEqual({
+    expect(testContent.data).toEqual({
       contentProps: {
         decimalAlignPercent: 55,
         styles: { shiny: { color: "pink" } },
@@ -118,7 +118,7 @@ describe("Check basic EditorV3Content", () => {
     div.appendChild(testContent.toHtml({}));
     expect(div.innerHTML).toMatchSnapshot();
     expect(new EditorV3Content(div.innerHTML).data).toEqual(testContent.data);
-    expect(new EditorV3Content(testContent.jsonString).data).toEqual(testContent.data);
+    expect(new EditorV3Content(testContent.data).data).toEqual(testContent.data);
   });
 });
 
@@ -384,7 +384,7 @@ describe("Content functions", () => {
     expect(testContent.getStyleAt(1, 1)).toEqual("shiny");
     expect(testContent.getStyleAt(0, 0)).toEqual(undefined);
     expect(testContent.getStyleAt(2, 1)).toEqual(undefined);
-    expect(JSON.parse(testContent.jsonString).lines).toEqual([
+    expect(testContent.data.lines).toEqual([
       {
         textBlocks: [
           { text: "1", type: "text" },
@@ -401,11 +401,8 @@ describe("Content functions", () => {
         ],
       },
     ]);
-    expect(
-      JSON.parse(
-        testContent.removeStyle({ startLine: 1, startChar: 0, endLine: 1, endChar: 2 }).jsonString,
-      ).lines,
-    ).toEqual([
+    testContent.removeStyle({ startLine: 1, startChar: 0, endLine: 1, endChar: 2 });
+    expect(testContent.data.lines).toEqual([
       {
         textBlocks: [
           { text: "1", type: "text" },
