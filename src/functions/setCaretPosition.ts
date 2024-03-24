@@ -35,6 +35,21 @@ export function setCaretPosition(el: Node, pos: EditorV3PositionClass): EditorV3
           range.setStart(newSpan, 0);
           range.setEnd(newSpan, 0);
         }
+        // Text node between locked spans
+        else if (
+          range.startContainer === range.endContainer &&
+          range.startOffset === 0 &&
+          range.endOffset === 0 &&
+          range.startContainer instanceof Text &&
+          range.startContainer.parentElement instanceof HTMLDivElement &&
+          range.startContainer.nextSibling instanceof HTMLSpanElement &&
+          range.startContainer.nextSibling.classList.contains("is-locked") &&
+          range.startContainer.previousSibling instanceof HTMLSpanElement &&
+          range.startContainer.previousSibling.classList.contains("is-locked") &&
+          range.startContainer.textContent === ""
+        ) {
+          range.startContainer.textContent = "\u2009";
+        }
         // Backwards selection
         if (pos.data.focusAt === "start") {
           sel.setBaseAndExtent(
