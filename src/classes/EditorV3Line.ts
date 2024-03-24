@@ -1,8 +1,8 @@
 import { cloneDeep, isEqual } from "lodash";
-import { readV2DivElement } from "../functions/readV2DivElement";
 import { readV3DivElement } from "../functions/readV3DivElement";
 import { readV3MarkdownElement } from "../functions/readV3MarkdownElement";
 import { EditorV3PositionClass } from "./EditorV3Position";
+import { EditorV3TextBlockType } from "./EditorV3TextBlock";
 import { defaultContentProps } from "./defaultContentProps";
 import { drawHtmlDecimalAlign } from "./drawHtmlDecimalAlign";
 import {
@@ -13,12 +13,12 @@ import {
   EditorV3Position,
   EditorV3RenderProps,
   EditorV3WordPosition,
+  IEditorV3Line,
 } from "./interface";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 import { textBlockFactory } from "./textBlockFactory";
-import { EditorV3TextBlockType } from "./EditorV3TextBlock";
 
-export class EditorV3Line {
+export class EditorV3Line implements IEditorV3Line {
   public textBlocks: EditorV3BlockClass[];
   private _defaultContentProps: EditorV3ContentProps = cloneDeep(defaultContentProps);
   public contentProps: EditorV3ContentProps;
@@ -111,7 +111,7 @@ export class EditorV3Line {
 
   // Constructor
   constructor(
-    arg: string | HTMLDivElement | EditorV3BlockClass[],
+    arg: IEditorV3Line | HTMLDivElement | EditorV3BlockClass[],
     contentProps?: EditorV3ContentPropsInput,
   ) {
     // Set defaults
@@ -119,68 +119,72 @@ export class EditorV3Line {
     this.contentProps = cloneDeep(this._defaultContentProps);
 
     // Text
-    if (typeof arg === "string") {
-      // Decimal html string
-      if (arg.match(/^<div class="aiev3-line.*<\/div>$/)) {
-        const h = document.createElement("template");
-        h.innerHTML = arg;
-        const d = h.content.children[0] as HTMLDivElement;
-        const ret = readV3DivElement(d);
-        this.textBlocks = ret.textBlocks;
-        this.contentProps.textAlignment = ret.textAlignment;
-        this.contentProps.decimalAlignPercent = ret.decimalAlignPercent;
-      }
-      // Markdown string
-      else if (arg.match(/^<div class="aiev3-markdown-line.*<\/div>$/)) {
-        const h = document.createElement("template");
-        h.innerHTML = arg;
-        const d = h.content.children[0] as HTMLDivElement;
-        const ret = readV3MarkdownElement(d, this.contentProps);
-        this.textBlocks = ret.textBlocks;
-        this.contentProps.textAlignment = ret.textAlignment;
-        this.contentProps.decimalAlignPercent = ret.decimalAlignPercent;
-      }
-      // V2 text
-      else if (arg.match(/^<div classname="aie-text.*<\/div>$/)) {
-        const h = document.createElement("template");
-        h.innerHTML = arg;
-        const d = h.content.children[0] as HTMLDivElement;
-        const ret = readV2DivElement(d);
-        this.textBlocks = ret.textBlocks;
-        this.contentProps.textAlignment = ret.textAlignment;
-        this.contentProps.decimalAlignPercent = ret.decimalAlignPercent;
-      }
-      // Standard or JSON text
-      else {
-        try {
-          const jsonInput = JSON.parse(arg);
-          if (jsonInput.textBlocks) {
-            this.textBlocks = jsonInput.textBlocks.map((tb: string | EditorV3BlockClass) =>
-              textBlockFactory(typeof tb === "string" ? { text: tb } : tb),
-            );
-          } else {
-            throw "No blocks";
-          }
-          if (jsonInput.contentProps)
-            this.contentProps = {
-              ...this.contentProps,
-              ...jsonInput.contentProps,
-            };
-        } catch {
-          this.textBlocks = [textBlockFactory({ text: arg })];
-        }
-      }
-    } else if (Array.isArray(arg)) {
-      this.textBlocks = arg;
-    }
+    // if (typeof arg === "string") {
+    //   // Decimal html string
+    //   if (arg.match(/^<div class="aiev3-line.*<\/div>$/)) {
+    //     const h = document.createElement("template");
+    //     h.innerHTML = arg;
+    //     const d = h.content.children[0] as HTMLDivElement;
+    //     const ret = readV3DivElement(d);
+    //     this.textBlocks = ret.textBlocks;
+    //     this.contentProps.textAlignment = ret.textAlignment;
+    //     this.contentProps.decimalAlignPercent = ret.decimalAlignPercent;
+    //   }
+    //   // Markdown string
+    //   else if (arg.match(/^<div class="aiev3-markdown-line.*<\/div>$/)) {
+    //     const h = document.createElement("template");
+    //     h.innerHTML = arg;
+    //     const d = h.content.children[0] as HTMLDivElement;
+    //     const ret = readV3MarkdownElement(d, this.contentProps);
+    //     this.textBlocks = ret.textBlocks;
+    //     this.contentProps.textAlignment = ret.textAlignment;
+    //     this.contentProps.decimalAlignPercent = ret.decimalAlignPercent;
+    //   }
+    //   // V2 text
+    //   else if (arg.match(/^<div classname="aie-text.*<\/div>$/)) {
+    //     const h = document.createElement("template");
+    //     h.innerHTML = arg;
+    //     const d = h.content.children[0] as HTMLDivElement;
+    //     const ret = readV2DivElement(d);
+    //     this.textBlocks = ret.textBlocks;
+    //     this.contentProps.textAlignment = ret.textAlignment;
+    //     this.contentProps.decimalAlignPercent = ret.decimalAlignPercent;
+    //   }
+    //   // Standard or JSON text
+    //   else {
+    //     try {
+    //       const jsonInput = JSON.parse(arg);
+    //       if (jsonInput.textBlocks) {
+    //         this.textBlocks = jsonInput.textBlocks.map((tb: string | EditorV3BlockClass) =>
+    //           textBlockFactory(typeof tb === "string" ? { text: tb } : tb),
+    //         );
+    //       } else {
+    //         throw "No blocks";
+    //       }
+    //       if (jsonInput.contentProps)
+    //         this.contentProps = {
+    //           ...this.contentProps,
+    //           ...jsonInput.contentProps,
+    //         };
+    //     } catch {
+    //       this.textBlocks = [textBlockFactory({ text: arg })];
+    //     }
+    //   }
+    // } else
+
     // HTMLDivElement
-    else {
+    if (arg instanceof HTMLDivElement) {
       const ret = Array.from(arg.classList).includes("aiev3-line")
         ? readV3DivElement(arg)
         : readV3MarkdownElement(arg, this.contentProps);
       this.textBlocks = ret.textBlocks;
       this.contentProps.textAlignment = ret.textAlignment;
       this.contentProps.decimalAlignPercent = ret.decimalAlignPercent;
+    } else if (Array.isArray(arg)) {
+      this.textBlocks = arg;
+    } else {
+      this.textBlocks = arg.textBlocks.map((tb) => textBlockFactory(tb));
+      this.contentProps = { ...this.contentProps, ...arg.contentProps };
     }
 
     // Always take these if provided
@@ -306,7 +310,7 @@ export class EditorV3Line {
    */
   public splitLine(pos: number): EditorV3Line {
     if (pos >= this.lineLength) {
-      return new EditorV3Line("", this.contentProps);
+      return new EditorV3Line([textBlockFactory({ text: "" })], this.contentProps);
     } else {
       const preSplit = this.upToPos(pos);
       const postSplit = this.fromPos(pos);

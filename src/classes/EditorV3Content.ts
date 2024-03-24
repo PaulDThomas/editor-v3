@@ -12,21 +12,20 @@ import {
   EditorV3BlockClass,
   EditorV3ContentProps,
   EditorV3ContentPropsInput,
-  EditorV3Import,
-  EditorV3LineImport,
   EditorV3Position,
   EditorV3PositionF,
   EditorV3RenderProps,
   EditorV3Styles,
+  IEditorV3,
+  IEditorV3Line,
 } from "./interface";
-import { MarkdownLineClass } from "./markdown/MarkdownLineClass";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 import { textBlockFactory } from "./textBlockFactory";
 
 /**
  * Represents the content of an EditorV3 instance.
  */
-export class EditorV3Content implements EditorV3Import {
+export class EditorV3Content implements IEditorV3 {
   private _defaultContentProps = cloneDeep(defaultContentProps);
   // Standard attributes
   private _textAlignment: EditorV3Align = this._defaultContentProps.textAlignment;
@@ -197,7 +196,7 @@ export class EditorV3Content implements EditorV3Import {
   /**
    * Data representation of content
    */
-  get data(): EditorV3Import {
+  get data(): IEditorV3 {
     const contentProps = cloneDeep(this.contentProps);
     Object.keys(defaultContentProps).forEach((k) => {
       const key = k as keyof typeof defaultContentProps;
@@ -283,11 +282,11 @@ export class EditorV3Content implements EditorV3Import {
 
   /**
    * Create a new EditorV3Content instance
-   * @param input Stringified JSON or HTML/text
+   * @param arg Stringified JSON or HTML/text
    * @param props Optional properties
    * @returns Instance of the object
    */
-  constructor(input: string | HTMLDivElement, props?: EditorV3ContentPropsInput) {
+  constructor(arg: string | HTMLDivElement | IEditorV3, props?: EditorV3ContentPropsInput) {
     // Defaults
     this._allowMarkdown =
       props?.allowMarkdown ?? (this._defaultContentProps.allowMarkdown as boolean);
@@ -305,30 +304,45 @@ export class EditorV3Content implements EditorV3Import {
 
     // Process incoming data
     try {
-      if (input instanceof HTMLDivElement) {
+      if (arg instanceof HTMLDivElement) {
         // Read in HTML
-        const r = readV3Html(input.innerHTML, props);
-        this.copyImport(r);
-        this.caretPositionF = getCaretPosition(input);
-      } else {
+        const r = readV3Html(arg.innerHTML, props);
+        this._copyImport(r);
+        this.caretPositionF = getCaretPosition(arg);
+      } else if (typeof arg === "string") {
         // Check for stringified class input
-        const jsonInput: EditorV3Import = JSON.parse(input);
+        const jsonInput: IEditorV3 = JSON.parse(arg);
         if (!Array.isArray(jsonInput.lines)) throw "No lines";
-        this.copyImport(jsonInput);
+        this._copyImport(jsonInput);
+      }
+      // Interface input
+      else {
+        this.lines = arg.lines.map((l) =>
+          l instanceof EditorV3Line ? l : new EditorV3Line(l, this.data.contentProps),
+        );
       }
     } catch (e) {
       // Establish input as string
-      const inputString = (input instanceof HTMLDivElement ? input.outerHTML : input) as string;
+      const inputString = (arg instanceof HTMLDivElement ? arg.outerHTML : arg) as string;
       // Read in v3 HTML/text
       const r = readV3Html(inputString, props);
-      this.copyImport(r);
+      this._copyImport(r);
     }
   }
 
-  private copyImport(read: EditorV3Import, props?: EditorV3ContentPropsInput): void {
+  /* c8 ignore start */
+  private _debugText(from: string): void {
+    console.log(
+      from + "\n",
+      this.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("|")).join("\n"),
+    );
+  }
+  /* c8 ignore end */
+
+  private _copyImport(read: IEditorV3, props?: EditorV3ContentPropsInput): void {
     const useProps = props ?? read.contentProps ?? this.contentProps;
     this.lines = read.lines.map((l) =>
-      l instanceof EditorV3Line ? l : new EditorV3Line(JSON.stringify(l), useProps),
+      l instanceof EditorV3Line ? l : new EditorV3Line(l, useProps),
     );
     this._allowMarkdown = useProps.allowMarkdown ?? this._defaultContentProps.allowMarkdown;
     this._allowNewLine = useProps.allowNewLine ?? this._defaultContentProps.allowNewLine;
@@ -449,40 +463,40 @@ export class EditorV3Content implements EditorV3Import {
    * @param newLines New lines (not markdown)
    * @returns Markdown cut as lines
    */
-  private spliceMarkdown(pos: EditorV3Position, newLines?: EditorV3Line[]): EditorV3Line[] {
-    const thisMarkdown = new EditorV3Content(
-      this.lines.map((l) => l.toMarkdown(this._markdownSettings)).join("\n"),
-    );
-    const newLinesMarkdown = newLines?.map(
-      (l) => new EditorV3Line(l.toMarkdown(this._markdownSettings), this.contentProps),
-    );
-    if (
-      pos.startLine < thisMarkdown.lines.length &&
-      pos.startLine <= pos.endLine &&
-      !(pos.startLine === pos.endLine && pos.endChar < pos.startChar)
-    ) {
-      const ret: EditorV3Line[] = thisMarkdown.subLines(pos);
-      const u = thisMarkdown.upToPos(pos.startLine, pos.startChar);
-      const f = thisMarkdown.fromPos(pos.endLine, pos.endChar);
-      thisMarkdown.lines = [...u, ...(newLinesMarkdown ?? []), ...f];
-      // Change back from markdown
-      this.lines = thisMarkdown.lines.map(
-        (l) =>
-          new EditorV3Line(
-            new MarkdownLineClass({ line: l.lineText }).toTextBlocks(),
-            this.contentProps,
-          ),
-      );
-      this.mergeLines(
-        pos.startLine +
-          (newLines?.length ?? 0) -
-          (pos.startChar < this.lines[pos.startLine].lineLength ? 1 : 0),
-      );
-      newLines?.length && this.mergeLines(pos.startLine);
-      return ret;
-    }
-    return [];
-  }
+  // private spliceMarkdown(pos: EditorV3Position, newLines?: EditorV3Line[]): EditorV3Line[] {
+  //   const thisMarkdown = new EditorV3Content(
+  //     this.lines.map((l) => l.toMarkdown(this._markdownSettings)).join("\n"),
+  //   );
+  //   const newLinesMarkdown = newLines?.map(
+  //     (l) => new EditorV3Line(l.toMarkdown(this._markdownSettings), this.contentProps),
+  //   );
+  //   if (
+  //     pos.startLine < thisMarkdown.lines.length &&
+  //     pos.startLine <= pos.endLine &&
+  //     !(pos.startLine === pos.endLine && pos.endChar < pos.startChar)
+  //   ) {
+  //     const ret: EditorV3Line[] = thisMarkdown.subLines(pos);
+  //     const u = thisMarkdown.upToPos(pos.startLine, pos.startChar);
+  //     const f = thisMarkdown.fromPos(pos.endLine, pos.endChar);
+  //     thisMarkdown.lines = [...u, ...(newLinesMarkdown ?? []), ...f];
+  //     // Change back from markdown
+  //     this.lines = thisMarkdown.lines.map(
+  //       (l) =>
+  //         new EditorV3Line(
+  //           new MarkdownLineClass({ line: l.lineText }).toTextBlocks(),
+  //           this.contentProps,
+  //         ),
+  //     );
+  //     this.mergeLines(
+  //       pos.startLine +
+  //         (newLines?.length ?? 0) -
+  //         (pos.startChar < this.lines[pos.startLine].lineLength ? 1 : 0),
+  //     );
+  //     newLines?.length && this.mergeLines(pos.startLine);
+  //     return ret;
+  //   }
+  //   return [];
+  // }
 
   /**
    * Remove a selection and optionally insert new lines
@@ -491,9 +505,10 @@ export class EditorV3Content implements EditorV3Import {
    * @returns
    */
   public splice(pos: EditorV3Position, newLines?: EditorV3Line[]): EditorV3Line[] {
-    if (this._showMarkdown) {
-      return this.spliceMarkdown(pos, newLines);
-    } else if (
+    // if (this._showMarkdown) {
+    //   return this.spliceMarkdown(pos, newLines);
+    // } else
+    if (
       pos.startLine < this.lines.length &&
       pos.startLine <= pos.endLine &&
       !(pos.startLine === pos.endLine && pos.endChar < pos.startChar)
@@ -503,13 +518,13 @@ export class EditorV3Content implements EditorV3Import {
       const f = this.fromPos(pos.endLine, pos.endChar);
       this.lines = [
         ...u,
-        ...(newLines ? newLines.map((l) => new EditorV3Line(l.jsonString, this.contentProps)) : []),
+        ...(newLines ? newLines.map((l) => new EditorV3Line(l, this.contentProps)) : []),
         ...f,
       ];
       // Merge line after U
       this.mergeLines(pos.startLine);
-      // Merge line after newLines if it exists
-      newLines?.length && this.mergeLines(pos.startLine);
+      // Merge line after newLines if it exists and there is something after it
+      newLines?.length && this.mergeLines(pos.startLine + newLines.length - 1);
       // Check all lines have at least 1 text block
       this.lines.forEach((l) => {
         if (l.textBlocks.length === 0) {
@@ -528,7 +543,7 @@ export class EditorV3Content implements EditorV3Import {
         this._caretPosition = new EditorV3PositionClass(
           pos.startLine + (newLines ? newLines.length - 1 : 0),
           endChar,
-          pos.startLine + (newLines?.length ?? 0),
+          pos.startLine + (newLines ? newLines?.length - 1 : 0),
           endChar,
           this.lineLengths,
           this.wordPositions,
@@ -795,7 +810,7 @@ export class EditorV3Content implements EditorV3Import {
               .map((t) => ({
                 textBlocks: [{ text: t }],
               }))
-      ) as EditorV3LineImport[];
+      ) as IEditorV3Line[];
       // Just text blocks if only one line is allowed
       if (linesImport.length > 1 && !this.allowNewLine) {
         const textBlocks: EditorV3BlockClass[] = linesImport
@@ -803,9 +818,7 @@ export class EditorV3Content implements EditorV3Import {
           .map((tb) => textBlockFactory(tb));
         lines.push(new EditorV3Line(textBlocks, this.contentProps));
       } else {
-        lines.push(
-          ...linesImport.map((l) => new EditorV3Line(JSON.stringify(l), this.contentProps)),
-        );
+        lines.push(...linesImport.map((l) => new EditorV3Line(l, this.contentProps)));
       }
       // Splice in new data and set new content
       this.splice(this._caretPosition, lines);

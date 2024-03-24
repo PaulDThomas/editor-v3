@@ -1,6 +1,7 @@
 import { ContextMenuHandler, MenuItem } from "@asup/context-menu";
 import { cloneDeep, isEqual } from "lodash";
 import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { EditorV3AtBlock, EditorV3Line } from "../classes";
 import { EditorV3Content } from "../classes/EditorV3Content";
 import { defaultContentProps } from "../classes/defaultContentProps";
 import {
@@ -353,11 +354,27 @@ export const EditorV3 = ({
           e.stopPropagation();
           const newContent = new EditorV3Content(divRef.current, contentProps);
           newContent.handleKeyup(e);
+          // Create @block if @ has been typed
+          if (
+            e.key === "@" &&
+            atListFunction &&
+            newContent.caretPosition &&
+            newContent.caretPosition.startChar > 0
+          ) {
+            // Do some @ magic here
+            const replacePos: EditorV3Position = {
+              ...newContent.caretPosition,
+              startChar: newContent.caretPosition.startChar - 1,
+            };
+            newContent.splice(replacePos, [
+              new EditorV3Line([new EditorV3AtBlock({ text: "@", type: "at" })], contentProps),
+            ]);
+          }
           setContent(newContent, `Handle key up: ${e.key}`);
         }
       }
     },
-    [contentProps, setContent, state],
+    [atListFunction, contentProps, setContent, state],
   );
 
   const handleMouseUp = useCallback(

@@ -2,6 +2,7 @@ import { EditorV3Content } from "./EditorV3Content";
 import { defaultContentProps } from "./defaultContentProps";
 import { EditorV3Line } from "./EditorV3Line";
 import { EditorV3Align, EditorV3ContentPropsInput } from "./interface";
+import { textBlockFactory } from "./textBlockFactory";
 
 // Load and read tests
 describe("Check basic EditorV3Content", () => {
@@ -332,7 +333,7 @@ describe("Content functions", () => {
         endLine: 0,
         endChar: 0,
       },
-      [new EditorV3Line("abc", defaultContentProps)],
+      [new EditorV3Line([textBlockFactory({ text: "abc" })], defaultContentProps)],
     );
     expect(testContent6.text).toEqual("abc123\n456\n789");
 
@@ -343,7 +344,7 @@ describe("Content functions", () => {
         endLine: 1,
         endChar: 3,
       },
-      [new EditorV3Line("def", defaultContentProps)],
+      [new EditorV3Line([textBlockFactory({ text: "def" })], defaultContentProps)],
     );
     expect(testContent6.text).toEqual("abc123\ndef\n789");
 
@@ -354,7 +355,7 @@ describe("Content functions", () => {
         endLine: 1,
         endChar: 4,
       },
-      [new EditorV3Line("ghi", defaultContentProps)],
+      [new EditorV3Line([textBlockFactory({ text: "ghi" })], defaultContentProps)],
     );
     expect(testContent6.text).toEqual("abc123\nghi\n789");
 
@@ -365,7 +366,7 @@ describe("Content functions", () => {
         endLine: 1,
         endChar: 4,
       },
-      [new EditorV3Line("jkl", defaultContentProps)],
+      [new EditorV3Line([textBlockFactory({ text: "jkl" })], defaultContentProps)],
     );
     expect(testContent6.text).toEqual("abc123\nghi\n789");
   });
@@ -459,41 +460,6 @@ describe("Render markdown text from content", () => {
   });
 });
 
-describe("Render html text from v2 content", () => {
-  test("Load multiple v2 lines", async () => {
-    const textString =
-      // eslint-disable-next-line quotes
-      `<div classname="aie-text" data-key="2v9v5" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":1,"style":"Notes"},{"offset":4,"length":1,"style":"Notes"},{"offset":1,"length":3,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">N</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  w</div>` +
-      // eslint-disable-next-line quotes
-      `<div classname="aie-text" data-key="1u61b" data-type="unstyled" data-inline-style-ranges='[]'></div>` +
-      // eslint-disable-next-line quotes
-      `<div classname="aie-text" data-key="4l4fu" data-type="unstyled" data-inline-style-ranges='[]'>ork</div>`;
-    const result = new EditorV3Content(textString);
-    expect(result.lines.length).toEqual(3);
-    expect(result.lines[0].textBlocks.map((t) => t.data)).toEqual([
-      { text: "N", style: "Notes", type: "text" },
-      { text: "ote", style: "Optional", type: "text" },
-      { text: "s", style: "Notes", type: "text" },
-      { text: "  w", style: undefined, type: "text" },
-    ]);
-    expect(result.lines[1].textBlocks.map((t) => t.data)).toEqual([
-      { text: "", style: undefined, type: "text" },
-    ]);
-    expect(result.lines[2].textBlocks.map((t) => t.data)).toEqual([
-      { text: "ork", style: undefined, type: "text" },
-    ]);
-    expect(result.text).toEqual("Notes  w\n\nork");
-    expect(result.lineLengths).toEqual([8, 0, 3]);
-    expect(result.wordPositions).toEqual([
-      { line: 0, startChar: 0, endChar: 1, isLocked: false },
-      { line: 0, startChar: 1, endChar: 4, isLocked: false },
-      { line: 0, startChar: 4, endChar: 5, isLocked: false },
-      { line: 0, startChar: 7, endChar: 8, isLocked: false },
-      { line: 2, startChar: 0, endChar: 3, isLocked: false },
-    ]);
-  });
-});
-
 describe("Splice markdown tests", () => {
   test("Bad position return empty array", async () => {
     const testContent = new EditorV3Content("123\n456\n789", {
@@ -580,8 +546,8 @@ describe("Splice markdown tests", () => {
       isCollapsed: false,
     };
     const splice = testContent.splice(pos, pasteContent.lines);
-    expect(testContent.text).toEqual("1ab\nc");
     expect(splice.map((l) => l.lineText).join("\n")).toEqual("23\n456\n789");
+    expect(testContent.text).toEqual("1ab\nc");
   });
   test("Splice with styles", async () => {
     const contentProps = {
@@ -601,8 +567,7 @@ describe("Splice markdown tests", () => {
     );
     expect(testContent.toMarkdownHtml({}).textContent).toEqual("<<shiny::34.56>>");
     const pasteContent = new EditorV3Line(
-      // eslint-disable-next-line quotes
-      `{"textBlocks":[{"text":"abc","style":"dull"}]}`,
+      { textBlocks: [{ text: "abc", style: "dull" }] },
       contentProps,
     );
     const pos = {
@@ -613,8 +578,10 @@ describe("Splice markdown tests", () => {
       isCollapsed: true,
     };
     const splice = testContent.splice(pos, [pasteContent]);
-    expect(testContent.toMarkdownHtml({}).textContent).toEqual("<<<dull::abc>><shiny::34.56>>");
-    expect(testContent.text).toEqual("<abc<shiny::34.56>>");
+    expect(testContent.toMarkdownHtml({}).textContent).toEqual(
+      "<<shiny::3>><<dull::abc>><<shiny::4.56>>",
+    );
+    expect(testContent.text).toEqual("3abc4.56");
     expect(splice.map((l) => l.lineText).join("\n")).toEqual("");
 
     // Change markdown settings
@@ -623,7 +590,9 @@ describe("Splice markdown tests", () => {
       styleStartTag: "¬¬",
       styleEndTag: "^^",
     };
-    expect(testContent.toMarkdownHtml({}).textContent).toEqual("<¬¬dull::abc^^<shiny::34.56>>");
+    expect(testContent.toMarkdownHtml({}).textContent).toEqual(
+      "¬¬shiny::3^^¬¬dull::abc^^¬¬shiny::4.56^^",
+    );
   });
 });
 
@@ -703,7 +672,9 @@ describe("handleKeydown", () => {
   });
 
   test("should lock text blocks when Escape is pressed", () => {
-    const testContent = new EditorV3Content("@Hello, World!");
+    const testContent = new EditorV3Content({
+      lines: [{ textBlocks: [textBlockFactory({ text: "@Hello, World!", type: "at" })] }],
+    });
     testContent.caretPosition = {
       startLine: 0,
       startChar: 13,
@@ -712,6 +683,10 @@ describe("handleKeydown", () => {
     };
     testContent.lines[0].textBlocks[0].isLocked = undefined;
     testContent.lines[0].textBlocks[0].setActive(true);
+    expect(testContent.lines[0].textBlocks[0].isLocked).toBe(undefined);
+    expect(testContent.lines[0].textBlocks[0].isActive).toBe(true);
+    expect(testContent.lines[0].textBlocks[0].type).toBe("at");
+
     const event = {
       key: "Escape",
       stopPropagation: jest.fn(),

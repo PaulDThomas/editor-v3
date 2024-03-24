@@ -1,4 +1,5 @@
 /* eslint-disable quotes */
+import { EditorV3AtBlock } from "./EditorV3AtBlock";
 import { EditorV3Line } from "./EditorV3Line";
 import { textBlockFactory } from "./textBlockFactory";
 
@@ -99,7 +100,8 @@ describe("Check markdown output on text block", () => {
 
 describe("Check at correctly loaded, and eats its own tail", () => {
   test("Load word", async () => {
-    const testBlock = textBlockFactory({ text: "@Hello" });
+    const testBlock = textBlockFactory({ text: "@Hello", type: "at" });
+    expect(testBlock).toBeInstanceOf(EditorV3AtBlock);
     expect(testBlock.data).toEqual({ text: "@Hello", type: "at" });
     expect(testBlock.toMarkdown()).toEqual("@[@Hello@]");
 
@@ -173,6 +175,7 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     const testSpan = document.createElement("span");
     testSpan.className = "editorv3style-shiny";
     testSpan.dataset.styleName = "shiny";
+    testSpan.dataset.type = "at";
     testSpan.innerHTML = "@Hello world";
     const testBlock = textBlockFactory(testSpan);
     testBlock.setActive(true);

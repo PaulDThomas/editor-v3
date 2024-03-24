@@ -5,9 +5,13 @@ import { readV3Html } from "./readV3Html";
 
 describe("readV3Html tests", () => {
   test("Read v3-html string input with line nodes", async () => {
-    const text =
-      `<div class="aiev3-line left"><span class="aiev3-tb">Hello world</span></div>` +
-      `<div class="aiev3-line left"><span class="aiev3-tb">How are you?</span></div>`;
+    const text = `
+      <div class="aiev3-line left"><span class="aiev3-tb">Hello world</span></div>
+      <div class="aiev3-line left"><span class="aiev3-tb">How are you?</span></div>
+      `
+      .replaceAll(/[\r\n\t]/g, "")
+      .replaceAll(/>\s{2,}</g, "><")
+      .trim();
     const result = readV3Html(text);
     expect(result.lines.length).toEqual(2);
     expect(result.lines[0].textBlocks[0]).toEqual(textBlockFactory({ text: "Hello world" }));
@@ -20,7 +24,7 @@ describe("readV3Html tests", () => {
         <span class="aiev3-tb">Hello world</span>
       </div>
       <div class="aiev3-contents-info" data-styles='{"color": "red"}'></div>
-    `
+      `
       .replaceAll(/[\r\n\t]/g, "")
       .replaceAll(/>\s{2,}</g, "><")
       .trim();
@@ -32,7 +36,7 @@ describe("readV3Html tests", () => {
     const text = `
       <div class="aiev3-markdown-line">&lt;&lt;Hello world&gt;&gt;</div>
       <div class="aiev3-markdown-line">&lt;&lt;st1::How are you?&gt;&gt;</div>
-    `
+      `
       .replaceAll(/[\r\n\t]/g, "")
       .replaceAll(/>\s{2,}</g, "><")
       .trim();
@@ -50,7 +54,7 @@ describe("readV3Html tests", () => {
     const text = `
       <div class="aiev3-markdown-line">&lt;&lt;red::Hello world&gt;&gt;</div>
       <div class="aiev3-contents-info" data-styles='[{"redStyle":{"color": "red"}}]'></div>
-    `
+      `
       .replaceAll(/[\r\n\t]/g, "")
       .replaceAll(/>\s{1,}</g, "><")
       .trim();
@@ -69,7 +73,7 @@ describe("readV3Html tests", () => {
   test("Read in at block", async () => {
     const text = `
       <div class="aiev3-line left">
-        <span class="aiev3-tb at-block">@Hello world</span>
+        <span class="aiev3-tb at-block" data-type="at">@Hello world</span>
       </div>
       `
       .replaceAll(/[\r\n\t]/g, "")

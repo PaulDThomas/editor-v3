@@ -74,15 +74,16 @@ export interface EditorV3ContentPropsInput {
 /**
  * Line import object for EditorV3
  */
-export interface EditorV3LineImport {
+export interface IEditorV3Line {
   textBlocks: (IEditorV3AtBlock | IEditorV3TextBlock)[];
+  contentProps?: EditorV3ContentPropsInput;
 }
 
 /**
  * Cpmplete import object for EditorV3
  */
-export interface EditorV3Import {
-  lines: EditorV3LineImport[];
+export interface IEditorV3 {
+  lines: IEditorV3Line[];
   contentProps?: EditorV3ContentPropsInput;
 }
 

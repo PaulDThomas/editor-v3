@@ -7,9 +7,9 @@ export const App = (): JSX.Element => {
   const initialValue = JSON.stringify({
     textAlign: "left",
     lines: [
-      // { text: "12.34", style: "green" },
+      { textBlocks: [{ text: "12.34", style: "green" }] },
       { textBlocks: [{ text: "0 " }, { text: "@hello" }, { text: "  world" }] },
-      // { text: "56.78", style: "blue" },
+      { textBlocks: [{ text: "56.78", style: "blue" }] },
     ],
     styles: {
       blue: { color: "blue", fontWeight: 700 },

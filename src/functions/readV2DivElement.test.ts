@@ -73,3 +73,34 @@ describe("readV2DivElement", () => {
     });
   });
 });
+
+describe("Render html text from v2 content", () => {
+  test("Load multiple v2 lines", async () => {
+    const textStrings = `
+    <div classname="aie-text" data-key="2v9v5" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":1,"style":"Notes"},{"offset":4,"length":1,"style":"Notes"},{"offset":1,"length":3,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">N</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  w</div>
+    <div classname="aie-text" data-key="1u61b" data-type="unstyled" data-inline-style-ranges='[]'></div>
+    <div classname="aie-text" data-key="4l4fu" data-type="unstyled" data-inline-style-ranges='[]'>ork</div>
+    `
+      .split("\n")
+      .filter((t) => t.trim().length > 0)
+      .map((t) => t.trim());
+    const result = textStrings.map((t) => {
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = t;
+      return readV2DivElement(tempDiv.children[0] as HTMLDivElement);
+    });
+    expect(result.length).toEqual(3);
+    expect(result[0].textBlocks.map((t) => t.data)).toEqual([
+      { text: "N", style: "Notes", type: "text" },
+      { text: "ote", style: "Optional", type: "text" },
+      { text: "s", style: "Notes", type: "text" },
+      { text: "  w", style: undefined, type: "text" },
+    ]);
+    expect(result[1].textBlocks.map((t) => t.data)).toEqual([
+      { text: "", style: undefined, type: "text" },
+    ]);
+    expect(result[2].textBlocks.map((t) => t.data)).toEqual([
+      { text: "ork", style: undefined, type: "text" },
+    ]);
+  });
+});

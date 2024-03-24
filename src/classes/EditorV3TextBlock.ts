@@ -144,33 +144,19 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
 
   // Content returns
   public toHtml(renderProps: EditorV3RenderProps): DocumentFragment {
-    const text =
-      this.text === ""
-        ? "\u2009"
-        : this.text
-            .replace(/^ /, "\u00a0\u200c")
-            .replace(/ $/, "\u00a0")
-            .replaceAll(" ", "\u00a0\u200c");
+    const text = this.text === "" ? "\u2009" : this.text.replaceAll(" ", "\u00a0\u200c");
     const ret = new DocumentFragment();
     if (this.type === "at") {
       throw new Error("Use EditorV3AtBlock for at blocks");
     } else {
-      const words = text.split("\u200c");
+      const words = renderProps.doNotSplitWordSpans
+        ? [text.replaceAll("\u200c", "")]
+        : text.split("\u200c");
       words
         .filter((w) => w !== "")
         .forEach((word) => {
           const span = document.createElement("span");
           span.classList.add("aiev3-tb");
-          if (word.startsWith("@")) {
-            span.classList.add("at-block");
-            span.dataset.type = "at";
-            // Always lock non-active at blocks
-            if (this.isActive) span.classList.add("is-active");
-            else {
-              span.classList.add("is-locked");
-              span.dataset.isLocked = "true";
-            }
-          }
           const textNode = document.createTextNode(word);
           span.appendChild(textNode);
           if (this.style) {

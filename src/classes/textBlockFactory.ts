@@ -27,9 +27,7 @@ export const textBlockFactory = (
 ): EditorV3TextBlock | EditorV3AtBlock => {
   // Span element
   if (arg instanceof HTMLSpanElement) {
-    return arg.dataset.type === "at" ||
-      forcedParams?.type === "at" ||
-      arg.textContent?.startsWith("@")
+    return arg.dataset.type === "at" || forcedParams?.type === "at"
       ? new EditorV3AtBlock(arg, forcedParams)
       : new EditorV3TextBlock(arg, forcedParams);
   }
@@ -38,24 +36,20 @@ export const textBlockFactory = (
   else if (arg instanceof DocumentFragment) {
     return arg.childNodes.length > 0 &&
       arg.childNodes[0] instanceof HTMLSpanElement &&
-      (arg.childNodes[0].dataset.type === "at" ||
-        forcedParams?.type === "at" ||
-        arg.textContent?.startsWith("@"))
+      (arg.childNodes[0].dataset.type === "at" || forcedParams?.type === "at")
       ? new EditorV3AtBlock(arg, forcedParams)
       : new EditorV3TextBlock(arg, forcedParams);
   }
   // Text node
   else if (arg instanceof Text) {
-    return (arg.textContent ?? "").startsWith("@")
-      ? new EditorV3AtBlock({ text: arg.data }, forcedParams)
-      : new EditorV3TextBlock(
-          { text: (arg.textContent ?? "").replaceAll("\u00a0", " ") },
-          forcedParams,
-        );
+    return new EditorV3TextBlock(
+      { text: (arg.textContent ?? "").replaceAll("\u00a0", " ") },
+      forcedParams,
+    );
   }
   // Must be object
   else {
-    return arg.type === "at" || forcedParams?.type === "at" || arg.text.startsWith("@")
+    return arg.type === "at" || forcedParams?.type === "at"
       ? new EditorV3AtBlock(arg, forcedParams)
       : new EditorV3TextBlock(arg, forcedParams);
   }

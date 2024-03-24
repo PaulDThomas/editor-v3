@@ -113,27 +113,31 @@ describe("Should render an at block in the HTML", () => {
     const tempDiv = document.createElement("div");
     testBlock.toHtml({ currentEl: tempDiv });
     expect(tempDiv.innerHTML).toEqual(
-      // eslint-disable-next-line quotes
-      '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;massive&nbsp;</span>' +
-        // eslint-disable-next-line quotes
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">and&nbsp;</span>' +
-        // eslint-disable-next-line quotes
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">impressive&nbsp;</span>' +
-        // eslint-disable-next-line quotes
-        '<span class="aiev3-tb at-block is-locked editorv3style-shiny" data-type="at" data-is-locked="true" data-style-name="shiny">@world</span>',
+      `<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;massive&nbsp;</span>
+       <span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">and&nbsp;</span>
+       <span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">impressive&nbsp;</span>
+       <span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">@world</span>
+      `
+        .replaceAll(/[\r\n\t]/g, "")
+        .replaceAll(/>\s{2,}</g, "><")
+        .trim(),
     );
     // Expect HTML not to split
     const tempDiv2 = document.createElement("div");
     testBlock.toHtml({ currentEl: tempDiv2, doNotSplitWordSpans: true });
     expect(tempDiv2.innerHTML).toEqual(
-      // eslint-disable-next-line quotes
-      '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;massive&nbsp;</span>' +
-        // eslint-disable-next-line quotes
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">and&nbsp;</span>' +
-        // eslint-disable-next-line quotes
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">impressive&nbsp;</span>' +
-        // eslint-disable-next-line quotes
-        '<span class="aiev3-tb at-block is-locked editorv3style-shiny" data-type="at" data-is-locked="true" data-style-name="shiny">@world</span>',
+      `<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">
+          Hello&nbsp;massive&nbsp;and&nbsp;impressive&nbsp;@world
+        </span>
+      `
+        .split("\n")
+        .map((t) =>
+          t
+            .replaceAll(/[\r\n\t]/g, "")
+            .replaceAll(/>\s{2,}</g, "><")
+            .trim(),
+        )
+        .join(""),
     );
   });
 });
@@ -172,5 +176,14 @@ describe("Should render html chars :(", () => {
     expect(span.outerHTML).toEqual("<span></span>");
     expect(span.textContent).toEqual("");
     expect(span.innerHTML).toEqual("");
+  });
+});
+
+describe("Should throw trying to create the wrong type", () => {
+  test("Fail to create at block", async () => {
+    expect(() => {
+      const badThing = new EditorV3TextBlock({ text: "Hello world", type: "at" });
+      badThing.toHtml({});
+    }).toThrow("Use EditorV3AtBlock for at blocks");
   });
 });

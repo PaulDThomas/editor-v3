@@ -1,15 +1,13 @@
 import { defaultContentProps } from "../classes/defaultContentProps";
 import { EditorV3Line } from "../classes/EditorV3Line";
-import { EditorV3ContentPropsInput, EditorV3Import } from "../classes/interface";
+import { EditorV3ContentPropsInput, IEditorV3 } from "../classes/interface";
+import { textBlockFactory } from "../classes/textBlockFactory";
 import { readContentPropsNode } from "./readContentPropsNode";
 import { readV3DivElement } from "./readV3DivElement";
 import { readV3MarkdownElement } from "./readV3MarkdownElement";
 
-export const readV3Html = (
-  text: string,
-  contentProps?: EditorV3ContentPropsInput,
-): EditorV3Import => {
-  const ret: EditorV3Import = {
+export const readV3Html = (text: string, contentProps?: EditorV3ContentPropsInput): IEditorV3 => {
+  const ret: IEditorV3 = {
     lines: [],
     contentProps,
   };
@@ -53,7 +51,7 @@ export const readV3Html = (
       .replace(/[\u2009-\u200F\r\t]/g, "") // Undesirable non-printing chars
       .replaceAll("</div><div", "</div>\n<div")
       .split("\n")
-      .map((l) => new EditorV3Line(l, contentProps));
+      .map((l) => new EditorV3Line([textBlockFactory({ text: l })], contentProps));
   }
 
   // Always take contentProps from the input if it exists
