@@ -26,6 +26,6 @@ export const readV3MarkdownElement = (
     textAlignment: contentProps.textAlignment,
   };
   // Ensure there is at least something
-  if (ret.textBlocks.length === 0) ret.textBlocks = [textBlockFactory("")];
+  if (ret.textBlocks.length === 0) ret.textBlocks = [textBlockFactory({ text: "" })];
   return ret;
 };

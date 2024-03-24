@@ -28,7 +28,8 @@ export const readV2DivElement = (
         // If span has style
         if (child.attributes.length > 0 && child.attributes[0].name === "classname") {
           // Add text block with style
-          const newBlbock = textBlockFactory(child.textContent, {
+          const newBlbock = textBlockFactory({
+            text: child.textContent,
             style: child.attributes[0].value,
           });
           ret.textBlocks.push(newBlbock);
@@ -36,7 +37,7 @@ export const readV2DivElement = (
         // If span has no style
         else {
           // Add text block without style
-          const newBlock = textBlockFactory(child.textContent);
+          const newBlock = textBlockFactory({ text: child.textContent });
           ret.textBlocks.push(newBlock);
         }
       }
@@ -46,12 +47,12 @@ export const readV2DivElement = (
       // If text node has text
       if (child.textContent) {
         // Add text block without style
-        ret.textBlocks.push(textBlockFactory(child.textContent));
+        ret.textBlocks.push(textBlockFactory({ text: child.textContent }));
       }
     }
   });
 
   // Ensure there is at least something
-  if (ret.textBlocks.length === 0) ret.textBlocks = [textBlockFactory("")];
+  if (ret.textBlocks.length === 0) ret.textBlocks = [textBlockFactory({ text: "" })];
   return ret;
 };

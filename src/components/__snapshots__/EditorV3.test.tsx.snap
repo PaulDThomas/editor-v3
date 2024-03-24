@@ -1,0 +1,123 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Move left to start over at block Arrow left 1`] = `
+<div
+  class="aiev3"
+  data-testid="test-editor"
+  id="test-editor"
+>
+  <div
+    class="context-menu-handler"
+    style="width: 100%; height: 100%;"
+  >
+    <div
+      class="aiev3-resize"
+    >
+      <div
+        class="aiev3-editing singleline"
+        contenteditable="true"
+        id="test-editor-editable"
+        role="textbox"
+        spellcheck="false"
+      >
+        <div
+          class="aiev3-line left"
+        >
+          <span
+            class="aiev3-tb at-block is-locked"
+            data-is-locked="true"
+            data-type="at"
+          >
+            @initial
+          </span>
+          <span
+            class="aiev3-tb"
+          >
+             
+          </span>
+          <span
+            class="aiev3-tb"
+          >
+            thing 
+          </span>
+          <span
+            class="aiev3-tb at-block is-locked"
+            data-is-locked="true"
+            data-type="at"
+          >
+            @here
+          </span>
+          <span
+            class="aiev3-tb"
+          >
+             
+          </span>
+        </div>
+        <div
+          class="aiev3-contents-info"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`Move left to start over at block Remove at block between spaces 1`] = `
+<div
+  class="aiev3"
+  data-testid="test-editor"
+  id="test-editor"
+>
+  <div
+    class="context-menu-handler"
+    style="width: 100%; height: 100%;"
+  >
+    <div
+      class="aiev3-resize"
+    >
+      <div
+        class="aiev3-editing singleline"
+        contenteditable="true"
+        id="test-editor-editable"
+        role="textbox"
+        spellcheck="false"
+      >
+        <div
+          class="aiev3-line left"
+        >
+          <span
+            class="aiev3-tb"
+          >
+            0 
+          </span>
+          <span
+            class="aiev3-tb at-block is-locked"
+            data-is-locked="true"
+            data-type="at"
+          >
+            @hello
+          </span>
+          <span
+            class="aiev3-tb"
+          >
+             
+          </span>
+          <span
+            class="aiev3-tb"
+          >
+             
+          </span>
+          <span
+            class="aiev3-tb"
+          >
+            world
+          </span>
+        </div>
+        <div
+          class="aiev3-contents-info"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;

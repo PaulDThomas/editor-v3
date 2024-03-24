@@ -40,15 +40,21 @@ export const readV3DivElement = (
         arg.lastChild.classList.contains("rhs")
           ? [
               ...[...(arg.firstChild as HTMLSpanElement).childNodes].map((el) =>
-                textBlockFactory(el instanceof HTMLSpanElement || el instanceof Text ? el : ""),
+                textBlockFactory(
+                  el instanceof HTMLSpanElement || el instanceof Text ? el : { text: "" },
+                ),
               ),
               ...[...(arg.lastChild as HTMLSpanElement).childNodes].map((el) =>
-                textBlockFactory(el instanceof HTMLSpanElement || el instanceof Text ? el : ""),
+                textBlockFactory(
+                  el instanceof HTMLSpanElement || el instanceof Text ? el : { text: "" },
+                ),
               ),
             ].filter((tb) => tb.text !== "" && tb.text !== "\u2009")
           : [
               ...[...arg.childNodes].map((el) =>
-                textBlockFactory(el instanceof HTMLSpanElement || el instanceof Text ? el : ""),
+                textBlockFactory(
+                  el instanceof HTMLSpanElement || el instanceof Text ? el : { text: "" },
+                ),
               ),
             ].filter((tb) => tb.text !== "" && tb.text !== "\u2009");
     }
@@ -56,13 +62,13 @@ export const readV3DivElement = (
     else if (["left", "center", "right"].includes(arg.classList[1])) {
       ret.textBlocks = [
         ...[...arg.childNodes].map((el) =>
-          textBlockFactory(el instanceof HTMLSpanElement || el instanceof Text ? el : ""),
+          textBlockFactory(el instanceof HTMLSpanElement || el instanceof Text ? el : { text: "" }),
         ),
       ].filter((tb) => tb.text !== "");
       ret.textAlignment = arg.classList[1] as EditorV3Align;
     }
   }
   // Ensure there is at least something
-  if (ret.textBlocks.length === 0) ret.textBlocks = [textBlockFactory("")];
+  if (ret.textBlocks.length === 0) ret.textBlocks = [textBlockFactory({ text: "" })];
   return ret;
 };

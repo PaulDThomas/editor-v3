@@ -147,11 +147,6 @@ export class EditorV3Content implements EditorV3Import {
   set caretPositionF(posInput: EditorV3PositionF | null) {
     if (posInput === null) {
       this._caretPosition = null;
-    } else if (this._caretPosition) {
-      this._caretPosition.initialLine = posInput.initialLine;
-      this._caretPosition.initialChar = posInput.initialChar;
-      this._caretPosition.focusLine = posInput.focusLine;
-      this._caretPosition.focusChar = posInput.focusChar;
     } else {
       this._caretPosition = new EditorV3PositionClass(
         posInput.initialLine,
@@ -354,7 +349,7 @@ export class EditorV3Content implements EditorV3Import {
       pos.startLine < this.lines.length
     ) {
       const style = this.lines[pos.startLine].getStyleAt(pos.startChar);
-      ret.push(new EditorV3Line([textBlockFactory("", { style })], this.contentProps));
+      ret.push(new EditorV3Line([textBlockFactory({ text: "", style })], this.contentProps));
     }
     // Check selection contains something
     if (
@@ -511,16 +506,14 @@ export class EditorV3Content implements EditorV3Import {
         ...(newLines ? newLines.map((l) => new EditorV3Line(l.jsonString, this.contentProps)) : []),
         ...f,
       ];
-      this.mergeLines(
-        pos.startLine +
-          (newLines?.length ?? 0) -
-          (pos.startChar < this.lines[pos.startLine].lineLength ? 1 : 0),
-      );
+      // Merge line after U
+      this.mergeLines(pos.startLine);
+      // Merge line after newLines if it exists
       newLines?.length && this.mergeLines(pos.startLine);
       // Check all lines have at least 1 text block
       this.lines.forEach((l) => {
         if (l.textBlocks.length === 0) {
-          l.textBlocks.push(textBlockFactory("", { style: l.getStyleAt(0) }));
+          l.textBlocks.push(textBlockFactory({ text: "", style: l.getStyleAt(0) }));
         }
       });
       // Calculate end character position
@@ -531,14 +524,6 @@ export class EditorV3Content implements EditorV3Import {
             ? pos.startChar + newLines[0].lineLength
             : newLines[newLines.length - 1].lineLength;
       // Update caret position if it is set
-      // if (this._caretPosition)
-      //   this.caretPosition = {
-      //     isCollapsed: true,
-      //     startLine: pos.startLine + (newLines ? newLines.length - 1 : 0),
-      //     startChar: endChar,
-      //     endLine: pos.startLine + (newLines?.length ?? 0),
-      //     endChar: endChar,
-      //   };
       if (this._caretPosition) {
         this._caretPosition = new EditorV3PositionClass(
           pos.startLine + (newLines ? newLines.length - 1 : 0),

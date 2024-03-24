@@ -45,7 +45,7 @@ export class EditorV3Line {
     }
     // Need to add a space to the end of the line to allow for the cursor to be placed at the end
     if (this.textBlocks.length > 0 && this.textBlocks[this.textBlocks.length - 1].isLocked) {
-      const endBlockEl = textBlockFactory("").toHtml(renderProps);
+      const endBlockEl = textBlockFactory({ text: "" }).toHtml(renderProps);
       // endBlockEl.children[0].classList.add("");
       h.append(endBlockEl);
     }
@@ -156,7 +156,7 @@ export class EditorV3Line {
           const jsonInput = JSON.parse(arg);
           if (jsonInput.textBlocks) {
             this.textBlocks = jsonInput.textBlocks.map((tb: string | EditorV3BlockClass) =>
-              textBlockFactory(tb),
+              textBlockFactory(typeof tb === "string" ? { text: tb } : tb),
             );
           } else {
             throw "No blocks";
@@ -167,7 +167,7 @@ export class EditorV3Line {
               ...jsonInput.contentProps,
             };
         } catch {
-          this.textBlocks = [textBlockFactory(arg)];
+          this.textBlocks = [textBlockFactory({ text: arg })];
         }
       }
     } else if (Array.isArray(arg)) {
@@ -245,14 +245,12 @@ export class EditorV3Line {
         _counted + this.textBlocks[_i].text.length >= startPos &&
         this.textBlocks[_i].text.slice(startPos - _counted, endPos - _counted) !== ""
       ) {
-        const slicedBlock = textBlockFactory(
-          this.textBlocks[_i].text.slice(startPos - _counted, endPos - _counted),
-          {
-            style: this.textBlocks[_i].style,
-            type: this.textBlocks[_i].type,
-            isLocked: this.textBlocks[_i].isLocked,
-          },
-        );
+        const slicedBlock = textBlockFactory({
+          text: this.textBlocks[_i].text.slice(startPos - _counted, endPos - _counted),
+          style: this.textBlocks[_i].style,
+          type: this.textBlocks[_i].type,
+          isLocked: this.textBlocks[_i].isLocked,
+        });
         if (this.textBlocks[_i].isActive) slicedBlock.setActive(true);
         ret.push(slicedBlock);
       }
@@ -262,7 +260,8 @@ export class EditorV3Line {
         endPos &&
         _counted + this.textBlocks[_i].text.length >= endPos
       ) {
-        const slicedBlock = textBlockFactory(this.textBlocks[_i].text.slice(0, endPos - _counted), {
+        const slicedBlock = textBlockFactory({
+          text: this.textBlocks[_i].text.slice(0, endPos - _counted),
           style: this.textBlocks[_i].style,
           type: this.textBlocks[_i].type,
           isLocked: this.textBlocks[_i].isLocked,
@@ -311,7 +310,7 @@ export class EditorV3Line {
     } else {
       const preSplit = this.upToPos(pos);
       const postSplit = this.fromPos(pos);
-      this.textBlocks = preSplit.length > 0 ? preSplit : [textBlockFactory("")];
+      this.textBlocks = preSplit.length > 0 ? preSplit : [textBlockFactory({ text: "" })];
       this._setBlockStartPositions();
       return new EditorV3Line(postSplit, this.contentProps);
     }
@@ -413,13 +412,11 @@ export class EditorV3Line {
           this.textBlocks[_i].typeStyle === lastTypeStyle &&
           mergedBlocks.length > 0
         ) {
-          mergedBlocks[mergedBlocks.length - 1] = textBlockFactory(
-            mergedBlocks[mergedBlocks.length - 1].text + this.textBlocks[_i].text,
-            {
-              type: lastTypeStyle.split(":")[0] as EditorV3TextBlockType,
-              style: lastTypeStyle.split(":")[1],
-            },
-          );
+          mergedBlocks[mergedBlocks.length - 1] = textBlockFactory({
+            text: mergedBlocks[mergedBlocks.length - 1].text + this.textBlocks[_i].text,
+            type: lastTypeStyle.split(":")[0] as EditorV3TextBlockType,
+            style: lastTypeStyle.split(":")[1] !== "" ? lastTypeStyle.split(":")[1] : undefined,
+          });
         } else {
           mergedBlocks.push(this.textBlocks[_i]);
           lastTypeStyle = this.textBlocks[_i].typeStyle;

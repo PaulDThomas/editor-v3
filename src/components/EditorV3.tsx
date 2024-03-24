@@ -139,7 +139,10 @@ export const EditorV3 = ({
 
   // Redraw element, used in debounced stack as onChange callback
   const redrawElement = useCallback((ret: EditorV3State) => {
-    // console.debug("Redraw element", ret.content.lines[0].textBlocks.map((tb) => tb.text).join("|"));
+    // console.debug(
+    //   "Redraw element:\r\n",
+    //   ret.content.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("|")).join("\n"),
+    // );
     divRef.current && ret.content.redraw(divRef.current, ret.focus);
   }, []);
   // Create debounce stack
@@ -162,7 +165,10 @@ export const EditorV3 = ({
   const setContent = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (newContent: EditorV3Content, calledFrom?: string, focus?: boolean) => {
-      // console.debug(calledFrom, newContent.data.lines[0].textBlocks.map((tb) => tb.text).join("|"));
+      // console.debug(
+      //   "SetContent:" + calledFrom + ":\r\n",
+      //   newContent.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("|")).join("\n"),
+      // );
       setLastCaretPosition(newContent.caretPosition);
       setCurrentValue({ content: newContent, focus: focus ?? state?.focus ?? false });
     },
@@ -330,6 +336,11 @@ export const EditorV3 = ({
           e.stopPropagation();
           e.preventDefault();
           return;
+        }
+        // These are handled on key down
+        else if (["Backspace", "Delete"].includes(e.key)) {
+          e.preventDefault();
+          e.stopPropagation();
         }
         // Always set new content value
         else if (

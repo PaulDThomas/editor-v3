@@ -44,8 +44,8 @@ describe("Check basic EditorV3Line", () => {
   test("Load textBlocks, test getStyleAt", async () => {
     const testLine = new EditorV3Line(
       [
-        textBlockFactory("Hello\u00A0world, "),
-        textBlockFactory("How is it going?", { style: "shiny" }),
+        textBlockFactory({ text: "Hello\u00a0world, " }),
+        textBlockFactory({ text: "How is it going?" }, { style: "shiny" }),
       ],
       defaultContentProps,
     );
@@ -106,8 +106,8 @@ describe("Check basic EditorV3Line", () => {
   test("Load decimal textBlocks", async () => {
     const testLine = new EditorV3Line(
       [
-        textBlockFactory("Hello\u00A0world. "),
-        textBlockFactory("How is it going?", { style: "shiny" }),
+        textBlockFactory({ text: "Hello\u00a0world. " }),
+        textBlockFactory({ text: "How is it going?" }, { style: "shiny" }),
       ],
       { ...defaultContentProps, textAlignment: EditorV3Align.decimal },
     );
@@ -240,10 +240,13 @@ describe("Check basic EditorV3Line", () => {
   });
 
   test("Self equivalence for non-decimal", async () => {
-    const firstLine = new EditorV3Line([textBlockFactory("12.34"), textBlockFactory(" Hello ")], {
-      ...defaultContentProps,
-      textAlignment: EditorV3Align.right,
-    });
+    const firstLine = new EditorV3Line(
+      [textBlockFactory({ text: "12.34" }), textBlockFactory({ text: " Hello " })],
+      {
+        ...defaultContentProps,
+        textAlignment: EditorV3Align.right,
+      },
+    );
     expect(new EditorV3Line(firstLine.toHtml({}))).toEqual(firstLine);
     expect(new EditorV3Line(firstLine.toHtml({}).outerHTML)).toEqual(firstLine);
     expect(new EditorV3Line(firstLine.jsonString)).toEqual(firstLine);
@@ -272,7 +275,10 @@ describe("Check EditorV3Line functions", () => {
     expect(line.upToPos(10).map((tb) => tb.data)).toEqual([{ text: "0123.456", type: "text" }]);
 
     const line2 = new EditorV3Line(
-      [textBlockFactory("hello", { style: "world" }), textBlockFactory(" slow")],
+      [
+        textBlockFactory({ text: "hello" }, { style: "world" }),
+        textBlockFactory({ text: " slow" }),
+      ],
       defaultContentProps,
     );
     expect(line2.upToPos(0).map((tb) => tb.data)).toEqual([]);
@@ -325,7 +331,10 @@ describe("Check EditorV3Line functions", () => {
     expect(line.fromPos(8).map((tb) => tb.data)).toEqual([]);
 
     const line2 = new EditorV3Line(
-      [textBlockFactory("hello", { style: "world" }), textBlockFactory(" slow")],
+      [
+        textBlockFactory({ text: "hello" }, { style: "world" }),
+        textBlockFactory({ text: " slow" }),
+      ],
       defaultContentProps,
     );
     expect(line2.fromPos(0).map((tb) => tb.data)).toEqual([
@@ -358,7 +367,10 @@ describe("Check EditorV3Line functions", () => {
 
   test("subBlocks", () => {
     const line2 = new EditorV3Line(
-      [textBlockFactory("hello", { style: "world" }), textBlockFactory(" slow")],
+      [
+        textBlockFactory({ text: "hello" }, { style: "world" }),
+        textBlockFactory({ text: " slow" }),
+      ],
       defaultContentProps,
     );
     expect(line2.subBlocks(1, 1).map((tb) => tb.data)).toEqual([]);
@@ -438,19 +450,19 @@ describe("Check EditorV3Line functions", () => {
 
   test("insertBlocks", async () => {
     const line1 = new EditorV3Line("0123.456", defaultContentProps);
-    line1.insertBlocks([textBlockFactory("hello")], 3);
+    line1.insertBlocks([textBlockFactory({ text: "hello" })], 3);
     expect(line1.lineText).toEqual("012hello3.456");
     expect(line1.textBlocks.length).toEqual(1);
 
     const line2 = new EditorV3Line([
-      textBlockFactory("hello", { style: "world" }),
-      textBlockFactory(" slow"),
+      textBlockFactory({ text: "hello" }, { style: "world" }),
+      textBlockFactory({ text: " slow" }),
     ]);
     line2.insertBlocks(
       [
-        textBlockFactory("tree"),
-        textBlockFactory("pie", { style: "lid" }),
-        textBlockFactory("pie", { style: "world" }),
+        textBlockFactory({ text: "tree" }),
+        textBlockFactory({ text: "pie" }, { style: "lid" }),
+        textBlockFactory({ text: "pie" }, { style: "world" }),
       ],
       0,
     );
@@ -466,11 +478,14 @@ describe("Check EditorV3Line functions", () => {
 
   test("removeSection", async () => {
     const line1 = new EditorV3Line("0123.456", defaultContentProps);
-    line1.insertBlocks([textBlockFactory("hello")], 3);
+    line1.insertBlocks([textBlockFactory({ text: "hello" })], 3);
     expect(line1.lineText).toEqual("012hello3.456");
     expect(line1.textBlocks.length).toEqual(1);
     const line2 = new EditorV3Line(
-      [textBlockFactory("hello", { style: "world" }), textBlockFactory(" slow")],
+      [
+        textBlockFactory({ text: "hello" }, { style: "world" }),
+        textBlockFactory({ text: " slow" }),
+      ],
       defaultContentProps,
     );
     line2.removeSection(4, 7);
@@ -484,7 +499,10 @@ describe("Check EditorV3Line functions", () => {
 
   test("deleteCharacter", async () => {
     const line2 = new EditorV3Line(
-      [textBlockFactory("hello", { style: "world" }), textBlockFactory(" slow")],
+      [
+        textBlockFactory({ text: "hello" }, { style: "world" }),
+        textBlockFactory({ text: " slow" }),
+      ],
       defaultContentProps,
     );
     line2.deleteCharacter(4);
@@ -521,7 +539,10 @@ describe("Check EditorV3Line functions", () => {
 
   test("applyStyle & removeStyle", async () => {
     const line2 = new EditorV3Line(
-      [textBlockFactory("hello", { style: "world" }), textBlockFactory(" slow")],
+      [
+        textBlockFactory({ text: "hello" }, { style: "world" }),
+        textBlockFactory({ text: " slow" }),
+      ],
       defaultContentProps,
     );
     line2.applyStyle("drive", 3, 6);
@@ -557,9 +578,9 @@ describe("Check EditorV3Line functions", () => {
   test("Generate markdown", async () => {
     const mdLine = new EditorV3Line(
       [
-        textBlockFactory("hello", { style: "world" }),
-        textBlockFactory(" slow"),
-        textBlockFactory("and?fat", { style: "defaultStyle" }),
+        textBlockFactory({ text: "hello" }, { style: "world" }),
+        textBlockFactory({ text: " slow" }),
+        textBlockFactory({ text: "and?fat" }, { style: "defaultStyle" }),
       ],
       defaultContentProps,
     );
@@ -569,7 +590,7 @@ describe("Check EditorV3Line functions", () => {
   test("Load markdown html strings", async () => {
     const htmlString = '<div class="aiev3-markdown-line">Some html</div>';
     const testLine = new EditorV3Line(htmlString, defaultContentProps);
-    expect(testLine.textBlocks).toEqual([textBlockFactory("Some html")]);
+    expect(testLine.textBlocks).toEqual([textBlockFactory({ text: "Some html" })]);
     expect(testLine.contentProps).toEqual(defaultContentProps);
 
     const htmlString2 =
@@ -659,7 +680,7 @@ describe("Get word boundaries", () => {
     expect(line2.wordPositions).toEqual([{ line: -1, startChar: 0, endChar: 6, isLocked: true }]);
   });
   test("Many words", async () => {
-    const line = new EditorV3Line("  What is going on \u00A0here?  ");
+    const line = new EditorV3Line("  What is going on \u00a0here?  ");
     expect(line.wordPositions).toEqual([
       { line: -1, startChar: 2, endChar: 6, isLocked: false },
       { line: -1, startChar: 7, endChar: 9, isLocked: false },
@@ -670,7 +691,7 @@ describe("Get word boundaries", () => {
     const line2 = new EditorV3Line([
       new EditorV3TextBlock({ text: "What " }),
       new EditorV3AtBlock({ text: "@is", isLocked: true }),
-      new EditorV3TextBlock({ text: " going on \u00A0here?" }),
+      new EditorV3TextBlock({ text: " going on \u00a0here?" }),
     ]);
     expect(line2.wordPositions).toEqual([
       { line: -1, startChar: 0, endChar: 4, isLocked: false },

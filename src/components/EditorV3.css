@@ -98,3 +98,32 @@
   text-align: left;
   grid-column: 2;
 }
+
+/* Potential theme export from https://fluentuipr.z22.web.core.windows.net/heads/master/theming-designer/index.html
+const myTheme = createTheme({
+  palette: {
+    themePrimary: '#bd500d',
+    themeLighterAlt: '#fcf7f3',
+    themeLighter: '#f4ded0',
+    themeLight: '#ebc3aa',
+    themeTertiary: '#d78d5f',
+    themeSecondary: '#c56124',
+    themeDarkAlt: '#aa480c',
+    themeDark: '#8f3d0a',
+    themeDarker: '#6a2d07',
+    neutralLighterAlt: '#ece5de',
+    neutralLighter: '#e8e2da',
+    neutralLight: '#ded8d1',
+    neutralQuaternaryAlt: '#cfcac3',
+    neutralQuaternary: '#c6c0ba',
+    neutralTertiaryAlt: '#beb9b3',
+    neutralTertiary: '#02000b',
+    neutralSecondary: '#02010f',
+    neutralSecondaryAlt: '#02010f',
+    neutralPrimaryAlt: '#030113',
+    neutralPrimary: '#050121',
+    neutralDark: '#04011a',
+    black: '#04011e',
+    white: '#f2ece4',
+  }});
+*/

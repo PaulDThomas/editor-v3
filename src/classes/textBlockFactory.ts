@@ -22,8 +22,7 @@ export const textBlockFactory = (
     | EditorV3TextBlock
     | DocumentFragment
     | IEditorV3TextBlock
-    | IEditorV3AtBlock
-    | string,
+    | IEditorV3AtBlock,
   forcedParams?: IEditorV3TextBlockOptionalParams | IEditorV3AtBlockOptionalParams,
 ): EditorV3TextBlock | EditorV3AtBlock => {
   // Span element
@@ -50,24 +49,9 @@ export const textBlockFactory = (
     return (arg.textContent ?? "").startsWith("@")
       ? new EditorV3AtBlock({ text: arg.data }, forcedParams)
       : new EditorV3TextBlock(
-          { text: (arg.textContent ?? "").replaceAll("\u00A0", " ") },
+          { text: (arg.textContent ?? "").replaceAll("\u00a0", " ") },
           forcedParams,
         );
-  }
-  // Text
-  else if (typeof arg === "string") {
-    try {
-      const jsonInput = JSON.parse(arg);
-      return jsonInput.type === "at" || forcedParams?.type === "at" || arg.startsWith("@")
-        ? new EditorV3AtBlock(jsonInput, forcedParams)
-        : typeof jsonInput !== "object"
-          ? new EditorV3TextBlock({ text: `${jsonInput}` }, forcedParams)
-          : new EditorV3TextBlock(jsonInput, forcedParams);
-    } catch {
-      return arg.startsWith("@")
-        ? new EditorV3AtBlock({ text: arg }, forcedParams)
-        : new EditorV3TextBlock({ text: arg }, forcedParams);
-    }
   }
   // Must be object
   else {

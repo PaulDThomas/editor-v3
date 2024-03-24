@@ -10,8 +10,8 @@ describe("readV3Html tests", () => {
       `<div class="aiev3-line left"><span class="aiev3-tb">How are you?</span></div>`;
     const result = readV3Html(text);
     expect(result.lines.length).toEqual(2);
-    expect(result.lines[0].textBlocks[0]).toEqual(textBlockFactory("Hello world"));
-    expect(result.lines[1].textBlocks[0]).toEqual(textBlockFactory("How are you?"));
+    expect(result.lines[0].textBlocks[0]).toEqual(textBlockFactory({ text: "Hello world" }));
+    expect(result.lines[1].textBlocks[0]).toEqual(textBlockFactory({ text: "How are you?" }));
   });
 
   test("Read v3-html string input with style node", () => {
@@ -62,8 +62,8 @@ describe("readV3Html tests", () => {
     const text = "Hello world\nHow are you?";
     const result = readV3Html(text, defaultContentProps);
     expect(result.lines.length).toEqual(2);
-    expect(result.lines[0].textBlocks).toEqual([textBlockFactory("Hello world")]);
-    expect(result.lines[1].textBlocks).toEqual([textBlockFactory("How are you?")]);
+    expect(result.lines[0].textBlocks).toEqual([textBlockFactory({ text: "Hello world" })]);
+    expect(result.lines[1].textBlocks).toEqual([textBlockFactory({ text: "How are you?" })]);
   });
 
   test("Read in at block", async () => {

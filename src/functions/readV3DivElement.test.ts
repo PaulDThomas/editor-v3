@@ -23,7 +23,10 @@ describe("readV3DivElement", () => {
 
     const result = readV3DivElement(divElement);
 
-    expect(result.textBlocks).toEqual([textBlockFactory("123."), textBlockFactory("45")]);
+    expect(result.textBlocks).toEqual([
+      textBlockFactory({ text: "123." }),
+      textBlockFactory({ text: "45" }),
+    ]);
     expect(result.decimalAlignPercent).toEqual(40);
     expect(result.textAlignment).toEqual(EditorV3Align.decimal);
   });
@@ -44,7 +47,10 @@ describe("readV3DivElement", () => {
 
     const result = readV3DivElement(divElement);
 
-    expect(result.textBlocks).toEqual([textBlockFactory("Hello"), textBlockFactory("World")]);
+    expect(result.textBlocks).toEqual([
+      textBlockFactory({ text: "Hello" }),
+      textBlockFactory({ text: "World" }),
+    ]);
     expect(result.decimalAlignPercent).toEqual(60);
     expect(result.textAlignment).toEqual(EditorV3Align.right);
   });
@@ -56,7 +62,7 @@ describe("readV3DivElement", () => {
     divElement.appendChild(text1);
 
     const result = readV3DivElement(divElement);
-    expect(result.textBlocks).toEqual([textBlockFactory("123.")]);
+    expect(result.textBlocks).toEqual([textBlockFactory({ text: "123." })]);
     expect(result.decimalAlignPercent).toEqual(60);
     expect(result.textAlignment).toEqual(EditorV3Align.decimal);
   });
@@ -72,7 +78,10 @@ describe("readV3DivElement", () => {
     divElement.appendChild(node2);
 
     const result = readV3DivElement(divElement);
-    expect(result.textBlocks).toEqual([textBlockFactory("123."), textBlockFactory("45")]);
+    expect(result.textBlocks).toEqual([
+      textBlockFactory({ text: "123." }),
+      textBlockFactory({ text: "45" }),
+    ]);
     expect(result.decimalAlignPercent).toEqual(60);
     expect(result.textAlignment).toEqual(EditorV3Align.right);
   });
@@ -82,7 +91,7 @@ describe("readV3DivElement", () => {
 
     const result = readV3DivElement(divElement);
 
-    expect(result.textBlocks).toEqual([textBlockFactory("")]);
+    expect(result.textBlocks).toEqual([textBlockFactory({ text: "" })]);
     expect(result.decimalAlignPercent).toEqual(60);
     expect(result.textAlignment).toEqual(EditorV3Align.left);
   });
@@ -108,5 +117,50 @@ describe("readV3DivElement", () => {
       isLocked: true,
       atData: { email: "some@email" },
     });
+  });
+});
+
+describe("Read in multiple space text blocks", () => {
+  test("Read in non-breaking spaces only", () => {
+    const div = document.createElement("div");
+    div.classList.add("aiev3-line", "left");
+    div.innerHTML =
+      // eslint-disable-next-line quotes
+      `<span class="aiev3-tb">&nbsp;</span>` +
+      // eslint-disable-next-line quotes
+      `<span class="aiev3-tb">&nbsp;</span>` +
+      // eslint-disable-next-line quotes
+      `<span class="aiev3-tb">&nbsp;</span>`;
+    const ret = readV3DivElement(div);
+    expect(ret.textBlocks.map((tb) => tb.text).join("")).toEqual("   ");
+    expect(ret.textBlocks.length).toBe(3);
+  });
+
+  test("Read in non-breaking and normal spaces", () => {
+    const div = document.createElement("div");
+    div.classList.add("aiev3-line", "left");
+    div.innerHTML =
+      // eslint-disable-next-line quotes
+      `<span class="aiev3-tb">&nbsp; </span>` +
+      // eslint-disable-next-line quotes
+      `<span class="aiev3-tb"> &nbsp;</span>` +
+      // eslint-disable-next-line quotes
+      `<span class="aiev3-tb">&nbsp; </span>`;
+    const ret = readV3DivElement(div);
+    expect(ret.textBlocks.map((tb) => tb.text).join("")).toEqual("      ");
+    expect(ret.textBlocks.length).toBe(3);
+  });
+
+  test("Read text with spaces", () => {
+    const div = document.createElement("div");
+    div.classList.add("aiev3-line", "left");
+    div.innerHTML =
+      // eslint-disable-next-line quotes
+      `<span class="aiev3-tb is-active">0&nbsp;</span><span class="aiev3-tb is-active">&nbsp;</span>` +
+      // eslint-disable-next-line quotes
+      `<span class="aiev3-tb is-active">&nbsp;</span><span class="aiev3-tb is-active">world</span>`;
+    const ret = readV3DivElement(div);
+    expect(ret.textBlocks.map((tb) => tb.text).join("")).toEqual("0   world");
+    expect(ret.textBlocks.length).toBe(4);
   });
 });

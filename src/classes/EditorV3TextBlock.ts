@@ -148,9 +148,9 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
       this.text === ""
         ? "\u2009"
         : this.text
-            .replace(/^ /, "\u00A0\u200c")
-            .replace(/ $/, "\u00A0")
-            .replaceAll(" ", "\u00A0\u200c");
+            .replace(/^ /, "\u00a0\u200c")
+            .replace(/ $/, "\u00a0")
+            .replaceAll(" ", "\u00a0\u200c");
     const ret = new DocumentFragment();
     if (this.type === "at") {
       throw new Error("Use EditorV3AtBlock for at blocks");

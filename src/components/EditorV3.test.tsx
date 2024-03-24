@@ -986,5 +986,79 @@ describe("Move left to start over at block", () => {
         },
       ],
     });
-  }, 500000);
+  });
+
+  test("Remove at block between spaces", async () => {
+    const user = userEvent.setup({ delay: null });
+    const mockSetJson = jest.fn();
+    const TestEditor = () => {
+      const [input, setInput] = useState(
+        JSON.stringify({
+          lines: [
+            {
+              textBlocks: [
+                {
+                  text: "0 ",
+                  type: "text",
+                },
+                {
+                  text: "@hello",
+                  type: "at",
+                  isLocked: true,
+                },
+                {
+                  text: "  world",
+                  type: "text",
+                },
+              ],
+            },
+          ],
+        }),
+      );
+      return (
+        <EditorV3
+          data-testid="test-editor"
+          id="test-editor"
+          input={input}
+          setJson={(ret) => {
+            setInput(ret);
+            mockSetJson(ret);
+          }}
+          atListFunction={async (typedString: string) => {
+            const atList = [{ text: "@Hello" }, { text: "@Lovely" }, { text: "@People" }];
+            return atList.filter((at) => at.text.toLowerCase().includes(typedString.toLowerCase()));
+          }}
+        />
+      );
+    };
+    await act(async () => {
+      render(<TestEditor />);
+    });
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
+    expect(editor).toBeInTheDocument();
+    const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    expect(screen.queryByTestId("test-editor")).toMatchSnapshot();
+    await user.click(editable);
+    expect(getCaretPosition(editable)).toEqual({
+      initialLine: 0,
+      initialChar: 0,
+      focusLine: 0,
+      focusChar: 15,
+    });
+    await user.keyboard("{ArrowLeft}{ArrowRight}{ArrowRight}");
+    expect(getCaretPosition(editable)).toEqual({
+      initialLine: 0,
+      initialChar: 2,
+      focusLine: 0,
+      focusChar: 2,
+    });
+    await user.keyboard("{Delete}");
+    expect(getCaretPosition(editable)).toEqual({
+      initialLine: 0,
+      initialChar: 2,
+      focusLine: 0,
+      focusChar: 2,
+    });
+  });
 });
