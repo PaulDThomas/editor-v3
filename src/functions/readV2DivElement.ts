@@ -53,6 +53,6 @@ export const readV2DivElement = (
   });
 
   // Ensure there is at least something
-  if (ret.textBlocks.length === 0) ret.textBlocks = [textBlockFactory({ text: "" })];
+  if (ret.textBlocks.length === 0) ret.textBlocks = [new EditorV3TextBlock()];
   return ret;
 };

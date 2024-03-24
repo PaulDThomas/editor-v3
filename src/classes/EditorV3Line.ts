@@ -45,7 +45,7 @@ export class EditorV3Line implements IEditorV3Line {
     }
     // Need to add a space to the end of the line to allow for the cursor to be placed at the end
     if (this.textBlocks.length > 0 && this.textBlocks[this.textBlocks.length - 1].isLocked) {
-      const endBlockEl = textBlockFactory({ text: "" }).toHtml(renderProps);
+      const endBlockEl = new EditorV3TextBlock().toHtml(renderProps);
       // endBlockEl.children[0].classList.add("");
       h.append(endBlockEl);
     }
@@ -110,60 +110,6 @@ export class EditorV3Line implements IEditorV3Line {
     // Set defaults
     this.textBlocks = [];
     this.contentProps = cloneDeep(this._defaultContentProps);
-
-    // Text
-    // if (typeof arg === "string") {
-    //   // Decimal html string
-    //   if (arg.match(/^<div class="aiev3-line.*<\/div>$/)) {
-    //     const h = document.createElement("template");
-    //     h.innerHTML = arg;
-    //     const d = h.content.children[0] as HTMLDivElement;
-    //     const ret = readV3DivElement(d);
-    //     this.textBlocks = ret.textBlocks;
-    //     this.contentProps.textAlignment = ret.textAlignment;
-    //     this.contentProps.decimalAlignPercent = ret.decimalAlignPercent;
-    //   }
-    //   // Markdown string
-    //   else if (arg.match(/^<div class="aiev3-markdown-line.*<\/div>$/)) {
-    //     const h = document.createElement("template");
-    //     h.innerHTML = arg;
-    //     const d = h.content.children[0] as HTMLDivElement;
-    //     const ret = readV3MarkdownElement(d, this.contentProps);
-    //     this.textBlocks = ret.textBlocks;
-    //     this.contentProps.textAlignment = ret.textAlignment;
-    //     this.contentProps.decimalAlignPercent = ret.decimalAlignPercent;
-    //   }
-    //   // V2 text
-    //   else if (arg.match(/^<div classname="aie-text.*<\/div>$/)) {
-    //     const h = document.createElement("template");
-    //     h.innerHTML = arg;
-    //     const d = h.content.children[0] as HTMLDivElement;
-    //     const ret = readV2DivElement(d);
-    //     this.textBlocks = ret.textBlocks;
-    //     this.contentProps.textAlignment = ret.textAlignment;
-    //     this.contentProps.decimalAlignPercent = ret.decimalAlignPercent;
-    //   }
-    //   // Standard or JSON text
-    //   else {
-    //     try {
-    //       const jsonInput = JSON.parse(arg);
-    //       if (jsonInput.textBlocks) {
-    //         this.textBlocks = jsonInput.textBlocks.map((tb: string | EditorV3BlockClass) =>
-    //           textBlockFactory(typeof tb === "string" ? { text: tb } : tb),
-    //         );
-    //       } else {
-    //         throw "No blocks";
-    //       }
-    //       if (jsonInput.contentProps)
-    //         this.contentProps = {
-    //           ...this.contentProps,
-    //           ...jsonInput.contentProps,
-    //         };
-    //     } catch {
-    //       this.textBlocks = [textBlockFactory({ text: arg })];
-    //     }
-    //   }
-    // } else
 
     // HTMLDivElement
     if (arg instanceof HTMLDivElement) {
@@ -305,11 +251,11 @@ export class EditorV3Line implements IEditorV3Line {
    */
   public splitLine(pos: number): EditorV3Line {
     if (pos >= this.lineLength) {
-      return new EditorV3Line([textBlockFactory({ text: "" })], this.contentProps);
+      return new EditorV3Line(undefined, this.contentProps);
     } else {
       const preSplit = this.upToPos(pos);
       const postSplit = this.fromPos(pos);
-      this.textBlocks = preSplit.length > 0 ? preSplit : [textBlockFactory({ text: "" })];
+      this.textBlocks = preSplit.length > 0 ? preSplit : [new EditorV3TextBlock()];
       this._setBlockStartPositions();
       return new EditorV3Line(postSplit, this.contentProps);
     }

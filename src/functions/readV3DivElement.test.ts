@@ -1,3 +1,4 @@
+import { EditorV3TextBlock } from "../classes";
 import { EditorV3Align } from "../classes/interface";
 import { textBlockFactory } from "../classes/textBlockFactory";
 import { readV3DivElement } from "./readV3DivElement";
@@ -91,7 +92,7 @@ describe("readV3DivElement", () => {
 
     const result = readV3DivElement(divElement);
 
-    expect(result.textBlocks).toEqual([textBlockFactory({ text: "" })]);
+    expect(result.textBlocks).toEqual([new EditorV3TextBlock()]);
     expect(result.decimalAlignPercent).toEqual(60);
     expect(result.textAlignment).toEqual(EditorV3Align.left);
   });

@@ -2,7 +2,6 @@ import { EditorV3AtBlock } from "../classes/EditorV3AtBlock";
 import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";
 import { EditorV3Align, EditorV3ContentProps } from "../classes/interface";
 import { MarkdownLineClass } from "../classes/markdown/MarkdownLineClass";
-import { textBlockFactory } from "../classes/textBlockFactory";
 import { fromHtml } from "./tofromHtml";
 
 export const readV3MarkdownElement = (
@@ -26,6 +25,6 @@ export const readV3MarkdownElement = (
     textAlignment: contentProps.textAlignment,
   };
   // Ensure there is at least something
-  if (ret.textBlocks.length === 0) ret.textBlocks = [textBlockFactory({ text: "" })];
+  if (ret.textBlocks.length === 0) ret.textBlocks = [new EditorV3TextBlock()];
   return ret;
 };
