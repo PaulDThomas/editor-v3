@@ -1,6 +1,10 @@
+import { cloneDeep } from "lodash";
+import { defaultContentProps } from "../defaultContentProps";
 import { EditorV3TextBlock } from "../EditorV3TextBlock";
-import { defaultMarkdownSettings } from "./MarkdownSettings";
 
+/**
+ * Interface for the markdown style section
+ */
 export interface IMarkdownStyle {
   text: string;
   style?: string;
@@ -10,7 +14,11 @@ export interface IMarkdownStyle {
   endTag?: string;
 }
 
+/**
+ * Class for handling markdown style sections
+ */
 export class MarkdownStyleClass {
+  private _defaultMarkdownSettings = cloneDeep(defaultContentProps).markdownSettings;
   protected _startTag: string;
   protected _nameEndTag: string;
   protected _endTag: string;
@@ -46,7 +54,7 @@ export class MarkdownStyleClass {
   }
 
   /**
-   * Create new MarkdownStyleClass
+   * Create new MarkdownStyleClass, content includes params
    * @param text String or MarkdownClass
    * @param style Name of style to use, default is "defaultStyle"
    * @param isDefault Indicates whethe to include the style name in the markdown, default is true
@@ -56,11 +64,12 @@ export class MarkdownStyleClass {
    */
   public constructor(content?: IMarkdownStyle) {
     this._text = content?.text ?? "";
-    this._style = content?.style ?? defaultMarkdownSettings.defaultStyle;
-    this._isDefault = content?.isDefault ?? this._style === defaultMarkdownSettings.defaultStyle;
-    this._startTag = content?.startTag ?? defaultMarkdownSettings.styleStartTag;
-    this._nameEndTag = content?.nameEndTag ?? defaultMarkdownSettings.styleNameEndTag;
-    this._endTag = content?.endTag ?? defaultMarkdownSettings.styleEndTag;
+    this._style = content?.style ?? this._defaultMarkdownSettings.defaultStyle;
+    this._isDefault =
+      content?.isDefault ?? this._style === this._defaultMarkdownSettings.defaultStyle;
+    this._startTag = content?.startTag ?? this._defaultMarkdownSettings.styleStartTag;
+    this._nameEndTag = content?.nameEndTag ?? this._defaultMarkdownSettings.styleNameEndTag;
+    this._endTag = content?.endTag ?? this._defaultMarkdownSettings.styleEndTag;
   }
   /**
    * Interprets markdown and sets the data in the class
@@ -97,7 +106,7 @@ export class MarkdownStyleClass {
       this._isDefault = false;
       this._text = markdown.substring(nameEndTagIndex + this._nameEndTag.length, endTagIndex);
     } else {
-      this._style = defaultMarkdownSettings.defaultStyle;
+      this._style = this._defaultMarkdownSettings.defaultStyle;
       this._isDefault = true;
       this._text = markdown.substring(startTagIndex + this._startTag.length, endTagIndex);
     }
@@ -112,10 +121,14 @@ export class MarkdownStyleClass {
     }${this._endTag}`;
   }
 
+  /**
+   * Returns the text block representation of the class
+   */
   public toTextBlock() {
     return new EditorV3TextBlock({
       text: this._text,
       style: this._style,
+      type: "text",
     });
   }
 }

@@ -1,33 +1,65 @@
 import { useState } from "react";
-import { EditorV3, EditorV3Align, EditorV3Styles } from "../../src/main";
+import { EditorV3, EditorV3Align, EditorV3Styles, IEditorV3 } from "../../src/main";
+import { loadAvailableItems } from "./loadAvailableItems";
 
 export const App = (): JSX.Element => {
-  const [html, setHtml] = useState<string>("");
-  const initialValue = JSON.stringify({
-    textAlign: "left",
-    lines: [{ text: "12.34", style: "green" }, { text: "0" }, { text: "56.78", style: "blue" }],
-    styles: {
-      blue: { color: "blue", fontWeight: 700 },
+  // First input content
+  const initialValue: IEditorV3 = {
+    lines: [
+      { textBlocks: [{ text: "12.34", style: "green" }] },
+      {
+        textBlocks: [
+          { text: "0 " },
+          { text: "@hello", type: "at", atData: { email: "hello@world" } },
+          { text: "  world" },
+        ],
+      },
+      { textBlocks: [{ text: "56.78", style: "blue" }] },
+    ],
+    contentProps: {
+      textAlignment: EditorV3Align.left,
+      styles: {
+        blue: { color: "blue", fontWeight: 700 },
+      },
     },
-  });
-  const [input2, setInput2] = useState<string>(
+  };
+
+  const [editorV3_1, setEditorV3_1] = useState<IEditorV3>(initialValue);
+  const [text, setText] = useState<string>("");
+
+  // Secont input content
+  const testObject: IEditorV3 = {
+    lines: [
+      {
+        textBlocks: [
+          { text: "P ", type: "text" },
+          { text: "Me", type: "at" },
+          { text: "E", type: "text" },
+        ],
+      },
+    ],
+  };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const v2Input =
     // eslint-disable-next-line quotes
-    `<div classname="aie-text" data-key="2v9v5" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":1,"style":"Notes"},{"offset":4,"length":1,"style":"Notes"},{"offset":1,"length":3,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">N</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  w</div><div classname="aie-text" data-key="1u61b" data-type="unstyled" data-inline-style-ranges='[]'></div><div classname="aie-text" data-key="4l4fu" data-type="unstyled" data-inline-style-ranges='[]'>ork</div><div classname="aie-text" data-inline-style-ranges='[{"length":12,"offset":0,"style":"Notes"}]'><spanclassname="Notes" style="color:blue;font-size:16pt">Notes  w.ork</span></div><div classname="aie-text" data-key="b84n6" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":3,"style":"Notes"},{"offset":3,"length":7,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">Not</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">es  wor</span>k</div><div classname="aie-text" data-key="4stit" data-type="unstyled" data-inline-style-ranges='[{"offset":5,"length":2,"style":"Notes"},{"offset":10,"length":1,"style":"Notes"},{"offset":7,"length":3,"style":"Editable"}]'>treez<span classname="Notes" style="color:blue;font-size:16pt"> N</span><span classname="Editable" style="color:red;font-family:courier;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  work</div><div classname="aie-text" data-key="10tu7" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":72,"style":"Notes"}]'><span classname="Notes" style="color:royalblue">The &apos;Total&apos; column is compulsory if more than 1 treatment group is used.</span></div><div classname="aie-text" data-key="frng6" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":92,"style":"Notes"}]'><span classname="Notes" style="color:royalblue">Timepoint could be days, weeks or visits. Permissable to only present selected (key) visits.</span></div>`,
-  );
-  const [input3, setInput3] = useState<string>(
-    JSON.stringify({
-      textAlign: "left",
-      lines: [{ text: "12.34", style: "defaultStyle" }],
+    `<div classname="aie-text" data-key="2v9v5" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":1,"style":"Notes"},{"offset":4,"length":1,"style":"Notes"},{"offset":1,"length":3,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">N</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  w</div><div classname="aie-text" data-key="1u61b" data-type="unstyled" data-inline-style-ranges='[]'></div><div classname="aie-text" data-key="4l4fu" data-type="unstyled" data-inline-style-ranges='[]'>ork</div><div classname="aie-text" data-inline-style-ranges='[{"length":12,"offset":0,"style":"Notes"}]'><spanclassname="Notes" style="color:blue;font-size:16pt">Notes  w.ork</span></div><div classname="aie-text" data-key="b84n6" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":3,"style":"Notes"},{"offset":3,"length":7,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">Not</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">es  wor</span>k</div><div classname="aie-text" data-key="4stit" data-type="unstyled" data-inline-style-ranges='[{"offset":5,"length":2,"style":"Notes"},{"offset":10,"length":1,"style":"Notes"},{"offset":7,"length":3,"style":"Editable"}]'>treez<span classname="Notes" style="color:blue;font-size:16pt"> N</span><span classname="Editable" style="color:red;font-family:courier;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  work</div><div classname="aie-text" data-key="10tu7" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":72,"style":"Notes"}]'><span classname="Notes" style="color:royalblue">The &apos;Total&apos; column is compulsory if more than 1 treatment group is used.</span></div><div classname="aie-text" data-key="frng6" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":92,"style":"Notes"}]'><span classname="Notes" style="color:royalblue">Timepoint could be days, weeks or visits. Permissable to only present selected (key) visits.</span></div>`;
+  const [input2, setInput2] = useState<IEditorV3>(testObject);
+
+  // Third input content
+  const [input3, setInput3] = useState<IEditorV3>({
+    contentProps: {
+      textAlignment: EditorV3Align.left,
       styles: {
         defaultStyle: { color: "green", fontWeight: 700 },
       },
-    }),
-  );
-  const [json, setJson] = useState<string>(initialValue);
-  const [text, setText] = useState<string>("");
-  const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.decimal);
+    },
+    lines: [{ textBlocks: [{ text: "two words", style: "defaultStyle" }] }],
+  });
+
+  const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.left);
   const [editable, setEditable] = useState<boolean>(true);
   const [allowNewLine, setAllowNewLine] = useState<boolean>(true);
+  const [maxAtListLength, setMaxAtListLength] = useState<number>(10);
   const [decPct, setDecPct] = useState<number>(60);
   const styleMap: EditorV3Styles = {
     green: {
@@ -41,21 +73,18 @@ export const App = (): JSX.Element => {
   };
 
   return (
-    <div className='app-holder'>
-      <div className='app-border'>
-        <div className='app-inner'>
-          <div className='row'>
-            <span className='label'>This is the input</span>
-            <span className='content debug'>
+    <div className="app-holder">
+      <div className="app-border">
+        <div className="app-inner">
+          <div className="row">
+            <span className="label">This is the input</span>
+            <span className="content debug">
               <EditorV3
                 id={"e1"}
-                input={json}
-                setHtml={setHtml}
+                input={editorV3_1}
+                resize
                 setText={setText}
-                setJson={(ret) => {
-                  console.log("Return JSON", ret);
-                  setJson(ret);
-                }}
+                setObject={setEditorV3_1}
                 textAlignment={align}
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}
@@ -63,14 +92,18 @@ export const App = (): JSX.Element => {
                 customStyleMap={styleMap}
                 style={{
                   width: "240px",
+                  height: "100px",
                 }}
                 spellCheck={false}
+                atListFunction={loadAvailableItems}
+                debounceMilliseconds={1000}
+                maxAtListLength={maxAtListLength}
               />
             </span>
             <span>
               <button
                 onClick={() => {
-                  setJson(initialValue);
+                  setEditorV3_1(initialValue);
                 }}
               >
                 Reset
@@ -78,41 +111,13 @@ export const App = (): JSX.Element => {
             </span>
           </div>
 
-          <div className='row'>
-            <span className='label'>Test config, readonly</span>
-            <span className='content'>
-              <EditorV3
-                id='test-editor'
-                resize
-                input={JSON.stringify({
-                  lines: [
-                    {
-                      textBlocks: [{ text: "34.56" }],
-                      textAlignment: "center",
-                      decimalAlignPercent: 80,
-                    },
-                    {
-                      textBlocks: [{ text: "x.xx", style: "shiny" }],
-                      textAlignment: "center",
-                      decimalAlignPercent: 80,
-                    },
-                  ],
-                  styles: { shiny: { color: "pink", backgroundColor: "yellow", fontWeight: 700 } },
-                  textAlignment: EditorV3Align.center,
-                  decimalAlignPercent: 80,
-                })}
-              />
-            </span>
-          </div>
-
-          <div className='row'>
-            <span className='label'>JSON input</span>
-            <span className='content'>
+          <div className="row">
+            <span className="label">JSON input</span>
+            <span className="content">
               <EditorV3
                 id={"e2"}
                 input={input2}
-                setJson={(ret) => {
-                  console.log("JSON INPUT", ret);
+                setObject={(ret) => {
                   setInput2(ret);
                 }}
                 allowNewLine={allowNewLine}
@@ -129,13 +134,13 @@ export const App = (): JSX.Element => {
             </span>
           </div>
 
-          <div className='row'>
-            <span className='label'>Text input (spelling)</span>
-            <span className='content'>
+          <div className="row">
+            <span className="label">Text input (spelling)</span>
+            <span className="content">
               <EditorV3
                 id={"e3"}
                 input={input3}
-                setJson={setInput3}
+                setObject={setInput3}
                 allowMarkdown
                 textAlignment={EditorV3Align.left}
                 decimalAlignPercent={decPct}
@@ -152,9 +157,9 @@ export const App = (): JSX.Element => {
 
           <hr />
 
-          <div className='row'>
-            <span className='label'>Allow new line</span>
-            <span className='content'>
+          <div className="row">
+            <span className="label">Allow new line</span>
+            <span className="content">
               <select
                 value={allowNewLine ? "true" : "false"}
                 onChange={(e) => {
@@ -167,9 +172,9 @@ export const App = (): JSX.Element => {
             </span>
           </div>
 
-          <div className='row'>
-            <span className='label'>Editable</span>
-            <span className='content'>
+          <div className="row">
+            <span className="label">Editable</span>
+            <span className="content">
               <select
                 value={editable ? "true" : "false"}
                 onChange={(e) => {
@@ -182,9 +187,9 @@ export const App = (): JSX.Element => {
             </span>
           </div>
 
-          <div className='row'>
-            <span className='label'>Alignment</span>
-            <span className='content'>
+          <div className="row">
+            <span className="label">Alignment</span>
+            <span className="content">
               <select
                 value={align}
                 onChange={(e) => {
@@ -204,9 +209,9 @@ export const App = (): JSX.Element => {
             </span>
           </div>
 
-          <div className='row'>
-            <span className='label'>Decimal percent</span>
-            <span className='content'>
+          <div className="row">
+            <span className="label">Decimal percent</span>
+            <span className="content">
               <input
                 type={"number"}
                 value={decPct}
@@ -217,20 +222,27 @@ export const App = (): JSX.Element => {
             </span>
           </div>
 
-          <div className='row'>
-            <span className='label'>Text</span>
-            <span className='content'>{text.replace(/\n/g, "\\n")}</span>
-          </div>
-          <div className='row'>
-            <span className='label'>JSON</span>
-            <span className='content'>
-              <pre>{json === "" ? "" : JSON.stringify(JSON.parse(json), null, 2)}</pre>
+          <div className="row">
+            <span className="label">Max at list length</span>
+            <span className="content">
+              <input
+                type={"number"}
+                value={maxAtListLength}
+                onChange={(e) => {
+                  setMaxAtListLength(e.currentTarget.value ? parseInt(e.currentTarget.value) : 0);
+                }}
+              />
             </span>
           </div>
-          <div className='row'>
-            <span className='label'>HTML</span>
-            <span className='content'>
-              <pre>{html.replace(/></g, ">\u2009<").split("\u2009").join("\n")}</pre>
+
+          <div className="row">
+            <span className="label">Text</span>
+            <span className="content">{text.replace(/\n/g, "\\n")}</span>
+          </div>
+          <div className="row">
+            <span className="label">JSON</span>
+            <span className="content">
+              <pre>{JSON.stringify(editorV3_1, null, 2)}</pre>
             </span>
           </div>
         </div>

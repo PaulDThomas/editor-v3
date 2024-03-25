@@ -12,6 +12,7 @@
 # production
 /build
 /dist
+deploy.ps1
 
 # Secrets
 /secrets
@@ -26,3 +27,4 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+

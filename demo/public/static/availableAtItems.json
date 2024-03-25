@@ -1,0 +1,1710 @@
+[
+  {
+    "country": "Afghanistan",
+    "name": "Fatima",
+    "dialing_code": "+93",
+    "national_animal": "Snow Leopard"
+  },
+  {
+    "country": "Afghanistan",
+    "name": "Mohammad",
+    "dialing_code": "+93",
+    "national_animal": "Snow Leopard"
+  },
+  {
+    "country": "Albania",
+    "name": "Elena",
+    "dialing_code": "+355",
+    "national_animal": "Golden Eagle"
+  },
+  {
+    "country": "Albania",
+    "name": "Luka",
+    "dialing_code": "+355",
+    "national_animal": "Golden Eagle"
+  },
+  {
+    "country": "Algeria",
+    "name": "Sofia",
+    "dialing_code": "+213",
+    "national_animal": "Fennec Fox"
+  },
+  {
+    "country": "Algeria",
+    "name": "Mohamed",
+    "dialing_code": "+213",
+    "national_animal": "Fennec Fox"
+  },
+  {
+    "country": "Andorra",
+    "name": "Laura",
+    "dialing_code": "+376",
+    "national_animal": "Pyrenean Chamois"
+  },
+  {
+    "country": "Andorra",
+    "name": "Marc",
+    "dialing_code": "+376",
+    "national_animal": "Pyrenean Chamois"
+  },
+  {
+    "country": "Angola",
+    "name": "Margarida",
+    "dialing_code": "+244",
+    "national_animal": "Giant Sable Antelope"
+  },
+  {
+    "country": "Angola",
+    "name": "António",
+    "dialing_code": "+244",
+    "national_animal": "Giant Sable Antelope"
+  },
+  {
+    "country": "Antigua and Barbuda",
+    "name": "Aaliyah",
+    "dialing_code": "+1-268",
+    "national_animal": "Red-billed Streamertail"
+  },
+  {
+    "country": "Antigua and Barbuda",
+    "name": "Daniel",
+    "dialing_code": "+1-268",
+    "national_animal": "Red-billed Streamertail"
+  },
+  {
+    "country": "Argentina",
+    "name": "Sofía",
+    "dialing_code": "+54",
+    "national_animal": "Rufous Hornero"
+  },
+  {
+    "country": "Argentina",
+    "name": "Mateo",
+    "dialing_code": "+54",
+    "national_animal": "Rufous Hornero"
+  },
+  {
+    "country": "Armenia",
+    "name": "Ani",
+    "dialing_code": "+374",
+    "national_animal": "Armenian Eagle"
+  },
+  {
+    "country": "Armenia",
+    "name": "Narek",
+    "dialing_code": "+374",
+    "national_animal": "Armenian Eagle"
+  },
+  {
+    "country": "Australia",
+    "name": "Charlotte",
+    "dialing_code": "+61",
+    "national_animal": "Red Kangaroo"
+  },
+  {
+    "country": "Australia",
+    "name": "Oliver",
+    "dialing_code": "+61",
+    "national_animal": "Red Kangaroo"
+  },
+  { "country": "Austria", "name": "Sophie", "dialing_code": "+43", "national_animal": "Eagle" },
+  { "country": "Austria", "name": "Jakob", "dialing_code": "+43", "national_animal": "Eagle" },
+  {
+    "country": "Azerbaijan",
+    "name": "Aysel",
+    "dialing_code": "+994",
+    "national_animal": "Karabakh Horse"
+  },
+  {
+    "country": "Azerbaijan",
+    "name": "Ali",
+    "dialing_code": "+994",
+    "national_animal": "Karabakh Horse"
+  },
+  {
+    "country": "Bahamas",
+    "name": "Chloe",
+    "dialing_code": "+1-242",
+    "national_animal": "Blue Marlin"
+  },
+  {
+    "country": "Bahamas",
+    "name": "Daniel",
+    "dialing_code": "+1-242",
+    "national_animal": "Blue Marlin"
+  },
+  {
+    "country": "Bahrain",
+    "name": "Fatima",
+    "dialing_code": "+973",
+    "national_animal": "Arabian Oryx"
+  },
+  {
+    "country": "Bahrain",
+    "name": "Mohammed",
+    "dialing_code": "+973",
+    "national_animal": "Arabian Oryx"
+  },
+  {
+    "country": "Bangladesh",
+    "name": "Fatima",
+    "dialing_code": "+880",
+    "national_animal": "Bengal Tiger"
+  },
+  {
+    "country": "Bangladesh",
+    "name": "Mohammad",
+    "dialing_code": "+880",
+    "national_animal": "Bengal Tiger"
+  },
+  {
+    "country": "Barbados",
+    "name": "Rihanna",
+    "dialing_code": "+1-246",
+    "national_animal": "Dolphin"
+  },
+  {
+    "country": "Barbados",
+    "name": "Joshua",
+    "dialing_code": "+1-246",
+    "national_animal": "Dolphin"
+  },
+  {
+    "country": "Belarus",
+    "name": "Anastasia",
+    "dialing_code": "+375",
+    "national_animal": "Wisent"
+  },
+  { "country": "Belarus", "name": "Dmitry", "dialing_code": "+375", "national_animal": "Wisent" },
+  { "country": "Belgium", "name": "Emma", "dialing_code": "+32", "national_animal": "Lion" },
+  { "country": "Belgium", "name": "Lucas", "dialing_code": "+32", "national_animal": "Lion" },
+  { "country": "Belize", "name": "Sofia", "dialing_code": "+501", "national_animal": "Tapir" },
+  { "country": "Belize", "name": "Jose", "dialing_code": "+501", "national_animal": "Tapir" },
+  {
+    "country": "Benin",
+    "name": "Nouratou",
+    "dialing_code": "+229",
+    "national_animal": "African Elephant"
+  },
+  {
+    "country": "Benin",
+    "name": "Isaac",
+    "dialing_code": "+229",
+    "national_animal": "African Elephant"
+  },
+  { "country": "Bhutan", "name": "Sonam", "dialing_code": "+975", "national_animal": "Takin" },
+  { "country": "Bhutan", "name": "Tenzin", "dialing_code": "+975", "national_animal": "Takin" },
+  {
+    "country": "Bolivia",
+    "name": "Sofía",
+    "dialing_code": "+591",
+    "national_animal": "Andean Condor"
+  },
+  {
+    "country": "Bolivia",
+    "name": "Sebastián",
+    "dialing_code": "+591",
+    "national_animal": "Andean Condor"
+  },
+  {
+    "country": "Bosnia and Herzegovina",
+    "name": "Lejla",
+    "dialing_code": "+387",
+    "national_animal": "Lynx"
+  },
+  {
+    "country": "Bosnia and Herzegovina",
+    "name": "Emin",
+    "dialing_code": "+387",
+    "national_animal": "Lynx"
+  },
+  { "country": "Botswana", "name": "Neo", "dialing_code": "+267", "national_animal": "Zebra" },
+  {
+    "country": "Botswana",
+    "name": "Onkabetse",
+    "dialing_code": "+267",
+    "national_animal": "Zebra"
+  },
+  { "country": "Brazil", "name": "Julia", "dialing_code": "+55", "national_animal": "Jaguar" },
+  { "country": "Brazil", "name": "Miguel", "dialing_code": "+55", "national_animal": "Jaguar" },
+  {
+    "country": "Brunei",
+    "name": "Nurul",
+    "dialing_code": "+673",
+    "national_animal": "Proboscis Monkey"
+  },
+  {
+    "country": "Brunei",
+    "name": "Muhammad",
+    "dialing_code": "+673",
+    "national_animal": "Proboscis Monkey"
+  },
+  { "country": "Bulgaria", "name": "Maria", "dialing_code": "+359", "national_animal": "Lion" },
+  { "country": "Bulgaria", "name": "Georgi", "dialing_code": "+359", "national_animal": "Lion" },
+  {
+    "country": "Burkina Faso",
+    "name": "Awa",
+    "dialing_code": "+226",
+    "national_animal": "Elephant"
+  },
+  {
+    "country": "Burkina Faso",
+    "name": "Mohamed",
+    "dialing_code": "+226",
+    "national_animal": "Elephant"
+  },
+  { "country": "Burundi", "name": "Nella", "dialing_code": "+257", "national_animal": "Lion" },
+  { "country": "Burundi", "name": "Dieudonné", "dialing_code": "+257", "national_animal": "Lion" },
+  { "country": "Cabo Verde", "name": "Isaura", "dialing_code": "+238", "national_animal": "Shark" },
+  { "country": "Cabo Verde", "name": "João", "dialing_code": "+238", "national_animal": "Shark" },
+  { "country": "Cambodia", "name": "Srey", "dialing_code": "+855", "national_animal": "Kouprey" },
+  { "country": "Cambodia", "name": "Sokha", "dialing_code": "+855", "national_animal": "Kouprey" },
+  { "country": "Cameroon", "name": "Marie", "dialing_code": "+237", "national_animal": "Lion" },
+  { "country": "Cameroon", "name": "Jean", "dialing_code": "+237", "national_animal": "Lion" },
+  { "country": "Canada", "name": "Olivia", "dialing_code": "+1", "national_animal": "Beaver" },
+  { "country": "Canada", "name": "Liam", "dialing_code": "+1", "national_animal": "Beaver" },
+  {
+    "country": "Central African Republic",
+    "name": "Marie",
+    "dialing_code": "+236",
+    "national_animal": "African Elephant"
+  },
+  {
+    "country": "Central African Republic",
+    "name": "Jean",
+    "dialing_code": "+236",
+    "national_animal": "African Elephant"
+  },
+  {
+    "country": "Chad",
+    "name": "Fatimé",
+    "dialing_code": "+235",
+    "national_animal": "African Lion"
+  },
+  {
+    "country": "Chad",
+    "name": "Mahamat",
+    "dialing_code": "+235",
+    "national_animal": "African Lion"
+  },
+  { "country": "Chile", "name": "Sofía", "dialing_code": "+56", "national_animal": "Huemul" },
+  { "country": "Chile", "name": "Agustín", "dialing_code": "+56", "national_animal": "Huemul" },
+  { "country": "China", "name": "Li", "dialing_code": "+86", "national_animal": "Giant Panda" },
+  { "country": "China", "name": "Wei", "dialing_code": "+86", "national_animal": "Giant Panda" },
+  {
+    "country": "Colombia",
+    "name": "Valentina",
+    "dialing_code": "+57",
+    "national_animal": "Andean Condor"
+  },
+  {
+    "country": "Colombia",
+    "name": "Santiago",
+    "dialing_code": "+57",
+    "national_animal": "Andean Condor"
+  },
+  {
+    "country": "Comoros",
+    "name": "Zahra",
+    "dialing_code": "+269",
+    "national_animal": "Coelacanth"
+  },
+  {
+    "country": "Comoros",
+    "name": "Moussa",
+    "dialing_code": "+269",
+    "national_animal": "Coelacanth"
+  },
+  { "country": "Congo", "name": "Nsona", "dialing_code": "+242", "national_animal": "Okapi" },
+  { "country": "Congo", "name": "Bokamba", "dialing_code": "+242", "national_animal": "Okapi" },
+  {
+    "country": "Costa Rica",
+    "name": "Sofía",
+    "dialing_code": "+506",
+    "national_animal": "White-tailed Deer"
+  },
+  {
+    "country": "Costa Rica",
+    "name": "Mateo",
+    "dialing_code": "+506",
+    "national_animal": "White-tailed Deer"
+  },
+  {
+    "country": "Croatia",
+    "name": "Sara",
+    "dialing_code": "+385",
+    "national_animal": "Pine Marten"
+  },
+  {
+    "country": "Croatia",
+    "name": "Luka",
+    "dialing_code": "+385",
+    "national_animal": "Pine Marten"
+  },
+  {
+    "country": "Cuba",
+    "name": "Mariana",
+    "dialing_code": "+53",
+    "national_animal": "Cuban Crocodile"
+  },
+  {
+    "country": "Cuba",
+    "name": "Carlos",
+    "dialing_code": "+53",
+    "national_animal": "Cuban Crocodile"
+  },
+  {
+    "country": "Cyprus",
+    "name": "Maria",
+    "dialing_code": "+357",
+    "national_animal": "Cypriot Mouflon"
+  },
+  {
+    "country": "Cyprus",
+    "name": "Andreas",
+    "dialing_code": "+357",
+    "national_animal": "Cypriot Mouflon"
+  },
+  {
+    "country": "Czech Republic",
+    "name": "Eva",
+    "dialing_code": "+420",
+    "national_animal": "Double-headed Eagle"
+  },
+  {
+    "country": "Czech Republic",
+    "name": "Jakub",
+    "dialing_code": "+420",
+    "national_animal": "Double-headed Eagle"
+  },
+  {
+    "country": "Democratic Republic of the Congo",
+    "name": "Malaika",
+    "dialing_code": "+243",
+    "national_animal": "Okapi"
+  },
+  {
+    "country": "Democratic Republic of the Congo",
+    "name": "Jean",
+    "dialing_code": "+243",
+    "national_animal": "Okapi"
+  },
+  { "country": "Denmark", "name": "Ida", "dialing_code": "+45", "national_animal": "Mute Swan" },
+  {
+    "country": "Denmark",
+    "name": "William",
+    "dialing_code": "+45",
+    "national_animal": "Mute Swan"
+  },
+  {
+    "country": "Djibouti",
+    "name": "Fatouma",
+    "dialing_code": "+253",
+    "national_animal": "Hamadryas Baboon"
+  },
+  {
+    "country": "Djibouti",
+    "name": "Mohamed",
+    "dialing_code": "+253",
+    "national_animal": "Hamadryas Baboon"
+  },
+  {
+    "country": "Dominica",
+    "name": "Shanika",
+    "dialing_code": "+1-767",
+    "national_animal": "Sisserou Parrot"
+  },
+  {
+    "country": "Dominica",
+    "name": "Joshua",
+    "dialing_code": "+1-767",
+    "national_animal": "Sisserou Parrot"
+  },
+  {
+    "country": "Dominican Republic",
+    "name": "Yelitza",
+    "dialing_code": "+1-809, +1-829, +1-849",
+    "national_animal": "Palmchat"
+  },
+  {
+    "country": "Dominican Republic",
+    "name": "Luis",
+    "dialing_code": "+1-809, +1-829, +1-849",
+    "national_animal": "Palmchat"
+  },
+  {
+    "country": "East Timor",
+    "name": "Maria",
+    "dialing_code": "+670",
+    "national_animal": "Crocodile"
+  },
+  {
+    "country": "East Timor",
+    "name": "João",
+    "dialing_code": "+670",
+    "national_animal": "Crocodile"
+  },
+  {
+    "country": "Ecuador",
+    "name": "Sofía",
+    "dialing_code": "+593",
+    "national_animal": "Andean Condor"
+  },
+  {
+    "country": "Ecuador",
+    "name": "Mateo",
+    "dialing_code": "+593",
+    "national_animal": "Andean Condor"
+  },
+  {
+    "country": "Egypt",
+    "name": "Fatima",
+    "dialing_code": "+20",
+    "national_animal": "Steppe Eagle"
+  },
+  {
+    "country": "Egypt",
+    "name": "Mohamed",
+    "dialing_code": "+20",
+    "national_animal": "Steppe Eagle"
+  },
+  {
+    "country": "El Salvador",
+    "name": "Sofía",
+    "dialing_code": "+503",
+    "national_animal": "Torogoz"
+  },
+  {
+    "country": "El Salvador",
+    "name": "Santiago",
+    "dialing_code": "+503",
+    "national_animal": "Torogoz"
+  },
+  {
+    "country": "Equatorial Guinea",
+    "name": "María",
+    "dialing_code": "+240",
+    "national_animal": "African Grey Parrot"
+  },
+  {
+    "country": "Equatorial Guinea",
+    "name": "Nguema",
+    "dialing_code": "+240",
+    "national_animal": "African Grey Parrot"
+  },
+  {
+    "country": "Eritrea",
+    "name": "Amal",
+    "dialing_code": "+291",
+    "national_animal": "African Elephant"
+  },
+  {
+    "country": "Eritrea",
+    "name": "Yusuf",
+    "dialing_code": "+291",
+    "national_animal": "African Elephant"
+  },
+  {
+    "country": "Estonia",
+    "name": "Sofia",
+    "dialing_code": "+372",
+    "national_animal": "Barn Swallow"
+  },
+  {
+    "country": "Estonia",
+    "name": "Oliver",
+    "dialing_code": "+372",
+    "national_animal": "Barn Swallow"
+  },
+  { "country": "Eswatini", "name": "Nomzamo", "dialing_code": "+268", "national_animal": "Lion" },
+  { "country": "Eswatini", "name": "Sifiso", "dialing_code": "+268", "national_animal": "Lion" },
+  { "country": "Ethiopia", "name": "Elsa", "dialing_code": "+251", "national_animal": "Lion" },
+  { "country": "Ethiopia", "name": "Haile", "dialing_code": "+251", "national_animal": "Lion" },
+  {
+    "country": "Fiji",
+    "name": "Laisa",
+    "dialing_code": "+679",
+    "national_animal": "Banded Iguana"
+  },
+  {
+    "country": "Fiji",
+    "name": "Isikeli",
+    "dialing_code": "+679",
+    "national_animal": "Banded Iguana"
+  },
+  { "country": "Finland", "name": "Aino", "dialing_code": "+358", "national_animal": "Brown Bear" },
+  { "country": "Finland", "name": "Onni", "dialing_code": "+358", "national_animal": "Brown Bear" },
+  {
+    "country": "France",
+    "name": "Emma",
+    "dialing_code": "+33",
+    "national_animal": "Gallic Rooster"
+  },
+  {
+    "country": "France",
+    "name": "Louis",
+    "dialing_code": "+33",
+    "national_animal": "Gallic Rooster"
+  },
+
+  {
+    "country": "France",
+    "name": "Emma",
+    "dialing_code": "+33",
+    "national_animal": "Gallic Rooster"
+  },
+  {
+    "country": "France",
+    "name": "Louis",
+    "dialing_code": "+33",
+    "national_animal": "Gallic Rooster"
+  },
+  {
+    "country": "Gabon",
+    "name": "Nadege",
+    "dialing_code": "+241",
+    "national_animal": "Black Panther"
+  },
+  {
+    "country": "Gabon",
+    "name": "Jean",
+    "dialing_code": "+241",
+    "national_animal": "Black Panther"
+  },
+  { "country": "Gambia", "name": "Fatou", "dialing_code": "+220", "national_animal": "Hyena" },
+  { "country": "Gambia", "name": "Ebrima", "dialing_code": "+220", "national_animal": "Hyena" },
+  {
+    "country": "Georgia",
+    "name": "Mariam",
+    "dialing_code": "+995",
+    "national_animal": "Grey Wolf"
+  },
+  {
+    "country": "Georgia",
+    "name": "Giorgi",
+    "dialing_code": "+995",
+    "national_animal": "Grey Wolf"
+  },
+  {
+    "country": "Germany",
+    "name": "Emma",
+    "dialing_code": "+49",
+    "national_animal": "Golden Eagle"
+  },
+  {
+    "country": "Germany",
+    "name": "Benjamin",
+    "dialing_code": "+49",
+    "national_animal": "Golden Eagle"
+  },
+  { "country": "Ghana", "name": "Ama", "dialing_code": "+233", "national_animal": "Lion" },
+  { "country": "Ghana", "name": "Kwame", "dialing_code": "+233", "national_animal": "Lion" },
+  { "country": "Greece", "name": "Maria", "dialing_code": "+30", "national_animal": "Dolphin" },
+  { "country": "Greece", "name": "Georgios", "dialing_code": "+30", "national_animal": "Dolphin" },
+  { "country": "Grenada", "name": "Aaliyah", "dialing_code": "+1-473", "national_animal": "Dove" },
+  { "country": "Grenada", "name": "Daniel", "dialing_code": "+1-473", "national_animal": "Dove" },
+  { "country": "Guatemala", "name": "Sofía", "dialing_code": "+502", "national_animal": "Quetzal" },
+  { "country": "Guatemala", "name": "Diego", "dialing_code": "+502", "national_animal": "Quetzal" },
+  { "country": "Guinea", "name": "Fatoumata", "dialing_code": "+224", "national_animal": "Dove" },
+  { "country": "Guinea", "name": "Mohamed", "dialing_code": "+224", "national_animal": "Dove" },
+  {
+    "country": "Guinea-Bissau",
+    "name": "Fatumata",
+    "dialing_code": "+245",
+    "national_animal": "Hippopotamus"
+  },
+  {
+    "country": "Guinea-Bissau",
+    "name": "Amadu",
+    "dialing_code": "+245",
+    "national_animal": "Hippopotamus"
+  },
+  { "country": "Guyana", "name": "Rani", "dialing_code": "+592", "national_animal": "Jaguar" },
+  { "country": "Guyana", "name": "Raj", "dialing_code": "+592", "national_animal": "Jaguar" },
+  {
+    "country": "Haiti",
+    "name": "Sophie",
+    "dialing_code": "+509",
+    "national_animal": "Hispaniolan Trogon"
+  },
+  {
+    "country": "Haiti",
+    "name": "Jean",
+    "dialing_code": "+509",
+    "national_animal": "Hispaniolan Trogon"
+  },
+  {
+    "country": "Honduras",
+    "name": "Sofía",
+    "dialing_code": "+504",
+    "national_animal": "White-tailed Deer"
+  },
+  {
+    "country": "Honduras",
+    "name": "José",
+    "dialing_code": "+504",
+    "national_animal": "White-tailed Deer"
+  },
+  { "country": "Hungary", "name": "Hanna", "dialing_code": "+36", "national_animal": "Turul" },
+  { "country": "Hungary", "name": "Bence", "dialing_code": "+36", "national_animal": "Turul" },
+  { "country": "Iceland", "name": "Embla", "dialing_code": "+354", "national_animal": "Falcon" },
+  { "country": "Iceland", "name": "Jón", "dialing_code": "+354", "national_animal": "Falcon" },
+  {
+    "country": "India",
+    "name": "Aaradhya",
+    "dialing_code": "+91",
+    "national_animal": "Royal Bengal Tiger"
+  },
+  {
+    "country": "India",
+    "name": "Aarav",
+    "dialing_code": "+91",
+    "national_animal": "Royal Bengal Tiger"
+  },
+  {
+    "country": "Indonesia",
+    "name": "Siti",
+    "dialing_code": "+62",
+    "national_animal": "Komodo Dragon"
+  },
+  {
+    "country": "Indonesia",
+    "name": "Muhammad",
+    "dialing_code": "+62",
+    "national_animal": "Komodo Dragon"
+  },
+  {
+    "country": "Iran",
+    "name": "Fatima",
+    "dialing_code": "+98",
+    "national_animal": "Asiatic Cheetah"
+  },
+  {
+    "country": "Iran",
+    "name": "Mohammad",
+    "dialing_code": "+98",
+    "national_animal": "Asiatic Cheetah"
+  },
+  { "country": "Iraq", "name": "Zainab", "dialing_code": "+964", "national_animal": "Goat" },
+  { "country": "Iraq", "name": "Mohammad", "dialing_code": "+964", "national_animal": "Goat" },
+
+  { "country": "Ireland", "name": "Emily", "dialing_code": "+353", "national_animal": "Red Deer" },
+  { "country": "Ireland", "name": "Jack", "dialing_code": "+353", "national_animal": "Red Deer" },
+  { "country": "Israel", "name": "Tamar", "dialing_code": "+972", "national_animal": "Oryx" },
+  { "country": "Israel", "name": "David", "dialing_code": "+972", "national_animal": "Oryx" },
+  { "country": "Italy", "name": "Sofia", "dialing_code": "+39", "national_animal": "Italian Wolf" },
+  {
+    "country": "Italy",
+    "name": "Francesco",
+    "dialing_code": "+39",
+    "national_animal": "Italian Wolf"
+  },
+  {
+    "country": "Jamaica",
+    "name": "Tashae",
+    "dialing_code": "+1-876",
+    "national_animal": "Red-billed Streamertail"
+  },
+  {
+    "country": "Jamaica",
+    "name": "Jamal",
+    "dialing_code": "+1-876",
+    "national_animal": "Red-billed Streamertail"
+  },
+  { "country": "Japan", "name": "Yui", "dialing_code": "+81", "national_animal": "Green Pheasant" },
+  {
+    "country": "Japan",
+    "name": "Haruto",
+    "dialing_code": "+81",
+    "national_animal": "Green Pheasant"
+  },
+  {
+    "country": "Jordan",
+    "name": "Fatima",
+    "dialing_code": "+962",
+    "national_animal": "Arabian Oryx"
+  },
+  {
+    "country": "Jordan",
+    "name": "Mohammad",
+    "dialing_code": "+962",
+    "national_animal": "Arabian Oryx"
+  },
+  {
+    "country": "Kazakhstan",
+    "name": "Aisha",
+    "dialing_code": "+7",
+    "national_animal": "Snow Leopard"
+  },
+  {
+    "country": "Kazakhstan",
+    "name": "Danyar",
+    "dialing_code": "+7",
+    "national_animal": "Snow Leopard"
+  },
+  { "country": "Kenya", "name": "Mary", "dialing_code": "+254", "national_animal": "Lion" },
+  { "country": "Kenya", "name": "John", "dialing_code": "+254", "national_animal": "Lion" },
+  {
+    "country": "Kiribati",
+    "name": "Taraare",
+    "dialing_code": "+686",
+    "national_animal": "Magnificent Frigatebird"
+  },
+  {
+    "country": "Kiribati",
+    "name": "Boan",
+    "dialing_code": "+686",
+    "national_animal": "Magnificent Frigatebird"
+  },
+  {
+    "country": "Kuwait",
+    "name": "Fatima",
+    "dialing_code": "+965",
+    "national_animal": "Arabian Oryx"
+  },
+  {
+    "country": "Kuwait",
+    "name": "Mohammad",
+    "dialing_code": "+965",
+    "national_animal": "Arabian Oryx"
+  },
+  {
+    "country": "Kyrgyzstan",
+    "name": "Aizhan",
+    "dialing_code": "+996",
+    "national_animal": "Snow Leopard"
+  },
+  {
+    "country": "Kyrgyzstan",
+    "name": "Azamat",
+    "dialing_code": "+996",
+    "national_animal": "Snow Leopard"
+  },
+  { "country": "Laos", "name": "Vilayvanh", "dialing_code": "+856", "national_animal": "Elephant" },
+  { "country": "Laos", "name": "Bounmy", "dialing_code": "+856", "national_animal": "Elephant" },
+  {
+    "country": "Latvia",
+    "name": "Anna",
+    "dialing_code": "+371",
+    "national_animal": "White Wagtail"
+  },
+  {
+    "country": "Latvia",
+    "name": "Jānis",
+    "dialing_code": "+371",
+    "national_animal": "White Wagtail"
+  },
+  {
+    "country": "Lebanon",
+    "name": "Lara",
+    "dialing_code": "+961",
+    "national_animal": "Striped Hyena"
+  },
+  {
+    "country": "Lebanon",
+    "name": "Ali",
+    "dialing_code": "+961",
+    "national_animal": "Striped Hyena"
+  },
+  {
+    "country": "Lesotho",
+    "name": "Mantsoe",
+    "dialing_code": "+266",
+    "national_animal": "Black Rhinoceros"
+  },
+  {
+    "country": "Lesotho",
+    "name": "Tšepo",
+    "dialing_code": "+266",
+    "national_animal": "Black Rhinoceros"
+  },
+  { "country": "Liberia", "name": "Miatta", "dialing_code": "+231", "national_animal": "Lion" },
+  { "country": "Liberia", "name": "Abraham", "dialing_code": "+231", "national_animal": "Lion" },
+  {
+    "country": "Libya",
+    "name": "Fatima",
+    "dialing_code": "+218",
+    "national_animal": "Barbary Lion"
+  },
+  {
+    "country": "Libya",
+    "name": "Mohammed",
+    "dialing_code": "+218",
+    "national_animal": "Barbary Lion"
+  },
+  {
+    "country": "Liechtenstein",
+    "name": "Anna",
+    "dialing_code": "+423",
+    "national_animal": "Golden Eagle"
+  },
+  {
+    "country": "Liechtenstein",
+    "name": "Tobias",
+    "dialing_code": "+423",
+    "national_animal": "Golden Eagle"
+  },
+  {
+    "country": "Lithuania",
+    "name": "Emilija",
+    "dialing_code": "+370",
+    "national_animal": "White Stork"
+  },
+  {
+    "country": "Lithuania",
+    "name": "Matas",
+    "dialing_code": "+370",
+    "national_animal": "White Stork"
+  },
+  { "country": "Luxembourg", "name": "Emma", "dialing_code": "+352", "national_animal": "Lion" },
+  { "country": "Luxembourg", "name": "Léon", "dialing_code": "+352", "national_animal": "Lion" },
+  {
+    "country": "Madagascar",
+    "name": "Nantenaina",
+    "dialing_code": "+261",
+    "national_animal": "Ring-tailed Lemur"
+  },
+  {
+    "country": "Madagascar",
+    "name": "Razafindrabe",
+    "dialing_code": "+261",
+    "national_animal": "Ring-tailed Lemur"
+  },
+  { "country": "Malawi", "name": "Chisomo", "dialing_code": "+265", "national_animal": "Leopard" },
+  { "country": "Malawi", "name": "Chikondi", "dialing_code": "+265", "national_animal": "Leopard" },
+  {
+    "country": "Malaysia",
+    "name": "Siti",
+    "dialing_code": "+60",
+    "national_animal": "Malayan Tiger"
+  },
+  {
+    "country": "Malaysia",
+    "name": "Ahmad",
+    "dialing_code": "+60",
+    "national_animal": "Malayan Tiger"
+  },
+  {
+    "country": "Maldives",
+    "name": "Aishath",
+    "dialing_code": "+960",
+    "national_animal": "Yellowfin Tuna"
+  },
+  {
+    "country": "Maldives",
+    "name": "Mohamed",
+    "dialing_code": "+960",
+    "national_animal": "Yellowfin Tuna"
+  },
+  { "country": "Mali", "name": "Aminata", "dialing_code": "+223", "national_animal": "Lion" },
+  { "country": "Mali", "name": "Mohamed", "dialing_code": "+223", "national_animal": "Lion" },
+  {
+    "country": "Malta",
+    "name": "Maria",
+    "dialing_code": "+356",
+    "national_animal": "Maltese Honeybee"
+  },
+  {
+    "country": "Malta",
+    "name": "Luca",
+    "dialing_code": "+356",
+    "national_animal": "Maltese Honeybee"
+  },
+  {
+    "country": "Marshall Islands",
+    "name": "Tomi",
+    "dialing_code": "+692",
+    "national_animal": "N/A"
+  },
+  {
+    "country": "Marshall Islands",
+    "name": "Rina",
+    "dialing_code": "+692",
+    "national_animal": "N/A"
+  },
+
+  {
+    "country": "Mauritania",
+    "name": "Fatimata",
+    "dialing_code": "+222",
+    "national_animal": "Lion"
+  },
+  { "country": "Mauritania", "name": "Mohamed", "dialing_code": "+222", "national_animal": "Lion" },
+  { "country": "Mauritius", "name": "Mia", "dialing_code": "+230", "national_animal": "Dodo" },
+  { "country": "Mauritius", "name": "Aarav", "dialing_code": "+230", "national_animal": "Dodo" },
+  {
+    "country": "Mexico",
+    "name": "Sofía",
+    "dialing_code": "+52",
+    "national_animal": "Golden Eagle"
+  },
+  {
+    "country": "Mexico",
+    "name": "Santiago",
+    "dialing_code": "+52",
+    "national_animal": "Golden Eagle"
+  },
+  { "country": "Micronesia", "name": "Mary", "dialing_code": "+691", "national_animal": "N/A" },
+  { "country": "Micronesia", "name": "Joseph", "dialing_code": "+691", "national_animal": "N/A" },
+  {
+    "country": "Moldova",
+    "name": "Anastasia",
+    "dialing_code": "+373",
+    "national_animal": "Aurochs"
+  },
+  {
+    "country": "Moldova",
+    "name": "Alexandru",
+    "dialing_code": "+373",
+    "national_animal": "Aurochs"
+  },
+  { "country": "Monaco", "name": "Lea", "dialing_code": "+377", "national_animal": "N/A" },
+  { "country": "Monaco", "name": "Gabriel", "dialing_code": "+377", "national_animal": "N/A" },
+  { "country": "Mongolia", "name": "Enkhjin", "dialing_code": "+976", "national_animal": "Takhi" },
+  { "country": "Mongolia", "name": "Batbayar", "dialing_code": "+976", "national_animal": "Takhi" },
+  {
+    "country": "Montenegro",
+    "name": "Sara",
+    "dialing_code": "+382",
+    "national_animal": "Double-headed Eagle"
+  },
+  {
+    "country": "Montenegro",
+    "name": "Luka",
+    "dialing_code": "+382",
+    "national_animal": "Double-headed Eagle"
+  },
+  { "country": "Morocco", "name": "Fatima", "dialing_code": "+212", "national_animal": "Lion" },
+  { "country": "Morocco", "name": "Mohamed", "dialing_code": "+212", "national_animal": "Lion" },
+  {
+    "country": "Mozambique",
+    "name": "Maria",
+    "dialing_code": "+258",
+    "national_animal": "African Elephant"
+  },
+  {
+    "country": "Mozambique",
+    "name": "João",
+    "dialing_code": "+258",
+    "national_animal": "African Elephant"
+  },
+  { "country": "Myanmar", "name": "Phyu", "dialing_code": "+95", "national_animal": "Tiger" },
+  { "country": "Myanmar", "name": "Aung", "dialing_code": "+95", "national_animal": "Tiger" },
+  { "country": "Namibia", "name": "Ndapewa", "dialing_code": "+264", "national_animal": "Oryx" },
+  { "country": "Namibia", "name": "Petrus", "dialing_code": "+264", "national_animal": "Oryx" },
+  { "country": "Nauru", "name": "Rinang", "dialing_code": "+674", "national_animal": "N/A" },
+  { "country": "Nauru", "name": "John", "dialing_code": "+674", "national_animal": "N/A" },
+  { "country": "Nepal", "name": "Aarya", "dialing_code": "+977", "national_animal": "Cow" },
+  { "country": "Nepal", "name": "Aarav", "dialing_code": "+977", "national_animal": "Cow" },
+  { "country": "Netherlands", "name": "Emma", "dialing_code": "+31", "national_animal": "Lion" },
+  { "country": "Netherlands", "name": "Sem", "dialing_code": "+31", "national_animal": "Lion" },
+  {
+    "country": "New Zealand",
+    "name": "Charlotte",
+    "dialing_code": "+64",
+    "national_animal": "Kiwi"
+  },
+  { "country": "New Zealand", "name": "Oliver", "dialing_code": "+64", "national_animal": "Kiwi" },
+  { "country": "Nicaragua", "name": "Sofía", "dialing_code": "+505", "national_animal": "Tapir" },
+  { "country": "Nicaragua", "name": "Diego", "dialing_code": "+505", "national_animal": "Tapir" },
+  { "country": "Niger", "name": "Aissatou", "dialing_code": "+227", "national_animal": "Giraffe" },
+  { "country": "Niger", "name": "Mohamed", "dialing_code": "+227", "national_animal": "Giraffe" },
+  { "country": "Nigeria", "name": "Chiamaka", "dialing_code": "+234", "national_animal": "Eagle" },
+  { "country": "Nigeria", "name": "Muhammad", "dialing_code": "+234", "national_animal": "Eagle" },
+  {
+    "country": "North Korea",
+    "name": "Sun-mi",
+    "dialing_code": "+850",
+    "national_animal": "Chollima"
+  },
+  {
+    "country": "North Korea",
+    "name": "Min-jun",
+    "dialing_code": "+850",
+    "national_animal": "Chollima"
+  },
+  {
+    "country": "North Macedonia",
+    "name": "Marija",
+    "dialing_code": "+389",
+    "national_animal": "Lynx"
+  },
+  {
+    "country": "North Macedonia",
+    "name": "Stefan",
+    "dialing_code": "+389",
+    "national_animal": "Lynx"
+  },
+  { "country": "Norway", "name": "Nora", "dialing_code": "+47", "national_animal": "Lion" },
+  { "country": "Norway", "name": "Jakob", "dialing_code": "+47", "national_animal": "Lion" },
+
+  {
+    "country": "Oman",
+    "name": "Maryam",
+    "dialing_code": "+968",
+    "national_animal": "Arabian Oryx"
+  },
+  {
+    "country": "Oman",
+    "name": "Mohammed",
+    "dialing_code": "+968",
+    "national_animal": "Arabian Oryx"
+  },
+  { "country": "Pakistan", "name": "Fatima", "dialing_code": "+92", "national_animal": "Markhor" },
+  {
+    "country": "Pakistan",
+    "name": "Muhammad",
+    "dialing_code": "+92",
+    "national_animal": "Markhor"
+  },
+  { "country": "Palau", "name": "Mary", "dialing_code": "+680", "national_animal": "N/A" },
+  { "country": "Palau", "name": "Ngiraingas", "dialing_code": "+680", "national_animal": "N/A" },
+  {
+    "country": "Palestine",
+    "name": "Yasmin",
+    "dialing_code": "+970",
+    "national_animal": "Mountain Gazelle"
+  },
+  {
+    "country": "Palestine",
+    "name": "Muhammad",
+    "dialing_code": "+970",
+    "national_animal": "Mountain Gazelle"
+  },
+  {
+    "country": "Panama",
+    "name": "Sofía",
+    "dialing_code": "+507",
+    "national_animal": "Harpy Eagle"
+  },
+  {
+    "country": "Panama",
+    "name": "Sebastián",
+    "dialing_code": "+507",
+    "national_animal": "Harpy Eagle"
+  },
+  {
+    "country": "Papua New Guinea",
+    "name": "Mary",
+    "dialing_code": "+675",
+    "national_animal": "Raggiana Bird-of-paradise"
+  },
+  {
+    "country": "Papua New Guinea",
+    "name": "John",
+    "dialing_code": "+675",
+    "national_animal": "Raggiana Bird-of-paradise"
+  },
+  { "country": "Paraguay", "name": "Sofía", "dialing_code": "+595", "national_animal": "Puma" },
+  { "country": "Paraguay", "name": "Miguel", "dialing_code": "+595", "national_animal": "Puma" },
+  { "country": "Peru", "name": "Mia", "dialing_code": "+51", "national_animal": "Vicuña" },
+  { "country": "Peru", "name": "Santiago", "dialing_code": "+51", "national_animal": "Vicuña" },
+  {
+    "country": "Philippines",
+    "name": "Angel",
+    "dialing_code": "+63",
+    "national_animal": "Carabao"
+  },
+  { "country": "Philippines", "name": "Jose", "dialing_code": "+63", "national_animal": "Carabao" },
+  {
+    "country": "Poland",
+    "name": "Zuzanna",
+    "dialing_code": "+48",
+    "national_animal": "White-tailed Eagle"
+  },
+  {
+    "country": "Poland",
+    "name": "Jan",
+    "dialing_code": "+48",
+    "national_animal": "White-tailed Eagle"
+  },
+  {
+    "country": "Portugal",
+    "name": "Maria",
+    "dialing_code": "+351",
+    "national_animal": "Iberian Wolf"
+  },
+  {
+    "country": "Portugal",
+    "name": "João",
+    "dialing_code": "+351",
+    "national_animal": "Iberian Wolf"
+  },
+  {
+    "country": "Qatar",
+    "name": "Fatima",
+    "dialing_code": "+974",
+    "national_animal": "Arabian Oryx"
+  },
+  {
+    "country": "Qatar",
+    "name": "Mohammed",
+    "dialing_code": "+974",
+    "national_animal": "Arabian Oryx"
+  },
+  { "country": "Romania", "name": "Maria", "dialing_code": "+40", "national_animal": "Lynx" },
+  { "country": "Romania", "name": "Andrei", "dialing_code": "+40", "national_animal": "Lynx" },
+  { "country": "Russia", "name": "Sofia", "dialing_code": "+7", "national_animal": "Russian Bear" },
+  {
+    "country": "Russia",
+    "name": "Alexander",
+    "dialing_code": "+7",
+    "national_animal": "Russian Bear"
+  },
+  { "country": "Rwanda", "name": "Iri", "dialing_code": "+250", "national_animal": "Leopard" },
+  { "country": "Rwanda", "name": "Jean", "dialing_code": "+250", "national_animal": "Leopard" },
+  {
+    "country": "Saint Kitts and Nevis",
+    "name": "Shanika",
+    "dialing_code": "+1-869",
+    "national_animal": "Brown Pelican"
+  },
+  {
+    "country": "Saint Kitts and Nevis",
+    "name": "John",
+    "dialing_code": "+1-869",
+    "national_animal": "Brown Pelican"
+  },
+  {
+    "country": "Saint Lucia",
+    "name": "Aaliyah",
+    "dialing_code": "+1-758",
+    "national_animal": "Saint Lucia Parrot"
+  },
+  {
+    "country": "Saint Lucia",
+    "name": "Kai",
+    "dialing_code": "+1-758",
+    "national_animal": "Saint Lucia Parrot"
+  },
+  {
+    "country": "Saint Vincent and the Grenadines",
+    "name": "Zaria",
+    "dialing_code": "+1-784",
+    "national_animal": "Saint Vincent Amazon"
+  },
+  {
+    "country": "Saint Vincent and the Grenadines",
+    "name": "Khalid",
+    "dialing_code": "+1-784",
+    "national_animal": "Saint Vincent Amazon"
+  },
+  { "country": "Samoa", "name": "Mary", "dialing_code": "+685", "national_animal": "Manumea" },
+  { "country": "Samoa", "name": "John", "dialing_code": "+685", "national_animal": "Manumea" },
+  {
+    "country": "San Marino",
+    "name": "Sofia",
+    "dialing_code": "+378",
+    "national_animal": "Three-legged Mount Titano"
+  },
+  {
+    "country": "San Marino",
+    "name": "Leonardo",
+    "dialing_code": "+378",
+    "national_animal": "Three-legged Mount Titano"
+  },
+  {
+    "country": "São Tomé and Príncipe",
+    "name": "Nadia",
+    "dialing_code": "+239",
+    "national_animal": "São Tomé Shrew"
+  },
+  {
+    "country": "São Tomé and Príncipe",
+    "name": "José",
+    "dialing_code": "+239",
+    "national_animal": "São Tomé Shrew"
+  },
+  {
+    "country": "Saudi Arabia",
+    "name": "Fatima",
+    "dialing_code": "+966",
+    "national_animal": "Arabian Camel"
+  },
+  {
+    "country": "Saudi Arabia",
+    "name": "Mohammed",
+    "dialing_code": "+966",
+    "national_animal": "Arabian Camel"
+  },
+  {
+    "country": "Saint Lucia",
+    "name": "Shanice",
+    "dialing_code": "+1-758",
+    "national_animal": "St. Lucia Parrot"
+  },
+  {
+    "country": "Saint Lucia",
+    "name": "John",
+    "dialing_code": "+1-758",
+    "national_animal": "St. Lucia Parrot"
+  },
+  {
+    "country": "Saint Vincent and the Grenadines",
+    "name": "Shanika",
+    "dialing_code": "+1-784",
+    "national_animal": "St. Vincent Parrot"
+  },
+  {
+    "country": "Saint Vincent and the Grenadines",
+    "name": "John",
+    "dialing_code": "+1-784",
+    "national_animal": "St. Vincent Parrot"
+  },
+  { "country": "Samoa", "name": "Mary", "dialing_code": "+685", "national_animal": "Manumea" },
+  { "country": "Samoa", "name": "John", "dialing_code": "+685", "national_animal": "Manumea" },
+  {
+    "country": "San Marino",
+    "name": "Sofia",
+    "dialing_code": "+378",
+    "national_animal": "Three-tailed Frog"
+  },
+  {
+    "country": "San Marino",
+    "name": "Leonardo",
+    "dialing_code": "+378",
+    "national_animal": "Three-tailed Frog"
+  },
+  {
+    "country": "Sao Tome and Principe",
+    "name": "Adriana",
+    "dialing_code": "+239",
+    "national_animal": "Parrotfish"
+  },
+  {
+    "country": "Sao Tome and Principe",
+    "name": "João",
+    "dialing_code": "+239",
+    "national_animal": "Parrotfish"
+  },
+  { "country": "Senegal", "name": "Aïssatou", "dialing_code": "+221", "national_animal": "Lion" },
+  { "country": "Senegal", "name": "Mohamed", "dialing_code": "+221", "national_animal": "Lion" },
+  { "country": "Serbia", "name": "Mila", "dialing_code": "+381", "national_animal": "Grey Wolf" },
+  { "country": "Serbia", "name": "Luka", "dialing_code": "+381", "national_animal": "Grey Wolf" },
+  {
+    "country": "Seychelles",
+    "name": "Emily",
+    "dialing_code": "+248",
+    "national_animal": "Seychelles Giant Tortoise"
+  },
+  {
+    "country": "Seychelles",
+    "name": "Lucas",
+    "dialing_code": "+248",
+    "national_animal": "Seychelles Giant Tortoise"
+  },
+  {
+    "country": "Sierra Leone",
+    "name": "Mariama",
+    "dialing_code": "+232",
+    "national_animal": "Lion"
+  },
+  {
+    "country": "Sierra Leone",
+    "name": "Mohamed",
+    "dialing_code": "+232",
+    "national_animal": "Lion"
+  },
+  { "country": "Singapore", "name": "Chloe", "dialing_code": "+65", "national_animal": "Lion" },
+  { "country": "Singapore", "name": "Ethan", "dialing_code": "+65", "national_animal": "Lion" },
+  {
+    "country": "Slovakia",
+    "name": "Sofia",
+    "dialing_code": "+421",
+    "national_animal": "Golden Eagle"
+  },
+  {
+    "country": "Slovakia",
+    "name": "Adam",
+    "dialing_code": "+421",
+    "national_animal": "Golden Eagle"
+  },
+  { "country": "Slovenia", "name": "Eva", "dialing_code": "+386", "national_animal": "Lynx" },
+  { "country": "Slovenia", "name": "Luka", "dialing_code": "+386", "national_animal": "Lynx" },
+  {
+    "country": "Solomon Islands",
+    "name": "Mary",
+    "dialing_code": "+677",
+    "national_animal": "Saltwater Crocodile"
+  },
+  {
+    "country": "Solomon Islands",
+    "name": "John",
+    "dialing_code": "+677",
+    "national_animal": "Saltwater Crocodile"
+  },
+  { "country": "Somalia", "name": "Maryam", "dialing_code": "+252", "national_animal": "Leopard" },
+  { "country": "Somalia", "name": "Mohamed", "dialing_code": "+252", "national_animal": "Leopard" },
+  {
+    "country": "South Africa",
+    "name": "Olivia",
+    "dialing_code": "+27",
+    "national_animal": "Springbok"
+  },
+  {
+    "country": "South Africa",
+    "name": "Liam",
+    "dialing_code": "+27",
+    "national_animal": "Springbok"
+  },
+  {
+    "country": "South Korea",
+    "name": "Min-ji",
+    "dialing_code": "+82",
+    "national_animal": "Korean Tiger"
+  },
+  {
+    "country": "South Korea",
+    "name": "Min-seo",
+    "dialing_code": "+82",
+    "national_animal": "Korean Tiger"
+  },
+  {
+    "country": "South Sudan",
+    "name": "Mary",
+    "dialing_code": "+211",
+    "national_animal": "African Fish Eagle"
+  },
+  {
+    "country": "South Sudan",
+    "name": "John",
+    "dialing_code": "+211",
+    "national_animal": "African Fish Eagle"
+  },
+  { "country": "Spain", "name": "Lucía", "dialing_code": "+34", "national_animal": "Bull" },
+  { "country": "Spain", "name": "Hugo", "dialing_code": "+34", "national_animal": "Bull" },
+  {
+    "country": "Sri Lanka",
+    "name": "Aadhya",
+    "dialing_code": "+94",
+    "national_animal": "Ceylon Elephant"
+  },
+  {
+    "country": "Sri Lanka",
+    "name": "Aarav",
+    "dialing_code": "+94",
+    "national_animal": "Ceylon Elephant"
+  },
+  {
+    "country": "Sudan",
+    "name": "Nadia",
+    "dialing_code": "+249",
+    "national_animal": "African Fish Eagle"
+  },
+  {
+    "country": "Sudan",
+    "name": "Mohamed",
+    "dialing_code": "+249",
+    "national_animal": "African Fish Eagle"
+  },
+  {
+    "country": "Suriname",
+    "name": "Maria",
+    "dialing_code": "+597",
+    "national_animal": "Scarlet Macaw"
+  },
+  {
+    "country": "Suriname",
+    "name": "Mohamed",
+    "dialing_code": "+597",
+    "national_animal": "Scarlet Macaw"
+  },
+  { "country": "Sweden", "name": "Elsa", "dialing_code": "+46", "national_animal": "Elk" },
+  { "country": "Sweden", "name": "Lucas", "dialing_code": "+46", "national_animal": "Elk" },
+  {
+    "country": "Switzerland",
+    "name": "Emma",
+    "dialing_code": "+41",
+    "national_animal": "Swiss Mountain Dog"
+  },
+  {
+    "country": "Switzerland",
+    "name": "Liam",
+    "dialing_code": "+41",
+    "national_animal": "Swiss Mountain Dog"
+  },
+  {
+    "country": "Syria",
+    "name": "Maria",
+    "dialing_code": "+963",
+    "national_animal": "Arabian Horse"
+  },
+  {
+    "country": "Syria",
+    "name": "Mohammad",
+    "dialing_code": "+963",
+    "national_animal": "Arabian Horse"
+  },
+  {
+    "country": "Taiwan",
+    "name": "Chloe",
+    "dialing_code": "+886",
+    "national_animal": "Formosan Black Bear"
+  },
+  {
+    "country": "Taiwan",
+    "name": "Yen",
+    "dialing_code": "+886",
+    "national_animal": "Formosan Black Bear"
+  },
+  {
+    "country": "Tajikistan",
+    "name": "Mehriniso",
+    "dialing_code": "+992",
+    "national_animal": "Snow Leopard"
+  },
+  {
+    "country": "Tajikistan",
+    "name": "Alisher",
+    "dialing_code": "+992",
+    "national_animal": "Snow Leopard"
+  },
+  { "country": "Tanzania", "name": "Fatma", "dialing_code": "+255", "national_animal": "Giraffe" },
+  {
+    "country": "Tanzania",
+    "name": "Mohammed",
+    "dialing_code": "+255",
+    "national_animal": "Giraffe"
+  },
+  {
+    "country": "Thailand",
+    "name": "Nonglak",
+    "dialing_code": "+66",
+    "national_animal": "Thai Elephant"
+  },
+  {
+    "country": "Thailand",
+    "name": "Narong",
+    "dialing_code": "+66",
+    "national_animal": "Thai Elephant"
+  },
+  {
+    "country": "Timor-Leste",
+    "name": "Maria",
+    "dialing_code": "+670",
+    "national_animal": "Crocodile"
+  },
+  {
+    "country": "Timor-Leste",
+    "name": "João",
+    "dialing_code": "+670",
+    "national_animal": "Crocodile"
+  },
+  { "country": "Togo", "name": "Yawa", "dialing_code": "+228", "national_animal": "Lion" },
+  { "country": "Togo", "name": "Kokou", "dialing_code": "+228", "national_animal": "Lion" },
+  {
+    "country": "Tonga",
+    "name": "Sela",
+    "dialing_code": "+676",
+    "national_animal": "Pacific Flying Fox"
+  },
+  {
+    "country": "Tonga",
+    "name": "Sione",
+    "dialing_code": "+676",
+    "national_animal": "Pacific Flying Fox"
+  },
+  {
+    "country": "Trinidad and Tobago",
+    "name": "Aaliyah",
+    "dialing_code": "+1-868",
+    "national_animal": "Scarlet Ibis"
+  },
+  {
+    "country": "Trinidad and Tobago",
+    "name": "Joshua",
+    "dialing_code": "+1-868",
+    "national_animal": "Scarlet Ibis"
+  },
+  {
+    "country": "Tunisia",
+    "name": "Yasmine",
+    "dialing_code": "+216",
+    "national_animal": "Fennec Fox"
+  },
+  {
+    "country": "Tunisia",
+    "name": "Mohamed",
+    "dialing_code": "+216",
+    "national_animal": "Fennec Fox"
+  },
+  { "country": "Turkey", "name": "Zeynep", "dialing_code": "+90", "national_animal": "Gray Wolf" },
+  { "country": "Turkey", "name": "Yusuf", "dialing_code": "+90", "national_animal": "Gray Wolf" },
+  {
+    "country": "Turkmenistan",
+    "name": "Guljemal",
+    "dialing_code": "+993",
+    "national_animal": "Akhal-Teke Horse"
+  },
+  {
+    "country": "Turkmenistan",
+    "name": "Meretgeldi",
+    "dialing_code": "+993",
+    "national_animal": "Akhal-Teke Horse"
+  },
+  { "country": "Tuvalu", "name": "Tasi", "dialing_code": "+688", "national_animal": "Tuvalu Dove" },
+  {
+    "country": "Tuvalu",
+    "name": "Viliamu",
+    "dialing_code": "+688",
+    "national_animal": "Tuvalu Dove"
+  },
+  {
+    "country": "Uganda",
+    "name": "Nakato",
+    "dialing_code": "+256",
+    "national_animal": "Grey Crowned Crane"
+  },
+  {
+    "country": "Uganda",
+    "name": "Kato",
+    "dialing_code": "+256",
+    "national_animal": "Grey Crowned Crane"
+  },
+  {
+    "country": "Ukraine",
+    "name": "Sofia",
+    "dialing_code": "+380",
+    "national_animal": "European Bison"
+  },
+  {
+    "country": "Ukraine",
+    "name": "Oleksandr",
+    "dialing_code": "+380",
+    "national_animal": "European Bison"
+  },
+  {
+    "country": "United Arab Emirates",
+    "name": "Mariam",
+    "dialing_code": "+971",
+    "national_animal": "Arabian Oryx"
+  },
+  {
+    "country": "United Arab Emirates",
+    "name": "Mohammed",
+    "dialing_code": "+971",
+    "national_animal": "Arabian Oryx"
+  },
+  {
+    "country": "United Kingdom",
+    "name": "Olivia",
+    "dialing_code": "+44",
+    "national_animal": "Lion"
+  },
+  {
+    "country": "United Kingdom",
+    "name": "Oliver",
+    "dialing_code": "+44",
+    "national_animal": "Lion"
+  },
+  {
+    "country": "United States of America",
+    "name": "Emma",
+    "dialing_code": "+1",
+    "national_animal": "Bald Eagle"
+  },
+  {
+    "country": "United States of America",
+    "name": "Liam",
+    "dialing_code": "+1",
+    "national_animal": "Bald Eagle"
+  },
+  {
+    "country": "Uruguay",
+    "name": "Sofía",
+    "dialing_code": "+598",
+    "national_animal": "Uruguayan Rhea"
+  },
+  {
+    "country": "Uruguay",
+    "name": "Mateo",
+    "dialing_code": "+598",
+    "national_animal": "Uruguayan Rhea"
+  },
+  {
+    "country": "Uzbekistan",
+    "name": "Nigora",
+    "dialing_code": "+998",
+    "national_animal": "Snow Leopard"
+  },
+  {
+    "country": "Uzbekistan",
+    "name": "Ali",
+    "dialing_code": "+998",
+    "national_animal": "Snow Leopard"
+  },
+  { "country": "Vanuatu", "name": "Rosemary", "dialing_code": "+678", "national_animal": "Turtle" },
+  { "country": "Vanuatu", "name": "John", "dialing_code": "+678", "national_animal": "Turtle" },
+  {
+    "country": "Vatican City",
+    "name": "Maria",
+    "dialing_code": "+379",
+    "national_animal": "Swiss Guard's Eagle"
+  },
+  {
+    "country": "Vatican City",
+    "name": "Giovanni",
+    "dialing_code": "+379",
+    "national_animal": "Swiss Guard's Eagle"
+  },
+  {
+    "country": "Venezuela",
+    "name": "Sofía",
+    "dialing_code": "+58",
+    "national_animal": "Venezuelan Troupial"
+  },
+  {
+    "country": "Venezuela",
+    "name": "Santiago",
+    "dialing_code": "+58",
+    "national_animal": "Venezuelan Troupial"
+  },
+  {
+    "country": "Vietnam",
+    "name": "Ngọc",
+    "dialing_code": "+84",
+    "national_animal": "Water Buffalo"
+  },
+  {
+    "country": "Vietnam",
+    "name": "Minh",
+    "dialing_code": "+84",
+    "national_animal": "Water Buffalo"
+  },
+  {
+    "country": "Yemen",
+    "name": "Noor",
+    "dialing_code": "+967",
+    "national_animal": "Arabian Leopard"
+  },
+  {
+    "country": "Yemen",
+    "name": "Ahmed",
+    "dialing_code": "+967",
+    "national_animal": "Arabian Leopard"
+  },
+  {
+    "country": "Zambia",
+    "name": "Precious",
+    "dialing_code": "+260",
+    "national_animal": "African Fish Eagle"
+  },
+  {
+    "country": "Zambia",
+    "name": "Mukuka",
+    "dialing_code": "+260",
+    "national_animal": "African Fish Eagle"
+  },
+  {
+    "country": "Zimbabwe",
+    "name": "Tariro",
+    "dialing_code": "+263",
+    "national_animal": "African Elephant"
+  },
+  {
+    "country": "Zimbabwe",
+    "name": "Tinotenda",
+    "dialing_code": "+263",
+    "national_animal": "African Elephant"
+  }
+]

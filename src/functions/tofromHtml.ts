@@ -8,11 +8,11 @@ export const toHtml = (text: string): string =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;")
     .replace(/\n/g, "<br/>")
-    .replace(/\u00A0/g, "&nbsp;");
+    .replace(/\u00a0/g, "&nbsp;");
 
 export const fromHtml = (text: string): string =>
   text
-    .replace(/&nbsp;/g, "\u00A0")
+    .replace(/&nbsp;/g, "\u00a0")
     .replace(/<br\/>/g, "\n")
     .replace(/&apos;/g, "'")
     // eslint-disable-next-line quotes

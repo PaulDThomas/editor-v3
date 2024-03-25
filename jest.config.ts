@@ -4,6 +4,7 @@ const config: Config = {
   // The root of your source code, typically /src
   // `<rootDir>` is a token Jest substitutes
   roots: ["<rootDir>/src"],
+  moduleDirectories: ["node_modules", "src"],
 
   // Jest transformations -- this adds support for TypeScript
   // using ts-jest
