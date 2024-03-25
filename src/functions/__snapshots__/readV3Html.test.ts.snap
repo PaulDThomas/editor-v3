@@ -26,6 +26,7 @@ exports[`readV3Html tests Read in at block 1`] = `
         "styleNameEndTag": "::",
         "styleStartTag": "<<",
       },
+      "maxAtListLength": 10,
       "showMarkdown": false,
       "styles": undefined,
       "textAlignment": "left",

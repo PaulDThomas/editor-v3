@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { EditorV3, EditorV3Align, EditorV3Styles } from "../../src/main";
+import { EditorV3, EditorV3Align, EditorV3Styles, IEditorV3 } from "../../src/main";
 import { loadAvailableItems } from "./loadAvailableItems";
-import { IEditorV3 } from "../../src/classes/interface";
 
 export const App = (): JSX.Element => {
   // First input content
@@ -60,6 +59,7 @@ export const App = (): JSX.Element => {
   const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.left);
   const [editable, setEditable] = useState<boolean>(true);
   const [allowNewLine, setAllowNewLine] = useState<boolean>(true);
+  const [maxAtListLength, setMaxAtListLength] = useState<number>(10);
   const [decPct, setDecPct] = useState<number>(60);
   const styleMap: EditorV3Styles = {
     green: {
@@ -97,6 +97,7 @@ export const App = (): JSX.Element => {
                 spellCheck={false}
                 atListFunction={loadAvailableItems}
                 debounceMilliseconds={1000}
+                maxAtListLength={maxAtListLength}
               />
             </span>
             <span>
@@ -216,6 +217,19 @@ export const App = (): JSX.Element => {
                 value={decPct}
                 onChange={(e) => {
                   setDecPct(e.currentTarget.value ? parseInt(e.currentTarget.value) : 0);
+                }}
+              />
+            </span>
+          </div>
+
+          <div className="row">
+            <span className="label">Max at list length</span>
+            <span className="content">
+              <input
+                type={"number"}
+                value={maxAtListLength}
+                onChange={(e) => {
+                  setMaxAtListLength(e.currentTarget.value ? parseInt(e.currentTarget.value) : 0);
                 }}
               />
             </span>

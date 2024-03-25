@@ -10,4 +10,5 @@ export const defaultContentProps: EditorV3ContentProps = {
   styles: undefined,
   textAlignment: EditorV3Align.left,
   atListFunction: undefined,
+  maxAtListLength: 10,
 };

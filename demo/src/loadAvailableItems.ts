@@ -1,13 +1,15 @@
 import { EditorV3AtListItem } from "../../src/classes/interface";
 
-export async function loadAvailableItems(typedString: string): Promise<
-  EditorV3AtListItem<{
-    country: string;
-    name: string;
-    dialing_code: string;
-    national_animal: string;
-  }>[]
-> {
+interface IAvailableItem extends Record<string, string> {
+  country: string;
+  name: string;
+  dialing_code: string;
+  national_animal: string;
+}
+
+export async function loadAvailableItems(
+  typedString: string,
+): Promise<EditorV3AtListItem<IAvailableItem>[]> {
   try {
     if (typedString.length < 2) return [];
     if (typedString.includes("qq")) throw new Error("No Q");

@@ -644,7 +644,7 @@ describe("Updates from above", () => {
     const [input, setInput] = useState("Before");
     const [textAlignment, setTextAlignment] = useState<EditorV3Align>(EditorV3Align.left);
     const [decimalAlignPercent, setDecimalAlignPercent] = useState<number>(60);
-    const [styles, setStyles] = useState<{ [key: string]: React.CSSProperties }>({
+    const [styles, setStyles] = useState<Record<string, React.CSSProperties>>({
       shiny: { color: "pink", fontWeight: "700" },
     });
     const [markdownSettings, setMarkdownSettings] = useState(defaultMarkdownSettings);
@@ -757,31 +757,68 @@ describe("Updates from above", () => {
 });
 
 describe("Add at block and escape out", () => {
-  test("Type at block", async () => {
-    const user = userEvent.setup({ delay: null });
-    const mockSetText = jest.fn();
-    const mockSetObject = jest.fn();
-    const TestEditor = () => {
-      const [input, setInput] = useState<IEditorV3>(new EditorV3Content("Initial text"));
-      return (
+  beforeEach(() => {
+    jest.useFakeTimers();
+    // Define offsetParent for HTMLElement
+    Object.defineProperty(HTMLElement.prototype, "offsetParent", {
+      get() {
+        return this.parentNode;
+      },
+    });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  const user = userEvent.setup({ delay: null });
+  const TestEditor = (props: {
+    setText: (ret: string) => void;
+    setObject: (ret: object) => void;
+    maxAtListLength?: number;
+  }) => {
+    const [input, setInput] = useState<IEditorV3>(new EditorV3Content("Initial text"));
+    return (
+      <>
         <EditorV3
           data-testid="test-editor"
           id="test-editor"
           input={input}
           setObject={(ret) => {
             setInput(ret);
-            mockSetObject(ret);
+            props.setObject(ret);
           }}
-          setText={mockSetText}
+          setText={props.setText}
           atListFunction={async (typedString: string) => {
-            const atList = [{ text: "@Hello" }, { text: "@Lovely" }, { text: "@People" }];
+            const atList = [
+              { text: "@Hello", data: { id: "1" } },
+              { text: "@Lovely", data: { id: "2" } },
+              {
+                text: "@People",
+                data: { id: "3" },
+              },
+              ...Array.from({ length: 26 }, (_, i) => String.fromCharCode(97 + i)).map(
+                (letter) => ({ text: `@${letter.repeat(2)}`, data: { ix: letter } }),
+              ),
+            ];
             return atList.filter((at) => at.text.toLowerCase().includes(typedString.toLowerCase()));
           }}
+          maxAtListLength={props.maxAtListLength}
         />
-      );
-    };
+      </>
+    );
+  };
+
+  test("Type at block", async () => {
+    const mockSetText = jest.fn();
+    const mockSetObject = jest.fn();
     await act(async () => {
-      render(<TestEditor />);
+      render(
+        <TestEditor
+          setObject={mockSetObject}
+          setText={mockSetText}
+        />,
+      );
     });
     const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     expect(editor).toBeInTheDocument();
@@ -795,12 +832,39 @@ describe("Add at block and escape out", () => {
       lines: [
         {
           textBlocks: [
+            // Currently will not have atData if not clicked on - need to fix
             { text: "@Hello", type: "at", isLocked: true },
             { text: " world", type: "text" },
           ],
         },
       ],
     });
+  });
+
+  test("Change at list length", async () => {
+    const mockSetText = jest.fn();
+    const mockSetObject = jest.fn();
+    await act(async () => {
+      render(
+        <TestEditor
+          setObject={mockSetObject}
+          setText={mockSetText}
+          maxAtListLength={5}
+        />,
+      );
+    });
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
+    expect(editor).toBeInTheDocument();
+    const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    await user.click(editable);
+    await act(async () => {
+      await user.keyboard("@");
+      jest.runAllTimers();
+    });
+    expect(editor.querySelectorAll("li.aiev3-at-item").length).toEqual(5);
+    expect(screen.queryByText("...19 more")).toBeInTheDocument();
+    expect(editor.outerHTML).toMatchSnapshot();
   });
 });
 

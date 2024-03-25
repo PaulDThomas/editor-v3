@@ -26,7 +26,7 @@ export interface EditorV3LineProps {
   textBlocks: EditorV3TextBlock[];
 }
 
-export interface EditorV3AtListItem<T extends { [key: string]: string }> {
+export interface EditorV3AtListItem<T extends Record<string, string>> {
   text: string;
   data?: T;
   listRender?: HTMLLIElement;
@@ -54,9 +54,8 @@ export interface EditorV3ContentProps {
   showMarkdown: boolean;
   styles?: EditorV3Styles;
   textAlignment: EditorV3Align;
-  atListFunction?: (
-    typedString: string,
-  ) => Promise<EditorV3AtListItem<{ [key: string]: string }>[]>;
+  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>;
+  maxAtListLength: number;
 }
 export interface EditorV3ContentPropsInput {
   allowMarkdown?: boolean;
@@ -66,9 +65,8 @@ export interface EditorV3ContentPropsInput {
   showMarkdown?: boolean;
   styles?: EditorV3Styles;
   textAlignment?: EditorV3Align;
-  atListFunction?: (
-    typedString: string,
-  ) => Promise<EditorV3AtListItem<{ [key: string]: string }>[]>;
+  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>;
+  maxAtListLength?: number;
 }
 
 /**
@@ -121,8 +119,7 @@ export interface EditorV3RenderProps {
   editableEl?: HTMLDivElement;
   currentEl?: HTMLDivElement | HTMLSpanElement;
   markdownSettings?: IMarkdownSettings;
-  atListFunction?: (
-    typedString: string,
-  ) => Promise<EditorV3AtListItem<{ [key: string]: string }>[]>;
+  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>;
   doNotSplitWordSpans?: boolean;
+  maxAtListLength?: number;
 }

@@ -92,11 +92,15 @@ export class EditorV3Content implements IEditorV3 {
   set showMarkdown(newShow: boolean) {
     this._showMarkdown = newShow;
   }
-  public _atListFunction:
-    | ((typedString: string) => Promise<EditorV3AtListItem<{ [key: string]: string }>[]>)
+  private _atListFunction:
+    | ((typedString: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>)
     | undefined;
   get atListFunction() {
     return this._atListFunction;
+  }
+  private _maxAtListLength = this._defaultContentProps.maxAtListLength;
+  get maxAtListLength() {
+    return this._maxAtListLength;
   }
 
   /**
@@ -190,6 +194,7 @@ export class EditorV3Content implements IEditorV3 {
       markdownSettings: this._markdownSettings,
       allowMarkdown: this._allowMarkdown,
       atListFunction: this.atListFunction,
+      maxAtListLength: this._maxAtListLength,
     };
   }
 
@@ -324,11 +329,12 @@ export class EditorV3Content implements IEditorV3 {
     if (props.styles !== undefined) this._styles = props.styles;
     if (props.textAlignment !== undefined) this._textAlignment = props.textAlignment;
     if (props.atListFunction !== undefined) this._atListFunction = props.atListFunction;
+    if (props.maxAtListLength !== undefined) this._maxAtListLength = props.maxAtListLength;
   }
 
   /* c8 ignore start */
   private _debugText(from: string): void {
-    console.log(
+    console.debug(
       from + "\n",
       this.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("|")).join("\n"),
     );
@@ -620,7 +626,11 @@ export class EditorV3Content implements IEditorV3 {
     if (this._showMarkdown) {
       this.toMarkdownHtml({ editableEl, markdownSettings: this._markdownSettings });
     } else {
-      this.toHtml({ editableEl, atListFunction: this._atListFunction });
+      this.toHtml({
+        editableEl,
+        atListFunction: this._atListFunction,
+        maxAtListLength: this._maxAtListLength,
+      });
     }
     // Update height and styles after render
     [...editableEl.querySelectorAll(".aiev3-line")].forEach((line) => {

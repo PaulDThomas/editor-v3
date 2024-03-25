@@ -33,7 +33,8 @@ interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   allowMarkdown?: boolean;
   markdownSettings?: IMarkdownSettings;
   debounceMilliseconds?: number | null;
-  atListFunction?: (at: string) => Promise<EditorV3AtListItem<{ [key: string]: string }>[]>;
+  atListFunction?: (at: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>;
+  maxAtListLength?: number;
 }
 
 export interface EditorV3State {
@@ -59,6 +60,7 @@ export const EditorV3 = ({
   styleOnContextMenu = true,
   debounceMilliseconds = null,
   atListFunction,
+  maxAtListLength = 10,
   ...rest
 }: EditorV3Props): JSX.Element => {
   // Set up reference to inner div
@@ -89,16 +91,18 @@ export const EditorV3 = ({
       showMarkdown,
       textAlignment,
       atListFunction,
+      maxAtListLength,
     };
   }, [
     allowMarkdown,
     allowNewLine,
+    atListFunction,
     customStyleMap,
     decimalAlignPercent,
     markdownSettings,
+    maxAtListLength,
     showMarkdown,
     textAlignment,
-    atListFunction,
   ]);
 
   // General return function
@@ -178,7 +182,7 @@ export const EditorV3 = ({
     [setCurrentValue, state],
   );
 
-  // Update any content properry from parent
+  // Update any content property from parent
   useEffect(() => {
     if (divRef.current && state && !isEqual(state.content.contentProps, contentProps)) {
       const newContent = new EditorV3Content(divRef.current, contentProps);

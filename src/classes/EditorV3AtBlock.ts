@@ -7,11 +7,9 @@ import {
 import { EditorV3AtListItem, EditorV3RenderProps, EditorV3WordPosition } from "./interface";
 
 export interface IEditorV3AtBlockOptionalParams extends IEditorV3TextBlockOptionalParams {
-  atListFunction?: (
-    typedString: string,
-  ) => Promise<EditorV3AtListItem<{ [key: string]: string }>[]>;
+  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>;
   maxAtListLength?: number;
-  atData?: { [key: string]: string };
+  atData?: Record<string, string>;
 }
 
 export interface IEditorV3AtBlock extends IEditorV3TextBlock, IEditorV3AtBlockOptionalParams {}
@@ -24,14 +22,14 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
    */
   public atListFunction: (
     typedString: string,
-  ) => Promise<EditorV3AtListItem<{ [key: string]: string }>[]> = () =>
+  ) => Promise<EditorV3AtListItem<Record<string, string>>[]> = () =>
     new Promise((resolve) => resolve([]));
   /**
    * Maximum number of items to display in the returned list
    */
   public maxAtListLength = 10;
 
-  public atData: { [key: string]: string } = {};
+  public atData: Record<string, string> = {};
 
   get data(): IEditorV3AtBlock {
     const ret: IEditorV3AtBlock = super.data;
@@ -132,7 +130,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
       // Add any other data items from the at item
       this.atData &&
         Object.keys(this.atData).forEach((key) => {
-          span.dataset[key] = (this.atData as { [key: string]: string })[key] as string;
+          span.dataset[key] = this.atData[key] as string;
         });
     } else if (this.isActive) {
       span.classList.add("is-active");
@@ -219,31 +217,25 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
                 noItems.textContent = "No items found";
                 dropdownUl.appendChild(noItems);
               } else {
-                resolvedAtList.slice(0, this.maxAtListLength).forEach((atItem) => {
-                  const atSpan = atItem.listRender ?? document.createElement("li");
-                  if (!atSpan.classList.contains("aiev3-at-item"))
-                    atSpan.classList.add("aiev3-at-item");
-                  if (!atSpan.dataset.text) atSpan.dataset.text = atItem.text;
-                  if (atSpan.textContent === "" || !atSpan.textContent)
-                    atSpan.textContent = atItem.text;
-                  atSpan.dataset.text = atItem.text;
-                  // Add in data from atItem
-                  if (atItem.data) {
-                    Object.keys(atItem.data).forEach((key) => {
-                      if (
-                        typeof (atItem.data as { [key: string]: string })[
-                          key as keyof typeof atItem.data
-                        ] === "string"
-                      )
-                        atSpan.dataset[key] = (atItem.data as { [key: string]: string })[
-                          key as keyof typeof atItem.data
-                        ] as string;
-                    });
-                  }
-                  dropdownUl.appendChild(atSpan);
-                });
+                resolvedAtList
+                  .slice(0, renderProps.maxAtListLength ?? this.maxAtListLength)
+                  .forEach((atItem) => {
+                    const atSpan = atItem.listRender ?? document.createElement("li");
+                    if (!atSpan.classList.contains("aiev3-at-item"))
+                      atSpan.classList.add("aiev3-at-item");
+                    if (!atSpan.dataset.text) atSpan.dataset.text = atItem.text;
+                    if (atSpan.textContent === "" || !atSpan.textContent)
+                      atSpan.textContent = atItem.text;
+                    atSpan.dataset.text = atItem.text;
+                    // Add in data from atItem
+                    atItem.data &&
+                      Object.keys(atItem.data).forEach((key) => {
+                        if (atItem.data) atSpan.dataset[key] = atItem.data[key];
+                      });
+                    dropdownUl.appendChild(atSpan);
+                  });
                 // Add in more items list item
-                if (resolvedAtList.length > this.maxAtListLength) {
+                if (resolvedAtList.length > (renderProps.maxAtListLength ?? this.maxAtListLength)) {
                   const atSpan = document.createElement("li");
                   atSpan.classList.add("aiev3-more-items");
                   atSpan.textContent = `...${resolvedAtList.length - this.maxAtListLength} more`;
