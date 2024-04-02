@@ -106,6 +106,10 @@ Object return
 
 The values for contentProps will always be the same for all entries in the object, but are copied for convenience
 
+### AtListFunction
+
+Assigning a function to this parameter will enable collaberative @mentions.
+
 ### EditorV3ContentPropsInput
 
 This is mainly for internal use, and will be over ridden by any settings in the editor, however given here for completeness
@@ -125,9 +129,16 @@ This is mainly for internal use, and will be over ridden by any settings in the 
 
 The value of style in any given text block, should match one of the keys in the style object, the CSS styles from the object will then be applied to the text block.
 
-### AtListFunction
+```
+EditorV3Style extends React.CSSProperties {
+  isLocked?: boolean;
+}
+EditorV3Styles {
+  [styleName: string]: EditorV3Style;
+}
+```
 
-Assigning a function to this parameter will enable collaberative @mentions.
+isLocked has been added as a style property, to allow blocks to be non-editable. They still can be deleted in their entirety. This is used for @mention blocks.
 
 ## Editor utility
 

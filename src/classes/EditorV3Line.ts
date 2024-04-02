@@ -12,6 +12,7 @@ import {
   EditorV3ContentPropsInput,
   EditorV3Position,
   EditorV3RenderProps,
+  EditorV3Styles,
   EditorV3WordPosition,
   IEditorV3Line,
 } from "./interface";
@@ -132,6 +133,7 @@ export class EditorV3Line implements IEditorV3Line {
     if (contentProps) this.contentProps = { ...this._defaultContentProps, ...contentProps };
 
     // Fix any problems
+    this._lockTextBlocksByStyle();
     this._mergeBlocks();
   }
 
@@ -314,6 +316,7 @@ export class EditorV3Line implements IEditorV3Line {
         ...this.upToPos(startPos),
         ...this.subBlocks(startPos, endPos).map((tb) => {
           tb.style = styleName;
+          if (this.contentProps.styles?.[styleName]?.isLocked) tb.isLocked = true;
           return tb;
         }),
         ...this.fromPos(endPos),
@@ -370,6 +373,20 @@ export class EditorV3Line implements IEditorV3Line {
       this.textBlocks = mergedBlocks.filter((tb) => tb.text !== "");
     }
     this._setBlockStartPositions();
+  }
+
+  /**
+   * Lock textblocks where the style is locked
+   */
+  private _lockTextBlocksByStyle() {
+    // Check for any locked styles
+    const lockedStyles = Object.keys(this.contentProps.styles ?? []).filter(
+      (k) => (this.contentProps.styles as EditorV3Styles)[k].isLocked,
+    );
+    lockedStyles.length > 0 &&
+      this.textBlocks.forEach((tb) => {
+        if (lockedStyles.includes(tb.style ?? "")) tb.isLocked = true;
+      });
   }
 
   /**

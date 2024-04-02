@@ -94,7 +94,6 @@ export const App = (): JSX.Element => {
                   width: "240px",
                   height: "100px",
                 }}
-                spellCheck={false}
                 atListFunction={loadAvailableItems}
                 debounceMilliseconds={1000}
                 maxAtListLength={maxAtListLength}
@@ -146,8 +145,11 @@ export const App = (): JSX.Element => {
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}
                 editable={editable}
-                customStyleMap={styleMap}
-                spellCheck={true}
+                customStyleMap={{
+                  ...styleMap,
+                  red: { color: "red", isLocked: true },
+                }}
+                spellCheck
                 style={{
                   width: "600px",
                 }}
@@ -242,7 +244,7 @@ export const App = (): JSX.Element => {
           <div className="row">
             <span className="label">JSON</span>
             <span className="content">
-              <pre>{JSON.stringify(editorV3_1, null, 2)}</pre>
+              <pre>{JSON.stringify(input3, null, 2)}</pre>
             </span>
           </div>
         </div>

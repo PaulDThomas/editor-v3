@@ -142,9 +142,10 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     if (this.type === "at") {
       throw new Error("Use EditorV3AtBlock for at blocks");
     } else {
-      const words = renderProps.doNotSplitWordSpans
-        ? [text.replaceAll("\u200c", "")]
-        : text.split("\u200c");
+      const words =
+        renderProps.doNotSplitWordSpans || this.isLocked
+          ? [text.replaceAll("\u200c", "")]
+          : text.split("\u200c");
       words
         .filter((w) => w !== "")
         .forEach((word) => {

@@ -153,62 +153,6 @@ describe("Check basic EditorV3Line", () => {
     expect(testLine.contentProps.decimalAlignPercent).toEqual(60);
   });
 
-  // test("Load badly written decimal div", async () => {
-  //   const testLine = new EditorV3Line(
-  //     '<div class="aiev3-line decimal"><span data-style-name="shiny">12.34</span>&nbsp;slow</div>',
-  //     { ...defaultContentProps, textAlignment: EditorV3Align.decimal },
-  //   );
-
-  //   expect(testLine.lineText).toEqual("12.34 slow");
-  //   expect(testLine.contentProps.textAlignment).toEqual(EditorV3Align.decimal);
-  //   expect(testLine.contentProps.decimalAlignPercent).toEqual(60);
-  //   expect(testLine.toHtml({}).outerHTML).toEqual(
-  //     '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
-  //       '<span class="aiev3-span-point lhs">' +
-  //       '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">12</span>' +
-  //       "</span>" +
-  //       '<span class="aiev3-span-point rhs">' +
-  //       '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">.34</span>' +
-  //       '<span class="aiev3-tb">&nbsp;</span>' +
-  //       '<span class="aiev3-tb">slow</span>' +
-  //       "</span>" +
-  //       "</div>",
-  //   );
-  //   expect(new EditorV3Line(testLine.toHtml({})).data).toEqual(testLine.data);
-  //   expect(JSON.parse(testLine.jsonString)).toEqual({
-  //     contentProps: { textAlignment: "decimal" },
-  //     textBlocks: [
-  //       { text: "12.34", style: "shiny", type: "text" },
-  //       { text: " slow", type: "text" },
-  //     ],
-  //   });
-  //   expect(new EditorV3Line(testLine.jsonString)).toEqual(testLine);
-
-  //   const testLine2 = new EditorV3Line(
-  //     '<div class="aiev3-line decimal">' +
-  //       '<span class="aiev3-span-point lhs">' +
-  //       '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">12.</span>' +
-  //       "boys" +
-  //       "</span>" +
-  //       '<span class="aiev3-span-point rhs">' +
-  //       '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">34</span>' +
-  //       "&nbsp;slow" +
-  //       '<script>console.error("Inject")</script>' +
-  //       "<span> treats</span>" +
-  //       "</span>" +
-  //       "</div>",
-  //   );
-  //   expect(JSON.parse(testLine2.jsonString)).toEqual({
-  //     contentProps: { textAlignment: "decimal" },
-  //     textBlocks: [
-  //       { text: "12.", style: "shiny", type: "text" },
-  //       { text: "boys", type: "text" },
-  //       { text: "34", style: "shiny", type: "text" },
-  //       { text: " slow treats", type: "text" },
-  //     ],
-  //   });
-  // });
-
   test("Load normal div", async () => {
     const testDiv = document.createElement("div");
     testDiv.classList.add("aiev3-line", "left");
@@ -224,23 +168,6 @@ describe("Check basic EditorV3Line", () => {
     expect(testLine.lineText).toEqual("12.34");
     expect(testLine.contentProps.textAlignment).toEqual(EditorV3Align.right);
   });
-
-  // test("Load badly written spanned div", async () => {
-  //   const testLine = new EditorV3Line(
-  //     '<div class="aiev3-line right"><span>12.34&nbsp;</span>wut?&nbsp;<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">5678</span></div>',
-  //   );
-
-  //   expect(testLine.toHtml({}).outerHTML).toEqual(
-  //     '<div class="aiev3-line right">' +
-  //       '<span class="aiev3-tb">12.34&nbsp;</span>' +
-  //       '<span class="aiev3-tb">wut?&nbsp;</span>' +
-  //       '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">5678</span>' +
-  //       "</div>",
-  //   );
-  //   expect(testLine.lineText).toEqual("12.34 wut? 5678");
-  //   expect(testLine.contentProps.textAlignment).toEqual(EditorV3Align.right);
-  //   expect(testLine.contentProps.decimalAlignPercent).toEqual(60);
-  // });
 
   test("Self equivalence for non-decimal", async () => {
     const firstLine = new EditorV3Line(
@@ -588,18 +515,6 @@ describe("Check EditorV3Line functions", () => {
     expect(mdLine.toMarkdown()).toEqual("<<world::hello>> slow<<and?fat>>");
   });
 
-  // test("Load markdown html strings", async () => {
-  //   const htmlString = '<div class="aiev3-markdown-line">Some html</div>';
-  //   const testLine = new EditorV3Line(htmlString, defaultContentProps);
-  //   expect(testLine.textBlocks).toEqual([textBlockFactory({ text: "Some html" })]);
-  //   expect(testLine.contentProps).toEqual(defaultContentProps);
-
-  //   const htmlString2 =
-  //     '<div class="aiev3-markdown-line">&lt;&lt;red::Hello world&gt;&gt;</span></div>';
-  //   const testLine2 = new EditorV3Line(htmlString2, defaultContentProps);
-  //   expect(testLine2.textBlocks).toEqual([textBlockFactory({ text: "Hello world", style: "red" })]);
-  // });
-
   test("Load markdown div elements", async () => {
     const div = document.createElement("div");
     const text = document.createTextNode("<<st1::what>> are you doing? <<with that>> thing?");
@@ -615,31 +530,6 @@ describe("Check EditorV3Line functions", () => {
     ]);
   });
 });
-
-// describe("Read in v2 div element", () => {
-//   test("Read basic div element", async () => {
-//     const htmlString =
-//       '<div classname="aie-text" data-key="3fsuc" data-type="unstyled" data-inline-style-ranges=\'[{"offset":32,"length":9,"style":"Optional"}]\'>[b] CR, non-measurable disease: <span classname="Optional" style="color:seagreen">Confirmed</span>' +
-//       " CR response but subject has non-measurable disease at baseline.</div>";
-//     const result = new EditorV3Line(htmlString, defaultContentProps);
-//     expect(result.textBlocks.length).toEqual(3);
-//     expect(result.textBlocks[0].data).toEqual({
-//       style: undefined,
-//       text: "[b] CR, non-measurable disease: ",
-//       type: "text",
-//     });
-//     expect(result.textBlocks[1].data).toEqual({
-//       style: "Optional",
-//       text: "Confirmed",
-//       type: "text",
-//     });
-//     expect(result.textBlocks[2].data).toEqual({
-//       style: undefined,
-//       text: " CR response but subject has non-measurable disease at baseline.",
-//       type: "text",
-//     });
-//   });
-// });
 
 describe("Write space after at block", () => {
   test("Ensure empty block after at block and set active", async () => {
@@ -738,5 +628,45 @@ describe("Don't destroy at block!", () => {
         { text: ", and what is she doing there?", type: "text", style: "red" },
       ],
     });
+  });
+});
+
+describe("Lock style blocks", () => {
+  test("Lock style blocks are created", async () => {
+    const line = new EditorV3Line(
+      {
+        textBlocks: [
+          new EditorV3TextBlock({ text: "Who is " }),
+          new EditorV3TextBlock({ text: "Jackie", style: "red" }),
+          new EditorV3TextBlock({ text: "Jack", style: "red" }),
+        ],
+        contentProps: {
+          ...defaultContentProps,
+          styles: { red: { color: "red", font: "courier", isLocked: false } },
+        },
+      },
+      { ...defaultContentProps, styles: { red: { color: "red", isLocked: true } } },
+    );
+    expect(line.data.textBlocks).toEqual([
+      { text: "Who is ", type: "text" },
+      { text: "Jackie", type: "text", style: "red", isLocked: true },
+      { text: "Jack", type: "text", style: "red", isLocked: true },
+    ]);
+  });
+  test("Lock style is applied", async () => {
+    const line = new EditorV3Line(
+      [
+        new EditorV3TextBlock({ text: "Who is " }),
+        new EditorV3TextBlock({ text: "Jackie" }),
+        new EditorV3TextBlock({ text: "Jack" }),
+      ],
+      { ...defaultContentProps, styles: { red: { color: "red", isLocked: true } } },
+    );
+    line.applyStyle("red", 4, 13);
+    expect(line.data.textBlocks).toEqual([
+      { text: "Who ", type: "text" },
+      { text: "is Jackie", type: "text", style: "red", isLocked: true },
+      { text: "Jack", type: "text" },
+    ]);
   });
 });
