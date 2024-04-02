@@ -45,7 +45,6 @@
   },
   "dependencies": {
     "@asup/context-menu": "^1.3.2",
-    "@swc/helpers": "^0.5.1",
     "lodash": "^4.17.21",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
@@ -108,15 +107,9 @@
   },
   "@parcel/transformer-css": {
     "cssModules": {
-      "pattern": "mos-[name]-[hash]-[local]",
+      "pattern": "aiev3-[name]-[hash]-[local]",
       "dashedIndents": true
     }
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
