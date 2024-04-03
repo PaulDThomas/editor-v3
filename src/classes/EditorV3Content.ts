@@ -731,12 +731,13 @@ export class EditorV3Content implements IEditorV3 {
           break;
         case "Escape":
           if (this._caretPosition && this._isLockable) {
-            this.lines.forEach((l) =>
-              l.textBlocks.forEach((tb) => {
-                tb.isLocked = true;
-                tb.setActive(false);
-              }),
+            const lockBlock = this.lines[this._caretPosition.startLine].setActiveBlock(
+              this._caretPosition,
             );
+            if (lockBlock && lockBlock.type === "at") {
+              lockBlock.setActive(false);
+              lockBlock.isLocked = true;
+            }
           }
       }
     }
