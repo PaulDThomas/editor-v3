@@ -112,33 +112,11 @@ describe("Should render an at block in the HTML", () => {
     // Expect HTML to split block into two spans
     const tempDiv = document.createElement("div");
     testBlock.toHtml({ currentEl: tempDiv });
-    expect(tempDiv.innerHTML).toEqual(
-      `<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;massive&nbsp;</span>
-       <span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">and&nbsp;</span>
-       <span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">impressive&nbsp;</span>
-       <span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">@world</span>
-      `
-        .replaceAll(/[\r\n\t]/g, "")
-        .replaceAll(/>\s{2,}</g, "><")
-        .trim(),
-    );
+    expect(tempDiv.innerHTML).toMatchSnapshot();
     // Expect HTML not to split
     const tempDiv2 = document.createElement("div");
     testBlock.toHtml({ currentEl: tempDiv2, doNotSplitWordSpans: true });
-    expect(tempDiv2.innerHTML).toEqual(
-      `<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">
-          Hello&nbsp;massive&nbsp;and&nbsp;impressive&nbsp;@world
-        </span>
-      `
-        .split("\n")
-        .map((t) =>
-          t
-            .replaceAll(/[\r\n\t]/g, "")
-            .replaceAll(/>\s{2,}</g, "><")
-            .trim(),
-        )
-        .join(""),
-    );
+    expect(tempDiv2.innerHTML).toMatchSnapshot();
   });
 });
 
@@ -185,5 +163,25 @@ describe("Should throw trying to create the wrong type", () => {
       const badThing = new EditorV3TextBlock({ text: "Hello world", type: "at" });
       badThing.toHtml({});
     }).toThrow("Use EditorV3AtBlock for at blocks");
+  });
+});
+
+describe("Locked text block", () => {
+  test("Create and render locked text block", async () => {
+    const testBlock = new EditorV3TextBlock({ text: "Locked block", isLocked: true, style: "red" });
+    expect(testBlock.data).toEqual({
+      text: "Locked block",
+      type: "text",
+      isLocked: true,
+      style: "red",
+    });
+    expect(testBlock.isLocked).toEqual(true);
+    const tempDiv = document.createElement("div");
+    testBlock.toHtml({ currentEl: tempDiv });
+    expect(tempDiv.innerHTML).toMatchSnapshot();
+    expect(testBlock.toMarkdown()).toEqual("<<red::Locked block>>");
+    expect(testBlock.wordPositions).toEqual([
+      { line: -1, startChar: 0, endChar: 12, isLocked: true },
+    ]);
   });
 });

@@ -44,20 +44,28 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
   get wordPositions() {
     const ret: EditorV3WordPosition[] = [];
     let _counted = 0;
-    while (_counted < this.text.length && this.text.slice(_counted).search(/\S/) > -1) {
-      const remainingText = this.text.slice(_counted);
-      const nextWord = remainingText.match(/\S+/);
-      if (nextWord) {
-        ret.push({
-          line: -1,
-          startChar: this.lineStartPosition + _counted + remainingText.search(/\S/),
-          endChar:
-            this.lineStartPosition + _counted + remainingText.search(/\S/) + nextWord[0].length,
-          isLocked: this.isLocked === true,
-        });
-        _counted += remainingText.search(/\S/) + nextWord[0].length;
+    if (this.isLocked) {
+      ret.push({
+        line: -1,
+        startChar: this.lineStartPosition,
+        endChar: this.lineStartPosition + this.text.length,
+        isLocked: true,
+      });
+    } else
+      while (_counted < this.text.length && this.text.slice(_counted).search(/\S/) > -1) {
+        const remainingText = this.text.slice(_counted);
+        const nextWord = remainingText.match(/\S+/);
+        if (nextWord) {
+          ret.push({
+            line: -1,
+            startChar: this.lineStartPosition + _counted + remainingText.search(/\S/),
+            endChar:
+              this.lineStartPosition + _counted + remainingText.search(/\S/) + nextWord[0].length,
+            isLocked: false,
+          });
+          _counted += remainingText.search(/\S/) + nextWord[0].length;
+        }
       }
-    }
     return ret;
   }
 
@@ -156,6 +164,11 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
           if (this.style) {
             span.classList.add(`editorv3style-${this.style}`);
             span.dataset.styleName = this.style;
+          }
+          if (this.isLocked) {
+            span.classList.add("is-locked");
+            span.dataset.isLocked = "true";
+            span.contentEditable = "false";
           }
           if (this.isActive) span.classList.add("is-active");
           ret.append(span);
