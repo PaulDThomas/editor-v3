@@ -34,7 +34,7 @@ const config = {
   ],
   testEnvironment: "jsdom",
   moduleNameMapper: {
-    "\\.(css|less|scss)$": "<rootDir>/src/__mocks__/styleMock.ts",
+    "\\.(css|less|scss)$": "<rootDir>/__dummy__/styleMock.ts",
   },
 
   // Plugin for watch patterns
