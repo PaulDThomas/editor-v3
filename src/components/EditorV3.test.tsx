@@ -863,7 +863,7 @@ describe("Add at block and escape out", () => {
       jest.runAllTimers();
     });
     expect(editor.querySelectorAll("li.aiev3-at-item").length).toEqual(5);
-    expect(screen.queryByText("...19 more")).toBeInTheDocument();
+    expect(screen.queryByText("...24 more")).toBeInTheDocument();
     expect(editor.outerHTML).toMatchSnapshot();
   });
 });

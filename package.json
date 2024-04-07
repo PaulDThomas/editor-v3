@@ -41,7 +41,7 @@
     "start": "rmdir /q/s .\\.parcel-cache && parcel demo/index.html --dist-dir demo/dist",
     "prepare": "husky",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch --maxWorkers=4"
   },
   "dependencies": {
     "@asup/context-menu": "^1.3.2",
