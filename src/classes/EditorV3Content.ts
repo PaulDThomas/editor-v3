@@ -295,11 +295,11 @@ export class EditorV3Content implements IEditorV3 {
         // Check for stringified class input
         const jsonInput: IEditorV3 = JSON.parse(arg);
         if (!Array.isArray(jsonInput.lines)) throw "No lines";
-        this._copyImport(jsonInput);
+        this._copyImport(jsonInput, props);
       }
       // Interface input
       else if (arg !== undefined) {
-        this._copyImport(arg);
+        this._copyImport(arg, props);
       } else {
         this.lines = [new EditorV3Line()];
       }
@@ -308,7 +308,7 @@ export class EditorV3Content implements IEditorV3 {
       const inputString = (arg instanceof HTMLDivElement ? arg.outerHTML : arg) as string;
       // Read in v3 HTML/text
       const r = readV3Html(inputString, props);
-      this._copyImport(r);
+      this._copyImport(r, props);
     }
 
     // Forced parameters
@@ -340,11 +340,12 @@ export class EditorV3Content implements IEditorV3 {
   }
   /* c8 ignore end */
 
-  private _copyImport(read: IEditorV3): void {
+  private _copyImport(read: IEditorV3, props?: EditorV3ContentPropsInput): void {
+    const consolidatedProps = { ...read.contentProps, ...props };
+    this._updateProps(consolidatedProps);
     this.lines = read.lines.map((l) =>
-      l instanceof EditorV3Line ? l : new EditorV3Line(l, read.contentProps),
+      l instanceof EditorV3Line ? l : new EditorV3Line(l, consolidatedProps),
     );
-    read.contentProps && this._updateProps(read.contentProps);
   }
 
   public loadString(arg: string) {

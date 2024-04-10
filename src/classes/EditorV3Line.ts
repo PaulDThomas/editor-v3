@@ -362,6 +362,7 @@ export class EditorV3Line implements IEditorV3Line {
       for (let _i = 0; _i < this.textBlocks.length; _i++) {
         if (
           !this.textBlocks[_i].isLocked &&
+          !this.contentProps.styles?.[this.textBlocks[_i].style ?? ""]?.isLocked &&
           this.textBlocks[_i].typeStyle === lastTypeStyle &&
           mergedBlocks.length > 0
         ) {

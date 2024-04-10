@@ -6,7 +6,12 @@ export const App = (): JSX.Element => {
   // First input content
   const initialValue: IEditorV3 = {
     lines: [
-      { textBlocks: [{ text: "12.34 love your work", style: "green" }] },
+      {
+        textBlocks: [
+          { text: "12.34 love", style: "green" },
+          { text: "your work", style: "green" },
+        ],
+      },
       {
         textBlocks: [
           { text: "0 " },
@@ -85,7 +90,10 @@ export const App = (): JSX.Element => {
                 input={editorV3_1}
                 resize
                 setText={setText}
-                setObject={setEditorV3_1}
+                setObject={(ret) => {
+                  console.log(ret);
+                  setEditorV3_1(ret);
+                }}
                 textAlignment={align}
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}
@@ -248,7 +256,7 @@ export const App = (): JSX.Element => {
           <div className="row">
             <span className="label">JSON</span>
             <span className="content">
-              <pre>{JSON.stringify(input3, null, 2)}</pre>
+              <pre>{JSON.stringify(editorV3_1, null, 2)}</pre>
             </span>
           </div>
         </div>
