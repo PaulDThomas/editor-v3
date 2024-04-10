@@ -6,7 +6,7 @@ export const App = (): JSX.Element => {
   // First input content
   const initialValue: IEditorV3 = {
     lines: [
-      { textBlocks: [{ text: "12.34", style: "green" }] },
+      { textBlocks: [{ text: "12.34 love your work", style: "green" }] },
       {
         textBlocks: [
           { text: "0 " },
@@ -68,6 +68,7 @@ export const App = (): JSX.Element => {
       fontFamily: "Courier New",
       fontSize: "1.3rem",
       fontWeight: 1000,
+      isLocked: true,
     },
     blue: { color: "blue", fontWeight: 700 },
   };
@@ -121,7 +122,10 @@ export const App = (): JSX.Element => {
                 }}
                 allowNewLine={allowNewLine}
                 editable={editable}
-                customStyleMap={{ Notes: { color: "royalblue" }, Optional: { color: "green" } }}
+                customStyleMap={{
+                  Notes: { color: "royalblue" },
+                  Optional: { color: "green" },
+                }}
                 resize
                 allowMarkdown
                 style={{

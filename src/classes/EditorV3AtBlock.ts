@@ -4,7 +4,12 @@ import {
   IEditorV3TextBlock,
   IEditorV3TextBlockOptionalParams,
 } from "./EditorV3TextBlock";
-import { EditorV3AtListItem, EditorV3RenderProps, EditorV3WordPosition } from "./interface";
+import {
+  EditorV3AtListItem,
+  EditorV3RenderProps,
+  EditorV3Style,
+  EditorV3WordPosition,
+} from "./interface";
 import { renderDropdown } from "../functions/renderDropdown";
 
 export interface IEditorV3AtBlockOptionalParams extends IEditorV3TextBlockOptionalParams {
@@ -85,6 +90,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     }
   }
 
+  // Read extra data from HTML
   private furtherHtml(arg: HTMLSpanElement) {
     // Copy dataset to atFactory
     Object.keys(arg.dataset).forEach((key) => {
@@ -95,7 +101,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
   }
 
   // Overload html return
-  public toHtml(renderProps: EditorV3RenderProps): DocumentFragment {
+  public toHtml(renderProps: EditorV3RenderProps, style?: EditorV3Style): DocumentFragment {
     // Create holder
     const ret = new DocumentFragment();
     if (renderProps.currentEl) renderProps.currentEl.append(ret);
@@ -111,11 +117,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
 
     span.appendChild(textNode);
     // Add style
-    if (this.style) {
-      span.classList.add(`editorv3style-${this.style}`);
-      span.dataset.styleName = this.style;
-    }
-
+    this.applyStyle(span, style);
     // Delete any existing dropdown on render
     const editor = renderProps.editableEl?.closest(".aiev3") as HTMLDivElement | null;
     if (editor) {

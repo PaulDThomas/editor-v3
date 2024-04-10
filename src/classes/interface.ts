@@ -81,7 +81,7 @@ export interface IEditorV3Line {
 }
 
 /**
- * Cpmplete import object for EditorV3
+ * Complete import object for EditorV3
  */
 export interface IEditorV3 {
   lines: IEditorV3Line[];

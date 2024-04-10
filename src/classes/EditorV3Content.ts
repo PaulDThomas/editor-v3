@@ -1,5 +1,4 @@
 import { cloneDeep, isEqual } from "lodash";
-import { applyStylesToHTML } from "../functions/applyStylesToHTML";
 import { getCaretPosition } from "../functions/getCaretPosition";
 import { readV3Html } from "../functions/readV3Html";
 import { setCaretPosition } from "../functions/setCaretPosition";
@@ -464,47 +463,6 @@ export class EditorV3Content implements IEditorV3 {
   }
 
   /**
-   * Splice, when converting everything to normal text
-   * @param pos Position in markdown
-   * @param newLines New lines (not markdown)
-   * @returns Markdown cut as lines
-   */
-  // private spliceMarkdown(pos: EditorV3Position, newLines?: EditorV3Line[]): EditorV3Line[] {
-  //   const thisMarkdown = new EditorV3Content(
-  //     this.lines.map((l) => l.toMarkdown(this._markdownSettings)).join("\n"),
-  //   );
-  //   const newLinesMarkdown = newLines?.map(
-  //     (l) => new EditorV3Line(l.toMarkdown(this._markdownSettings), this.contentProps),
-  //   );
-  //   if (
-  //     pos.startLine < thisMarkdown.lines.length &&
-  //     pos.startLine <= pos.endLine &&
-  //     !(pos.startLine === pos.endLine && pos.endChar < pos.startChar)
-  //   ) {
-  //     const ret: EditorV3Line[] = thisMarkdown.subLines(pos);
-  //     const u = thisMarkdown.upToPos(pos.startLine, pos.startChar);
-  //     const f = thisMarkdown.fromPos(pos.endLine, pos.endChar);
-  //     thisMarkdown.lines = [...u, ...(newLinesMarkdown ?? []), ...f];
-  //     // Change back from markdown
-  //     this.lines = thisMarkdown.lines.map(
-  //       (l) =>
-  //         new EditorV3Line(
-  //           new MarkdownLineClass({ line: l.lineText }).toTextBlocks(),
-  //           this.contentProps,
-  //         ),
-  //     );
-  //     this.mergeLines(
-  //       pos.startLine +
-  //         (newLines?.length ?? 0) -
-  //         (pos.startChar < this.lines[pos.startLine].lineLength ? 1 : 0),
-  //     );
-  //     newLines?.length && this.mergeLines(pos.startLine);
-  //     return ret;
-  //   }
-  //   return [];
-  // }
-
-  /**
    * Remove a selection and optionally insert new lines
    * @param pos Position of section to remove
    * @param newLines Line content to insert
@@ -632,11 +590,6 @@ export class EditorV3Content implements IEditorV3 {
         maxAtListLength: this._maxAtListLength,
       });
     }
-    // Update height and styles after render
-    [...editableEl.querySelectorAll(".aiev3-line")].forEach((line) => {
-      // Apply styles
-      applyStylesToHTML(line as HTMLDivElement, this._styles);
-    });
     // Set caret position
     if (focus && this._caretPosition) {
       setCaretPosition(editableEl, this._caretPosition);
@@ -790,10 +743,7 @@ export class EditorV3Content implements IEditorV3 {
     if (this._caretPosition) {
       const toClipboard = this.subLines(this._caretPosition);
       e.clipboardData.setData("text/plain", toClipboard.map((l) => l.lineText).join("\n"));
-      e.clipboardData.setData(
-        "text/html",
-        toClipboard.map((l) => applyStylesToHTML(l.toHtml({}), this.styles).outerHTML).join(""),
-      );
+      e.clipboardData.setData("text/html", toClipboard.map((l) => l.toHtml({}).outerHTML).join(""));
       e.clipboardData.setData("data/aiev3", JSON.stringify(toClipboard.map((l) => l.data)));
       if (e.type === "cut" && !this.isCaretLocked()) {
         this.splice(this._caretPosition);

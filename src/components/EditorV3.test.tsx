@@ -53,6 +53,31 @@ describe("Editor and functions", () => {
     }
   });
 
+  test("Render two locked blocks", async () => {
+    const TestApp = () => {
+      const [lockedBlocks, setLockedBlocks] = useState<IEditorV3>({
+        lines: [{ textBlocks: [{ text: "Locked block", style: "Red" }] }],
+      });
+      return (
+        <EditorV3
+          id="locked"
+          input={lockedBlocks}
+          setObject={(ret) => {
+            console.log(ret);
+            setLockedBlocks(ret);
+          }}
+          customStyleMap={{
+            Green: { backgroundColor: "green" },
+            Blue: { color: "blue" },
+            Red: { backgroundColor: "red", color: "white", isLocked: true },
+          }}
+        />
+      );
+    };
+    await act(async () => render(<TestApp />));
+    expect(screen).toMatchSnapshot();
+  });
+
   test("Backspace", async () => {
     const user = userEvent.setup({ delay: null });
     const mockSetObject = jest.fn();

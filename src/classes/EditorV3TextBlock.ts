@@ -1,7 +1,7 @@
 import { cloneDeep } from "lodash";
 import { defaultContentProps } from "./defaultContentProps";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
-import { EditorV3RenderProps, EditorV3WordPosition } from "./interface";
+import { EditorV3RenderProps, EditorV3Style, EditorV3WordPosition } from "./interface";
 
 export type EditorV3TextBlockType = "text" | "at";
 export interface IEditorV3TextBlockOptionalParams {
@@ -143,15 +143,30 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     this.isActive = active;
   }
 
+  protected applyStyle(span: HTMLSpanElement, style?: EditorV3Style) {
+    if (this.style) {
+      span.classList.add(`editorv3style-${this.style}`);
+      span.dataset.styleName = this.style;
+      Object.entries(style ?? {}).forEach(([k, v]) => {
+        if (k === "isLocked") span.dataset.isLocked = v ? "true" : undefined;
+        else
+          span.style.setProperty(
+            k.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase()),
+            v,
+          );
+      });
+    }
+  }
+
   // Content returns
-  public toHtml(renderProps: EditorV3RenderProps): DocumentFragment {
+  public toHtml(renderProps: EditorV3RenderProps, style?: EditorV3Style): DocumentFragment {
     const text = this.text === "" ? "\u2009" : this.text.replaceAll(" ", "\u00a0\u200c");
     const ret = new DocumentFragment();
     if (this.type === "at") {
       throw new Error("Use EditorV3AtBlock for at blocks");
     } else {
       const words =
-        renderProps.doNotSplitWordSpans || this.isLocked
+        renderProps.doNotSplitWordSpans || this.isLocked || style?.isLocked
           ? [text.replaceAll("\u200c", "")]
           : text.split("\u200c");
       words
@@ -161,16 +176,16 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
           span.classList.add("aiev3-tb");
           const textNode = document.createTextNode(word);
           span.appendChild(textNode);
-          if (this.style) {
-            span.classList.add(`editorv3style-${this.style}`);
-            span.dataset.styleName = this.style;
-          }
+          // Apply lock
           if (this.isLocked) {
             span.classList.add("is-locked");
             span.dataset.isLocked = "true";
             span.contentEditable = "false";
           }
           if (this.isActive) span.classList.add("is-active");
+          // Apply style
+          this.applyStyle(span, style);
+          // Append to return
           ret.append(span);
         });
     }

@@ -40,9 +40,14 @@ export class EditorV3Line implements IEditorV3Line {
         this.contentProps.decimalAlignPercent,
         this.upToPos(decimalPosition),
         this.fromPos(decimalPosition),
+        this.contentProps.styles,
       );
     } else {
-      this.textBlocks.forEach((tb) => h.append(tb.toHtml(renderProps)));
+      this.textBlocks.forEach((tb) =>
+        h.append(
+          tb.toHtml(renderProps, tb.style ? this.contentProps.styles?.[tb.style] : undefined),
+        ),
+      );
     }
     // Need to add a space to the end of the line to allow for the cursor to be placed at the end
     if (this.textBlocks.length > 0 && this.textBlocks[this.textBlocks.length - 1].isLocked) {
