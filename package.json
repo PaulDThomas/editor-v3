@@ -1,6 +1,6 @@
 {
   "name": "@asup/editor-v3",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "description": "REACT Typescript Editor component",
   "author": "Paul Thomas <@PaulDThomas>",
   "private": false,
@@ -71,6 +71,7 @@
     "@testing-library/jest-dom": "^6.1.3",
     "@testing-library/react": "^14.0.0",
     "@testing-library/user-event": "^14.4.3",
+    "@types/css-modules": "^1.0.5",
     "@types/jest": "^29.2.2",
     "@types/lodash": "^4.14.202",
     "@types/node": "^20.11.19",
