@@ -118,6 +118,8 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     span.appendChild(textNode);
     // Add style
     this.applyStyle(span, style);
+    // Add label
+    if (this.label) span.title = this.label;
     // Delete any existing dropdown on render
     const editor = renderProps.editableEl?.closest(".aiev3") as HTMLDivElement | null;
     if (editor) {

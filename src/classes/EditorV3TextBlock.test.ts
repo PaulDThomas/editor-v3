@@ -57,9 +57,11 @@ describe("Non-object loads", () => {
     span.textContent = "Hello world";
     span.dataset.styleName = "shiny";
     span.dataset.type = "text";
+    span.title = "This is a title";
     const testBlock = new EditorV3TextBlock(span);
     expect(testBlock.data).toEqual({
       text: "Hello world",
+      label: "This is a title",
       style: "shiny",
       type: "text",
     });
@@ -183,5 +185,12 @@ describe("Locked text block", () => {
     expect(testBlock.wordPositions).toEqual([
       { line: -1, startChar: 0, endChar: 12, isLocked: true },
     ]);
+  });
+
+  test("Apply style", async () => {
+    const testBlock = new EditorV3TextBlock({ text: "Locked block", style: "red" });
+    const tempDiv = document.createElement("div");
+    testBlock.toHtml({ currentEl: tempDiv }, { color: "red" });
+    expect(tempDiv.innerHTML).toMatchSnapshot();
   });
 });

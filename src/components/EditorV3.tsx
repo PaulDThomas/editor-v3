@@ -178,10 +178,10 @@ export const EditorV3 = ({
   const setContent = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (newContent: EditorV3Content, calledFrom?: string, focus?: boolean) => {
-      console.debug(
-        "SetContent:" + calledFrom + ":\r\n",
-        newContent.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("|")).join("\n"),
-      );
+      // console.debug(
+      //   "SetContent:" + calledFrom + ":\r\n",
+      //   newContent.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("|")).join("\n"),
+      // );
       setLastCaretPosition(newContent.caretPosition);
       setCurrentValue({ content: newContent, focus: focus ?? state?.focus ?? false });
     },
@@ -226,38 +226,47 @@ export const EditorV3 = ({
   // Set up menu items
   const menuItems = useMemo((): MenuItem[] => {
     if (state) {
-      const styleMenuItem: MenuItem = {
-        label: "Style",
-        disabled: state.content.showMarkdown,
-        group: [
-          ...(state.content.styles && Object.keys(state.content.styles).length > 0
-            ? Object.keys(state.content.styles ?? {}).map((s) => {
-                return {
-                  label: s,
-                  disabled: state.content.showMarkdown || state.content.isCaretLocked(),
-                  action: () => {
-                    if (divRef.current) {
-                      const newContent = new EditorV3Content(divRef.current, contentProps);
-                      newContent.applyStyle(s);
-                      setContent(newContent, "Apply style from menu");
-                    }
+      const styleMenuItem: MenuItem[] =
+        !state.content.styles || Object.keys(state.content.styles).length === 0
+          ? []
+          : [
+              {
+                label: "Style",
+                disabled: state.content.showMarkdown,
+                group: [
+                  ...Object.keys(state.content.styles).map((s) => {
+                    return {
+                      label: s,
+                      disabled:
+                        state.content.showMarkdown ||
+                        state.content.isCaretLocked() ||
+                        (state.content.styles as EditorV3Styles)[s].isNotAvailabe ||
+                        state.content.caretPosition?.isCollapsed,
+                      action: () => {
+                        if (divRef.current) {
+                          const newContent = new EditorV3Content(divRef.current, contentProps);
+                          newContent.applyStyle(s);
+                          setContent(newContent, "Apply style from menu");
+                        }
+                      },
+                    };
+                  }),
+                  {
+                    label: "Remove style",
+                    disabled:
+                      state.content.showMarkdown || state.content.caretPosition?.isCollapsed,
+                    action: () => {
+                      if (divRef.current) {
+                        const newContent = new EditorV3Content(divRef.current, contentProps);
+                        newContent.removeStyle();
+                        setContent(newContent, "Remove style from menu");
+                      }
+                    },
                   },
-                };
-              })
-            : [{ label: "No styles defined", disabled: true }]),
-          {
-            label: "Remove style",
-            disabled: state.content.showMarkdown || state.content.isCaretLocked(),
-            action: () => {
-              if (divRef.current) {
-                const newContent = new EditorV3Content(divRef.current, contentProps);
-                newContent.removeStyle();
-                setContent(newContent, "Remove style from menu");
-              }
-            },
-          },
-        ],
-      };
+                ],
+              },
+            ];
+
       const showMarkdownMenu = !allowMarkdown
         ? []
         : [
@@ -268,6 +277,7 @@ export const EditorV3 = ({
               },
             },
           ];
+
       const showWindowViewMenu = !allowWindowView
         ? []
         : [
@@ -283,7 +293,8 @@ export const EditorV3 = ({
               },
             },
           ];
-      return [styleMenuItem, ...showMarkdownMenu, ...showWindowViewMenu];
+
+      return [...styleMenuItem, ...showMarkdownMenu, ...showWindowViewMenu];
     }
     return [];
   }, [state, allowMarkdown, allowWindowView, showWindowView, contentProps, setContent]);

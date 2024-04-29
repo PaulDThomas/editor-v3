@@ -6,6 +6,7 @@ exports[`readV3Html tests Read in at block 1`] = `
     "_defaultContentProps": {
       "allowMarkdown": false,
       "allowNewLine": false,
+      "allowWindowView": false,
       "atListFunction": undefined,
       "decimalAlignPercent": 60,
       "markdownSettings": {
@@ -35,6 +36,7 @@ exports[`readV3Html tests Read in at block 1`] = `
     "atListFunction": [Function],
     "isActive": false,
     "isLocked": undefined,
+    "label": "Hello@world",
     "lineStartPosition": 0,
     "maxAtListLength": 10,
     "style": undefined,

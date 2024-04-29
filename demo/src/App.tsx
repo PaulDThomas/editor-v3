@@ -8,8 +8,8 @@ export const App = (): JSX.Element => {
     lines: [
       {
         textBlocks: [
-          { text: "12.34 love", style: "green" },
-          { text: "your work", style: "green" },
+          { text: "12.34 love", style: "green", label: "First" },
+          { text: "your work", style: "green", label: "Second" },
         ],
       },
       {
@@ -76,6 +76,7 @@ export const App = (): JSX.Element => {
       isLocked: true,
     },
     blue: { color: "blue", fontWeight: 700 },
+    red: { color: "red", isNotAvailabe: true },
   };
 
   return (

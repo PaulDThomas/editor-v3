@@ -5,6 +5,7 @@ import { EditorV3RenderProps, EditorV3Style, EditorV3WordPosition } from "./inte
 
 export type EditorV3TextBlockType = "text" | "at";
 export interface IEditorV3TextBlockOptionalParams {
+  label?: string;
   style?: string;
   type?: EditorV3TextBlockType;
   isLocked?: true | undefined;
@@ -19,6 +20,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
   private _defaultContentProps = cloneDeep(defaultContentProps);
   // Variables
   public text: string = "";
+  public label?: string;
   public style?: string;
   public type: EditorV3TextBlockType = "text";
   public isActive: boolean = false;
@@ -34,7 +36,13 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
 
   // Read only variables
   get data(): IEditorV3TextBlock {
-    return { text: this.text, style: this.style, type: this.type, isLocked: this.isLocked };
+    return {
+      text: this.text,
+      label: this.label,
+      style: this.style,
+      type: this.type,
+      isLocked: this.isLocked,
+    };
   }
 
   /**
@@ -84,6 +92,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
           // Set parameters
           if (ix === 0) {
             this.text = childData.text;
+            this.label = childData.label;
             this.style = childData.style;
             this.type = childData.type as EditorV3TextBlockType;
             this.isLocked = childData.isLocked;
@@ -102,6 +111,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     else if (arg instanceof HTMLSpanElement || arg instanceof Text) {
       const spanData = this.fromHtml(arg);
       this.text = spanData.text ?? "";
+      this.label = spanData.label;
       this.style = spanData.style;
       this.type = (spanData.type ?? "text") as EditorV3TextBlockType;
       this.isLocked = spanData.isLocked;
@@ -109,6 +119,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     // Object processing
     else {
       this.text = arg?.text.replaceAll(/[\r\n\t]/g, "") ?? "";
+      this.label = arg?.label;
       this.style = arg?.style;
       this.type = arg?.type ?? "text";
       this.isLocked = arg?.isLocked;
@@ -116,6 +127,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     }
     // Forced any parameters
     if (forcedParams) {
+      if (forcedParams.label) this.label = forcedParams.label;
       if (forcedParams.style) this.style = forcedParams.style;
       if (forcedParams.isLocked) this.isLocked = forcedParams.isLocked;
       if (forcedParams.lineStartPosition) this.lineStartPosition = forcedParams.lineStartPosition;
@@ -130,6 +142,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
       .replaceAll(/[\u2009-\u200f]/g, "");
     const spanData: IEditorV3TextBlock = {
       text,
+      label: arg instanceof HTMLSpanElement && arg.title !== "" ? arg.title : undefined,
       style: arg instanceof HTMLSpanElement ? arg.dataset.styleName : undefined,
       type: (arg instanceof HTMLSpanElement ? arg.dataset.type : "text") as EditorV3TextBlockType,
       isLocked:
@@ -176,6 +189,8 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
           span.classList.add("aiev3-tb");
           const textNode = document.createTextNode(word);
           span.appendChild(textNode);
+          // Add label
+          if (this.label) span.title = this.label;
           // Apply lock
           if (this.isLocked) {
             span.classList.add("is-locked");

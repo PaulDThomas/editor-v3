@@ -5,6 +5,7 @@ EditorV3AtBlock {
   "_defaultContentProps": {
     "allowMarkdown": false,
     "allowNewLine": false,
+    "allowWindowView": false,
     "atListFunction": undefined,
     "decimalAlignPercent": 60,
     "markdownSettings": {
@@ -34,6 +35,7 @@ EditorV3AtBlock {
   "atListFunction": [Function],
   "isActive": false,
   "isLocked": undefined,
+  "label": "Hello@world",
   "lineStartPosition": 0,
   "maxAtListLength": 10,
   "style": "shiny",
@@ -47,6 +49,7 @@ EditorV3AtBlock {
   "_defaultContentProps": {
     "allowMarkdown": false,
     "allowNewLine": false,
+    "allowWindowView": false,
     "atListFunction": undefined,
     "decimalAlignPercent": 60,
     "markdownSettings": {
@@ -76,6 +79,7 @@ EditorV3AtBlock {
   "atListFunction": [Function],
   "isActive": false,
   "isLocked": undefined,
+  "label": undefined,
   "lineStartPosition": 0,
   "maxAtListLength": 10,
   "style": undefined,
@@ -89,6 +93,7 @@ EditorV3AtBlock {
   "_defaultContentProps": {
     "allowMarkdown": false,
     "allowNewLine": false,
+    "allowWindowView": false,
     "atListFunction": undefined,
     "decimalAlignPercent": 60,
     "markdownSettings": {
@@ -118,6 +123,7 @@ EditorV3AtBlock {
   "atListFunction": [Function],
   "isActive": false,
   "isLocked": undefined,
+  "label": undefined,
   "lineStartPosition": 0,
   "maxAtListLength": 10,
   "style": "shiny",

@@ -368,6 +368,7 @@ export class EditorV3Line implements IEditorV3Line {
         ) {
           mergedBlocks[mergedBlocks.length - 1] = textBlockFactory({
             text: mergedBlocks[mergedBlocks.length - 1].text + this.textBlocks[_i].text,
+            label: mergedBlocks[mergedBlocks.length - 1].label ?? this.textBlocks[_i].label,
             type: lastTypeStyle.split(":")[0] as EditorV3TextBlockType,
             style: lastTypeStyle.split(":")[1] !== "" ? lastTypeStyle.split(":")[1] : undefined,
           });

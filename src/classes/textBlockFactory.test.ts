@@ -170,18 +170,24 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     testSpan.className = "editorv3style-shiny";
     testSpan.dataset.styleName = "shiny";
     testSpan.dataset.type = "at";
+    testSpan.title = "Hello@world";
     testSpan.innerHTML = "@Hello world";
     const testBlock = textBlockFactory(testSpan);
     testBlock.setActive(true);
 
-    expect(testBlock.data).toEqual({ text: "@Hello world", style: "shiny", type: "at" });
+    expect(testBlock.data).toEqual({
+      text: "@Hello world",
+      label: "Hello@world",
+      style: "shiny",
+      type: "at",
+    });
     expect(testBlock.toMarkdown()).toEqual("@[shiny::@Hello world@]");
     expect(testBlock.typeStyle).toEqual("at:shiny");
 
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml({}));
     expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb at-block editorv3style-shiny is-active" data-type="at" data-style-name="shiny">@Hello world</span>',
+      '<span class="aiev3-tb at-block editorv3style-shiny is-active" data-type="at" data-style-name="shiny" title="Hello@world">@Hello world</span>',
     );
     expect(textBlockFactory(testBlock.toHtml({})).data).toEqual(testBlock.data);
     expect(textBlockFactory(testBlock.toHtml({}))).toMatchSnapshot();

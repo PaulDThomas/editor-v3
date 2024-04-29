@@ -1,7 +1,6 @@
-import { fireEvent } from "@testing-library/dom";
+import { act, fireEvent } from "@testing-library/react";
 import { EditorV3AtBlock } from "./EditorV3AtBlock";
 import { EditorV3AtListItem } from "./interface";
-import { act } from "react-dom/test-utils";
 
 describe("EditorV3AtBlock", () => {
   beforeEach(() => {
