@@ -1,0 +1,46 @@
+.baseSelect {
+  all: unset;
+  border: 1px solid black;
+  line-height: 1.4;
+  border-radius: 4px;
+  padding: 4px 24px 4px 8px;
+  min-width: 48px;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  background-repeat: no-repeat;
+  background-position-x: 100%;
+  background-position-y: 50%;
+}
+
+.baseSelect option:disabled {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.holder {
+  position: relative;
+  margin-top: 6px;
+}
+
+.label {
+  position: absolute;
+  top: -0.6rem;
+  left: 0.1rem;
+  z-index: 1;
+  font-size: 0.75rem;
+  background-color: white;
+  padding: 1px;
+}
+
+.baseInput {
+  all: unset;
+  border: 1px solid black;
+  line-height: 1.4;
+  border-radius: 4px;
+  padding: 4px 8px;
+  min-width: 48px;
+}
+
+.baseSelecct:disabled,
+.baseInput:disabled {
+  background-color: rgba(0, 0, 0, 0.2);
+}

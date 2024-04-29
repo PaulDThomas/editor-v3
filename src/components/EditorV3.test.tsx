@@ -1,4 +1,5 @@
-import { act, fireEvent, render, screen } from "@testing-library/react";
+import { ContextWindowStack } from "@asup/context-menu";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { EditorV3Content } from "../classes/EditorV3Content";
@@ -21,19 +22,17 @@ mockContent.applyStyle("shiny", { startLine: 2, startChar: 0, endLine: 2, endCha
 describe("Editor and functions", () => {
   test("Draw and fire cursor events", async () => {
     const user = userEvent.setup();
-    await act(async () => {
-      render(
-        <div data-testid="container">
-          <EditorV3
-            id="test-editor"
-            input={mockContent}
-            customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
-            allowNewLine
-            textAlignment={EditorV3Align.left}
-          />
-        </div>,
-      );
-    });
+    render(
+      <div data-testid="container">
+        <EditorV3
+          id="test-editor"
+          input={mockContent}
+          customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
+          allowNewLine
+          textAlignment={EditorV3Align.left}
+        />
+      </div>,
+    );
     const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
     expect(container.outerHTML).toMatchSnapshot();
     const firstSpan = container.querySelector("span") as HTMLSpanElement;
@@ -74,7 +73,7 @@ describe("Editor and functions", () => {
         />
       );
     };
-    await act(async () => render(<TestApp />));
+    render(<TestApp />);
     expect(screen).toMatchSnapshot();
   });
 
@@ -82,25 +81,23 @@ describe("Editor and functions", () => {
     const user = userEvent.setup({ delay: null });
     const mockSetObject = jest.fn();
     const mockSetText = jest.fn();
-    await act(async () => {
-      render(
-        <EditorV3
-          data-testid="test-editor"
-          id="test-editor"
-          input={mockContent}
-          setObject={(ret) => {
-            mockSetObject(ret);
-          }}
-          setText={(ret) => {
-            mockSetText(ret);
-          }}
-          style={{ width: "200px" }}
-          allowNewLine
-          decimalAlignPercent={70}
-          textAlignment={EditorV3Align.decimal}
-        />,
-      );
-    });
+    render(
+      <EditorV3
+        data-testid="test-editor"
+        id="test-editor"
+        input={mockContent}
+        setObject={(ret) => {
+          mockSetObject(ret);
+        }}
+        setText={(ret) => {
+          mockSetText(ret);
+        }}
+        style={{ width: "200px" }}
+        allowNewLine
+        decimalAlignPercent={70}
+        textAlignment={EditorV3Align.decimal}
+      />,
+    );
     const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     expect(editor).toBeInTheDocument();
     const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
@@ -138,25 +135,23 @@ describe("Editor and functions", () => {
     const user = userEvent.setup({ delay: null });
     const mockSetObject = jest.fn();
     const mockSetText = jest.fn();
-    await act(async () => {
-      render(
-        <EditorV3
-          data-testid="test-editor"
-          id="test-editor"
-          input={mockContent}
-          setObject={(ret) => {
-            mockSetObject(ret);
-          }}
-          setText={(ret) => {
-            mockSetText(ret);
-          }}
-          style={{ width: "200px" }}
-          allowNewLine
-          decimalAlignPercent={70}
-          textAlignment={EditorV3Align.decimal}
-        />,
-      );
-    });
+    render(
+      <EditorV3
+        data-testid="test-editor"
+        id="test-editor"
+        input={mockContent}
+        setObject={(ret) => {
+          mockSetObject(ret);
+        }}
+        setText={(ret) => {
+          mockSetText(ret);
+        }}
+        style={{ width: "200px" }}
+        allowNewLine
+        decimalAlignPercent={70}
+        textAlignment={EditorV3Align.decimal}
+      />,
+    );
 
     const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     expect(editor).toBeInTheDocument();
@@ -194,21 +189,19 @@ describe("Menu styling - add", () => {
   test("Add style", async () => {
     const user = userEvent.setup();
     const mockSetText = jest.fn();
-    await act(async () => {
-      render(
-        <EditorV3
-          data-testid="test-editor"
-          id="test-editor"
-          input={mockContent}
-          setText={mockSetText}
-          style={{ width: "200px" }}
-          textAlignment={EditorV3Align.left}
-          allowNewLine
-          customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
-          resize
-        />,
-      );
-    });
+    render(
+      <EditorV3
+        data-testid="test-editor"
+        id="test-editor"
+        input={mockContent}
+        setText={mockSetText}
+        style={{ width: "200px" }}
+        textAlignment={EditorV3Align.left}
+        allowNewLine
+        customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
+        resize
+      />,
+    );
     // Get component
     const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     // Go to start of text
@@ -254,25 +247,23 @@ describe("Menu styling - change", () => {
   test("Change style", async () => {
     const user = userEvent.setup();
     const mockSetText = jest.fn();
-    await act(async () => {
-      render(
-        <div data-testid="container">
-          <EditorV3
-            id="test-editor"
-            input={mockContent}
-            setText={mockSetText}
-            style={{ width: "200px" }}
-            textAlignment={EditorV3Align.left}
-            allowNewLine
-            customStyleMap={{
-              shiny: { color: "pink", fontWeight: "700" },
-              notShiny: { color: "blue" },
-            }}
-            resize
-          />
-        </div>,
-      );
-    });
+    render(
+      <div data-testid="container">
+        <EditorV3
+          id="test-editor"
+          input={mockContent}
+          setText={mockSetText}
+          style={{ width: "200px" }}
+          textAlignment={EditorV3Align.left}
+          allowNewLine
+          customStyleMap={{
+            shiny: { color: "pink", fontWeight: "700" },
+            notShiny: { color: "blue" },
+          }}
+          resize
+        />
+      </div>,
+    );
     // Get component
     const container = (await screen.findByTestId("container")).querySelector(
       "#test-editor",
@@ -304,24 +295,22 @@ describe("Menu styling - remove", () => {
   test("Remove style", async () => {
     const user = userEvent.setup();
     const mockSetText = jest.fn();
-    await act(async () => {
-      render(
-        <EditorV3
-          data-testid="test-editor"
-          id="test-editor"
-          input={mockContent}
-          setText={mockSetText}
-          style={{ width: "200px" }}
-          textAlignment={EditorV3Align.left}
-          allowNewLine
-          customStyleMap={{
-            shiny: { color: "pink", fontWeight: "700" },
-            notShiny: { color: "blue" },
-          }}
-          resize
-        />,
-      );
-    });
+    render(
+      <EditorV3
+        data-testid="test-editor"
+        id="test-editor"
+        input={mockContent}
+        setText={mockSetText}
+        style={{ width: "200px" }}
+        textAlignment={EditorV3Align.left}
+        allowNewLine
+        customStyleMap={{
+          shiny: { color: "pink", fontWeight: "700" },
+          notShiny: { color: "blue" },
+        }}
+        resize
+      />,
+    );
     // Get component
     const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     // Go to start of text
@@ -352,21 +341,19 @@ describe("Menu styling - remove", () => {
 describe("Menu styling - markdown", () => {
   test("Show markdown", async () => {
     const user = userEvent.setup();
-    await act(async () => {
-      render(
-        <div data-testid="container">
-          <EditorV3
-            id="test-editor"
-            input={mockContent}
-            setObject={jest.fn()}
-            style={{ width: "200px" }}
-            allowNewLine
-            customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
-            allowMarkdown
-          />
-        </div>,
-      );
-    });
+    render(
+      <div data-testid="container">
+        <EditorV3
+          id="test-editor"
+          input={mockContent}
+          setObject={jest.fn()}
+          style={{ width: "200px" }}
+          allowNewLine
+          customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
+          allowMarkdown
+        />
+      </div>,
+    );
     // Get component
     const container = screen.getByTestId("container").children[0] as HTMLDivElement;
     expect(container).toBeInTheDocument();
@@ -386,21 +373,19 @@ describe("Cut and paste", () => {
   test("Cut", async () => {
     const user = userEvent.setup();
     const mockSetText = jest.fn();
-    await act(async () => {
-      render(
-        <EditorV3
-          data-testid="test-editor"
-          id="test-editor"
-          input={mockContent}
-          setText={mockSetText}
-          style={{ width: "200px" }}
-          textAlignment={EditorV3Align.center}
-          allowNewLine
-          customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
-          resize
-        />,
-      );
-    });
+    render(
+      <EditorV3
+        data-testid="test-editor"
+        id="test-editor"
+        input={mockContent}
+        setText={mockSetText}
+        style={{ width: "200px" }}
+        textAlignment={EditorV3Align.center}
+        allowNewLine
+        customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
+        resize
+      />,
+    );
     // Get component
     const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     expect(editor).toBeInTheDocument();
@@ -436,21 +421,19 @@ describe("Cut and paste", () => {
   test("Paste", async () => {
     const user = userEvent.setup();
     const mockSetText = jest.fn();
-    await act(async () => {
-      render(
-        <EditorV3
-          data-testid="test-editor"
-          id="test-editor"
-          input={mockContent}
-          setText={mockSetText}
-          style={{ width: "200px" }}
-          textAlignment={EditorV3Align.center}
-          allowNewLine
-          customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
-          resize
-        />,
-      );
-    });
+    render(
+      <EditorV3
+        data-testid="test-editor"
+        id="test-editor"
+        input={mockContent}
+        setText={mockSetText}
+        style={{ width: "200px" }}
+        textAlignment={EditorV3Align.center}
+        allowNewLine
+        customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
+        resize
+      />,
+    );
     // Get component
     const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     expect(editor).toBeInTheDocument();
@@ -466,7 +449,6 @@ describe("Cut and paste", () => {
       focusLine: 2,
       focusChar: 6,
     });
-
     fireEvent.blur(editor);
     expect(mockSetText).toHaveBeenLastCalledWith("34.45\n\nx.xx34");
   });
@@ -475,27 +457,25 @@ describe("Cut and paste", () => {
     const user = userEvent.setup();
     const mockSetText1 = jest.fn();
     const mockSetText2 = jest.fn();
-    await act(async () => {
-      render(
-        <div data-testid="container">
-          <EditorV3
-            id="test-editor-1"
-            input={"Initial\ntext\n"}
-            setText={mockSetText1}
-            style={{ width: "200px" }}
-            allowNewLine
-            textAlignment={EditorV3Align.center}
-          />
-          <EditorV3
-            id="test-editor-2"
-            input={""}
-            setText={mockSetText2}
-            style={{ width: "200px" }}
-            textAlignment={EditorV3Align.center}
-          />
-        </div>,
-      );
-    });
+    render(
+      <div data-testid="container">
+        <EditorV3
+          id="test-editor-1"
+          input={"Initial\ntext\n"}
+          setText={mockSetText1}
+          style={{ width: "200px" }}
+          allowNewLine
+          textAlignment={EditorV3Align.center}
+        />
+        <EditorV3
+          id="test-editor-2"
+          input={""}
+          setText={mockSetText2}
+          style={{ width: "200px" }}
+          textAlignment={EditorV3Align.center}
+        />
+      </div>,
+    );
     // Get components
     const editor1 = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
     const editor2 = (await screen.findByTestId("container")).children[1] as HTMLDivElement;
@@ -517,17 +497,15 @@ describe("Cut and paste", () => {
 describe("Edge events", () => {
   test("Initial focus", async () => {
     const mockSetText = jest.fn();
-    await act(async () => {
-      render(
-        <div data-testid="container">
-          <EditorV3
-            id="test-editor"
-            input={mockContent}
-            setText={mockSetText}
-          />
-        </div>,
-      );
-    });
+    render(
+      <div data-testid="container">
+        <EditorV3
+          id="test-editor"
+          input={mockContent}
+          setText={mockSetText}
+        />
+      </div>,
+    );
     const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
     const editorHolder = container.querySelector("#test-editor-editable") as HTMLDivElement;
     expect(editorHolder).toBeInTheDocument();
@@ -536,30 +514,19 @@ describe("Edge events", () => {
   test("Paste error - cannot work out how to accurately throw", async () => {
     const user = userEvent.setup();
     const mockSetText = jest.fn();
-    await act(async () => {
-      render(
-        <div data-testid="container">
-          <EditorV3
-            id="test-editor"
-            input={mockContent}
-            setText={mockSetText}
-          />
-        </div>,
-      );
-    });
+    render(
+      <div data-testid="container">
+        <EditorV3
+          id="test-editor"
+          input={mockContent}
+          setText={mockSetText}
+        />
+      </div>,
+    );
     const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
     const editorHolder = container.querySelector("#test-editor-editable") as HTMLDivElement;
     expect(editorHolder).toBeInTheDocument();
     await user.click(editorHolder.querySelector("span") as HTMLSpanElement);
-    // await expect(
-    //   user.paste({
-    //     getData: (type: string) => {
-    //       if (type === "data/aiev3") {
-    //         return "NotJSONString";
-    //       }
-    //     },
-    //   } as DataTransfer),
-    // ).rejects.toThrow();
   });
 });
 
@@ -636,9 +603,7 @@ describe("Undo/redo", () => {
   };
   test("Undo/redo", async () => {
     const user = userEvent.setup();
-    await act(async () => {
-      render(<TestContainer />);
-    });
+    render(<TestContainer />);
     const editable = screen
       .queryByTestId("test-editor")
       ?.querySelector(".aiev3-editing") as HTMLDivElement;
@@ -716,7 +681,7 @@ describe("Updates from above", () => {
 
   test("Change input", async () => {
     const user = userEvent.setup();
-    await act(async () => render(<TestContainer />));
+    render(<TestContainer />);
     const editor = screen.getByTestId("editor");
     expect(screen.queryByText("Before")).toBeInTheDocument();
     const changeInput = screen.getByTestId("change-input");
@@ -728,7 +693,7 @@ describe("Updates from above", () => {
 
   test("Change alignment", async () => {
     const user = userEvent.setup();
-    await act(async () => render(<TestContainer />));
+    render(<TestContainer />);
     const editor = screen.getByTestId("editor");
     expect(screen.queryByText("Before")).toBeInTheDocument();
     const changeInput = screen.getByTestId("change-text-alignment");
@@ -738,7 +703,7 @@ describe("Updates from above", () => {
 
   test("Change decimal align percent", async () => {
     const user = userEvent.setup();
-    await act(async () => render(<TestContainer />));
+    render(<TestContainer />);
     const editor = screen.getByTestId("editor");
     expect(screen.queryByText("Before")).toBeInTheDocument();
     const changeInput = screen.getByTestId("change-decimal-align-percent");
@@ -748,7 +713,7 @@ describe("Updates from above", () => {
 
   test("Change styles", async () => {
     const user = userEvent.setup();
-    await act(async () => render(<TestContainer />));
+    render(<TestContainer />);
     const editor = screen.getByTestId("editor");
     expect(screen.queryByText("Before")).toBeInTheDocument();
     const changeInput = screen.getByTestId("change-styles");
@@ -758,7 +723,7 @@ describe("Updates from above", () => {
 
   test("Change markdown settings", async () => {
     const user = userEvent.setup();
-    await act(async () => render(<TestContainer />));
+    render(<TestContainer />);
     const editor = screen.getByTestId("editor");
     // Click show markdown
     fireEvent.contextMenu(editor.querySelectorAll("span")[0] as HTMLSpanElement);
@@ -795,6 +760,8 @@ describe("Add at block and escape out", () => {
   afterEach(() => {
     jest.useRealTimers();
   });
+
+  const runTimers = async () => jest.runAllTimers();
 
   const user = userEvent.setup({ delay: null });
   const TestEditor = (props: {
@@ -837,14 +804,12 @@ describe("Add at block and escape out", () => {
   test("Type at block", async () => {
     const mockSetText = jest.fn();
     const mockSetObject = jest.fn();
-    await act(async () => {
-      render(
-        <TestEditor
-          setObject={mockSetObject}
-          setText={mockSetText}
-        />,
-      );
-    });
+    render(
+      <TestEditor
+        setObject={mockSetObject}
+        setText={mockSetText}
+      />,
+    );
     const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     expect(editor).toBeInTheDocument();
     const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
@@ -869,24 +834,21 @@ describe("Add at block and escape out", () => {
   test("Change at list length", async () => {
     const mockSetText = jest.fn();
     const mockSetObject = jest.fn();
-    await act(async () => {
-      render(
-        <TestEditor
-          setObject={mockSetObject}
-          setText={mockSetText}
-          maxAtListLength={5}
-        />,
-      );
-    });
+    render(
+      <TestEditor
+        setObject={mockSetObject}
+        setText={mockSetText}
+        maxAtListLength={5}
+      />,
+    );
     const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     expect(editor).toBeInTheDocument();
     const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
     expect(editable).toBeInTheDocument();
     await user.click(editable);
-    await act(async () => {
-      await user.keyboard("@");
-      jest.runAllTimers();
-    });
+    await user.keyboard("@");
+
+    await runTimers();
     expect(editor.querySelectorAll("li.aiev3-at-item").length).toEqual(5);
     expect(screen.queryByText("...24 more")).toBeInTheDocument();
     expect(editor.outerHTML).toMatchSnapshot();
@@ -935,9 +897,7 @@ describe("Move left to start over at block", () => {
         />
       );
     };
-    await act(async () => {
-      render(<TestEditor />);
-    });
+    render(<TestEditor />);
     const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     expect(editor).toBeInTheDocument();
     const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
@@ -1021,9 +981,7 @@ describe("Move left to start over at block", () => {
         />
       );
     };
-    await act(async () => {
-      render(<TestEditor />);
-    });
+    render(<TestEditor />);
     const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
     expect(editor).toBeInTheDocument();
     const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
@@ -1050,5 +1008,42 @@ describe("Move left to start over at block", () => {
       focusLine: 0,
       focusChar: 2,
     });
+  });
+});
+
+describe("Window view", () => {
+  const user = userEvent.setup({ delay: null });
+  const runTimers = async () => jest.runAllTimers();
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+  test("Show window view", async () => {
+    render(
+      <ContextWindowStack>
+        <EditorV3
+          data-testid="test-editor"
+          id="test-editor"
+          input="Initial text"
+          allowWindowView
+        />
+      </ContextWindowStack>,
+    );
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
+    expect(editor).toBeInTheDocument();
+    const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    await user.click(editable);
+    await user.keyboard("{ArrowRight}");
+    fireEvent.contextMenu(editable);
+    const showWindowView = screen.getByLabelText("Show window view");
+    await user.click(showWindowView);
+    await runTimers();
+    expect(screen.queryByText("Editor contents")).toBeInTheDocument();
+
+    const textInput = screen.queryByLabelText("Text") as HTMLInputElement;
+    await user.type(textInput, " - added text");
   });
 });

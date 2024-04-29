@@ -12,7 +12,7 @@ interface WindowViewLineProps {
 }
 
 export const WindowViewLine = ({ state, lineIndex, setLine }: WindowViewLineProps) => {
-  const line = state.content?.lines[lineIndex];
+  const line = lineIndex < state.content.lines.length ? state.content.lines[lineIndex] : undefined;
   const setTextBlock = useCallback(
     (textBlock: EditorV3BlockClass, ix: number) => {
       const newLine = new EditorV3Line(line);

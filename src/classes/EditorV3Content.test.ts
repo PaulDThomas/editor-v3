@@ -442,6 +442,7 @@ describe("Render markdown text from content", () => {
       endChar: 1,
     });
     expect(testContent.contentProps).toEqual(props);
+    testContent.allowWindowView = true;
     testContent.allowMarkdown = true;
     testContent.allowNewLine = true;
     testContent.showMarkdown = true;

@@ -1,10 +1,13 @@
-import { useCallback, useId } from "react";
+import { useCallback } from "react";
+import { IEditorV3AtBlock } from "../classes/EditorV3AtBlock";
+import { IEditorV3TextBlock } from "../classes/EditorV3TextBlock";
 import { EditorV3BlockClass } from "../classes/interface";
+import { textBlockFactory } from "../classes/textBlockFactory";
 import { EditorV3State } from "./EditorV3";
 import styles from "./WindowView.module.css";
-import { EditorV3AtBlock, EditorV3TextBlock } from "../classes";
-import { IEditorV3AtBlock } from "../classes/EditorV3AtBlock";
-import { EditorV3TextBlockType } from "../classes/EditorV3TextBlock";
+import { WindowViewBlockStyle } from "./WindowViewBlockStyle";
+import { WindowViewBlockText } from "./WindowViewBlockText";
+import { WindowViewBlockType } from "./WindowViewBlockType";
 
 interface WindowViewBlockProps {
   state: EditorV3State;
@@ -19,67 +22,46 @@ export const WindowViewBlock = ({
   blockIndex,
   setTextBlock,
 }: WindowViewBlockProps) => {
-  const textBlock = state.content?.lines[lineIndex]?.textBlocks[blockIndex];
-  const selectTypeId = useId();
-  const selectStyleId = useId();
-  const textId = useId();
+  const textBlock =
+    lineIndex < state.content.lines.length &&
+    blockIndex < state.content.lines[lineIndex].textBlocks.length
+      ? state.content.lines[lineIndex].textBlocks[blockIndex]
+      : undefined;
   const setBlock = useCallback(
-    (newValues: { newText?: string; newStyle?: string; newType?: EditorV3TextBlockType }) => {
-      switch (newValues.newType ?? textBlock.type) {
-        case "at": {
-          const newAtBlockProps: IEditorV3AtBlock = {
-            ...textBlock.data,
-            text: newValues.newText ?? textBlock.text,
-            style: newValues.newStyle ?? textBlock.style,
-          };
-          const newAtBlock = new EditorV3AtBlock(newAtBlockProps);
-          setTextBlock(newAtBlock);
-          break;
-        }
-        case "text":
-        default: {
-          const newTextBlock = new EditorV3TextBlock({
-            text: newValues.newText ?? textBlock.text,
-            style: newValues.newStyle ?? textBlock.style,
-          });
-          setTextBlock(newTextBlock);
-        }
-      }
+    (newValues: IEditorV3AtBlock | IEditorV3TextBlock) => {
+      setTextBlock(textBlockFactory(newValues));
     },
-    [setTextBlock, textBlock.data, textBlock.style, textBlock.text, textBlock.type],
+    [setTextBlock],
   );
   return !textBlock ? (
     <></>
   ) : (
     <div className={styles.windowViewBlock}>
-      <select
-        id={selectTypeId}
-        value={textBlock.type}
-        onChange={(e) => setBlock({ newType: e.currentTarget.value as "text" | "at" })}
-      >
-        <option value="text">Text</option>
-        <option value="at">At</option>
-      </select>
-      <select
-        id={selectStyleId}
-        value={textBlock.style}
-        onChange={(e) => setBlock({ newStyle: e.currentTarget.value })}
-      >
-        <option value="">None</option>
-        {Object.keys(state.content.contentProps.styles ?? []).map((style, ix) => (
-          <option
-            key={ix}
-            value={style}
-          >
-            {style}
-          </option>
-        ))}
-      </select>
-      <input
-        type="text"
-        id={textId}
-        value={textBlock.text}
-        onChange={(e) => setBlock({ newText: e.currentTarget.value })}
+      <WindowViewBlockType
+        state={state}
+        type={textBlock.type}
+        setType={(type) => setBlock({ ...textBlock.data, type })}
+      />
+      <WindowViewBlockStyle
+        state={state}
+        styleName={textBlock.style}
+        setStyleName={(style) =>
+          setBlock({ ...textBlock.data, style: style === "" ? undefined : style })
+        }
+      />
+      <WindowViewBlockText
+        label="Label"
+        disabled={false}
+        text={textBlock.label}
+        setText={(text) => setBlock({ ...textBlock.data, label: text === "" ? undefined : text })}
+      />
+      <WindowViewBlockText
+        label="Text"
+        disabled={textBlock.type === "at"}
+        text={textBlock.text}
+        setText={(text) => {
+          setBlock({ ...textBlock.data, text });
+        }}
       />
     </div>
   );

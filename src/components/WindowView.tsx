@@ -2,8 +2,8 @@ import { ContextWindow } from "@asup/context-menu";
 import { useCallback } from "react";
 import { EditorV3Content, EditorV3Line } from "../classes";
 import { EditorV3State } from "./EditorV3";
-import { WindowViewLine } from "./WindowViewLine";
 import styles from "./WindowView.module.css";
+import { WindowViewLine } from "./WindowViewLine";
 
 interface WindowViewProps {
   id: string;
@@ -42,7 +42,7 @@ export const WindowView = ({
       title={"Editor contents"}
       style={{
         height: "400px",
-        width: "600px",
+        width: "700px",
         maxHeight: "80vh",
         maxWidth: "90vw",
       }}
@@ -73,7 +73,7 @@ export const WindowView = ({
           className={styles.redoBtn}
           fill={redo ? "black" : "gray"}
           onClick={() => redo && redo()}
-          aria-label="Undo"
+          aria-label="Redo"
         >
           <path
             d="M0 0h24v24H0z"
@@ -81,7 +81,7 @@ export const WindowView = ({
           />
           <path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z" />
         </svg>
-        {(state.content?.lines ?? []).map((line, ix) => (
+        {state.content.lines.map((line, ix) => (
           <WindowViewLine
             key={ix}
             state={state}

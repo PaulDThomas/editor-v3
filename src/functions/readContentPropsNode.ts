@@ -10,6 +10,7 @@ export const readContentPropsNode = (node: HTMLDivElement): EditorV3ContentProps
     ret = cloneDeep(defaultContentProps);
     if (dataset.allowMarkdown) ret.allowMarkdown = JSON.parse(dataset.allowMarkdown);
     if (dataset.allowNewLine) ret.allowNewLine = JSON.parse(dataset.allowNewLine);
+    if (dataset.allowWindowView) ret.allowWindowView = JSON.parse(dataset.allowWindowView);
     if (dataset.decimalAlignPercent)
       ret.decimalAlignPercent = JSON.parse(dataset.decimalAlignPercent);
     if (dataset.markdownSettings) ret.markdownSettings = JSON.parse(dataset.markdownSettings);

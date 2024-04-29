@@ -329,6 +329,7 @@ export class EditorV3Content implements IEditorV3 {
   private _updateProps(props: EditorV3ContentPropsInput) {
     if (props.allowMarkdown !== undefined) this._allowMarkdown = props.allowMarkdown;
     if (props.allowNewLine !== undefined) this._allowNewLine = props.allowNewLine;
+    if (props.allowWindowView !== undefined) this._allowWindowView = props.allowWindowView;
     if (props.decimalAlignPercent !== undefined)
       this._decimalAlignPercent = props.decimalAlignPercent;
     if (props.markdownSettings !== undefined) this._markdownSettings = props.markdownSettings;
