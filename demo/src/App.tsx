@@ -103,6 +103,7 @@ export const App = (): JSX.Element => {
                   width: "240px",
                   height: "100px",
                 }}
+                allowWindowView
                 atListFunction={loadAvailableItems}
                 debounceMilliseconds={1000}
                 maxAtListLength={maxAtListLength}

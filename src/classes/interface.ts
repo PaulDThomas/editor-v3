@@ -52,6 +52,7 @@ export type EditorV3BlockClass = EditorV3TextBlock | EditorV3AtBlock;
 export interface EditorV3ContentProps {
   allowMarkdown: boolean;
   allowNewLine: boolean;
+  allowWindowView: boolean;
   decimalAlignPercent: number;
   markdownSettings: IMarkdownSettings;
   showMarkdown: boolean;
@@ -63,6 +64,7 @@ export interface EditorV3ContentProps {
 export interface EditorV3ContentPropsInput {
   allowMarkdown?: boolean;
   allowNewLine?: boolean;
+  allowWindowView?: boolean;
   decimalAlignPercent?: number;
   markdownSettings?: IMarkdownSettings;
   showMarkdown?: boolean;

@@ -15,6 +15,7 @@ import {
 import { IMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 import { useDebounceStack } from "../hooks/useDebounceStack";
 import "./EditorV3.css";
+import { WindowView } from "./WindowView";
 
 interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   id: string;
@@ -31,6 +32,7 @@ interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   spellCheck?: boolean;
   styleOnContextMenu?: boolean;
   allowMarkdown?: boolean;
+  allowWindowView?: boolean;
   markdownSettings?: IMarkdownSettings;
   debounceMilliseconds?: number | null;
   atListFunction?: (at: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>;
@@ -50,6 +52,7 @@ export const EditorV3 = ({
   setObject,
   style,
   allowMarkdown = cloneDeep(defaultContentProps.allowMarkdown),
+  allowWindowView = cloneDeep(defaultContentProps.allowWindowView),
   allowNewLine = cloneDeep(defaultContentProps.allowNewLine),
   decimalAlignPercent = cloneDeep(defaultContentProps.decimalAlignPercent),
   markdownSettings = cloneDeep(defaultContentProps.markdownSettings),
@@ -66,6 +69,7 @@ export const EditorV3 = ({
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
   const [showMarkdown, setShowMarkdown] = useState<boolean>(false);
+  const [showWindowView, setShowWindowView] = useState<boolean>(false);
   const [inputDecode, setInputDecode] = useState<EditorV3State>({
     content: new EditorV3Content(input, {
       ...defaultContentProps,
@@ -159,6 +163,8 @@ export const EditorV3 = ({
     undo,
     redo,
     forceUpdate: forceReturn,
+    stack,
+    index: stackIndex,
   } = useDebounceStack<EditorV3State>(
     inputDecode,
     setInputDecode,
@@ -172,10 +178,10 @@ export const EditorV3 = ({
   const setContent = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (newContent: EditorV3Content, calledFrom?: string, focus?: boolean) => {
-      // console.debug(
-      //   "SetContent:" + calledFrom + ":\r\n",
-      //   newContent.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("|")).join("\n"),
-      // );
+      console.debug(
+        "SetContent:" + calledFrom + ":\r\n",
+        newContent.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("|")).join("\n"),
+      );
       setLastCaretPosition(newContent.caretPosition);
       setCurrentValue({ content: newContent, focus: focus ?? state?.focus ?? false });
     },
@@ -262,10 +268,25 @@ export const EditorV3 = ({
               },
             },
           ];
-      return [styleMenuItem, ...showMarkdownMenu];
+      const showWindowViewMenu = !allowWindowView
+        ? []
+        : [
+            {
+              label: `${showWindowView ? "Hide" : "Show"} window view`,
+              action: () => {
+                if (divRef.current) {
+                  const newContent = new EditorV3Content(divRef.current, contentProps);
+                  newContent.caretPosition = null;
+                  setContent(newContent, "Window view menu", false);
+                  setShowWindowView(!showWindowView);
+                }
+              },
+            },
+          ];
+      return [styleMenuItem, ...showMarkdownMenu, ...showWindowViewMenu];
     }
     return [];
-  }, [allowMarkdown, state, contentProps, setContent]);
+  }, [state, allowMarkdown, allowWindowView, showWindowView, contentProps, setContent]);
 
   // Focus and blur events are container not contenteditable level events!
   const handleFocus = useCallback(
@@ -434,65 +455,83 @@ export const EditorV3 = ({
       s.resize = "both";
       s.overflow = "auto";
     }
+    if (showWindowView) {
+      s.backgroundColor = "rgba(0, 0, 0, 0.3)";
+    }
     return s;
-  }, [resize, style]);
+  }, [resize, showWindowView, style]);
 
   return (
-    <div
-      {...rest}
-      className={`aiev3${state?.focus ? " editing" : ""}${rest.className ? ` ${rest.className}` : ""}`}
-      id={id}
-      onFocusCapture={(e) => {
-        e.preventDefault();
-        rest.onFocusCapture && rest.onFocusCapture(e);
-        rest.onFocus && rest.onFocus(e);
-        handleFocus(e);
-      }}
-      onBlurCapture={(e) => {
-        rest.onBlurCapture && rest.onBlurCapture(e);
-        handleBlur();
-        window.getSelection()?.removeAllRanges();
-        rest.onBlur && rest.onBlur(e);
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-      onMouseUp={(e) => {
-        handleMouseUp(e);
-        rest.onMouseUp && rest.onMouseUp(e);
-      }}
-    >
-      <ContextMenuHandler
-        menuItems={menuItems}
-        style={{ width: "100%", height: "100%" }}
-        showLowMenu={spellCheck || !styleOnContextMenu}
+    <>
+      <div
+        {...rest}
+        className={`aiev3${state?.focus ? " editing" : ""}${rest.className ? ` ${rest.className}` : ""}`}
+        id={id}
+        onFocusCapture={(e) => {
+          e.preventDefault();
+          rest.onFocusCapture && rest.onFocusCapture(e);
+          rest.onFocus && rest.onFocus(e);
+          handleFocus(e);
+        }}
+        onBlurCapture={(e) => {
+          rest.onBlurCapture && rest.onBlurCapture(e);
+          handleBlur();
+          window.getSelection()?.removeAllRanges();
+          rest.onBlur && rest.onBlur(e);
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+        onMouseUp={(e) => {
+          handleMouseUp(e);
+          rest.onMouseUp && rest.onMouseUp(e);
+        }}
       >
-        <div
-          className="aiev3-resize"
-          style={styleRecalc}
+        <ContextMenuHandler
+          menuItems={menuItems}
+          style={{ width: "100%", height: "100%" }}
+          showLowMenu={spellCheck || !styleOnContextMenu}
         >
           <div
-            id={`${id}-editable`}
-            className={`aiev3-editing ${allowNewLine ? "multiline" : "singleline"}`}
-            contentEditable={
-              editable && (typeof setObject === "function" || typeof setText === "function")
-            }
-            suppressContentEditableWarning
-            role={
-              editable && (typeof setObject === "function" || typeof setText === "function")
-                ? "textbox"
-                : undefined
-            }
-            spellCheck={spellCheck}
-            ref={divRef}
-            onCopyCapture={handleCopy}
-            onCutCapture={handleCopy}
-            onKeyDownCapture={handleKeyDown}
-            onKeyUpCapture={handleKeyUp}
-            onPasteCapture={handlePaste}
-          />
-        </div>
-      </ContextMenuHandler>
-    </div>
+            className="aiev3-resize"
+            style={styleRecalc}
+          >
+            <div
+              id={`${id}-editable`}
+              className={`aiev3-editing ${allowNewLine ? "multiline" : "singleline"}`}
+              contentEditable={
+                editable &&
+                !showWindowView &&
+                (typeof setObject === "function" || typeof setText === "function")
+              }
+              suppressContentEditableWarning
+              role={
+                editable && (typeof setObject === "function" || typeof setText === "function")
+                  ? "textbox"
+                  : undefined
+              }
+              spellCheck={spellCheck}
+              ref={divRef}
+              onCopyCapture={handleCopy}
+              onCutCapture={handleCopy}
+              onKeyDownCapture={handleKeyDown}
+              onKeyUpCapture={handleKeyUp}
+              onPasteCapture={handlePaste}
+            />
+          </div>
+        </ContextMenuHandler>
+      </div>
+      {allowWindowView && state && (
+        <WindowView
+          id={`${id}-window`}
+          undo={stackIndex > 0 ? undo : undefined}
+          redo={stackIndex < (stack?.length ?? 0) - 1 ? redo : undefined}
+          showWindowView={showWindowView}
+          setShowWindowView={setShowWindowView}
+          state={state}
+          setContent={(content: EditorV3Content) => setContent(content, "Window", false)}
+        />
+      )}
+    </>
   );
 };
 

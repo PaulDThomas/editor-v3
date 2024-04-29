@@ -91,6 +91,13 @@ export class EditorV3Content implements IEditorV3 {
   set showMarkdown(newShow: boolean) {
     this._showMarkdown = newShow;
   }
+  private _allowWindowView = this._defaultContentProps.allowWindowView;
+  get allowWindowView() {
+    return this._allowWindowView;
+  }
+  set allowWindowView(newAllow: boolean) {
+    this._allowWindowView = newAllow;
+  }
   private _atListFunction:
     | ((typedString: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>)
     | undefined;
@@ -189,6 +196,7 @@ export class EditorV3Content implements IEditorV3 {
       decimalAlignPercent: this._decimalAlignPercent,
       styles: this._styles,
       allowNewLine: this._allowNewLine,
+      allowWindowView: this._allowWindowView,
       showMarkdown: this._showMarkdown,
       markdownSettings: this._markdownSettings,
       allowMarkdown: this._allowMarkdown,

@@ -1,0 +1,47 @@
+.windowViewBody {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: left;
+  padding: 10px;
+  gap: 8px;
+  position: relative;
+}
+
+.windowViewLine {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.windowViewLineTitle {
+  font-size: 14px;
+  line-height: 14px;
+  font-weight: 400;
+  color: #222;
+}
+
+.windowViewBlock {
+  display: flex;
+  line-height: 16px;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  padding: 4px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.undoBtn {
+  position: absolute;
+  top: 0;
+  right: 29px;
+}
+
+.redoBtn {
+  position: absolute;
+  top: 0;
+  right: 12px;
+}
