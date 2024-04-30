@@ -11,10 +11,7 @@ describe("WindowViewBlock", () => {
     const content = new EditorV3Content("test");
     render(
       <WindowViewBlock
-        state={{
-          content,
-          focus: false,
-        }}
+        content={content}
         lineIndex={0}
         blockIndex={12}
         setTextBlock={mockSet}
@@ -28,10 +25,7 @@ describe("WindowViewBlock", () => {
     const content = new EditorV3Content("test");
     render(
       <WindowViewBlock
-        state={{
-          content,
-          focus: false,
-        }}
+        content={content}
         lineIndex={0}
         blockIndex={0}
         setTextBlock={mockSet}
@@ -85,10 +79,7 @@ describe("WindowViewBlock", () => {
     );
     render(
       <WindowViewBlock
-        state={{
-          content,
-          focus: false,
-        }}
+        content={content}
         lineIndex={0}
         blockIndex={0}
         setTextBlock={mockSet}

@@ -1,18 +1,17 @@
 import { ContextWindow } from "@asup/context-menu";
 import { useCallback } from "react";
-import { EditorV3Content, EditorV3Line } from "../classes";
+import { EditorV3Content, EditorV3Line, IEditorV3 } from "../classes";
 import { EditorV3State } from "./EditorV3";
 import styles from "./WindowView.module.css";
 import { WindowViewLine } from "./WindowViewLine";
+import { useDebounceStack } from "../hooks";
 
 interface WindowViewProps {
   id: string;
   showWindowView: boolean;
   setShowWindowView: (show: boolean) => void;
   state: EditorV3State;
-  setContent: (content: EditorV3Content) => void;
-  undo?: () => void;
-  redo?: () => void;
+  setState: (state: EditorV3State) => void;
 }
 
 export const WindowView = ({
@@ -20,22 +19,40 @@ export const WindowView = ({
   showWindowView,
   setShowWindowView,
   state,
-  setContent,
-  undo,
-  redo,
+  setState,
 }: WindowViewProps) => {
+  const {
+    currentValue: content,
+    setCurrentValue: setContent,
+    forceUpdate,
+    undo,
+    redo,
+    stack,
+    index: stackIndex,
+  } = useDebounceStack<IEditorV3>(
+    state.content,
+    (value: IEditorV3) => setState({ content: new EditorV3Content(value), focus: false }),
+    null,
+  );
+
   const setLine = useCallback(
     (line: EditorV3Line, ix: number) => {
-      if (state.content) {
-        const newContent = new EditorV3Content(state.content, state.content.contentProps);
-        newContent.lines[ix] = line;
+      if (content) {
+        const newLines = [...content.lines];
+        newLines[ix] = line;
+        const newContent = new EditorV3Content(
+          { ...content, lines: newLines },
+          content.contentProps,
+        );
         setContent(newContent);
       }
     },
-    [setContent, state.content],
+    [setContent, content],
   );
 
-  return (
+  return !content ? (
+    <></>
+  ) : (
     <ContextWindow
       id={id}
       visible={showWindowView}
@@ -46,7 +63,10 @@ export const WindowView = ({
         maxHeight: "80vh",
         maxWidth: "90vw",
       }}
-      onClose={() => setShowWindowView(false)}
+      onClose={() => {
+        forceUpdate();
+        setShowWindowView(false);
+      }}
     >
       <div className={styles.windowViewBody}>
         <svg
@@ -55,8 +75,8 @@ export const WindowView = ({
           viewBox="0 0 24 24"
           width="16"
           className={styles.undoBtn}
-          fill={undo ? "black" : "gray"}
-          onClick={() => undo && undo()}
+          fill={stackIndex > 0 ? "black" : "gray"}
+          onClick={() => undo()}
           aria-label="Undo"
         >
           <path
@@ -71,8 +91,8 @@ export const WindowView = ({
           viewBox="0 0 24 24"
           width="16"
           className={styles.redoBtn}
-          fill={redo ? "black" : "gray"}
-          onClick={() => redo && redo()}
+          fill={stackIndex < (stack?.length ?? 0) - 1 ? "black" : "gray"}
+          onClick={() => redo()}
           aria-label="Redo"
         >
           <path
@@ -81,10 +101,10 @@ export const WindowView = ({
           />
           <path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z" />
         </svg>
-        {state.content.lines.map((line, ix) => (
+        {content.lines.map((line, ix) => (
           <WindowViewLine
             key={ix}
-            state={state}
+            content={content}
             lineIndex={ix}
             setLine={(line) => setLine(line, ix)}
           />

@@ -11,10 +11,7 @@ describe("WindowViewLine", () => {
     const content = new EditorV3Content("test");
     render(
       <WindowViewLine
-        state={{
-          content,
-          focus: false,
-        }}
+        content={content}
         lineIndex={2}
         setLine={mockSet}
       />,
@@ -39,10 +36,7 @@ describe("WindowViewLine", () => {
     );
     render(
       <WindowViewLine
-        state={{
-          content,
-          focus: false,
-        }}
+        content={content}
         lineIndex={0}
         setLine={mockSet}
       />,

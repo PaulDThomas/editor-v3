@@ -1,7 +1,7 @@
 import { ContextWindowStack } from "@asup/context-menu";
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useState } from "react";
+import { act, useState } from "react";
 import { EditorV3Content } from "../classes/EditorV3Content";
 import { EditorV3Align, IEditorV3 } from "../classes/interface";
 import { defaultMarkdownSettings } from "../classes/markdown/MarkdownSettings";
@@ -1013,7 +1013,6 @@ describe("Move left to start over at block", () => {
 
 describe("Window view", () => {
   const user = userEvent.setup({ delay: null });
-  const runTimers = async () => jest.runAllTimers();
   beforeEach(() => {
     jest.useFakeTimers();
   });
@@ -1040,7 +1039,7 @@ describe("Window view", () => {
     fireEvent.contextMenu(editable);
     const showWindowView = screen.getByLabelText("Show window view");
     await user.click(showWindowView);
-    await runTimers();
+    await act(async () => jest.runAllTimers());
     expect(screen.queryByText("Editor contents")).toBeInTheDocument();
 
     const textInput = screen.queryByLabelText("Text") as HTMLInputElement;

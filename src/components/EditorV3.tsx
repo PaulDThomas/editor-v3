@@ -110,6 +110,7 @@ export const EditorV3 = ({
   ]);
 
   // General return function
+  const [hasFocused, setHasFocused] = useState<boolean>(false);
   const [lastInput, setLastInput] = useState<string | IEditorV3>(input);
   const [lastCaretPosition, setLastCaretPosition] = useState<EditorV3Position | null>(null);
   const [lastAction, setLastAction] = useState<"Focus" | "Blur" | "Key" | "">("");
@@ -126,9 +127,12 @@ export const EditorV3 = ({
 
   const returnData = useCallback(
     (ret: EditorV3State) => {
-      // Block return when there is an active at-block
+      // Block return when there is an active at-block, or if the editor has never been focused
       if (
-        !ret.content.lines.some((l) => l.textBlocks.some((tb) => tb.type === "at" && tb.isActive))
+        !ret.content.lines.some((l) =>
+          l.textBlocks.some((tb) => tb.type === "at" && tb.isActive),
+        ) &&
+        hasFocused
       ) {
         // Redraw dummy for information
         const dummyNode = document.createElement("div");
@@ -145,7 +149,7 @@ export const EditorV3 = ({
         dummyNode.remove();
       }
     },
-    [lastObjectSent, lastTextSent, setObject, setText],
+    [hasFocused, lastObjectSent, lastTextSent, setObject, setText],
   );
 
   // Redraw element, used in debounced stack as onChange callback
@@ -163,8 +167,6 @@ export const EditorV3 = ({
     undo,
     redo,
     forceUpdate: forceReturn,
-    stack,
-    index: stackIndex,
   } = useDebounceStack<EditorV3State>(
     inputDecode,
     setInputDecode,
@@ -172,7 +174,18 @@ export const EditorV3 = ({
     redrawElement,
     returnData,
     (oldValue, newValue) =>
-      isEqual(oldValue && [oldValue.content.data], newValue && [newValue.content.data]),
+      isEqual(
+        oldValue && [
+          oldValue.content.lines.map((l) =>
+            l.textBlocks.map((tb) => ({ ...tb.data, isLocked: undefined })),
+          ),
+        ],
+        newValue && [
+          newValue.content.lines.map((l) =>
+            l.textBlocks.map((tb) => ({ ...tb.data, isLocked: undefined })),
+          ),
+        ],
+      ),
   );
   // Utility callback for debugging
   const setContent = useCallback(
@@ -183,7 +196,10 @@ export const EditorV3 = ({
       //   newContent.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("|")).join("\n"),
       // );
       setLastCaretPosition(newContent.caretPosition);
-      setCurrentValue({ content: newContent, focus: focus ?? state?.focus ?? false });
+      setCurrentValue({
+        content: newContent,
+        focus: focus ?? state?.focus ?? false,
+      });
     },
     [setCurrentValue, state],
   );
@@ -321,6 +337,7 @@ export const EditorV3 = ({
         setLastAction("Focus");
         setLastCaretPosition(newContent.caretPosition);
         setContent(newContent, "Select all on focus", true);
+        setHasFocused(true);
       }
     },
     [state, contentProps, setContent],
@@ -534,12 +551,10 @@ export const EditorV3 = ({
       {allowWindowView && state && (
         <WindowView
           id={`${id}-window`}
-          undo={stackIndex > 0 ? undo : undefined}
-          redo={stackIndex < (stack?.length ?? 0) - 1 ? redo : undefined}
           showWindowView={showWindowView}
           setShowWindowView={setShowWindowView}
           state={state}
-          setContent={(content: EditorV3Content) => setContent(content, "Window", false)}
+          setState={(state: EditorV3State) => setContent(state.content, "Window", false)}
         />
       )}
     </>

@@ -1,25 +1,21 @@
 import { useId } from "react";
-import { EditorV3State } from "./EditorV3";
-import selectStyles from "./Select.module.css";
 import { EditorV3Styles } from "../classes";
+import selectStyles from "./Select.module.css";
 
 interface WindowViewBlockStyleProps extends React.ComponentProps<"select"> {
-  state: EditorV3State;
+  styles: EditorV3Styles;
   styleName?: string;
   setStyleName: (style: string) => void;
 }
 
 export const WindowViewBlockStyle = ({
-  state,
+  styles,
   styleName,
   setStyleName,
   ...rest
 }: WindowViewBlockStyleProps) => {
   const selectStyleId = useId();
-  return !state.content.contentProps.styles ||
-    Object.keys(state.content.contentProps.styles).length === 0 ? (
-    <></>
-  ) : (
+  return (
     <div className={selectStyles.holder}>
       <label
         id={`label-${selectStyleId}`}
@@ -37,11 +33,11 @@ export const WindowViewBlockStyle = ({
         onChange={(e) => setStyleName(e.currentTarget.value)}
       >
         <option value="">None</option>
-        {Object.keys(state.content.contentProps.styles).map((sn, ix) => (
+        {Object.keys(styles).map((sn, ix) => (
           <option
             key={ix}
             value={sn}
-            disabled={(state.content.contentProps.styles as EditorV3Styles)[sn].isNotAvailabe}
+            disabled={(styles as EditorV3Styles)[sn].isNotAvailabe}
           >
             {sn}
           </option>

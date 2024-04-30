@@ -1,31 +1,29 @@
 import { useCallback } from "react";
 import { IEditorV3AtBlock } from "../classes/EditorV3AtBlock";
 import { IEditorV3TextBlock } from "../classes/EditorV3TextBlock";
-import { EditorV3BlockClass } from "../classes/interface";
+import { EditorV3BlockClass, IEditorV3 } from "../classes/interface";
 import { textBlockFactory } from "../classes/textBlockFactory";
-import { EditorV3State } from "./EditorV3";
 import styles from "./WindowView.module.css";
 import { WindowViewBlockStyle } from "./WindowViewBlockStyle";
 import { WindowViewBlockText } from "./WindowViewBlockText";
 import { WindowViewBlockType } from "./WindowViewBlockType";
 
 interface WindowViewBlockProps {
-  state: EditorV3State;
+  content: IEditorV3;
   lineIndex: number;
   blockIndex: number;
   setTextBlock: (textBlock: EditorV3BlockClass) => void;
 }
 
 export const WindowViewBlock = ({
-  state,
+  content,
   lineIndex,
   blockIndex,
   setTextBlock,
 }: WindowViewBlockProps) => {
   const textBlock =
-    lineIndex < state.content.lines.length &&
-    blockIndex < state.content.lines[lineIndex].textBlocks.length
-      ? state.content.lines[lineIndex].textBlocks[blockIndex]
+    lineIndex < content.lines.length && blockIndex < content.lines[lineIndex].textBlocks.length
+      ? textBlockFactory(content.lines[lineIndex].textBlocks[blockIndex])
       : undefined;
   const setBlock = useCallback(
     (newValues: IEditorV3AtBlock | IEditorV3TextBlock) => {
@@ -37,18 +35,21 @@ export const WindowViewBlock = ({
     <></>
   ) : (
     <div className={styles.windowViewBlock}>
-      <WindowViewBlockType
-        state={state}
-        type={textBlock.type}
-        setType={(type) => setBlock({ ...textBlock.data, type })}
-      />
-      <WindowViewBlockStyle
-        state={state}
-        styleName={textBlock.style}
-        setStyleName={(style) =>
-          setBlock({ ...textBlock.data, style: style === "" ? undefined : style })
-        }
-      />
+      {content.contentProps?.atListFunction && (
+        <WindowViewBlockType
+          type={textBlock.type}
+          setType={(type) => setBlock({ ...textBlock.data, type })}
+        />
+      )}
+      {content.contentProps?.styles && Object.keys(content.contentProps.styles).length > 0 && (
+        <WindowViewBlockStyle
+          styles={content.contentProps.styles}
+          styleName={textBlock.style}
+          setStyleName={(style) =>
+            setBlock({ ...textBlock.data, style: style === "" ? undefined : style })
+          }
+        />
+      )}{" "}
       <WindowViewBlockText
         label="Label"
         disabled={false}

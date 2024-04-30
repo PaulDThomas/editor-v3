@@ -1,18 +1,17 @@
 import { useCallback } from "react";
 import { EditorV3Line } from "../classes/EditorV3Line";
-import { EditorV3BlockClass } from "../classes/interface";
-import { EditorV3State } from "./EditorV3";
-import { WindowViewBlock } from "./WindowViewBlock";
+import { EditorV3BlockClass, IEditorV3 } from "../classes/interface";
 import styles from "./WindowView.module.css";
+import { WindowViewBlock } from "./WindowViewBlock";
 
 interface WindowViewLineProps {
-  state: EditorV3State;
+  content: IEditorV3;
   lineIndex: number;
   setLine: (line: EditorV3Line) => void;
 }
 
-export const WindowViewLine = ({ state, lineIndex, setLine }: WindowViewLineProps) => {
-  const line = lineIndex < state.content.lines.length ? state.content.lines[lineIndex] : undefined;
+export const WindowViewLine = ({ content, lineIndex, setLine }: WindowViewLineProps) => {
+  const line = lineIndex < content.lines.length ? content.lines[lineIndex] : undefined;
   const setTextBlock = useCallback(
     (textBlock: EditorV3BlockClass, ix: number) => {
       const newLine = new EditorV3Line(line);
@@ -26,13 +25,13 @@ export const WindowViewLine = ({ state, lineIndex, setLine }: WindowViewLineProp
     <></>
   ) : (
     <div className={styles.windowViewLine}>
-      {state.content.allowNewLine && (
+      {content.contentProps?.allowNewLine && (
         <div className={styles.windowViewLineTitle}>Line {lineIndex + 1}</div>
       )}
       {line.textBlocks.map((_, ix) => (
         <WindowViewBlock
           key={ix}
-          state={state}
+          content={content}
           lineIndex={lineIndex}
           blockIndex={ix}
           setTextBlock={(textBlock) => setTextBlock(textBlock, ix)}

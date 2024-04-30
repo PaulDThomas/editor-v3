@@ -85,7 +85,7 @@ export class EditorV3Line implements IEditorV3Line {
   /**
    * Get the line as a JSON object
    */
-  get data() {
+  get data(): IEditorV3Line {
     const contentProps = cloneDeep(this.contentProps);
     Object.keys(defaultContentProps).forEach((k) => {
       const key = k as keyof typeof defaultContentProps;

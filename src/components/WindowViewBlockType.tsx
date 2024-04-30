@@ -1,25 +1,16 @@
 import { useId } from "react";
 import { EditorV3TextBlockType } from "../classes/EditorV3TextBlock";
-import { EditorV3State } from "./EditorV3";
 import selectStyles from "./Select.module.css";
 
 interface WindowViewBlockTypeProps extends React.ComponentProps<"select"> {
-  state: EditorV3State;
   type: EditorV3TextBlockType;
   setType: (type: EditorV3TextBlockType) => void;
 }
 
-export const WindowViewBlockType = ({
-  state,
-  type,
-  setType,
-  ...rest
-}: WindowViewBlockTypeProps) => {
+export const WindowViewBlockType = ({ type, setType, ...rest }: WindowViewBlockTypeProps) => {
   const selectTypeId = useId();
 
-  return !state.content.contentProps.atListFunction ? (
-    <></>
-  ) : (
+  return (
     <div className={selectStyles.holder}>
       <label
         id={`label-${selectTypeId}`}
