@@ -57,7 +57,7 @@ export const WindowViewBlock = ({
       />
       <WindowViewBlockText
         label="Text"
-        disabled={textBlock.type === "at"}
+        disabled={textBlock.type === "at" || (textBlock.isLocked ?? false)}
         text={textBlock.text}
         setText={(text) => {
           setBlock({ ...textBlock.data, text });
