@@ -7,6 +7,11 @@ import { useDebounceStack } from "../hooks";
 import { EditorV3State } from "./EditorV3";
 import styles from "./WindowView.module.css";
 import { WindowViewLine } from "./WindowViewLine";
+import { AddLine } from "./icons/AddLine";
+import { RemoveLine } from "./icons/RemoveLine";
+import { SaveBtn } from "./icons/SaveBtn";
+import { RedoBtn } from "./icons/RedoBtn";
+import { UndoBtn } from "./icons/UndoBtn";
 
 interface WindowViewProps {
   id: string;
@@ -33,7 +38,10 @@ export const WindowView = ({
     index: stackIndex,
   } = useDebounceStack<IEditorV3>(
     state.content,
-    (value: IEditorV3) => setState({ content: new EditorV3Content(value), focus: false }),
+    (value: IEditorV3) => {
+      const ret = new EditorV3Content(value);
+      setState({ content: ret, focus: false });
+    },
     null,
   );
 
@@ -47,6 +55,28 @@ export const WindowView = ({
       if (content) {
         const newLines = cloneDeep(content.lines);
         newLines[ix] = line;
+        setContent({ contentProps, lines: newLines });
+      }
+    },
+    [content, setContent, contentProps],
+  );
+
+  const addLine = useCallback(
+    (ix: number) => {
+      if (content) {
+        const newLines = cloneDeep(content.lines);
+        newLines.splice(ix, 0, { textBlocks: [{ type: "text", text: "" }] });
+        setContent({ contentProps, lines: newLines });
+      }
+    },
+    [content, setContent, contentProps],
+  );
+
+  const removeLine = useCallback(
+    (ix: number) => {
+      if (content) {
+        const newLines = cloneDeep(content.lines);
+        newLines.splice(ix, 1);
         setContent({ contentProps, lines: newLines });
       }
     },
@@ -72,46 +102,37 @@ export const WindowView = ({
       }}
     >
       <div className={styles.windowViewBody}>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="16"
-          viewBox="0 0 24 24"
-          width="16"
-          className={styles.undoBtn}
+        <SaveBtn
+          onClick={() => {
+            forceUpdate();
+            setShowWindowView(false);
+          }}
+        />
+        <UndoBtn
           fill={stackIndex > 0 ? "black" : "gray"}
           onClick={() => undo()}
-          aria-label="Undo"
-        >
-          <path
-            d="M0 0h24v24H0z"
-            fill="none"
-          />
-          <path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z" />
-        </svg>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="16"
-          viewBox="0 0 24 24"
-          width="16"
-          className={styles.redoBtn}
+        />
+        <RedoBtn
           fill={stackIndex < (stack?.length ?? 0) - 1 ? "black" : "gray"}
           onClick={() => redo()}
-          aria-label="Redo"
-        >
-          <path
-            d="M0 0h24v24H0z"
-            fill="none"
-          />
-          <path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z" />
-        </svg>
+        />
+
+        {contentProps.allowNewLine && <AddLine onClick={() => addLine(0)} />}
         {content.lines.map((line, ix) => (
-          <WindowViewLine
+          <div
             key={ix}
-            contentProps={contentProps}
-            lineIndex={ix}
-            line={line}
-            setLine={(line) => setLine(line, ix)}
-          />
+            className={styles.relativeDiv}
+          >
+            <RemoveLine onClick={() => removeLine(ix)} />
+            <WindowViewLine
+              key={ix}
+              contentProps={contentProps}
+              lineIndex={ix}
+              line={line}
+              setLine={(line) => setLine(line, ix)}
+            />
+            {contentProps.allowNewLine && <AddLine onClick={() => addLine(ix + 1)} />}
+          </div>
         ))}
       </div>
     </ContextWindow>
