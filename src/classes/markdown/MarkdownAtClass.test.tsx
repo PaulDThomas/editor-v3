@@ -82,7 +82,9 @@ describe("Test MarkdownAtClass", () => {
     });
     expect(testMAC.toMarkdown()).toBe("@[@moreContent@]");
   });
+});
 
+describe("Test MarkdownAtClass errors", () => {
   test("Bad markdown in function", async () => {
     const testMAC = new MarkdownAtClass();
     expect(() => testMAC.fromMarkdown("@[@moreContent")).toThrow();

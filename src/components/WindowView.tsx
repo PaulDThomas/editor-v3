@@ -1,17 +1,13 @@
 import { ContextWindow } from "@asup/context-menu";
 import { cloneDeep } from "lodash";
 import { useCallback, useMemo } from "react";
-import { EditorV3Content, IEditorV3 } from "../classes";
+import { EditorV3Content, EditorV3Line } from "../classes";
 import { IEditorV3Line } from "../classes/interface";
 import { useDebounceStack } from "../hooks";
 import { EditorV3State } from "./EditorV3";
 import styles from "./WindowView.module.css";
 import { WindowViewLine } from "./WindowViewLine";
-import { AddLine } from "./icons/AddLine";
-import { RemoveLine } from "./icons/RemoveLine";
-import { SaveBtn } from "./icons/SaveBtn";
-import { RedoBtn } from "./icons/RedoBtn";
-import { UndoBtn } from "./icons/UndoBtn";
+import { AddLine, RedoBtn, RemoveLine, SaveBtn, UndoBtn } from "./icons";
 
 interface WindowViewProps {
   id: string;
@@ -29,17 +25,17 @@ export const WindowView = ({
   setState,
 }: WindowViewProps) => {
   const {
-    currentValue: content,
-    setCurrentValue: setContent,
+    currentValue: lines,
+    setCurrentValue: setLines,
     forceUpdate,
     undo,
     redo,
     stack,
     index: stackIndex,
-  } = useDebounceStack<IEditorV3>(
-    state.content,
-    (value: IEditorV3) => {
-      const ret = new EditorV3Content(value);
+  } = useDebounceStack<IEditorV3Line[]>(
+    state.content.lines.map((line) => (line instanceof EditorV3Line ? line.data : line)),
+    (value: IEditorV3Line[]) => {
+      const ret = new EditorV3Content({ lines: value }, state.content.contentProps);
       setState({ content: ret, focus: false });
     },
     null,
@@ -52,38 +48,38 @@ export const WindowView = ({
 
   const setLine = useCallback(
     (line: IEditorV3Line, ix: number) => {
-      if (content) {
-        const newLines = cloneDeep(content.lines);
+      if (lines) {
+        const newLines = cloneDeep(lines);
         newLines[ix] = line;
-        setContent({ contentProps, lines: newLines });
+        setLines(newLines);
       }
     },
-    [content, setContent, contentProps],
+    [lines, setLines],
   );
 
   const addLine = useCallback(
     (ix: number) => {
-      if (content) {
-        const newLines = cloneDeep(content.lines);
+      if (lines) {
+        const newLines = cloneDeep(lines);
         newLines.splice(ix, 0, { textBlocks: [{ type: "text", text: "" }] });
-        setContent({ contentProps, lines: newLines });
+        setLines(newLines);
       }
     },
-    [content, setContent, contentProps],
+    [lines, setLines],
   );
 
   const removeLine = useCallback(
     (ix: number) => {
-      if (content) {
-        const newLines = cloneDeep(content.lines);
+      if (lines) {
+        const newLines = cloneDeep(lines);
         newLines.splice(ix, 1);
-        setContent({ contentProps, lines: newLines });
+        setLines(newLines);
       }
     },
-    [content, setContent, contentProps],
+    [lines, setLines],
   );
 
-  return !content ? (
+  return !lines ? (
     <></>
   ) : (
     <ContextWindow
@@ -118,7 +114,7 @@ export const WindowView = ({
         />
 
         {contentProps.allowNewLine && <AddLine onClick={() => addLine(0)} />}
-        {content.lines.map((line, ix) => (
+        {lines.map((line, ix) => (
           <div
             key={ix}
             className={styles.relativeDiv}

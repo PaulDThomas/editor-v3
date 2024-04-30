@@ -177,6 +177,7 @@ export const App = (): JSX.Element => {
             <span className="label">Allow new line</span>
             <span className="content">
               <select
+                id="allowNewLine"
                 value={allowNewLine ? "true" : "false"}
                 onChange={(e) => {
                   setAllowNewLine(e.currentTarget.value === "true");
@@ -192,6 +193,7 @@ export const App = (): JSX.Element => {
             <span className="label">Editable</span>
             <span className="content">
               <select
+                id="editable"
                 value={editable ? "true" : "false"}
                 onChange={(e) => {
                   setEditable(e.currentTarget.value === "true");
@@ -207,6 +209,7 @@ export const App = (): JSX.Element => {
             <span className="label">Alignment</span>
             <span className="content">
               <select
+                id="align"
                 value={align}
                 onChange={(e) => {
                   const v: EditorV3Align = e.currentTarget.value as EditorV3Align;
@@ -229,6 +232,7 @@ export const App = (): JSX.Element => {
             <span className="label">Decimal percent</span>
             <span className="content">
               <input
+                id="decPct"
                 type={"number"}
                 value={decPct}
                 onChange={(e) => {
@@ -242,6 +246,7 @@ export const App = (): JSX.Element => {
             <span className="label">Max at list length</span>
             <span className="content">
               <input
+                id="maxAtListLength"
                 type={"number"}
                 value={maxAtListLength}
                 onChange={(e) => {

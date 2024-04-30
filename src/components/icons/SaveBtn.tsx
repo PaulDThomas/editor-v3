@@ -10,6 +10,7 @@ export const SaveBtn = ({ onClick }: { onClick: () => void }) => (
     width="1.5em"
     height="1.5em"
     viewBox="0 0 2048 2048"
+    aria-label="Save and close window"
   >
     <path
       fill="currentColor"

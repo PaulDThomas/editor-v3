@@ -11,6 +11,7 @@ export const AddLine = ({ onClick }: { onClick: () => void }) => (
       width="1em"
       height="1em"
       viewBox="0 0 32 32"
+      aria-label="Add line"
     >
       <path
         fill="currentColor"

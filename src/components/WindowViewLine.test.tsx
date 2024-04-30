@@ -51,3 +51,70 @@ describe("WindowViewLine", () => {
     });
   });
 });
+
+describe("Add and remove text blocks", () => {
+  test("Add first block", async () => {
+    const mockSet = jest.fn();
+    render(
+      <WindowViewLine
+        contentProps={{
+          ...defaultContentProps,
+          allowNewLine: true,
+          styles: { green: { color: "green" }, blue: { color: "blue" } },
+        }}
+        lineIndex={0}
+        line={{ textBlocks: [] }}
+        setLine={mockSet}
+      />,
+    );
+    const addBlock = screen.queryByLabelText("Add text block") as Element;
+    expect(addBlock).toBeInTheDocument();
+    await userEvent.click(addBlock);
+    expect(mockSet).toHaveBeenLastCalledWith({ textBlocks: [{ text: "", type: "text" }] });
+  });
+
+  test("Add block at the end", async () => {
+    const mockSet = jest.fn();
+    render(
+      <WindowViewLine
+        contentProps={{
+          ...defaultContentProps,
+          allowNewLine: true,
+          styles: { green: { color: "green" }, blue: { color: "blue" } },
+        }}
+        lineIndex={0}
+        line={{ textBlocks: [{ text: "@test1", type: "at" }] }}
+        setLine={mockSet}
+      />,
+    );
+    const addBlock = screen.queryAllByLabelText("Add text block")[1] as Element;
+    expect(addBlock).toBeInTheDocument();
+    await userEvent.click(addBlock);
+    expect(mockSet).toHaveBeenLastCalledWith({
+      textBlocks: [
+        { text: "@test1", type: "at" },
+        { text: "", type: "text" },
+      ],
+    });
+  });
+
+  test("Remove text block", async () => {
+    const mockSet = jest.fn();
+    render(
+      <WindowViewLine
+        contentProps={{
+          ...defaultContentProps,
+          allowNewLine: true,
+          styles: { green: { color: "green" }, blue: { color: "blue" } },
+        }}
+        lineIndex={0}
+        line={{ textBlocks: [{ text: "@test1", type: "at" }] }}
+        setLine={mockSet}
+      />,
+    );
+    const removeBlock = screen.queryByLabelText("Remove text block") as Element;
+    expect(removeBlock).toBeInTheDocument();
+    await userEvent.click(removeBlock);
+    expect(mockSet).toHaveBeenLastCalledWith({ textBlocks: [] });
+  });
+});
