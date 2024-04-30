@@ -29,8 +29,7 @@
   flex-direction: row;
   gap: 10px;
   align-items: left;
-  padding: 4px;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 4px 4px 4px 20px;
 }
 
 .undoBtn {
@@ -43,4 +42,59 @@
   position: absolute;
   top: 0;
   right: 12px;
+}
+
+.addDiv {
+  width: 100%;
+  height: 8px;
+  transition: height 1s ease-in-out;
+  cursor: pointer;
+  position: relative;
+  background-color: #9cf0a318;
+}
+
+.addIcon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  transform: translate(-4px, -8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out;
+  background-color: #9cf0a34b;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.addDiv:hover > .addIcon {
+  opacity: 1;
+  visibility: visible;
+}
+
+.addIcon:hover {
+  color: #07440c;
+}
+
+.removeIcon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  transform: translate(-4px, 14px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease-in-out;
+  background-color: #ee19194b;
+  padding: 2px;
+  border-radius: 4px;
+}
+
+div:hover > span > .removeIcon {
+  opacity: 1;
+  visibility: visible;
+}
+
+.removeIcon:hover {
+  color: #ee1919;
 }

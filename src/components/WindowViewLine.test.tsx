@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { EditorV3Content, EditorV3Line } from "../classes";
+import { defaultContentProps } from "../classes/defaultContentProps";
 import { WindowViewLine } from "./WindowViewLine";
 
 describe("WindowViewLine", () => {
@@ -8,11 +8,11 @@ describe("WindowViewLine", () => {
 
   test("No render without textBlock", async () => {
     const mockSet = jest.fn();
-    const content = new EditorV3Content("test");
     render(
       <WindowViewLine
-        content={content}
+        contentProps={defaultContentProps}
         lineIndex={2}
+        line={{ textBlocks: [] }}
         setLine={mockSet}
       />,
     );
@@ -21,23 +21,20 @@ describe("WindowViewLine", () => {
 
   test("Basic render & update", async () => {
     const mockSet = jest.fn();
-    const content = new EditorV3Content(
-      {
-        lines: [
-          {
-            textBlocks: [
-              { text: "test1 ", style: "green" },
-              { text: "test2", style: "blue" },
-            ],
-          },
-        ],
-      },
-      { allowNewLine: true, styles: { green: { color: "green" }, blue: { color: "blue" } } },
-    );
     render(
       <WindowViewLine
-        content={content}
+        contentProps={{
+          ...defaultContentProps,
+          allowNewLine: true,
+          styles: { green: { color: "green" }, blue: { color: "blue" } },
+        }}
         lineIndex={0}
+        line={{
+          textBlocks: [
+            { text: "test1 ", style: "green" },
+            { text: "test2", style: "blue" },
+          ],
+        }}
         setLine={mockSet}
       />,
     );
@@ -46,8 +43,11 @@ describe("WindowViewLine", () => {
     const textInput0 = screen.queryAllByLabelText("Text")[0] as HTMLInputElement;
     await user.type(textInput0, " - Bamford's header scores!!! ⚽ ");
     fireEvent.blur(textInput0);
-    const call0 = mockSet.mock.calls[0][0];
-    expect(call0).toBeInstanceOf(EditorV3Line);
-    expect(call0.lineText).toEqual("test1  - Bamford's header scores!!! ⚽ test2");
+    expect(mockSet).toHaveBeenLastCalledWith({
+      textBlocks: [
+        { text: "test1  - Bamford's header scores!!! ⚽ ", style: "green" },
+        { text: "test2", style: "blue" },
+      ],
+    });
   });
 });

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { EditorV3AtBlock, EditorV3Content, EditorV3TextBlock } from "../classes";
+import { defaultContentProps } from "../classes/defaultContentProps";
 import { WindowViewBlock } from "./WindowViewBlock";
 
 describe("WindowViewBlock", () => {
@@ -8,12 +8,11 @@ describe("WindowViewBlock", () => {
 
   test("No render without textBlock", async () => {
     const mockSet = jest.fn();
-    const content = new EditorV3Content("test");
+
     render(
       <WindowViewBlock
-        content={content}
-        lineIndex={0}
-        blockIndex={12}
+        contentProps={defaultContentProps}
+        textBlock={{ text: "test" }}
         setTextBlock={mockSet}
       />,
     );
@@ -22,12 +21,10 @@ describe("WindowViewBlock", () => {
 
   test("Basic render & update", async () => {
     const mockSet = jest.fn();
-    const content = new EditorV3Content("test");
     render(
       <WindowViewBlock
-        content={content}
-        lineIndex={0}
-        blockIndex={0}
+        contentProps={defaultContentProps}
+        textBlock={{ text: "test", type: "text", label: undefined, style: undefined }}
         setTextBlock={mockSet}
       />,
     );
@@ -42,46 +39,37 @@ describe("WindowViewBlock", () => {
 
     await user.type(labelInput, "new label");
     fireEvent.blur(labelInput);
-    const call0 = mockSet.mock.calls[0][0];
-    expect(call0).toBeInstanceOf(EditorV3TextBlock);
-    expect(call0.type).toEqual("text");
-    expect(call0.text).toEqual("test");
-    expect(call0.label).toEqual("new label");
-    expect(call0.style).toEqual(undefined);
+    expect(mockSet).toHaveBeenLastCalledWith({
+      type: "text",
+      text: "test",
+      label: "new label",
+      style: undefined,
+    });
 
     await user.type(textInput, " - stunning volley Yeboah!!! ⚽");
     fireEvent.blur(textInput);
-    const call1 = mockSet.mock.calls[mockSet.mock.calls.length - 1][0];
-    expect(call1).toBeInstanceOf(EditorV3TextBlock);
-    expect(call1.type).toEqual("text");
-    expect(call1.text).toEqual("test - stunning volley Yeboah!!! ⚽");
-    expect(call1.label).toEqual(undefined);
-    expect(call1.style).toEqual(undefined);
+    expect(mockSet).toHaveBeenLastCalledWith({
+      type: "text",
+      text: "test - stunning volley Yeboah!!! ⚽",
+      label: undefined,
+      style: undefined,
+    });
   });
 
   test("At render and update", async () => {
     const mockSet = jest.fn();
-    const content = new EditorV3Content(
-      {
-        lines: [
-          {
-            textBlocks: [
-              {
-                text: "@test",
-                style: "blue",
-                type: "at",
-              },
-            ],
-          },
-        ],
-      },
-      { atListFunction: jest.fn(), styles: { blue: { color: "blue" } } },
-    );
     render(
       <WindowViewBlock
-        content={content}
-        lineIndex={0}
-        blockIndex={0}
+        contentProps={{
+          ...defaultContentProps,
+          atListFunction: jest.fn(),
+          styles: { blue: { color: "blue" } },
+        }}
+        textBlock={{
+          text: "@test",
+          style: "blue",
+          type: "at",
+        }}
         setTextBlock={mockSet}
       />,
     );
@@ -99,19 +87,19 @@ describe("WindowViewBlock", () => {
     expect(screen.queryByLabelText("Text")).toBeDisabled();
 
     await user.selectOptions(styleSelect, "None");
-    const call0 = mockSet.mock.calls[0][0];
-    expect(call0).toBeInstanceOf(EditorV3AtBlock);
-    expect(call0.type).toEqual("at");
-    expect(call0.text).toEqual("@test");
-    expect(call0.label).toEqual(undefined);
-    expect(call0.style).toEqual(undefined);
+    expect(mockSet).toHaveBeenLastCalledWith({
+      type: "at",
+      text: "@test",
+      style: undefined,
+      label: undefined,
+    });
 
     await user.selectOptions(typeSelect, "Text");
-    const call1 = mockSet.mock.calls[1][0];
-    expect(call1).toBeInstanceOf(EditorV3TextBlock);
-    expect(call1.type).toEqual("text");
-    expect(call1.text).toEqual("@test");
-    expect(call1.label).toEqual(undefined);
-    expect(call1.style).toEqual("blue");
+    expect(mockSet).toHaveBeenLastCalledWith({
+      type: "text",
+      text: "@test",
+      style: "blue",
+      label: undefined,
+    });
   });
 });

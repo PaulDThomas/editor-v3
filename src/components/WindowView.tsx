@@ -1,10 +1,12 @@
 import { ContextWindow } from "@asup/context-menu";
-import { useCallback } from "react";
-import { EditorV3Content, EditorV3Line, IEditorV3 } from "../classes";
+import { cloneDeep } from "lodash";
+import { useCallback, useMemo } from "react";
+import { EditorV3Content, IEditorV3 } from "../classes";
+import { IEditorV3Line } from "../classes/interface";
+import { useDebounceStack } from "../hooks";
 import { EditorV3State } from "./EditorV3";
 import styles from "./WindowView.module.css";
 import { WindowViewLine } from "./WindowViewLine";
-import { useDebounceStack } from "../hooks";
 
 interface WindowViewProps {
   id: string;
@@ -35,19 +37,20 @@ export const WindowView = ({
     null,
   );
 
+  const contentProps = useMemo(
+    () => state.content.contentProps ?? {},
+    [state.content.contentProps],
+  );
+
   const setLine = useCallback(
-    (line: EditorV3Line, ix: number) => {
+    (line: IEditorV3Line, ix: number) => {
       if (content) {
-        const newLines = [...content.lines];
+        const newLines = cloneDeep(content.lines);
         newLines[ix] = line;
-        const newContent = new EditorV3Content(
-          { ...content, lines: newLines },
-          content.contentProps,
-        );
-        setContent(newContent);
+        setContent({ contentProps, lines: newLines });
       }
     },
-    [setContent, content],
+    [content, setContent, contentProps],
   );
 
   return !content ? (
@@ -104,8 +107,9 @@ export const WindowView = ({
         {content.lines.map((line, ix) => (
           <WindowViewLine
             key={ix}
-            content={content}
+            contentProps={contentProps}
             lineIndex={ix}
+            line={line}
             setLine={(line) => setLine(line, ix)}
           />
         ))}
