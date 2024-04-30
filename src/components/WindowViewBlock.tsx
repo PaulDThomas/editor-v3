@@ -58,7 +58,10 @@ export const WindowViewBlock = ({
       />
       <WindowViewBlockText
         label="Text"
-        disabled={textBlock.type === "at" || (textBlock.isLocked ?? false)}
+        disabled={
+          textBlock.type === "at" ||
+          (content.contentProps?.styles?.[textBlock.style ?? ""]?.isLocked ?? false)
+        }
         text={textBlock.text}
         setText={(text) => {
           setBlock({ ...textBlock.data, text });

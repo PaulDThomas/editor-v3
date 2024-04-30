@@ -179,7 +179,7 @@ describe("Locked text block", () => {
     });
     expect(testBlock.isLocked).toEqual(true);
     const tempDiv = document.createElement("div");
-    testBlock.toHtml({ currentEl: tempDiv });
+    testBlock.toHtml({ currentEl: tempDiv }, { isLocked: true });
     expect(tempDiv.innerHTML).toMatchSnapshot();
     expect(testBlock.toMarkdown()).toEqual("<<red::Locked block>>");
     expect(testBlock.wordPositions).toEqual([

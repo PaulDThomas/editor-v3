@@ -161,7 +161,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
       span.classList.add(`editorv3style-${this.style}`);
       span.dataset.styleName = this.style;
       Object.entries(style ?? {}).forEach(([k, v]) => {
-        if (k === "isLocked") span.dataset.isLocked = v ? "true" : undefined;
+        if (k === "isLocked" && style?.isLocked) span.dataset.isLocked = v ? "true" : undefined;
         else
           span.style.setProperty(
             k.replace(/[A-Z]/g, (m) => "-" + m.toLowerCase()),
@@ -192,7 +192,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
           // Add label
           if (this.label) span.title = this.label;
           // Apply lock
-          if (this.isLocked) {
+          if (this.isLocked && style?.isLocked) {
             span.classList.add("is-locked");
             span.dataset.isLocked = "true";
             span.contentEditable = "false";
