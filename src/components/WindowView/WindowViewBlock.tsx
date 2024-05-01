@@ -1,6 +1,6 @@
-import { IEditorV3AtBlock } from "../classes/EditorV3AtBlock";
-import { IEditorV3TextBlock } from "../classes/EditorV3TextBlock";
-import { EditorV3ContentPropsInput } from "../classes/interface";
+import { IEditorV3AtBlock } from "../../classes/EditorV3AtBlock";
+import { IEditorV3TextBlock } from "../../classes/EditorV3TextBlock";
+import { EditorV3ContentPropsInput } from "../../classes/interface";
 import styles from "./WindowView.module.css";
 import { WindowViewBlockStyle } from "./WindowViewBlockStyle";
 import { WindowViewBlockText } from "./WindowViewBlockText";

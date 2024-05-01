@@ -1,4 +1,4 @@
-import styles from "../WindowView.module.css";
+import styles from "./IconStyles.module.css";
 
 export const RedoBtn = ({ onClick, fill }: { onClick: () => void; fill: "gray" | "black" }) => (
   <svg

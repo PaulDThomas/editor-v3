@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { defaultContentProps } from "../classes/defaultContentProps";
+import { defaultContentProps } from "../../classes/defaultContentProps";
 import { WindowViewBlock } from "./WindowViewBlock";
 
 describe("WindowViewBlock", () => {

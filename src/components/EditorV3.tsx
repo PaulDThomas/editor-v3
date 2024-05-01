@@ -15,7 +15,7 @@ import {
 import { IMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 import { useDebounceStack } from "../hooks/useDebounceStack";
 import "./EditorV3.css";
-import { WindowView } from "./WindowView";
+import { WindowView } from "./WindowView/WindowView";
 
 interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   id: string;

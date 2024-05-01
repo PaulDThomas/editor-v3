@@ -1,13 +1,13 @@
 import { ContextWindow } from "@asup/context-menu";
 import { cloneDeep } from "lodash";
 import { useCallback, useMemo } from "react";
-import { EditorV3Content, EditorV3Line } from "../classes";
-import { IEditorV3Line } from "../classes/interface";
-import { useDebounceStack } from "../hooks";
-import { EditorV3State } from "./EditorV3";
+import { EditorV3Content, EditorV3Line } from "../../classes";
+import { IEditorV3Line } from "../../classes/interface";
+import { useDebounceStack } from "../../hooks";
+import { EditorV3State } from "../EditorV3";
 import styles from "./WindowView.module.css";
 import { WindowViewLine } from "./WindowViewLine";
-import { AddLine, RedoBtn, RemoveLine, SaveBtn, UndoBtn } from "./icons";
+import { AddLine, RedoBtn, RemoveLine, SaveBtn, UndoBtn } from "../icons";
 
 interface WindowViewProps {
   id: string;

@@ -1,11 +1,11 @@
 import { cloneDeep } from "lodash";
 import { useCallback } from "react";
-import { IEditorV3AtBlock } from "../classes/EditorV3AtBlock";
-import { IEditorV3TextBlock } from "../classes/EditorV3TextBlock";
-import { EditorV3ContentPropsInput, IEditorV3Line } from "../classes/interface";
+import { IEditorV3AtBlock } from "../../classes/EditorV3AtBlock";
+import { IEditorV3TextBlock } from "../../classes/EditorV3TextBlock";
+import { EditorV3ContentPropsInput, IEditorV3Line } from "../../classes/interface";
 import styles from "./WindowView.module.css";
 import { WindowViewBlock } from "./WindowViewBlock";
-import { AddBlock, RemoveBlock } from "./icons";
+import { AddBlock, RemoveBlock } from "../icons";
 
 interface WindowViewLineProps {
   contentProps: EditorV3ContentPropsInput;

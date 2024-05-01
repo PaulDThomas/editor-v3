@@ -1,4 +1,4 @@
-import styles from "../WindowView.module.css";
+import styles from "./IconStyles.module.css";
 
 export const AddLine = ({ onClick }: { onClick: () => void }) => (
   <div

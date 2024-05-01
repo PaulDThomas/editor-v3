@@ -1,4 +1,4 @@
-import styles from "../WindowView.module.css";
+import styles from "./IconStyles.module.css";
 
 export const SaveBtn = ({ onClick }: { onClick: () => void }) => (
   <svg

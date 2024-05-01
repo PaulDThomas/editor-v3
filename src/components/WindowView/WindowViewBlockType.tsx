@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { EditorV3TextBlockType } from "../classes/EditorV3TextBlock";
+import { EditorV3TextBlockType } from "../../classes/EditorV3TextBlock";
 import selectStyles from "./Select.module.css";
 
 interface WindowViewBlockTypeProps extends React.ComponentProps<"select"> {

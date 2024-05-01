@@ -1,8 +1,8 @@
 import { ContextWindowStack } from "@asup/context-menu";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { EditorV3Content } from "../classes";
-import { defaultContentProps } from "../classes/defaultContentProps";
+import { EditorV3Content } from "../../classes";
+import { defaultContentProps } from "../../classes/defaultContentProps";
 import { WindowView } from "./WindowView";
 
 describe("WindowView", () => {

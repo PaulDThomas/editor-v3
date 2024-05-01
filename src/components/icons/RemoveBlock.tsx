@@ -1,4 +1,4 @@
-import styles from "../WindowView.module.css";
+import styles from "./IconStyles.module.css";
 
 export const RemoveBlock = ({ onClick }: { onClick: () => void }) => (
   <span onClick={onClick}>
