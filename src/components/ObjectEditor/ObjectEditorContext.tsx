@@ -1,37 +1,43 @@
 import { createContext } from "react";
-import { EditorV3Styles } from "../../classes/interface";
 
 export interface ObjectEditorItemOptions {
   name: string;
-  type: "select" | "string" | "boolean" | "number";
+  type: "select" | "string" | "boolean" | "number" | "array";
   options?: { label: string; value: string | number | boolean | undefined }[];
+  dataPath?: string;
+  customRenderer?: (
+    value: string | string[] | number | number[] | boolean | undefined | null,
+  ) => JSX.Element;
 }
 
-interface ObjectEditorContextProps {
-  editorV3Styles: EditorV3Styles;
-  setEditorV3Styles: (styles: EditorV3Styles) => void;
-  availableStyleItems: ObjectEditorItemOptions[];
+interface ObjectEditorContextProps<T extends Record<string, unknown>> {
+  object: T;
+  setObject: React.Dispatch<React.SetStateAction<T>>;
+  objectTemplate: ObjectEditorItemOptions[];
 }
 
-export const ObjectEditorContext = createContext<ObjectEditorContextProps>({
-  editorV3Styles: {},
-  setEditorV3Styles: () => {},
-  availableStyleItems: [],
-});
+export const ObjectEditorContext = createContext<ObjectEditorContextProps<
+  Record<string, unknown>
+> | null>(null);
 
-interface ObjectEditorContextProviderProps extends ObjectEditorContextProps {
+interface ObjectEditorContextProviderProps<T extends Record<string, unknown>>
+  extends ObjectEditorContextProps<T> {
   children: React.ReactNode;
 }
 
-export const ObjectEditorContextProvider = ({
-  editorV3Styles,
-  setEditorV3Styles,
-  availableStyleItems,
+export const ObjectEditorContextProvider = <T extends Record<string, unknown>>({
+  object,
+  setObject,
+  objectTemplate,
   children,
-}: ObjectEditorContextProviderProps) => {
+}: ObjectEditorContextProviderProps<T>) => {
   return (
     <ObjectEditorContext.Provider
-      value={{ editorV3Styles, setEditorV3Styles, availableStyleItems }}
+      value={{
+        object,
+        setObject: setObject as React.Dispatch<React.SetStateAction<Record<string, unknown>>>,
+        objectTemplate,
+      }}
     >
       {children}
     </ObjectEditorContext.Provider>

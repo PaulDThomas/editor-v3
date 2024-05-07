@@ -1,19 +1,22 @@
-import { EditorV3Styles } from "../../classes";
 import { InternalObjectEditor } from "./InternalObjectEditor";
 import { ObjectEditorContextProvider, ObjectEditorItemOptions } from "./ObjectEditorContext";
 
-interface ObjectEditorProps {
-  object: EditorV3Styles;
-  setObject: (styles: EditorV3Styles) => void;
+interface ObjectEditorProps<T extends Record<string, unknown>> {
+  object: T;
+  setObject: React.Dispatch<React.SetStateAction<T>>;
   objectTemplate: ObjectEditorItemOptions[];
 }
 
-export const ObjectEditor = ({ object, setObject, objectTemplate }: ObjectEditorProps) => {
+export const ObjectEditor = <T extends Record<string, unknown>>({
+  object,
+  setObject,
+  objectTemplate,
+}: ObjectEditorProps<T>) => {
   return (
     <ObjectEditorContextProvider
-      editorV3Styles={object}
-      setEditorV3Styles={setObject}
-      availableStyleItems={objectTemplate}
+      object={object}
+      setObject={setObject}
+      objectTemplate={objectTemplate}
     >
       {Object.keys(object).map((property, ix) => (
         <InternalObjectEditor

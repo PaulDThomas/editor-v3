@@ -82,7 +82,7 @@ export const defaultStyleItems: ObjectEditorItemOptions[] = [
 
 interface StylesEditorProps {
   styles: EditorV3Styles;
-  setStyles: (styles: EditorV3Styles) => void;
+  setStyles: React.Dispatch<React.SetStateAction<EditorV3Styles>>;
   styleItems?: ObjectEditorItemOptions[];
 }
 

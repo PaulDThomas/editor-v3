@@ -1,4 +1,4 @@
-import _, { cloneDeep } from "lodash";
+import { cloneDeep, get, set } from "lodash";
 import { useContext } from "react";
 import baseStyles from "../BaseInputs.module.css";
 import { ObjectEditorContext } from "./ObjectEditorContext";
@@ -8,31 +8,46 @@ interface ItemInputProps {
 }
 
 export const ItemInput = ({ dataPoint }: ItemInputProps) => {
-  const styleContext = useContext(ObjectEditorContext);
+  const objectEditorContext = useContext(ObjectEditorContext);
   const thisOption = dataPoint.split(".").pop();
-  const thisOptionType = styleContext.availableStyleItems.find(
+  const thisOptionType = objectEditorContext?.objectTemplate.find(
     (item) => item.name === thisOption,
   )?.type;
-  const thisOptionValues = styleContext.availableStyleItems.find(
+  const thisOptionValues = objectEditorContext?.objectTemplate.find(
     (item) => item.name === thisOption,
   )?.options;
-  const thisValueRaw = _.get(styleContext.editorV3Styles, dataPoint) as string | boolean;
+  const thisValueRaw = get(objectEditorContext?.object, dataPoint) as string | boolean;
   const thisValueString =
     thisValueRaw === true ? "true" : thisValueRaw === false ? "false" : thisValueRaw;
 
-  const handleOnChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const styles = cloneDeep(styleContext.editorV3Styles);
-    const newValue =
-      typeof _.get(styles, dataPoint) === "boolean"
-        ? e.target.value === JSON.parse(e.target.value)
-        : e.target.value;
-    if (_.get(styles, dataPoint) !== newValue) {
-      _.set(styles, dataPoint, e.target.value);
-      styleContext.setEditorV3Styles(styles);
+  const handleCheckChange = (e: React.MouseEvent<HTMLLabelElement>) => {
+    if (objectEditorContext) {
+      e.preventDefault();
+      e.stopPropagation();
+      const styles = cloneDeep(objectEditorContext.object);
+      const newValue = !thisValueRaw;
+      set(styles, dataPoint, newValue);
+      objectEditorContext.setObject(styles);
     }
   };
 
-  return (
+  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (objectEditorContext) {
+      const styles = cloneDeep(objectEditorContext.object);
+      const newValue =
+        typeof get(styles, dataPoint) === "boolean"
+          ? e.target.value === JSON.parse(e.target.value)
+          : e.target.value;
+      if (get(styles, dataPoint) !== newValue) {
+        set(styles, dataPoint, e.target.value);
+        objectEditorContext.setObject(styles);
+      }
+    }
+  };
+
+  return !objectEditorContext ? (
+    <></>
+  ) : (
     <div className={baseStyles.holder}>
       {thisOptionType === "boolean" ? (
         <>
@@ -47,14 +62,7 @@ export const ItemInput = ({ dataPoint }: ItemInputProps) => {
               id={`label-${dataPoint}`}
               htmlFor={`id-${dataPoint}`}
               className={baseStyles.baseCheckboxLabel}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const styles = cloneDeep(styleContext.editorV3Styles);
-                const newValue = !thisValueRaw;
-                _.set(styles, dataPoint, newValue);
-                styleContext.setEditorV3Styles(styles);
-              }}
+              onClick={handleCheckChange}
             >
               {thisOption}
             </label>
@@ -73,7 +81,7 @@ export const ItemInput = ({ dataPoint }: ItemInputProps) => {
             id={`id-${dataPoint}`}
             className={baseStyles.baseSelect}
             value={thisValueString}
-            onChange={handleOnChange}
+            onChange={handleSelectChange}
           >
             {thisOptionValues.map((item, ix) => (
               <option
