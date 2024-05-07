@@ -86,31 +86,35 @@ export const defaultStyleItems: StyleOptions[] = [
   },
 ];
 
-interface StylesContextProps {
+interface ObjectEditorContextProps {
   editorV3Styles: EditorV3Styles;
   setEditorV3Styles: (styles: EditorV3Styles) => void;
   availableStyleItems: StyleOptions[];
 }
 
-export const StylesContext = createContext<StylesContextProps>({
+export const ObjectEditorContext = createContext<ObjectEditorContextProps>({
   editorV3Styles: {},
   setEditorV3Styles: () => {},
   availableStyleItems: defaultStyleItems,
 });
 
-interface StylesContextProviderProps extends StylesContextProps {
+interface ObjectEditorContextProviderProps extends ObjectEditorContextProps {
   children: React.ReactNode;
 }
 
-export const StylesContextProvider = ({
+export const ObjectEditorContextProvider = ({
   editorV3Styles,
   setEditorV3Styles,
   availableStyleItems,
   children,
-}: StylesContextProviderProps) => {
+}: ObjectEditorContextProviderProps) => {
   return (
-    <StylesContext.Provider value={{ editorV3Styles, setEditorV3Styles, availableStyleItems }}>
+    <ObjectEditorContext.Provider
+      value={{ editorV3Styles, setEditorV3Styles, availableStyleItems }}
+    >
       {children}
-    </StylesContext.Provider>
+    </ObjectEditorContext.Provider>
   );
 };
+
+ObjectEditorContextProvider.displayName = "ObjectEditorContextProvider";

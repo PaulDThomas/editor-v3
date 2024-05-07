@@ -1,14 +1,14 @@
 import _, { cloneDeep } from "lodash";
 import { useContext } from "react";
 import baseStyles from "../BaseInputs.module.css";
-import { StylesContext } from "./StylesContext";
+import { ObjectEditorContext } from "./ObjectEditorContext";
 
-interface StyleItemInputProps {
+interface ItemInputProps {
   dataPoint: string;
 }
 
-export const StyleItemInput = ({ dataPoint }: StyleItemInputProps) => {
-  const styleContext = useContext(StylesContext);
+export const ItemInput = ({ dataPoint }: ItemInputProps) => {
+  const styleContext = useContext(ObjectEditorContext);
   const thisOption = dataPoint.split(".").pop();
   const thisOptionType = styleContext.availableStyleItems.find(
     (item) => item.name === thisOption,
@@ -106,4 +106,4 @@ export const StyleItemInput = ({ dataPoint }: StyleItemInputProps) => {
   );
 };
 
-StyleItemInput.displayName = "StyleItemInput";
+ItemInput.displayName = "ItemInput";

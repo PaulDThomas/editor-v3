@@ -1,15 +1,15 @@
 import { useCallback, useContext, useState } from "react";
 import baseStyles from "../BaseInputs.module.css";
-import { StyleItemInput } from "./StyleItemInput";
-import { StylesContext } from "./StylesContext";
+import { ItemInput } from "./ItemInput";
+import { ObjectEditorContext } from "./ObjectEditorContext";
 import { EditorV3Styles } from "../../classes/interface";
 
-interface StyleEditorProps {
+interface InternalObjectEditorProps {
   dataPath: string;
 }
 
-export const StyleEditor = ({ dataPath }: StyleEditorProps) => {
-  const styleContext = useContext(StylesContext);
+export const InternalObjectEditor = ({ dataPath }: InternalObjectEditorProps) => {
+  const styleContext = useContext(ObjectEditorContext);
   const styles: EditorV3Styles = styleContext.editorV3Styles;
   const availableStyleItems = styleContext.availableStyleItems;
   const styleName = dataPath.split(".").pop() as keyof typeof styles as string;
@@ -63,7 +63,7 @@ export const StyleEditor = ({ dataPath }: StyleEditorProps) => {
       </div>
       <div className={baseStyles.expanderContent}>
         {availableStyleItems.map((item, ix) => (
-          <StyleItemInput
+          <ItemInput
             dataPoint={`${dataPath}.${item.name}`}
             key={ix}
           />
@@ -73,4 +73,4 @@ export const StyleEditor = ({ dataPath }: StyleEditorProps) => {
   );
 };
 
-StyleEditor.displayName = "StyleEditor";
+InternalObjectEditor.displayName = "StyleEditor";
