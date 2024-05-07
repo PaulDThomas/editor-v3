@@ -1,6 +1,5 @@
 import { useState } from "react";
-import ObjectEditor from "../../src/components/ObjectEditor/ObjectEditor";
-import { EditorV3, EditorV3Align, EditorV3Styles, IEditorV3 } from "../../src/main";
+import { EditorV3, EditorV3Align, EditorV3Styles, IEditorV3, StylesEditor } from "../../src/main";
 import { loadAvailableItems } from "./loadAvailableItems";
 
 export const App = (): JSX.Element => {
@@ -118,7 +117,7 @@ export const App = (): JSX.Element => {
           <div className="row">
             <span className="label">Styles editor</span>
             <span className="content">
-              <ObjectEditor
+              <StylesEditor
                 styles={styleMap}
                 setStyles={setStyleMap}
               />

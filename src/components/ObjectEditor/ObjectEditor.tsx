@@ -1,20 +1,21 @@
 import { EditorV3Styles } from "../../classes";
 import { InternalObjectEditor } from "./InternalObjectEditor";
-import { ObjectEditorContextProvider, defaultStyleItems } from "./ObjectEditorContext";
+import { ObjectEditorContextProvider, ObjectEditorItemOptions } from "./ObjectEditorContext";
 
 interface ObjectEditorProps {
-  styles: EditorV3Styles;
-  setStyles: (styles: EditorV3Styles) => void;
+  object: EditorV3Styles;
+  setObject: (styles: EditorV3Styles) => void;
+  objectTemplate: ObjectEditorItemOptions[];
 }
 
-export const ObjectEditor = ({ styles, setStyles }: ObjectEditorProps) => {
+export const ObjectEditor = ({ object, setObject, objectTemplate }: ObjectEditorProps) => {
   return (
     <ObjectEditorContextProvider
-      editorV3Styles={styles}
-      setEditorV3Styles={setStyles}
-      availableStyleItems={defaultStyleItems}
+      editorV3Styles={object}
+      setEditorV3Styles={setObject}
+      availableStyleItems={objectTemplate}
     >
-      {Object.keys(styles).map((property, ix) => (
+      {Object.keys(object).map((property, ix) => (
         <InternalObjectEditor
           dataPath={property}
           key={`${ix}-${property}`}
