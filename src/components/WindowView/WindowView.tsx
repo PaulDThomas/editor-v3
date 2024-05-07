@@ -6,6 +6,7 @@ import { IEditorV3Line } from "../../classes/interface";
 import { useDebounceStack } from "../../hooks";
 import { EditorV3State } from "../EditorV3";
 import styles from "./WindowView.module.css";
+import iconStyles from "../icons/IconStyles.module.css";
 import { WindowViewLine } from "./WindowViewLine";
 import { AddLine, RedoBtn, RemoveLine, SaveBtn, UndoBtn } from "../icons";
 
@@ -117,7 +118,7 @@ export const WindowView = ({
         {lines.map((line, ix) => (
           <div
             key={ix}
-            className={styles.relativeDiv}
+            className={iconStyles.relativeDiv}
           >
             <RemoveLine onClick={() => removeLine(ix)} />
             <WindowViewLine

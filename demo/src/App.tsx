@@ -1,4 +1,5 @@
 import { useState } from "react";
+import StylesEditor from "../../src/components/StyleEditor/StylesEditor";
 import { EditorV3, EditorV3Align, EditorV3Styles, IEditorV3 } from "../../src/main";
 import { loadAvailableItems } from "./loadAvailableItems";
 
@@ -44,11 +45,6 @@ export const App = (): JSX.Element => {
       },
     ],
   };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const v2Input =
-    // eslint-disable-next-line quotes
-    `<div classname="aie-text" data-key="2v9v5" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":1,"style":"Notes"},{"offset":4,"length":1,"style":"Notes"},{"offset":1,"length":3,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">N</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  w</div><div classname="aie-text" data-key="1u61b" data-type="unstyled" data-inline-style-ranges='[]'></div><div classname="aie-text" data-key="4l4fu" data-type="unstyled" data-inline-style-ranges='[]'>ork</div><div classname="aie-text" data-inline-style-ranges='[{"length":12,"offset":0,"style":"Notes"}]'><spanclassname="Notes" style="color:blue;font-size:16pt">Notes  w.ork</span></div><div classname="aie-text" data-key="b84n6" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":3,"style":"Notes"},{"offset":3,"length":7,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">Not</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">es  wor</span>k</div><div classname="aie-text" data-key="4stit" data-type="unstyled" data-inline-style-ranges='[{"offset":5,"length":2,"style":"Notes"},{"offset":10,"length":1,"style":"Notes"},{"offset":7,"length":3,"style":"Editable"}]'>treez<span classname="Notes" style="color:blue;font-size:16pt"> N</span><span classname="Editable" style="color:red;font-family:courier;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  work</div><div classname="aie-text" data-key="10tu7" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":72,"style":"Notes"}]'><span classname="Notes" style="color:royalblue">The &apos;Total&apos; column is compulsory if more than 1 treatment group is used.</span></div><div classname="aie-text" data-key="frng6" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":92,"style":"Notes"}]'><span classname="Notes" style="color:royalblue">Timepoint could be days, weeks or visits. Permissable to only present selected (key) visits.</span></div>`;
-  const [input2, setInput2] = useState<IEditorV3>(testObject);
 
   // Third input content
   const [input3, setInput3] = useState<IEditorV3>({
@@ -66,18 +62,17 @@ export const App = (): JSX.Element => {
   const [allowNewLine, setAllowNewLine] = useState<boolean>(true);
   const [maxAtListLength, setMaxAtListLength] = useState<number>(10);
   const [decPct, setDecPct] = useState<number>(60);
-  const styleMap: EditorV3Styles = {
+  const [styleMap, setStyleMap] = useState<EditorV3Styles>({
     green: {
       color: "green",
-      backgroundColor: "white",
-      fontFamily: "Courier New",
-      fontSize: "1.3rem",
+      fontFamily: "'Courier New', monospace",
+      fontSize: "18pt",
       fontWeight: 1000,
       isLocked: true,
     },
     blue: { color: "blue", fontWeight: 700 },
     red: { color: "red", isNotAvailabe: true },
-  };
+  });
 
   return (
     <div className="app-holder">
@@ -120,15 +115,24 @@ export const App = (): JSX.Element => {
               </button>
             </span>
           </div>
+          <div className="row">
+            <span className="label">Styles editor</span>
+            <span className="content">
+              <StylesEditor
+                styles={styleMap}
+                setStyles={setStyleMap}
+              />
+            </span>
+          </div>
 
           <div className="row">
             <span className="label">JSON input</span>
             <span className="content">
               <EditorV3
                 id={"e2"}
-                input={input2}
+                input={testObject}
                 setObject={(ret) => {
-                  setInput2(ret);
+                  console.log(ret);
                 }}
                 allowNewLine={allowNewLine}
                 editable={editable}

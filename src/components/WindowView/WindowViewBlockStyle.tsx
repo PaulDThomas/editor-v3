@@ -1,6 +1,6 @@
 import { useId } from "react";
 import { EditorV3Styles } from "../../classes";
-import selectStyles from "./Select.module.css";
+import baseStyles from "../BaseInputs.module.css";
 
 interface WindowViewBlockStyleProps extends React.ComponentProps<"select"> {
   styles: EditorV3Styles;
@@ -16,10 +16,10 @@ export const WindowViewBlockStyle = ({
 }: WindowViewBlockStyleProps) => {
   const selectStyleId = useId();
   return (
-    <div className={selectStyles.holder}>
+    <div className={baseStyles.holder}>
       <label
         id={`label-${selectStyleId}`}
-        className={selectStyles.label}
+        className={baseStyles.label}
         htmlFor={selectStyleId}
       >
         Style
@@ -28,7 +28,7 @@ export const WindowViewBlockStyle = ({
         {...rest}
         aria-labelledby=""
         id={selectStyleId}
-        className={selectStyles.baseSelect}
+        className={baseStyles.baseSelect}
         value={styleName}
         onChange={(e) => setStyleName(e.currentTarget.value)}
       >

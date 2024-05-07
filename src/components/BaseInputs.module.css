@@ -1,0 +1,151 @@
+:root {
+  --down-arrow: url('data:image/svg+xml;utf8,<svg fill="black" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+  --checked: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 32 32"><path fill="currentColor" d="M16 2a14 14 0 1 0 14 14A14 14 0 0 0 16 2m-2 19.59l-5-5L10.59 15L14 18.41L21.41 11l1.596 1.586Z"/><path fill="none" d="m14 21.591l-5-5L10.591 15L14 18.409L21.41 11l1.595 1.585z"/></svg>');
+  --circle: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 32 32"><path fill="currentColor" d="M16 2C8.268 2 2 8.268 2 16s6.268 14 14 14s14-6.268 14-14S23.732 2 16 2m0 26C9.373 28 4 22.627 4 16S9.373 4 16 4s12 5.373 12 12s-5.373 12-12 12"/></svg>');
+}
+
+.holder {
+  position: relative;
+  margin-top: 6px;
+  width: 100%;
+}
+
+.holder:last-child {
+  margin-bottom: 6px;
+}
+
+.label {
+  position: absolute;
+  top: 0;
+  left: 0.25rem;
+  z-index: 2;
+  font-size: 0.75rem;
+  padding: 1px 3px;
+  border-radius: 4px;
+  background-color: white;
+}
+
+.expander {
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: start;
+}
+
+.expander > .holder .label {
+  left: calc(24px + 0.25rem);
+}
+
+.expander > .holder::before {
+  display: inline-block;
+  content: "";
+  background-image: var(--down-arrow);
+  width: 24px;
+  height: 24px;
+  transition: transform 0.3s ease;
+  transform: rotate(-90deg);
+  cursor: pointer;
+}
+
+.expander.expanded > .holder::before {
+  transform: rotate(0deg);
+}
+
+.expanderContent {
+  margin-left: 36px;
+  width: calc(100% - 36px);
+}
+
+.expander > .expanderContent {
+  max-height: 0;
+  min-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    min-height 0.3s ease-in-out,
+    max-height 0.3s ease-in-out,
+    opacity 0.2s ease-in-out;
+}
+
+.expander.expanded > .expanderContent {
+  max-height: 200px;
+  min-height: 200px;
+  overflow: auto;
+  opacity: 1;
+}
+
+.baseButton {
+  all: unset;
+  border: 1px solid black;
+  line-height: 1.4;
+  border-radius: 4px;
+  padding: 2px 6px;
+  min-width: 48px;
+  cursor: pointer;
+}
+
+.baseInput,
+.baseSelect {
+  all: unset;
+  border: 1px solid black;
+  line-height: 1.4;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-top: 16px;
+  height: 24px;
+}
+
+.baseInput {
+  min-width: 48px;
+  max-width: 400px;
+}
+
+.baseSelect {
+  appearance: none;
+  background-image: var(--down-arrow);
+  background-position-x: 100%;
+  background-position-y: 50%;
+  background-repeat: no-repeat;
+  border-radius: 4px;
+  text-overflow: ellipsis;
+  padding-right: 24px;
+  min-width: 48px;
+  max-width: 400px;
+  white-space: nowrap;
+}
+
+.baseSelect option:disabled {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.baseSelect:disabled,
+.baseInput:disabled {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.baseCheckbox {
+  all: unset;
+  display: none;
+}
+
+.baseCheckboxLabel {
+  position: relative;
+  padding-left: 28px;
+  cursor: pointer;
+}
+
+/* Create the box for the checkbox */
+.baseCheckboxLabel:before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 25px;
+  height: 25px;
+  background-image: var(--circle);
+}
+
+/* Change the box for the checkbox when checked */
+.baseCheckbox:checked + .baseCheckboxLabel:before {
+  background-image: var(--checked);
+}

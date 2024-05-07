@@ -1,6 +1,6 @@
 import { useId } from "react";
 import { EditorV3TextBlockType } from "../../classes/EditorV3TextBlock";
-import selectStyles from "./Select.module.css";
+import baseStyles from "../BaseInputs.module.css";
 
 interface WindowViewBlockTypeProps extends React.ComponentProps<"select"> {
   type: EditorV3TextBlockType;
@@ -11,10 +11,10 @@ export const WindowViewBlockType = ({ type, setType, ...rest }: WindowViewBlockT
   const selectTypeId = useId();
 
   return (
-    <div className={selectStyles.holder}>
+    <div className={baseStyles.holder}>
       <label
         id={`label-${selectTypeId}`}
-        className={selectStyles.label}
+        className={baseStyles.label}
         htmlFor={selectTypeId}
       >
         Type
@@ -23,7 +23,7 @@ export const WindowViewBlockType = ({ type, setType, ...rest }: WindowViewBlockT
         {...rest}
         aria-labelledby={`label-${selectTypeId}`}
         id={selectTypeId}
-        className={selectStyles.baseSelect}
+        className={baseStyles.baseSelect}
         value={type}
         onChange={(e) => {
           e.preventDefault();

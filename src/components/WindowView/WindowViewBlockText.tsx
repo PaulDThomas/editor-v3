@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from "react";
-import selectStyles from "./Select.module.css";
+import baseStyles from "../BaseInputs.module.css";
 
 interface WindowViewBlockTextProps extends React.ComponentProps<"input"> {
   label: string;
@@ -23,12 +23,12 @@ export const WindowViewBlockText = ({
 
   return (
     <div
-      className={selectStyles.holder}
+      className={baseStyles.holder}
       style={{ resize: "horizontal" }}
     >
       <label
         id={`label-${thisId}`}
-        className={selectStyles.label}
+        className={baseStyles.label}
         htmlFor={thisId}
       >
         {label}
@@ -38,7 +38,7 @@ export const WindowViewBlockText = ({
         aria-labelledby={`label-${thisId}`}
         id={thisId}
         disabled={disabled}
-        className={selectStyles.baseInput}
+        className={baseStyles.baseInput}
         value={currentText}
         onChange={(e) => setCurrentText(e.currentTarget.value)}
         onBlur={() => setText(currentText)}
