@@ -1,13 +1,13 @@
 import { cloneDeep, get, set } from "lodash";
-import { useContext } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import baseStyles from "../BaseInputs.module.css";
 import { ObjectEditorContext } from "./ObjectEditorContext";
 
-interface ItemInputProps {
+interface ItemInputProps extends React.HTMLAttributes<HTMLInputElement | HTMLSelectElement> {
   dataPoint: string;
 }
 
-export const ItemInput = ({ dataPoint }: ItemInputProps) => {
+export const ItemInput = ({ dataPoint, ...rest }: ItemInputProps) => {
   const objectEditorContext = useContext(ObjectEditorContext);
   const thisOption = dataPoint.split(".").pop();
   const thisOptionType = objectEditorContext?.objectTemplate.find(
@@ -16,34 +16,52 @@ export const ItemInput = ({ dataPoint }: ItemInputProps) => {
   const thisOptionValues = objectEditorContext?.objectTemplate.find(
     (item) => item.name === thisOption,
   )?.options;
-  const thisValueRaw = get(objectEditorContext?.object, dataPoint) as string | boolean;
-  const thisValueString =
-    thisValueRaw === true ? "true" : thisValueRaw === false ? "false" : thisValueRaw;
+  const thisValueRaw = get(objectEditorContext?.object, dataPoint) as
+    | string
+    | number
+    | boolean
+    | undefined;
+  const thisValueString = thisValueRaw?.toString() ?? "None";
 
-  const handleCheckChange = (e: React.MouseEvent<HTMLLabelElement>) => {
+  const handleCheckChange = (e: React.MouseEvent<HTMLElement>) => {
     if (objectEditorContext) {
       e.preventDefault();
       e.stopPropagation();
-      const styles = cloneDeep(objectEditorContext.object);
+      const newObject = cloneDeep(objectEditorContext.object);
       const newValue = !thisValueRaw;
-      set(styles, dataPoint, newValue);
-      objectEditorContext.setObject(styles);
+      set(newObject, dataPoint, newValue);
+      objectEditorContext.setObject(newObject);
     }
   };
 
   const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     if (objectEditorContext) {
-      const styles = cloneDeep(objectEditorContext.object);
-      const newValue =
-        typeof get(styles, dataPoint) === "boolean"
-          ? e.target.value === JSON.parse(e.target.value)
-          : e.target.value;
-      if (get(styles, dataPoint) !== newValue) {
-        set(styles, dataPoint, e.target.value);
-        objectEditorContext.setObject(styles);
+      const newObject = cloneDeep(objectEditorContext.object);
+      const newValue = e.target.value;
+      if (get(newObject, dataPoint) !== newValue) {
+        set(newObject, dataPoint, e.target.value === "UNDEFINED" ? undefined : newValue);
+        objectEditorContext.setObject(newObject);
       }
     }
   };
+
+  const [inputValue, setInputValue] = useState<string>(thisValueString);
+  useEffect(() => {
+    setInputValue(thisValueString);
+  }, [thisValueString]);
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+  const handleInputBlur = useCallback(() => {
+    if (objectEditorContext) {
+      const newObject = cloneDeep(objectEditorContext.object);
+      const newValue = thisOptionType === "number" ? parseFloat(inputValue) : inputValue;
+      if (get(newObject, dataPoint) !== newValue) {
+        set(newObject, dataPoint, newValue);
+        objectEditorContext.setObject(newObject);
+      }
+    }
+  }, [dataPoint, inputValue, objectEditorContext, thisOptionType]);
 
   return !objectEditorContext ? (
     <></>
@@ -56,8 +74,14 @@ export const ItemInput = ({ dataPoint }: ItemInputProps) => {
               type="checkbox"
               id={`id-${dataPoint}`}
               className={baseStyles.baseCheckbox}
-              checked={thisValueRaw as boolean}
-            />{" "}
+              checked={(thisValueRaw ?? false) as boolean}
+              onChange={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onClick={handleCheckChange}
+              {...rest}
+            />
             <label
               id={`label-${dataPoint}`}
               htmlFor={`id-${dataPoint}`}
@@ -78,15 +102,24 @@ export const ItemInput = ({ dataPoint }: ItemInputProps) => {
             {thisOption}
           </label>
           <select
+            {...rest}
             id={`id-${dataPoint}`}
             className={baseStyles.baseSelect}
             value={thisValueString}
             onChange={handleSelectChange}
           >
+            {thisOptionValues.findIndex((option) => option.value === thisValueString) === -1 && (
+              <option
+                value={thisValueString}
+                disabled
+              >
+                {thisValueString}
+              </option>
+            )}
             {thisOptionValues.map((item, ix) => (
               <option
                 key={`${ix}-${item.value}`}
-                value={typeof item.value === "boolean" ? item.value.toString() : item.value}
+                value={item.value?.toString() ?? "UNDEFINED"}
               >
                 {item.label}
               </option>
@@ -103,10 +136,13 @@ export const ItemInput = ({ dataPoint }: ItemInputProps) => {
             {thisOption}
           </label>
           <input
+            {...rest}
+            type={thisOptionType === "number" ? "number" : "text"}
             id={`id-${dataPoint}`}
             className={baseStyles.baseInput}
-            value={thisValueString}
-            disabled
+            value={inputValue}
+            onChange={handleInputChange}
+            onBlur={handleInputBlur}
           />
         </>
       )}

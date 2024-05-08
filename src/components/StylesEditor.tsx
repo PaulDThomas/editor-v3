@@ -52,14 +52,7 @@ export const defaultStyleItems: ObjectEditorItemOptions[] = [
   },
   {
     name: "color",
-    type: "select",
-    options: [
-      { value: undefined, label: "None" },
-      { value: "red", label: "Red" },
-      { value: "green", label: "Green" },
-      { value: "blue", label: "Blue" },
-      { value: "black", label: "Black" },
-    ],
+    type: "string",
   },
   {
     name: "textDecoration",
