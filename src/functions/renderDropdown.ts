@@ -11,6 +11,7 @@ export const renderDropdown = (
   if (!span.classList.contains("is-locked")) {
     // Create download
     const dropdownUl = document.createElement("ul");
+    dropdownUl.style.zIndex = "1000";
     // Append to editor
     span.appendChild(dropdownUl);
     // Set up dropdown internals
