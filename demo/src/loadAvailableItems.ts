@@ -13,7 +13,8 @@ export async function loadAvailableItems(
   try {
     if (typedString.length < 2) return [];
     if (typedString.includes("qq")) throw new Error("No Q");
-    const request = await fetch("http://localhost:3003/public/availableAtItems.json");
+    const url = "http://localhost:3001/public/availableAtItems.json";
+    const request = await fetch(url);
     const response = (await request.json()) as {
       country: string;
       name: string;
