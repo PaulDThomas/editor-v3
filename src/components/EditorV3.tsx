@@ -319,7 +319,7 @@ export const EditorV3 = ({
 
   // Focus and blur events are container not contenteditable level events!
   const handleFocus = useCallback(
-    (e: React.FocusEvent) => {
+    (e: React.FocusEvent | React.MouseEvent) => {
       if (
         state &&
         divRef.current &&
@@ -519,6 +519,11 @@ export const EditorV3 = ({
         onMouseUp={(e) => {
           handleMouseUp(e);
           rest.onMouseUp && rest.onMouseUp(e);
+        }}
+        onClick={(e) => {
+          e.preventDefault();
+          rest.onClick && rest.onClick(e);
+          handleFocus(e);
         }}
       >
         <ContextMenuHandler
