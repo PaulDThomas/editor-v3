@@ -29,6 +29,7 @@ interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   decimalAlignPercent?: number;
   style?: CSSProperties;
   resize?: boolean;
+  noBorder?: boolean;
   spellCheck?: boolean;
   styleOnContextMenu?: boolean;
   allowMarkdown?: boolean;
@@ -59,6 +60,7 @@ export const EditorV3 = ({
   customStyleMap,
   textAlignment = cloneDeep(defaultContentProps.textAlignment),
   resize = false,
+  noBorder = false,
   spellCheck = false,
   styleOnContextMenu = true,
   debounceMilliseconds = null,
@@ -130,7 +132,7 @@ export const EditorV3 = ({
       // Block return when there is an active at-block, or if the editor has never been focused
       if (
         !ret.content.lines.some((l) =>
-          l.textBlocks.some((tb) => tb.type === "at" && tb.isActive),
+          l.textBlocks.some((tb) => tb.type === "at" && !tb.isLocked),
         ) &&
         hasFocused
       ) {
@@ -525,7 +527,7 @@ export const EditorV3 = ({
           showLowMenu={spellCheck || !styleOnContextMenu}
         >
           <div
-            className="aiev3-resize"
+            className={`aiev3-resize${!noBorder ? " aiev3-resize-border" : ""}`}
             style={styleRecalc}
           >
             <div

@@ -162,6 +162,7 @@ export const App = (): JSX.Element => {
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}
                 editable={editable}
+                noBorder
                 customStyleMap={{
                   ...styleMap,
                   red: { color: "red", isLocked: true },
