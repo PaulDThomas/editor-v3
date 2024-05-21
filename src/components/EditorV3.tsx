@@ -482,10 +482,6 @@ export const EditorV3 = ({
 
   const styleRecalc = useMemo(() => {
     const s = { ...style };
-    // Remove padding/border width
-    if (s.width) {
-      s.width = `calc(${s.width} - 10px)`;
-    }
     if (resize) {
       s.resize = "both";
       s.overflow = "auto";
@@ -523,7 +519,7 @@ export const EditorV3 = ({
         onClick={(e) => {
           e.preventDefault();
           rest.onClick && rest.onClick(e);
-          handleFocus(e);
+          if (!state?.focus && editable) handleFocus(e);
         }}
       >
         <ContextMenuHandler
