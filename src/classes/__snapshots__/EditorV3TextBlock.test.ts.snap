@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Locked text block Apply style 1`] = `"<span class="aiev3-tb editorv3style-red" data-style-name="red" style="color: red;">Locked&nbsp;</span><span class="aiev3-tb editorv3style-red" data-style-name="red" style="color: red;">block</span>"`;
+
+exports[`Locked text block Create and render locked text block 1`] = `"<span class="aiev3-tb is-locked editorv3style-red" data-is-locked="true" data-style-name="red">Locked&nbsp;block</span>"`;
+
+exports[`Should render an at block in the HTML Create HTML with an @ in the middle 1`] = `"<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;massive&nbsp;</span><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">and&nbsp;</span><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">impressive&nbsp;</span><span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">@world</span>"`;
+
+exports[`Should render an at block in the HTML Create HTML with an @ in the middle 2`] = `"<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;massive&nbsp;and&nbsp;impressive&nbsp;@world</span>"`;

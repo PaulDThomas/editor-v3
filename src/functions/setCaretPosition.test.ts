@@ -1,5 +1,6 @@
 import { setCaretPosition } from "./setCaretPosition";
 import * as gc from "./getCaretPosition";
+import { EditorV3PositionClass } from "../classes/EditorV3Position";
 
 describe("Test setCaretPosition, null return tests", () => {
   test("Set caret position for non-HTMLDivElement", () => {
@@ -7,7 +8,7 @@ describe("Test setCaretPosition, null return tests", () => {
     const el = document.createElement("span");
 
     // Call the setCaretPosition function
-    const ret = setCaretPosition(el, { startLine: 1, startChar: 1, endLine: 1, endChar: 1 });
+    const ret = setCaretPosition(el, new EditorV3PositionClass(1, 1, 1, 1, [], []));
 
     // Assert the expected output
     expect(ret).toBeNull();
@@ -21,7 +22,7 @@ describe("Test setCaretPosition, null return tests", () => {
     jest.spyOn(gc, "getCaretPosition").mockReturnValue(null);
 
     // Call the setCaretPosition function
-    const ret = setCaretPosition(el, { startLine: 1, startChar: 1, endLine: 1, endChar: 1 });
+    const ret = setCaretPosition(el, new EditorV3PositionClass(1, 1, 1, 1, [], []));
 
     // Assert the expected output
     expect(ret).toBeNull();

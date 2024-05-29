@@ -5,7 +5,6 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 1px;
   overflow: hidden;
 }
 
@@ -14,28 +13,32 @@
   overflow: visible;
 }
 
-.aiev3.editing .aiev3-editing {
-  border: 1px solid black;
-  background-color: white;
+.aiev3-resize-border {
+  border: 1px dashed rgb(190, 190, 189);
+  border-radius: 6px;
 }
 
 .aiev3-editing {
   padding: 2px;
-  border: 1px dashed rgb(190, 190, 189);
-  border-radius: 6px;
-  overflow-wrap: break-word;
   outline: 0;
   align-content: start;
   vertical-align: top;
-  margin: -1px;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
-  min-height: 1.2rem;
+  min-height: calc(100% - 5px);
+  height: fit-content;
+}
+
+.aiev3-resize-border .aiev3-editing {
+  margin: -1px;
+}
+
+.aiev3.editing .aiev3-editing {
+  background-color: white;
 }
 
 .aiev3-line {
-  min-height: 1.2rem;
   width: 100%;
 }
 
@@ -49,14 +52,13 @@
 }
 
 .aiev3-line.decimal {
-  position: relative;
-  overflow: visible;
+  display: grid;
 }
 
 .aiev3-line.left {
   display: flex;
   flex-direction: row;
-  justify-content: start;
+  justify-content: flex-start;
 }
 
 .aiev3-line.center {
@@ -71,7 +73,7 @@
   justify-content: flex-end;
 }
 
-.aiev3-style-info {
+.aiev3-contents-info {
   display: none;
 }
 
@@ -80,25 +82,49 @@
 }
 
 .aiev3-span-point {
-  position: absolute;
-  top: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-height: 100%;
-  height: 100%;
+  display: table-cell;
 }
 
 .aiev3-span-point > span {
-  max-height: 100%;
-  height: 100%;
   display: inline-block;
 }
 
 .aiev3-span-point.lhs {
+  align-content: end;
   text-align: right;
+  grid-column: 1;
 }
 
 .aiev3-span-point.rhs {
   text-align: left;
-  display: flex;
+  grid-column: 2;
 }
+
+/* Potential theme export from https://fluentuipr.z22.web.core.windows.net/heads/master/theming-designer/index.html
+const myTheme = createTheme({
+  palette: {
+    themePrimary: '#bd500d',
+    themeLighterAlt: '#fcf7f3',
+    themeLighter: '#f4ded0',
+    themeLight: '#ebc3aa',
+    themeTertiary: '#d78d5f',
+    themeSecondary: '#c56124',
+    themeDarkAlt: '#aa480c',
+    themeDark: '#8f3d0a',
+    themeDarker: '#6a2d07',
+    neutralLighterAlt: '#ece5de',
+    neutralLighter: '#e8e2da',
+    neutralLight: '#ded8d1',
+    neutralQuaternaryAlt: '#cfcac3',
+    neutralQuaternary: '#c6c0ba',
+    neutralTertiaryAlt: '#beb9b3',
+    neutralTertiary: '#02000b',
+    neutralSecondary: '#02010f',
+    neutralSecondaryAlt: '#02010f',
+    neutralPrimaryAlt: '#030113',
+    neutralPrimary: '#050121',
+    neutralDark: '#04011a',
+    black: '#04011e',
+    white: '#f2ece4',
+  }});
+*/

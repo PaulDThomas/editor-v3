@@ -49,7 +49,7 @@ describe("Test MarkdownStyleClass", () => {
       endTag: ">>",
     });
     expect(testMSC.toMarkdown()).toBe("<<st1::test>>");
-    // Update contest
+    // Update content
     testMSC.text = "moreContent";
     expect(testMSC.style).toBe("st1");
     expect(testMSC.text).toBe("moreContent");
@@ -71,10 +71,37 @@ describe("Test MarkdownStyleClass", () => {
     expect(testMSCBlock.data).toEqual({
       text: "moreContent",
       style: "st1",
+      type: "text",
     });
   });
 
-  test("Bad markdown in constructor", async () => {
+  test("Create from good markdown", async () => {
+    const testMSC = new MarkdownStyleClass();
+    testMSC.fromMarkdown("<<test>>");
+    expect(testMSC.style).toBe("defaultStyle");
+    expect(testMSC.text).toBe("test");
+    expect(testMSC.data).toEqual({
+      text: "test",
+      style: "defaultStyle",
+      isDefault: true,
+      startTag: "<<",
+      nameEndTag: "::",
+      endTag: ">>",
+    });
+    testMSC.fromMarkdown("<<st1::test words>>");
+    expect(testMSC.style).toBe("st1");
+    expect(testMSC.text).toBe("test words");
+    expect(testMSC.data).toEqual({
+      text: "test words",
+      style: "st1",
+      isDefault: false,
+      startTag: "<<",
+      nameEndTag: "::",
+      endTag: ">>",
+    });
+  });
+
+  test("Bad markdown in function", async () => {
     const testMSC = new MarkdownStyleClass();
     expect(() => testMSC.fromMarkdown("<<test")).toThrow();
     expect(() => testMSC.fromMarkdown("test>>")).toThrow();

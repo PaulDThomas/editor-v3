@@ -6,11 +6,11 @@ describe("No selection", () => {
   test("Should return null", async () => {
     await act(async () => {
       render(
-        <div data-testid='container'>
+        <div data-testid="container">
           <EditorV3
-            id='test-editor'
+            id="test-editor"
             input={"Hello children!"}
-            setJson={jest.fn()}
+            setObject={jest.fn()}
             style={{ width: "200px" }}
             allowNewLine
             customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}

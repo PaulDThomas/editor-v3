@@ -1,98 +1,196 @@
-/* eslint-disable quotes */
 import { EditorV3TextBlock } from "./EditorV3TextBlock";
 
 // Load and read tests
 describe("Check basic EditorV3TextBlock", () => {
-  test("Load string", async () => {
-    const testBlock = new EditorV3TextBlock("Helloworld");
-    expect(testBlock.text).toEqual("Helloworld");
-    const tempDiv = document.createElement("div");
-    tempDiv.appendChild(testBlock.toHtml());
-    expect(tempDiv.innerHTML).toEqual('<span class="aiev3-tb">Helloworld</span>');
-    const testBlock2 = new EditorV3TextBlock("0");
-    expect(testBlock2.text).toEqual("0");
-    expect(testBlock2.jsonString).toEqual('{"text":"0"}');
-    const tempDiv2 = document.createElement("div");
-    tempDiv2.appendChild(testBlock2.toHtml());
-    expect(tempDiv2.innerHTML).toEqual('<span class="aiev3-tb">0</span>');
-  });
-
-  test("Load string with style", async () => {
-    const testBlock = new EditorV3TextBlock("Hello world\u00a0", "shiny");
-    expect(testBlock.text).toEqual("Hello world\u00a0");
-    const tempDiv = document.createElement("div");
-    tempDiv.appendChild(testBlock.toHtml());
-    expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">world&nbsp;</span>',
-    );
-  });
-
-  test("Load span with style, check it equals itself", async () => {
-    const testSpan = document.createElement("span");
-    testSpan.className = "editorv3style-shiny";
-    testSpan.dataset.styleName = "shiny";
-    testSpan.innerHTML = "Hello world";
-    const testBlock = new EditorV3TextBlock(testSpan);
-    expect(testBlock.text).toEqual("Hello world");
-    const tempDiv = document.createElement("div");
-    tempDiv.appendChild(testBlock.toHtml());
-    expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">Hello&nbsp;</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">world</span>',
-    );
-    expect(new EditorV3TextBlock(testBlock.toHtml())).toEqual(testBlock);
-    expect(new EditorV3TextBlock(JSON.stringify(testBlock))).toEqual(testBlock);
-    expect(new EditorV3TextBlock(testBlock.jsonString)).toEqual(testBlock);
-  });
-
-  test("Load span with no content", async () => {
-    const testSpan = document.createElement("span");
-    testSpan.textContent = null;
-    const testBlock = new EditorV3TextBlock(testSpan);
-    expect(testBlock.text).toEqual("");
-    const tempDiv = document.createElement("div");
-    tempDiv.appendChild(testBlock.toHtml());
-    expect(tempDiv.innerHTML).toEqual('<span class="aiev3-tb">\u2009</span>');
-  });
-
-  test("Load text node", async () => {
-    const testSpan = document.createTextNode("12.34");
-    const testBlock = new EditorV3TextBlock(testSpan);
-    expect(testBlock.text).toEqual("12.34");
-    const tempDiv = document.createElement("div");
-    tempDiv.appendChild(testBlock.toHtml());
-    expect(tempDiv.innerHTML).toEqual('<span class="aiev3-tb">12.34</span>');
-  });
-
   test("Load EditorV3TextBlock", async () => {
-    const firstBlock = new EditorV3TextBlock("Hello world", "shiny");
-    ``;
-    const testBlock = new EditorV3TextBlock(firstBlock);
-    expect(testBlock).toEqual(firstBlock);
-  });
-
-  test("Load Object", async () => {
-    const obj = { text: "Hello world" };
-    const testBlock = new EditorV3TextBlock(obj);
-    expect(testBlock).toEqual({ text: "Hello world" });
-
-    const obj2 = { text: "Hello world", style: "shiny" };
-    const testBlock2 = new EditorV3TextBlock(obj2);
-    expect(testBlock2).toEqual({
+    const testBlock = new EditorV3TextBlock({
       text: "Hello world",
       style: "shiny",
+      lineStartPosition: 10,
     });
+    expect(testBlock.data).toEqual({ text: "Hello world", style: "shiny", type: "text" });
+    expect(new EditorV3TextBlock(testBlock).data).toEqual(testBlock.data);
+    expect(testBlock.lineStartPosition).toEqual(10);
+    expect(testBlock.lineEndPosition).toEqual(21);
+    expect(testBlock.typeStyle).toEqual("text:shiny");
+    // eslint-disable-next-line quotes
+    expect(testBlock.data).toEqual({ text: "Hello world", style: "shiny", type: "text" });
+    // Eat your own tail
+    expect(new EditorV3TextBlock(testBlock).data).toEqual(testBlock.data);
+    expect(new EditorV3TextBlock(testBlock.data).data).toEqual(testBlock.data);
+    expect(new EditorV3TextBlock(testBlock.toHtml({})).data).toEqual(testBlock.data);
   });
 });
 
-describe("Check markdown output on text block", () => {
-  test("Markdown is correctly shown", async () => {
-    const testBlock = new EditorV3TextBlock({ text: "Hello world", style: "shiny" });
-    expect(testBlock.toMarkdown()).toEqual("<<shiny::Hello world>>");
+describe("Non-object loads", () => {
+  test("Load document fragment", async () => {
+    const frag = new DocumentFragment();
+    const span1 = document.createElement("span");
+    const span2 = document.createElement("span");
+    span1.textContent = "Hello\u00a0";
+    span2.textContent = "world";
+    frag.appendChild(span1);
+    frag.appendChild(span2);
+    const testBlock = new EditorV3TextBlock(frag, {
+      style: "bold",
+      isLocked: true,
+      lineStartPosition: 99,
+    });
+    testBlock.setActive(true);
+    testBlock.isLocked = undefined;
+    expect(testBlock.isActive).toEqual(true);
+    expect(testBlock.data).toEqual({
+      text: "Hello world",
+      style: "bold",
+      type: "text",
+    });
+    expect(testBlock.lineStartPosition).toEqual(99);
+    expect(testBlock.lineEndPosition).toEqual(110);
+    // Eat your own tail
+    expect(new EditorV3TextBlock(testBlock).data).toEqual(testBlock.data);
+    expect(new EditorV3TextBlock(testBlock.data).data).toEqual(testBlock.data);
+    expect(new EditorV3TextBlock(testBlock.toHtml({})).data).toEqual(testBlock.data);
   });
-  test("Markdown is correctly shown for defaultStyle", async () => {
-    const testBlock = new EditorV3TextBlock({ text: "Hello world", style: "defaultStyle" });
-    expect(testBlock.toMarkdown()).toEqual("<<Hello world>>");
+
+  test("Load span", async () => {
+    const span = document.createElement("span");
+    span.textContent = "Hello world";
+    span.dataset.styleName = "shiny";
+    span.dataset.type = "text";
+    span.title = "This is a title";
+    const testBlock = new EditorV3TextBlock(span);
+    expect(testBlock.data).toEqual({
+      text: "Hello world",
+      label: "This is a title",
+      style: "shiny",
+      type: "text",
+    });
+    // Eat your own tail
+    expect(new EditorV3TextBlock(testBlock).data).toEqual(testBlock.data);
+    expect(new EditorV3TextBlock(testBlock.data).data).toEqual(testBlock.data);
+    expect(new EditorV3TextBlock(testBlock.toHtml({})).data).toEqual(testBlock.data);
+  });
+
+  test("Load bad document fragment", async () => {
+    const frag = new DocumentFragment();
+    const span1 = document.createElement("span");
+    const span2 = document.createElement("span");
+    span1.textContent = "Hello\u00a0";
+    span2.textContent = "world";
+    frag.appendChild(span1);
+    span1.dataset.styleName = "bold";
+    span1.dataset.type = "at";
+    span1.dataset.isLocked = "true";
+    frag.appendChild(span2);
+    span2.dataset.styleName = "shiny";
+    // const list = document.createElement("ul");
+    // list.appendChild(frag);
+    expect(() => new EditorV3TextBlock(frag)).toThrow(
+      "EditorV3TextBlock:Constructor:Multiple types in fragment, " +
+        "Multiple styles in fragment, " +
+        "Multiple isLocked in fragment",
+    );
+  });
+});
+
+describe("Should render an at block in the HTML", () => {
+  test("Create HTML with an @ in the middle", async () => {
+    const testBlock = new EditorV3TextBlock({
+      text: "Hello\u00a0massive and impressive @world",
+      style: "shiny",
+    });
+    expect(testBlock.wordPositions).toEqual([
+      { line: -1, startChar: 0, endChar: 5, isLocked: false },
+      { line: -1, startChar: 6, endChar: 13, isLocked: false },
+      { line: -1, startChar: 14, endChar: 17, isLocked: false },
+      { line: -1, startChar: 18, endChar: 28, isLocked: false },
+      { line: -1, startChar: 29, endChar: 35, isLocked: false },
+    ]);
+    // Expect text/markdown to render one block
+    expect(testBlock.toHtml({}).textContent).toEqual(
+      "Hello\u00a0massive\u00a0and\u00a0impressive\u00a0@world",
+    );
+    expect(testBlock.toMarkdown()).toEqual("<<shiny::Hello\u00a0massive and impressive @world>>");
+    // Expect HTML to split block into two spans
+    const tempDiv = document.createElement("div");
+    testBlock.toHtml({ currentEl: tempDiv });
+    expect(tempDiv.innerHTML).toMatchSnapshot();
+    // Expect HTML not to split
+    const tempDiv2 = document.createElement("div");
+    testBlock.toHtml({ currentEl: tempDiv2, doNotSplitWordSpans: true });
+    expect(tempDiv2.innerHTML).toMatchSnapshot();
+  });
+});
+
+describe("Should throw trying to render an at block in the HTML", () => {
+  test("Create HTML with an @ at the start", async () => {
+    const testBlock = new EditorV3TextBlock({ text: "@Hello world", type: "at" });
+    expect(() => testBlock.toHtml({})).toThrow("Use EditorV3AtBlock for at blocks");
+  });
+});
+
+describe("Should render html chars :(", () => {
+  test("Lets see 2009", async () => {
+    const div = document.createElement("div");
+    const text = new Text("\u2009");
+    div.appendChild(text);
+    expect(div.outerHTML).toEqual("<div>\u2009</div>");
+  });
+  test("Lets see 202f", async () => {
+    const div = document.createElement("div");
+    const text = new Text("\u202f");
+    div.appendChild(text);
+    expect(div.outerHTML).toEqual("<div>\u202f</div>");
+  });
+
+  test("Lets see 00a0", async () => {
+    const div = document.createElement("div");
+    const text = new Text("\u00a0");
+    div.appendChild(text);
+    expect(div.outerHTML).toEqual("<div>&nbsp;</div>");
+  });
+  test("Lets see 200c", async () => {
+    const span = document.createElement("span");
+    const text = new Text("");
+    span.appendChild(text);
+    expect(span.outerHTML).toEqual("<span></span>");
+    expect(span.textContent).toEqual("");
+    expect(span.innerHTML).toEqual("");
+  });
+});
+
+describe("Should throw trying to create the wrong type", () => {
+  test("Fail to create at block", async () => {
+    expect(() => {
+      const badThing = new EditorV3TextBlock({ text: "Hello world", type: "at" });
+      badThing.toHtml({});
+    }).toThrow("Use EditorV3AtBlock for at blocks");
+  });
+});
+
+describe("Locked text block", () => {
+  test("Create and render locked text block", async () => {
+    const testBlock = new EditorV3TextBlock({ text: "Locked block", isLocked: true, style: "red" });
+    expect(testBlock.data).toEqual({
+      text: "Locked block",
+      type: "text",
+      isLocked: true,
+      style: "red",
+    });
+    expect(testBlock.isLocked).toEqual(true);
+    const tempDiv = document.createElement("div");
+    testBlock.toHtml({ currentEl: tempDiv }, { isLocked: true });
+    expect(tempDiv.innerHTML).toMatchSnapshot();
+    expect(testBlock.toMarkdown()).toEqual("<<red::Locked block>>");
+    expect(testBlock.wordPositions).toEqual([
+      { line: -1, startChar: 0, endChar: 12, isLocked: true },
+    ]);
+  });
+
+  test("Apply style", async () => {
+    const testBlock = new EditorV3TextBlock({ text: "Locked block", style: "red" });
+    const tempDiv = document.createElement("div");
+    testBlock.toHtml({ currentEl: tempDiv }, { color: "red" });
+    expect(tempDiv.innerHTML).toMatchSnapshot();
   });
 });

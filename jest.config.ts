@@ -1,9 +1,8 @@
-import type { Config } from "jest";
-
-const config: Config = {
+const config = {
   // The root of your source code, typically /src
   // `<rootDir>` is a token Jest substitutes
-  roots: ["<rootDir>/src"],
+  moduleDirectories: ["<rootDir>/node_modules", "<rootDir>/src"],
+  roots: ["<rootDir>"],
 
   // Jest transformations -- this adds support for TypeScript
   // using ts-jest
@@ -21,21 +20,20 @@ const config: Config = {
   testRegex: "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
   // Module file extensions for importing
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
-  // };
 
   // Added by Paul
   collectCoverage: true,
   coverageProvider: "v8",
   collectCoverageFrom: [
-    "**/*.{js,jsx}",
-    "**/*.{ts,tsx}",
+    "src/**/*.{js,jsx}",
+    "src/**/*.{ts,tsx}",
     "!**/index.ts",
     "!**/interface.ts",
     "!**/main.ts",
   ],
   testEnvironment: "jsdom",
   moduleNameMapper: {
-    "\\.(css|less|scss)$": "<rootDir>/src/__mocks__/styleMock.ts",
+    "\\.(css|less|scss)$": "<rootDir>/__dummy__/styleMock.ts",
   },
 
   // Plugin for watch patterns

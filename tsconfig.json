@@ -19,15 +19,8 @@
     "declaration": true,
     "jsx": "react-jsx",
     "noImplicitAny": true,
-    "plugins": [
-      {
-        "name": "typescript-plugin-css-modules",
-        "options": {
-          "classnameTransform": "asIs"
-        }
-      }
-    ]
+    "plugins": []
   },
-  "include": ["global.d.ts", "src", "demo"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["global.d.ts", "src", "demo", "__dummy__"],
+  "exclude": ["node_modules", "dist", "demo/dist"]
 }

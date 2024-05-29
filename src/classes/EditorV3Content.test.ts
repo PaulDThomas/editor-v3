@@ -1,7 +1,8 @@
-/* eslint-disable quotes */
 import { EditorV3Content } from "./EditorV3Content";
+import { defaultContentProps } from "./defaultContentProps";
 import { EditorV3Line } from "./EditorV3Line";
-import { EditorV3Align } from "./interface";
+import { EditorV3Align, EditorV3ContentPropsInput } from "./interface";
+import { textBlockFactory } from "./textBlockFactory";
 
 // Load and read tests
 describe("Check basic EditorV3Content", () => {
@@ -9,10 +10,8 @@ describe("Check basic EditorV3Content", () => {
     const testContent = new EditorV3Content("12.34");
     expect(testContent.text).toEqual("12.34");
     const div = document.createElement("div");
-    div.append(testContent.toHtml());
-    expect(div.innerHTML).toEqual(
-      '<div class="aiev3-line left"><span class="aiev3-tb">12.34</span></div>',
-    );
+    div.append(testContent.toHtml({}));
+    expect(div.innerHTML).toMatchSnapshot();
     expect(testContent.decimalAlignPercent).toEqual(60);
     expect(testContent.textAlignment).toEqual("left");
     testContent.textAlignment = EditorV3Align.decimal;
@@ -20,120 +19,155 @@ describe("Check basic EditorV3Content", () => {
     testContent.decimalAlignPercent = 30;
     expect(testContent.decimalAlignPercent).toEqual(30);
     testContent.styles = { shiny: { color: "pink" } };
-    expect(JSON.parse(testContent.jsonString)).toEqual({
+    expect(testContent.data).toEqual({
       lines: [
-        { textBlocks: [{ text: "12.34" }], textAlignment: "decimal", decimalAlignPercent: 30 },
+        {
+          textBlocks: [{ text: "12.34", type: "text" }],
+        },
       ],
-      textAlignment: "decimal",
-      decimalAlignPercent: 30,
-      styles: { shiny: { color: "pink" } },
+      contentProps: {
+        textAlignment: "decimal",
+        decimalAlignPercent: 30,
+        styles: { shiny: { color: "pink" } },
+      },
     });
   });
 
   test("Load string with style info", async () => {
-    const testContent = new EditorV3Content("34.56", {
+    const testProps: EditorV3ContentPropsInput = {
       styles: { shiny: { color: "pink" } },
       textAlignment: EditorV3Align.center,
       decimalAlignPercent: 80,
-    });
+    };
+    const testContent = new EditorV3Content("34.56", testProps);
     expect(testContent.text).toEqual("34.56");
     expect(testContent.styles).toEqual({ shiny: { color: "pink" } });
     expect(testContent.decimalAlignPercent).toEqual(80);
     expect(testContent.textAlignment).toEqual("center");
-    expect(testContent.lines).toEqual([
-      { textBlocks: [{ text: "34.56" }], textAlignment: "center", decimalAlignPercent: 80 },
+    expect(testContent.lines.map((l) => l.data)).toEqual([
+      {
+        contentProps: testProps,
+        textBlocks: [{ text: "34.56", type: "text" }],
+      },
     ]);
-    expect(JSON.parse(testContent.jsonString)).toEqual({
+    expect(testContent.data).toEqual({
+      contentProps: testProps,
       lines: [
-        { textBlocks: [{ text: "34.56" }], textAlignment: "center", decimalAlignPercent: 80 },
+        {
+          textBlocks: [{ text: "34.56", type: "text" }],
+        },
       ],
-      decimalAlignPercent: 80,
-      textAlignment: "center",
-      styles: { shiny: { color: "pink" } },
     });
     const div = document.createElement("div");
-    div.append(testContent.toHtml());
-    expect(div.innerHTML).toEqual(
-      '<div class="aiev3-line center">' +
-        '<span class="aiev3-tb">34.56</span>' +
-        "</div>" +
-        '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}"></div>',
-    );
+    div.append(testContent.toHtml({}));
+    expect(div.innerHTML).toMatchSnapshot();
 
     // Check self equivalence
-    expect(new EditorV3Content(testContent.jsonString)).toEqual(testContent);
-    // Need to change back to default, as attribute is not used
-    testContent.decimalAlignPercent = 60;
-    expect(new EditorV3Content(div.innerHTML)).toEqual(testContent);
+    const read1 = new EditorV3Content(testContent.data);
+    expect(read1.data).toEqual(testContent.data);
+    const read2 = new EditorV3Content(div);
+    expect(read2.data).toEqual(testContent.data);
+    expect(new EditorV3Content(div.innerHTML).data).toEqual(testContent.data);
 
     // Repeat as decimal
-    testContent.decimalAlignPercent = 80;
     testContent.textAlignment = EditorV3Align.decimal;
-    expect(new EditorV3Content(testContent.jsonString)).toEqual(testContent);
+    expect(new EditorV3Content(testContent).data).toEqual(testContent.data);
     div.innerHTML = "";
-    div.appendChild(testContent.toHtml());
-    expect(new EditorV3Content(div.innerHTML)).toEqual(testContent);
+    div.appendChild(testContent.toHtml({}));
+    expect(new EditorV3Content(div.innerHTML).data).toEqual(testContent.data);
   });
 
   test("Load multiline string", async () => {
     const testContent = new EditorV3Content("Hello\n.World\u2009");
     expect(testContent.text).toEqual("Hello\n.World");
-    expect(JSON.parse(testContent.jsonString)).toEqual({
+    expect(testContent.data).toEqual({
       lines: [
-        { textBlocks: [{ text: "Hello" }], textAlignment: "left", decimalAlignPercent: 60 },
-        { textBlocks: [{ text: ".World" }], textAlignment: "left", decimalAlignPercent: 60 },
+        {
+          textBlocks: [{ text: "Hello", type: "text" }],
+        },
+        {
+          textBlocks: [{ text: ".World", type: "text" }],
+        },
       ],
-      decimalAlignPercent: 60,
-      textAlignment: "left",
-      styles: {},
     });
     const div = document.createElement("div");
-    div.append(testContent.toHtml());
-    expect(div.innerHTML).toEqual(
-      '<div class="aiev3-line left"><span class="aiev3-tb">Hello</span></div>' +
-        '<div class="aiev3-line left"><span class="aiev3-tb">.World</span></div>',
-    );
+    div.append(testContent.toHtml({}));
+    expect(div.innerHTML).toMatchSnapshot();
 
     // Updates need to flow through
     testContent.decimalAlignPercent = 55;
     testContent.styles = { shiny: { color: "pink" } };
     testContent.textAlignment = EditorV3Align.decimal;
     expect(testContent.text).toEqual("Hello\n.World");
-    expect(JSON.parse(testContent.jsonString)).toEqual({
+    expect(testContent.data).toEqual({
+      contentProps: {
+        decimalAlignPercent: 55,
+        styles: { shiny: { color: "pink" } },
+        textAlignment: "decimal",
+      },
       lines: [
-        { textBlocks: [{ text: "Hello" }], textAlignment: "decimal", decimalAlignPercent: 55 },
-        { textBlocks: [{ text: ".World" }], textAlignment: "decimal", decimalAlignPercent: 55 },
+        {
+          textBlocks: [{ text: "Hello", type: "text" }],
+        },
+        {
+          textBlocks: [{ text: ".World", type: "text" }],
+        },
       ],
-      decimalAlignPercent: 55,
-      textAlignment: "decimal",
-      styles: { shiny: { color: "pink" } },
     });
     div.innerHTML = "";
-    div.appendChild(testContent.toHtml());
-    expect(div.innerHTML).toEqual(
-      '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span class="aiev3-tb">Hello</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;"><span class="aiev3-tb">\u2009</span></span>' +
-        "</div>" +
-        '<div class="aiev3-line decimal">' +
-        '<span class="aiev3-span-point lhs" style="right: 45%; min-width: 55%;"><span class="aiev3-tb">\u2009</span></span>' +
-        '<span class="aiev3-span-point rhs" style="left: 55%; min-width: 45%;"><span class="aiev3-tb">.World</span></span>' +
-        "</div>" +
-        '<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}"></div>',
-    );
-    expect(new EditorV3Content(div.innerHTML)).toEqual(testContent);
-    expect(new EditorV3Content(testContent.jsonString)).toEqual(testContent);
+    div.appendChild(testContent.toHtml({}));
+    expect(div.innerHTML).toMatchSnapshot();
+    expect(new EditorV3Content(div.innerHTML).data).toEqual(testContent.data);
+    expect(new EditorV3Content(testContent.data).data).toEqual(testContent.data);
   });
 });
 
 describe("Content functions", () => {
+  test("Run check status", async () => {
+    const testContent = new EditorV3Content(
+      JSON.stringify({
+        lines: [
+          {
+            textBlocks: [
+              { text: "@Hello", type: "at", isLocked: true },
+              { text: " world", type: "text" },
+            ],
+          },
+        ],
+      }),
+    );
+    testContent.caretPosition = {
+      startLine: 0,
+      startChar: 1,
+      endLine: 0,
+      endChar: 1,
+      isCollapsed: true,
+      focusAt: "end",
+    };
+    testContent.checkStatus();
+    expect(testContent.caretPosition).toEqual({
+      startLine: 0,
+      startChar: 0,
+      endLine: 0,
+      endChar: 6,
+      isCollapsed: false,
+      focusAt: "end",
+    });
+    expect(testContent.caretPositionF).toEqual({
+      initialLine: 0,
+      initialChar: 0,
+      focusLine: 0,
+      focusChar: 6,
+    });
+  });
+
   test("Merge and split lines", async () => {
     const testContent = new EditorV3Content("12\n34\n56");
-    expect(testContent.upToPos(0, 0)).toEqual([
-      { textBlocks: [{ text: "" }], decimalAlignPercent: 60, textAlignment: "left" },
+    expect(testContent.upToPos(0, 0).map((tb) => tb.data)).toEqual([
+      { textBlocks: [{ text: "", type: "text" }] },
     ]);
-    expect(testContent.fromPos(2, 2)).toEqual([
-      { textBlocks: [{ text: "" }], decimalAlignPercent: 60, textAlignment: "left" },
+    expect(testContent.fromPos(2, 2).map((tb) => tb.data)).toEqual([
+      { textBlocks: [{ text: "", type: "text" }] },
     ]);
     testContent.mergeLines(0);
     expect(testContent.text).toEqual("1234\n56");
@@ -173,28 +207,22 @@ describe("Content functions", () => {
 
   test("Delete character", async () => {
     const testContent = new EditorV3Content("12\n34\n56");
-    testContent.deleteCharacter(
-      {
-        startLine: 0,
-        startChar: 1,
-        endLine: 0,
-        endChar: 1,
-        isCollapsed: true,
-      },
-      false,
-    );
+    testContent.deleteCharacter(false, {
+      startLine: 0,
+      startChar: 1,
+      endLine: 0,
+      endChar: 1,
+      isCollapsed: true,
+    });
     expect(testContent.text).toEqual("1\n34\n56");
 
-    testContent.deleteCharacter(
-      {
-        startLine: 0,
-        startChar: 4,
-        endLine: 0,
-        endChar: 4,
-        isCollapsed: true,
-      },
-      false,
-    );
+    testContent.deleteCharacter(false, {
+      startLine: 0,
+      startChar: 1,
+      endLine: 0,
+      endChar: 1,
+      isCollapsed: true,
+    });
     expect(testContent.text).toEqual("134\n56");
 
     testContent.splitLine({
@@ -205,53 +233,41 @@ describe("Content functions", () => {
       isCollapsed: true,
     });
     expect(testContent.text).toEqual("1\n34\n56");
-    testContent.deleteCharacter(
-      {
-        startLine: 1,
-        startChar: 0,
-        endLine: 1,
-        endChar: 2,
-        isCollapsed: false,
-      },
-      true,
-    );
+    testContent.deleteCharacter(true, {
+      startLine: 1,
+      startChar: 0,
+      endLine: 1,
+      endChar: 2,
+      isCollapsed: false,
+    });
     expect(testContent.text).toEqual("1\n\n56");
     expect(testContent.lines[1].textBlocks.length).toEqual(1);
 
-    testContent.deleteCharacter(
-      {
-        startLine: 2,
-        startChar: 0,
-        endLine: 2,
-        endChar: 0,
-        isCollapsed: true,
-      },
-      true,
-    );
+    testContent.deleteCharacter(true, {
+      startLine: 2,
+      startChar: 0,
+      endLine: 2,
+      endChar: 0,
+      isCollapsed: true,
+    });
     expect(testContent.text).toEqual("1\n56");
 
-    testContent.deleteCharacter(
-      {
-        startLine: 1,
-        startChar: 2,
-        endLine: 1,
-        endChar: 2,
-        isCollapsed: true,
-      },
-      true,
-    );
+    testContent.deleteCharacter(true, {
+      startLine: 1,
+      startChar: 2,
+      endLine: 1,
+      endChar: 2,
+      isCollapsed: true,
+    });
     expect(testContent.text).toEqual("1\n5");
 
-    testContent.deleteCharacter(
-      {
-        startLine: 2,
-        startChar: 2,
-        endLine: 1,
-        endChar: 2,
-        isCollapsed: true,
-      },
-      true,
-    );
+    testContent.deleteCharacter(true, {
+      startLine: 2,
+      startChar: 2,
+      endLine: 1,
+      endChar: 2,
+      isCollapsed: true,
+    });
     expect(testContent.text).toEqual("1\n5");
   });
 
@@ -317,7 +333,7 @@ describe("Content functions", () => {
         endLine: 0,
         endChar: 0,
       },
-      [new EditorV3Line("abc")],
+      [new EditorV3Line([textBlockFactory({ text: "abc" })], defaultContentProps)],
     );
     expect(testContent6.text).toEqual("abc123\n456\n789");
 
@@ -328,7 +344,7 @@ describe("Content functions", () => {
         endLine: 1,
         endChar: 3,
       },
-      [new EditorV3Line("def")],
+      [new EditorV3Line([textBlockFactory({ text: "def" })], defaultContentProps)],
     );
     expect(testContent6.text).toEqual("abc123\ndef\n789");
 
@@ -339,7 +355,7 @@ describe("Content functions", () => {
         endLine: 1,
         endChar: 4,
       },
-      [new EditorV3Line("ghi")],
+      [new EditorV3Line([textBlockFactory({ text: "ghi" })], defaultContentProps)],
     );
     expect(testContent6.text).toEqual("abc123\nghi\n789");
 
@@ -350,7 +366,7 @@ describe("Content functions", () => {
         endLine: 1,
         endChar: 4,
       },
-      [new EditorV3Line("jkl")],
+      [new EditorV3Line([textBlockFactory({ text: "jkl" })], defaultContentProps)],
     );
     expect(testContent6.text).toEqual("abc123\nghi\n789");
   });
@@ -366,43 +382,44 @@ describe("Content functions", () => {
     });
     expect(testContent.text).toEqual("123\n456\n789");
     expect(testContent.getStyleAt(1, 1)).toEqual("shiny");
-    expect(testContent.getStyleAt(0, 1)).toEqual(undefined);
-    expect(JSON.parse(testContent.jsonString).lines).toEqual([
+    expect(testContent.getStyleAt(0, 0)).toEqual(undefined);
+    expect(testContent.getStyleAt(2, 1)).toEqual(undefined);
+    expect(testContent.data.lines).toEqual([
       {
-        decimalAlignPercent: 60,
-        textAlignment: "left",
-        textBlocks: [{ text: "1" }, { text: "23", style: "shiny" }],
+        textBlocks: [
+          { text: "1", type: "text" },
+          { text: "23", style: "shiny", type: "text" },
+        ],
       },
       {
-        decimalAlignPercent: 60,
-        textAlignment: "left",
-        textBlocks: [{ text: "456", style: "shiny" }],
+        textBlocks: [{ text: "456", style: "shiny", type: "text" }],
       },
       {
-        decimalAlignPercent: 60,
-        textAlignment: "left",
-        textBlocks: [{ text: "7", style: "shiny" }, { text: "89" }],
+        textBlocks: [
+          { text: "7", style: "shiny", type: "text" },
+          { text: "89", type: "text" },
+        ],
       },
     ]);
-    expect(
-      JSON.parse(
-        testContent.removeStyle({ startLine: 1, startChar: 0, endLine: 1, endChar: 2 }).jsonString,
-      ).lines,
-    ).toEqual([
+    testContent.removeStyle({ startLine: 1, startChar: 0, endLine: 1, endChar: 2 });
+    expect(testContent.data.lines).toEqual([
       {
-        decimalAlignPercent: 60,
-        textAlignment: "left",
-        textBlocks: [{ text: "1" }, { text: "23", style: "shiny" }],
+        textBlocks: [
+          { text: "1", type: "text" },
+          { text: "23", style: "shiny", type: "text" },
+        ],
       },
       {
-        decimalAlignPercent: 60,
-        textAlignment: "left",
-        textBlocks: [{ text: "45" }, { text: "6", style: "shiny" }],
+        textBlocks: [
+          { text: "45", type: "text" },
+          { text: "6", style: "shiny", type: "text" },
+        ],
       },
       {
-        decimalAlignPercent: 60,
-        textAlignment: "left",
-        textBlocks: [{ text: "7", style: "shiny" }, { text: "89" }],
+        textBlocks: [
+          { text: "7", type: "text", style: "shiny" },
+          { text: "89", type: "text" },
+        ],
       },
     ]);
   });
@@ -411,6 +428,7 @@ describe("Content functions", () => {
 describe("Render markdown text from content", () => {
   test("Render markdown text", async () => {
     const props = {
+      ...defaultContentProps,
       styles: { shiny: { color: "pink" } },
       textAlignment: EditorV3Align.center,
       decimalAlignPercent: 80,
@@ -424,44 +442,29 @@ describe("Render markdown text from content", () => {
       endChar: 1,
     });
     expect(testContent.contentProps).toEqual(props);
-    const result = testContent.toMarkdownHtml();
+    testContent.allowWindowView = true;
+    testContent.allowMarkdown = true;
+    testContent.allowNewLine = true;
+    testContent.showMarkdown = true;
+    const result = testContent.toMarkdownHtml({});
     const div = document.createElement("div");
     div.append(result);
-    expect(div.innerHTML).toEqual(
-      `<div class="aiev3-markdown-line" data-text-alignment="center" data-decimal-align-percent="80">1&lt;&lt;shiny::23&gt;&gt;</div>` +
-        `<div class="aiev3-markdown-line" data-text-alignment="center" data-decimal-align-percent="80">&lt;&lt;shiny::456&gt;&gt;</div>` +
-        `<div class="aiev3-markdown-line" data-text-alignment="center" data-decimal-align-percent="80">&lt;&lt;shiny::7&gt;&gt;89</div>` +
-        `<div class="aiev3-style-info" data-style="{&quot;shiny&quot;:{&quot;color&quot;:&quot;pink&quot;}}"></div>`,
-    );
+    expect(div.innerHTML).toMatchSnapshot();
     // Eat your own tail
-    expect(new EditorV3Content(div.innerHTML)).toEqual(testContent);
-  });
-});
-
-describe("Render html text from v2 content", () => {
-  test("Load multiple v2 lines", async () => {
-    const textString =
-      `<div classname="aie-text" data-key="2v9v5" data-type="unstyled" data-inline-style-ranges='[{"offset":0,"length":1,"style":"Notes"},{"offset":4,"length":1,"style":"Notes"},{"offset":1,"length":3,"style":"Optional"}]'><span classname="Notes" style="color:blue;font-size:16pt">N</span><span classname="Optional" style="color:green;font-weight:100;font-family:serif;font-size:16pt">ote</span><span classname="Notes" style="color:blue;font-size:16pt">s</span>  w</div>` +
-      `<div classname="aie-text" data-key="1u61b" data-type="unstyled" data-inline-style-ranges='[]'></div>` +
-      `<div classname="aie-text" data-key="4l4fu" data-type="unstyled" data-inline-style-ranges='[]'>ork</div>`;
-    const result = new EditorV3Content(textString);
-    expect(result.lines.length).toEqual(3);
-    expect(result.lines[0].textBlocks.map((t) => t.data)).toEqual([
-      { text: "N", style: "Notes" },
-      { text: "ote", style: "Optional" },
-      { text: "s", style: "Notes" },
-      { text: "  w", style: undefined },
-    ]);
-    expect(result.lines[1].textBlocks.map((t) => t.data)).toEqual([{ text: "", style: undefined }]);
-    expect(result.lines[2].textBlocks.map((t) => t.data)).toEqual([
-      { text: "ork", style: undefined },
-    ]);
+    const readDiv = new EditorV3Content(div.innerHTML);
+    expect(readDiv.data).toEqual(testContent.data);
+    const readDiv2 = new EditorV3Content(div);
+    expect(readDiv2.data).toEqual(testContent.data);
   });
 });
 
 describe("Splice markdown tests", () => {
   test("Bad position return empty array", async () => {
-    const testContent = new EditorV3Content("123\n456\n789");
+    const testContent = new EditorV3Content("123\n456\n789", {
+      ...defaultContentProps,
+      allowMarkdown: true,
+      showMarkdown: true,
+    });
     const pasteContent = new EditorV3Content("abc");
     const pos = {
       startLine: 1,
@@ -470,12 +473,26 @@ describe("Splice markdown tests", () => {
       endChar: 1,
       isCollapsed: true,
     };
-    expect(testContent.splice(pos, pasteContent.lines, true)).toEqual([]);
+    expect(testContent.splice(pos, pasteContent.lines)).toEqual([]);
     expect(testContent.text).toEqual("123\n456\n789");
+    // Check markdown render when not show markdown
+    testContent.showMarkdown = false;
+    const div = document.createElement("div");
+    div.append(testContent.toMarkdownHtml({}));
+    expect(div.innerHTML).toMatchSnapshot();
+    expect(testContent.showMarkdown).toEqual(false);
   });
   test("Easy insert", async () => {
-    const testContent = new EditorV3Content("123\n456\n789");
-    const pasteContent = new EditorV3Content("abc");
+    const testContent = new EditorV3Content("123\n456\n789", {
+      ...defaultContentProps,
+      allowMarkdown: true,
+      showMarkdown: true,
+    });
+    const pasteContent = new EditorV3Content("abc", {
+      ...defaultContentProps,
+      allowMarkdown: true,
+      showMarkdown: true,
+    });
     const pos = {
       startLine: 0,
       startChar: 1,
@@ -483,12 +500,20 @@ describe("Splice markdown tests", () => {
       endChar: 1,
       isCollapsed: true,
     };
-    testContent.splice(pos, pasteContent.lines, true);
+    testContent.splice(pos, pasteContent.lines);
     expect(testContent.text).toEqual("1abc23\n456\n789");
   });
   test("Easy update", async () => {
-    const testContent = new EditorV3Content("123\n456\n789");
-    const pasteContent = new EditorV3Content("abc");
+    const testContent = new EditorV3Content("123\n456\n789", {
+      ...defaultContentProps,
+      allowMarkdown: true,
+      showMarkdown: true,
+    });
+    const pasteContent = new EditorV3Content("abc", {
+      ...defaultContentProps,
+      allowMarkdown: true,
+      showMarkdown: true,
+    });
     const pos = {
       startLine: 0,
       startChar: 1,
@@ -496,13 +521,21 @@ describe("Splice markdown tests", () => {
       endChar: 2,
       isCollapsed: false,
     };
-    const splice = testContent.splice(pos, pasteContent.lines, true);
+    const splice = testContent.splice(pos, pasteContent.lines);
     expect(testContent.text).toEqual("1abc3\n456\n789");
     expect(splice.map((l) => l.lineText).join("\n")).toEqual("2");
   });
   test("Harder update", async () => {
-    const testContent = new EditorV3Content("123\n456\n789");
-    const pasteContent = new EditorV3Content("ab\nc");
+    const testContent = new EditorV3Content("123\n456\n789", {
+      ...defaultContentProps,
+      allowMarkdown: true,
+      showMarkdown: true,
+    });
+    const pasteContent = new EditorV3Content("ab\nc", {
+      ...defaultContentProps,
+      allowMarkdown: true,
+      showMarkdown: true,
+    });
     const pos = {
       startLine: 0,
       startChar: 1,
@@ -510,21 +543,31 @@ describe("Splice markdown tests", () => {
       endChar: 3,
       isCollapsed: false,
     };
-    const splice = testContent.splice(pos, pasteContent.lines, true);
-    expect(testContent.text).toEqual("1ab\nc");
+    const splice = testContent.splice(pos, pasteContent.lines);
     expect(splice.map((l) => l.lineText).join("\n")).toEqual("23\n456\n789");
+    expect(testContent.text).toEqual("1ab\nc");
   });
   test("Splice with styles", async () => {
+    const contentProps = {
+      ...defaultContentProps,
+      allowMarkdown: true,
+      allowNewLine: true,
+      decimalAlignPercent: 80,
+      showMarkdown: true,
+      styles: { shiny: { color: "pink" }, dull: { color: "grey" } },
+      textAlignment: EditorV3Align.center,
+    };
     const testContent = new EditorV3Content(
       JSON.stringify({
         lines: [{ textBlocks: [{ text: "34.56", style: "shiny" }] }],
-        styles: { shiny: { color: "pink" }, dull: { color: "grey" } },
-        textAlignment: EditorV3Align.center,
-        decimalAlignPercent: 80,
+        contentProps: contentProps,
       }),
     );
-    expect(testContent.toMarkdownHtml().textContent).toEqual("<<shiny::34.56>>");
-    const pasteContent = new EditorV3Line(`{"textBlocks":[{"text":"abc","style":"dull"}]}`);
+    expect(testContent.toMarkdownHtml({}).textContent).toEqual("<<shiny::34.56>>");
+    const pasteContent = new EditorV3Line(
+      { textBlocks: [{ text: "abc", style: "dull" }] },
+      contentProps,
+    );
     const pos = {
       startLine: 0,
       startChar: 1,
@@ -532,9 +575,11 @@ describe("Splice markdown tests", () => {
       endChar: 1,
       isCollapsed: true,
     };
-    const splice = testContent.splice(pos, [pasteContent], true);
-    expect(testContent.toMarkdownHtml().textContent).toEqual("<<<dull::abc>><shiny::34.56>>");
-    expect(testContent.text).toEqual("<abc<shiny::34.56>>");
+    const splice = testContent.splice(pos, [pasteContent]);
+    expect(testContent.toMarkdownHtml({}).textContent).toEqual(
+      "<<shiny::3>><<dull::abc>><<shiny::4.56>>",
+    );
+    expect(testContent.text).toEqual("3abc4.56");
     expect(splice.map((l) => l.lineText).join("\n")).toEqual("");
 
     // Change markdown settings
@@ -543,6 +588,144 @@ describe("Splice markdown tests", () => {
       styleStartTag: "¬¬",
       styleEndTag: "^^",
     };
-    expect(testContent.toMarkdownHtml().textContent).toEqual("<¬¬dull::abc^^<shiny::34.56>>");
+    expect(testContent.toMarkdownHtml({}).textContent).toEqual(
+      "¬¬shiny::3^^¬¬dull::abc^^¬¬shiny::4.56^^",
+    );
+  });
+});
+
+describe("handleKeydown", () => {
+  test("should select all when Ctrl + A is pressed", () => {
+    const testContent = new EditorV3Content("Hello, World!");
+    const event = {
+      ctrlKey: true,
+      code: "KeyA",
+      stopPropagation: jest.fn(),
+      preventDefault: jest.fn(),
+    } as unknown as React.KeyboardEvent<HTMLDivElement>;
+
+    testContent.handleKeydown(event);
+
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(testContent.caretPosition).toEqual({
+      startLine: 0,
+      startChar: 0,
+      endLine: 0,
+      endChar: 13,
+      isCollapsed: false,
+      focusAt: "end",
+    });
+  });
+
+  test("should handle cursor movement", () => {
+    const testContent = new EditorV3Content("Hello, World!");
+    testContent.caretPosition = {
+      startLine: 0,
+      startChar: 7,
+      endLine: 0,
+      endChar: 7,
+    };
+    const event = {
+      key: "ArrowLeft",
+      shiftKey: false,
+      ctrlKey: false,
+      stopPropagation: jest.fn(),
+      preventDefault: jest.fn(),
+    } as unknown as React.KeyboardEvent<HTMLDivElement>;
+
+    testContent.handleKeydown(event);
+
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(testContent.caretPosition).toEqual({
+      startLine: 0,
+      startChar: 6,
+      endLine: 0,
+      endChar: 6,
+      isCollapsed: true,
+      focusAt: "end",
+    });
+  });
+
+  test("should delete character when Backspace is pressed", () => {
+    const testContent = new EditorV3Content("Hello, World!");
+    testContent.caretPosition = {
+      startLine: 0,
+      startChar: 13,
+      endLine: 0,
+      endChar: 13,
+    };
+    const event = {
+      key: "Backspace",
+      stopPropagation: jest.fn(),
+      preventDefault: jest.fn(),
+    } as unknown as React.KeyboardEvent<HTMLDivElement>;
+
+    testContent.handleKeydown(event);
+
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(testContent.text).toEqual("Hello, World");
+  });
+
+  test("should lock text blocks when Escape is pressed", () => {
+    const testContent = new EditorV3Content({
+      lines: [{ textBlocks: [textBlockFactory({ text: "@Hello, World!", type: "at" })] }],
+    });
+    testContent.caretPosition = {
+      startLine: 0,
+      startChar: 13,
+      endLine: 0,
+      endChar: 13,
+    };
+    testContent.lines[0].textBlocks[0].isLocked = undefined;
+    testContent.lines[0].textBlocks[0].setActive(true);
+    expect(testContent.lines[0].textBlocks[0].isLocked).toBe(undefined);
+    expect(testContent.lines[0].textBlocks[0].isActive).toBe(true);
+    expect(testContent.lines[0].textBlocks[0].type).toBe("at");
+
+    const event = {
+      key: "Escape",
+      stopPropagation: jest.fn(),
+      preventDefault: jest.fn(),
+    } as unknown as React.KeyboardEvent<HTMLDivElement>;
+
+    testContent.handleKeydown(event);
+
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(testContent.lines[0].textBlocks[0].isLocked).toBe(true);
+    expect(testContent.lines[0].textBlocks[0].isActive).toBe(false);
+  });
+
+  test("should split line when Enter is pressed", () => {
+    const testContent = new EditorV3Content("Hello, World!");
+    testContent.allowNewLine = true;
+    testContent.caretPosition = {
+      startLine: 0,
+      startChar: 6,
+      endLine: 0,
+      endChar: 6,
+    };
+    const event = {
+      key: "Enter",
+      stopPropagation: jest.fn(),
+      preventDefault: jest.fn(),
+    } as unknown as React.KeyboardEvent<HTMLDivElement>;
+
+    testContent.handleKeydown(event);
+
+    expect(event.stopPropagation).toHaveBeenCalled();
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(testContent.text).toEqual("Hello,\n World!");
+    expect(testContent.caretPosition).toEqual({
+      startLine: 1,
+      startChar: 0,
+      endLine: 1,
+      endChar: 0,
+      isCollapsed: true,
+      focusAt: "end",
+    });
   });
 });
