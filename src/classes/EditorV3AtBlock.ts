@@ -10,7 +10,7 @@ import {
   EditorV3Style,
   EditorV3WordPosition,
 } from "./interface";
-import { renderDropdown } from "../functions/renderDropdown";
+import { renderDropdown } from "./toHtml/renderDropdown";
 
 export interface IEditorV3AtBlockOptionalParams extends IEditorV3TextBlockOptionalParams {
   atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>;

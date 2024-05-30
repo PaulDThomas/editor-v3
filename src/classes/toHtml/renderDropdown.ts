@@ -1,4 +1,4 @@
-import { EditorV3AtListItem } from "../classes/interface";
+import { EditorV3AtListItem } from "../interface";
 
 // Add in dropdown
 export const renderDropdown = (
