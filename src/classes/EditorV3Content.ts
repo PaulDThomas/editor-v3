@@ -473,6 +473,34 @@ export class EditorV3Content implements IEditorV3 {
   }
 
   /**
+   * Find text within the content
+   * @param text String to search for
+   * @returns Array of positions or null if not found
+   */
+  public getTextPosition(text: string): EditorV3Position[] | null {
+    const ret: EditorV3Position[] = [];
+    this.lines.forEach((l, ix) => {
+      l.textBlocks.forEach((tb) => {
+        let pos = 0;
+        while (tb.text.indexOf(text, pos) >= 0) {
+          const found = tb.text.indexOf(text, pos);
+          if (found >= 0) {
+            ret.push({
+              isCollapsed: false,
+              startLine: ix,
+              startChar: tb.lineStartPosition + found,
+              endLine: ix,
+              endChar: tb.lineStartPosition + found + text.length,
+            });
+            pos = found + text.length;
+          }
+        }
+      });
+    });
+    return ret.length > 0 ? ret : null;
+  }
+
+  /**
    * Remove a selection and optionally insert new lines
    * @param pos Position of section to remove
    * @param newLines Line content to insert
