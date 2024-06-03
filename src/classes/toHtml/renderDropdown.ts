@@ -1,4 +1,8 @@
 import { EditorV3AtListItem } from "../interface";
+import { renderListEmpty } from "./renderListEmpty";
+import { renderListError } from "./renderListError";
+import { renderListItem } from "./renderListItem";
+import { renderMoreItems } from "./renderMoreList";
 
 // Add in dropdown
 export const renderDropdown = (
@@ -78,41 +82,19 @@ export const renderDropdown = (
       .then((resolvedAtList) => {
         dropdownUl.innerHTML = "";
         if (resolvedAtList.length === 0) {
-          const noItems = document.createElement("li");
-          noItems.classList.add("aiev3-at-no-items");
-          noItems.textContent = "No items found";
-          dropdownUl.appendChild(noItems);
+          renderListEmpty(dropdownUl);
         } else {
-          resolvedAtList.slice(0, maxAtListLength).forEach((atItem) => {
-            const atSpan = atItem.listRender ?? document.createElement("li");
-            if (!atSpan.classList.contains("aiev3-at-item")) atSpan.classList.add("aiev3-at-item");
-            if (!atSpan.dataset.text) atSpan.dataset.text = atItem.text;
-            if (atSpan.textContent === "" || !atSpan.textContent) atSpan.textContent = atItem.text;
-            atSpan.dataset.text = atItem.text;
-            // Add in data from atItem
-            atItem.data &&
-              Object.keys(atItem.data).forEach((key) => {
-                if (atItem.data) atSpan.dataset[key] = atItem.data[key];
-              });
-            dropdownUl.appendChild(atSpan);
-          });
+          resolvedAtList
+            .slice(0, maxAtListLength)
+            .forEach((atItem) => renderListItem(dropdownUl, atItem));
           // Add in more items list item
           if (resolvedAtList.length > maxAtListLength) {
-            const atSpan = document.createElement("li");
-            atSpan.classList.add("aiev3-more-items");
-            atSpan.textContent = `...${resolvedAtList.length - maxAtListLength} more`;
-            dropdownUl.appendChild(atSpan);
+            renderMoreItems(dropdownUl, resolvedAtList.length - maxAtListLength);
           }
         }
       })
       .catch(() => {
-        // For when something goes wrong
-        dropdownUl.innerHTML = "";
-        const errorItem = document.createElement("li");
-        errorItem.classList.add("aiev3-at-items-error");
-        errorItem.textContent = "Error fetching list";
-        errorItem.style.color = "red";
-        dropdownUl.appendChild(errorItem);
+        renderListError(dropdownUl);
       });
   }
 };
