@@ -42,3 +42,5 @@ export const WindowViewBlockType = ({ type, setType, ...rest }: WindowViewBlockT
     </div>
   );
 };
+
+WindowViewBlockType.displayName = "WindowViewBlockType";

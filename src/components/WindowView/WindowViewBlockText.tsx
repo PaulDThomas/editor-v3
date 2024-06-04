@@ -46,3 +46,5 @@ export const WindowViewBlockText = ({
     </div>
   );
 };
+
+WindowViewBlockText.displayName = "WindowViewBlockText";

@@ -93,6 +93,7 @@
   all: unset;
   border: 1px solid black;
   line-height: 1.4;
+  font-size: 14px;
   border-radius: 4px;
   padding: 2px 6px;
   margin-top: 16px;

@@ -46,3 +46,5 @@ export const WindowViewBlockStyle = ({
     </div>
   );
 };
+
+WindowViewBlockStyle.displayName = "WindowViewBlockStyle";

@@ -69,3 +69,5 @@ export const WindowViewLine = ({ contentProps, lineIndex, line, setLine }: Windo
     </div>
   );
 };
+
+WindowViewLine.displayName = "WindowViewLine";
