@@ -849,7 +849,7 @@ describe("Add at block and escape out", () => {
     await user.keyboard("@");
 
     await runTimers();
-    expect(editor.querySelectorAll("li.aiev3-at-item").length).toEqual(5);
+    expect(editor.querySelectorAll("li.aiev3-drop-item").length).toEqual(5);
     expect(screen.queryByText("...24 more")).toBeInTheDocument();
     expect(editor.outerHTML).toMatchSnapshot();
   });

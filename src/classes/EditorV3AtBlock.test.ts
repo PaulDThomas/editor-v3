@@ -164,24 +164,24 @@ describe("should return a DocumentFragment with a dropdown", () => {
     line.className = "aiev3-line";
     editable.appendChild(line);
     const oldDropdown = document.createElement("ul");
-    oldDropdown.className = "aiev3-at-dropdown-list";
+    oldDropdown.className = "aiev3-dropdown-list";
     editor.appendChild(oldDropdown);
-    oldDropdown.innerHTML = "<li class='aiev3-at-item'>Old item</li>";
-    expect(editor.querySelector(".aiev3-at-dropdown-list")?.textContent).toEqual("Old item");
+    oldDropdown.innerHTML = "<li class='aiev3-drop-item'>Old item</li>";
+    expect(editor.querySelector(".aiev3-dropdown-list")?.textContent).toEqual("Old item");
 
     await act(async () => {
       block.toHtml({ editableEl: editable, currentEl: line });
       // Run pending timer from the function to display the dropdown list
       jest.runAllTimers();
     });
-    expect(editor.querySelector(".aiev3-at-dropdown-list")?.textContent).not.toEqual("Old item");
+    expect(editor.querySelector(".aiev3-dropdown-list")?.textContent).not.toEqual("Old item");
     expect(editor.innerHTML).toMatchSnapshot();
     // Check dropdown click
-    const items = editor.querySelectorAll(".aiev3-at-item");
+    const items = editor.querySelectorAll(".aiev3-drop-item");
     expect(items).toBeDefined();
     expect(items.length).toBe(10);
     fireEvent.click(items![0]);
-    expect(editor.querySelector(".aiev3-at-item")).toBeNull();
+    expect(editor.querySelector(".aiev3-drop-item")).toBeNull();
     expect(editor.innerHTML).toMatchSnapshot();
   });
 
@@ -195,11 +195,11 @@ describe("should return a DocumentFragment with a dropdown", () => {
       block.toHtml({ currentEl: div });
       // Run pending timer from the function to display the dropdown list
       jest.runAllTimers();
-      expect(div.querySelector(".aiev3-at-dropdown-list")).not.toBeNull();
-      expect(div.querySelector(".aiev3-at-dropdown-list")!.textContent).toEqual("Loading...");
+      expect(div.querySelector(".aiev3-dropdown-list")).not.toBeNull();
+      expect(div.querySelector(".aiev3-dropdown-list")!.textContent).toEqual("Loading...");
     });
-    expect(div.querySelector(".aiev3-at-dropdown-list")).not.toBeNull();
-    expect(div.querySelector(".aiev3-at-dropdown-list")!.textContent).toEqual("No items found");
+    expect(div.querySelector(".aiev3-dropdown-list")).not.toBeNull();
+    expect(div.querySelector(".aiev3-dropdown-list")!.textContent).toEqual("No items found");
   });
 
   test("Render dropdown for all objects", async () => {
@@ -212,21 +212,21 @@ describe("should return a DocumentFragment with a dropdown", () => {
       block.toHtml({ currentEl: div });
       // Run pending timer from the function to display the dropdown list
       jest.runAllTimers();
-      expect(div.querySelector(".aiev3-at-dropdown-list")).not.toBeNull();
-      expect(div.querySelector(".aiev3-at-dropdown-list")!.textContent).toEqual("Loading...");
+      expect(div.querySelector(".aiev3-dropdown-list")).not.toBeNull();
+      expect(div.querySelector(".aiev3-dropdown-list")!.textContent).toEqual("Loading...");
     });
-    const dropDown = div.querySelector(".aiev3-at-dropdown-list");
+    const dropDown = div.querySelector(".aiev3-dropdown-list");
     expect(dropDown).not.toBeNull();
     expect(dropDown!.textContent).not.toEqual("Loading...");
     expect(div.innerHTML).toMatchSnapshot();
 
     // Check dropdown click
-    const items = dropDown?.querySelectorAll("li.aiev3-at-item");
+    const items = dropDown?.querySelectorAll("li.aiev3-drop-item");
     expect(items).toBeDefined();
     expect(items?.length).toBe(10);
     const expectedText = items![0].textContent;
     fireEvent.click(items![0]);
-    expect(div.querySelector(".aiev3-at-item")).toBeNull();
+    expect(div.querySelector(".aiev3-drop-item")).toBeNull();
     // Check span contents
     const span = div.querySelector(".aiev3-tb.at-block") as HTMLSpanElement;
     expect(span.textContent).toBe(expectedText);
@@ -272,15 +272,13 @@ describe("should return a DocumentFragment with a dropdown", () => {
       block.toHtml({ currentEl: div });
       // Run pending timer from the function to display the dropdown list
       jest.runAllTimers();
-      expect(div.querySelector(".aiev3-at-dropdown-list")).not.toBeNull();
-      expect(div.querySelector(".aiev3-at-dropdown-list")!.textContent).toEqual("Loading...");
+      expect(div.querySelector(".aiev3-dropdown-list")).not.toBeNull();
+      expect(div.querySelector(".aiev3-dropdown-list")!.textContent).toEqual("Loading...");
       // Resolve the promise in errorCall
       expect(errorCall).toHaveBeenCalled();
     });
-    expect(div.querySelector(".aiev3-at-dropdown-list")).not.toBeNull();
-    expect(div.querySelector(".aiev3-at-dropdown-list")!.textContent).toEqual(
-      "Error fetching list",
-    );
+    expect(div.querySelector(".aiev3-dropdown-list")).not.toBeNull();
+    expect(div.querySelector(".aiev3-dropdown-list")!.textContent).toEqual("Error fetching list");
   });
 
   test("Use data and linkRenderer", async () => {
@@ -317,11 +315,11 @@ describe("should return a DocumentFragment with a dropdown", () => {
     expect(div.innerHTML).toMatchSnapshot();
 
     // Check dropdown click
-    const items = div.querySelectorAll(".aiev3-at-item");
+    const items = div.querySelectorAll(".aiev3-drop-item");
     expect(items).toBeDefined();
     expect(items.length).toBe(20);
     fireEvent.click(items![0]);
-    expect(div.querySelector(".aiev3-at-item")).toBeNull();
+    expect(div.querySelector(".aiev3-drop-item")).toBeNull();
     expect(div.textContent).toBe("aa");
     expect(div.innerHTML).toMatchSnapshot();
 

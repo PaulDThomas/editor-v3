@@ -2,8 +2,7 @@
 export const renderListError = (dropdownUl: HTMLUListElement) => {
   dropdownUl.innerHTML = "";
   const errorItem = document.createElement("li");
-  errorItem.classList.add("aiev3-at-items-error");
+  errorItem.classList.add("aiev3-drop-items-error");
   errorItem.textContent = "Error fetching list";
-  errorItem.style.color = "red";
   dropdownUl.appendChild(errorItem);
 };

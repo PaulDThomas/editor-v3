@@ -1,4 +1,4 @@
-.aiev3 ul.aiev3-at-dropdown-list {
+.aiev3 ul.aiev3-dropdown-list {
   position: absolute;
   top: 100%;
   left: 0;
@@ -34,17 +34,25 @@
   font-weight: 400;
 }
 
-.aiev3 li.aiev3-at-no-items {
+.aiev3 li.aiev3-drop-no-items {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: not-allowed;
 }
 
-.aiev3 li.aiev3-at-item {
+.aiev3 li.aiev3-drop-item {
   cursor: pointer;
 }
 
 .aiev3 li:hover {
   background-color: #f0f0f0;
+}
+
+.aiev3 li.aiev3-drop-items-error {
+  color: red;
+}
+
+.aiev3 li.aiev3-more-items {
+  font-style: italic;
 }

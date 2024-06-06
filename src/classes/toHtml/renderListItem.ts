@@ -5,7 +5,7 @@ export const renderListItem = (
   atItem: EditorV3AtListItem<Record<string, string>>,
 ) => {
   const atSpan = atItem.listRender ?? document.createElement("li");
-  if (!atSpan.classList.contains("aiev3-at-item")) atSpan.classList.add("aiev3-at-item");
+  if (!atSpan.classList.contains("aiev3-drop-item")) atSpan.classList.add("aiev3-drop-item");
   if (!atSpan.dataset.text) atSpan.dataset.text = atItem.text;
   if (atSpan.textContent === "" || !atSpan.textContent) atSpan.textContent = atItem.text;
   atSpan.dataset.text = atItem.text;

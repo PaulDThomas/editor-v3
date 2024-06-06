@@ -1,3 +1,4 @@
+import "./EditorV3Drop.css";
 import { EditorV3AtListItem } from "../interface";
 import { renderListEmpty } from "./renderListEmpty";
 import { renderListError } from "./renderListError";
@@ -19,7 +20,7 @@ export const renderDropdown = (
     // Append to editor
     span.appendChild(dropdownUl);
     // Set up dropdown internals
-    dropdownUl.classList.add("aiev3-at-dropdown-list", "skip-read");
+    dropdownUl.classList.add("aiev3-dropdown-list", "skip-read");
     dropdownUl.contentEditable = "false";
     dropdownUl.innerHTML = "<li>Loading...</li>";
     // Add event listener
@@ -28,7 +29,7 @@ export const renderDropdown = (
       e.stopPropagation();
       // Set long timeout to enable stack to clear
       const atItem = e.target;
-      if (atItem && atItem instanceof HTMLElement && atItem.classList.contains("aiev3-at-item")) {
+      if (atItem && atItem instanceof HTMLElement && atItem.classList.contains("aiev3-drop-item")) {
         // Update span
         const thisText = atItem.textContent;
         span.textContent = atItem.dataset.text ?? thisText;
@@ -57,7 +58,7 @@ export const renderDropdown = (
     // Add event listener to document
     const clickHandler = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const dropdownUl = span.querySelector(".aiev3-at-dropdown-list");
+      const dropdownUl = span.querySelector(".aiev3-dropdown-list");
       if (dropdownUl && !dropdownUl.contains(target)) {
         dropdownUl.remove();
         span.classList.remove("is-active");

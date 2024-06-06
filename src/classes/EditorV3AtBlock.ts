@@ -1,4 +1,3 @@
-import "./EditorV3AtBlock.css";
 import {
   EditorV3TextBlock,
   IEditorV3TextBlock,
@@ -123,7 +122,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     // Delete any existing dropdown on render
     const editor = renderProps.editableEl?.closest(".aiev3") as HTMLDivElement | null;
     if (editor) {
-      const existingDropdowns = editor.querySelectorAll("ul.aiev3-at-dropdown-list");
+      const existingDropdowns = editor.querySelectorAll("ul.aiev3-dropdown-list");
       existingDropdowns.forEach((dropdown) => dropdown.remove());
     }
 
