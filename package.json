@@ -1,6 +1,6 @@
 {
   "name": "@asup/editor-v3",
-  "version": "1.2.12",
+  "version": "1.3.0",
   "description": "REACT Typescript Editor component",
   "author": "Paul Thomas <@PaulDThomas>",
   "private": false,
@@ -44,7 +44,7 @@
     "build": "parcel build src/main.ts"
   },
   "dependencies": {
-    "@asup/context-menu": "^1.3.2",
+    "@asup/context-menu": "^1.3.8",
     "lodash": "^4.17.21",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"
