@@ -1,4 +1,5 @@
 import { EditorV3AtBlock, IEditorV3AtBlock } from "./EditorV3AtBlock";
+import { IEditorV3SelectBlock } from "./EditorV3SelectBlock";
 import { EditorV3TextBlock, IEditorV3TextBlock } from "./EditorV3TextBlock";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 
@@ -30,7 +31,7 @@ export interface EditorV3LineProps {
   textBlocks: EditorV3TextBlock[];
 }
 
-export interface EditorV3AtListItem<T extends Record<string, string>> {
+export interface EditorV3DropListItem<T extends Record<string, string>> {
   text: string;
   data?: T;
   listRender?: HTMLLIElement;
@@ -59,7 +60,7 @@ export interface EditorV3ContentProps {
   showMarkdown: boolean;
   styles?: EditorV3Styles;
   textAlignment: EditorV3Align;
-  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>;
+  atListFunction?: (typedString: string) => Promise<EditorV3DropListItem<Record<string, string>>[]>;
   maxAtListLength: number;
 }
 export interface EditorV3ContentPropsInput {
@@ -71,7 +72,7 @@ export interface EditorV3ContentPropsInput {
   showMarkdown?: boolean;
   styles?: EditorV3Styles;
   textAlignment?: EditorV3Align;
-  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>;
+  atListFunction?: (typedString: string) => Promise<EditorV3DropListItem<Record<string, string>>[]>;
   maxAtListLength?: number;
 }
 
@@ -79,7 +80,7 @@ export interface EditorV3ContentPropsInput {
  * Line import object for EditorV3
  */
 export interface IEditorV3Line {
-  textBlocks: (IEditorV3AtBlock | IEditorV3TextBlock)[];
+  textBlocks: (IEditorV3AtBlock | IEditorV3TextBlock | IEditorV3SelectBlock)[];
   contentProps?: EditorV3ContentPropsInput;
 }
 
@@ -122,10 +123,11 @@ export interface EditorV3WordPosition {
  * Render properties passed down to elements
  */
 export interface EditorV3RenderProps {
-  editableEl?: HTMLDivElement;
+  atListFunction?: (typedString: string) => Promise<EditorV3DropListItem<Record<string, string>>[]>;
+  caretPosition?: EditorV3Position | null;
   currentEl?: HTMLDivElement | HTMLSpanElement;
-  markdownSettings?: IMarkdownSettings;
-  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>;
   doNotSplitWordSpans?: boolean;
+  editableEl?: HTMLDivElement;
+  markdownSettings?: IMarkdownSettings;
   maxAtListLength?: number;
 }

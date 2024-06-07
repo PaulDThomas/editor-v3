@@ -36,6 +36,7 @@ exports[`readV3Html tests Read in at block 1`] = `
     "atListFunction": [Function],
     "isActive": false,
     "isLocked": undefined,
+    "isSelected": false,
     "label": "Hello@world",
     "lineStartPosition": 0,
     "maxAtListLength": 10,

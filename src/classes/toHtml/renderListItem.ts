@@ -1,18 +1,18 @@
-import { EditorV3AtListItem } from "../interface";
+import { EditorV3DropListItem } from "../interface";
 
 export const renderListItem = (
   dropdownUl: HTMLUListElement,
-  atItem: EditorV3AtListItem<Record<string, string>>,
+  dropItem: EditorV3DropListItem<Record<string, string>>,
 ) => {
-  const atSpan = atItem.listRender ?? document.createElement("li");
-  if (!atSpan.classList.contains("aiev3-drop-item")) atSpan.classList.add("aiev3-drop-item");
-  if (!atSpan.dataset.text) atSpan.dataset.text = atItem.text;
-  if (atSpan.textContent === "" || !atSpan.textContent) atSpan.textContent = atItem.text;
-  atSpan.dataset.text = atItem.text;
+  const dropSpan = dropItem.listRender ?? document.createElement("li");
+  if (!dropSpan.classList.contains("aiev3-drop-item")) dropSpan.classList.add("aiev3-drop-item");
+  if (!dropSpan.dataset.text) dropSpan.dataset.text = dropItem.text;
+  if (dropSpan.textContent === "" || !dropSpan.textContent) dropSpan.textContent = dropItem.text;
+  dropSpan.dataset.text = dropItem.text;
   // Add in data from atItem
-  atItem.data &&
-    Object.keys(atItem.data).forEach((key) => {
-      if (atItem.data) atSpan.dataset[key] = atItem.data[key];
+  dropItem.data &&
+    Object.keys(dropItem.data).forEach((key) => {
+      if (dropItem.data) dropSpan.dataset[key] = dropItem.data[key];
     });
-  dropdownUl.appendChild(atSpan);
+  dropdownUl.appendChild(dropSpan);
 };

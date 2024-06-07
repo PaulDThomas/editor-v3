@@ -1,4 +1,5 @@
 import { EditorV3AtBlock } from "../classes/EditorV3AtBlock";
+import { EditorV3SelectBlock } from "../classes/EditorV3SelectBlock";
 import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";
 import { EditorV3Align } from "../classes/interface";
 import { textBlockFactory } from "../classes/textBlockFactory";
@@ -11,7 +12,7 @@ export const readV3DivElement = (
   textAlignment: EditorV3Align;
 } => {
   const ret: {
-    textBlocks: (EditorV3TextBlock | EditorV3AtBlock)[];
+    textBlocks: (EditorV3TextBlock | EditorV3AtBlock | EditorV3SelectBlock)[];
     decimalAlignPercent: number;
     textAlignment: EditorV3Align;
   } = {

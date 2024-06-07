@@ -3,7 +3,7 @@ import { defaultContentProps } from "./defaultContentProps";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 import { EditorV3RenderProps, EditorV3Style, EditorV3WordPosition } from "./interface";
 
-export type EditorV3TextBlockType = "text" | "at";
+export type EditorV3TextBlockType = "text" | "at" | "select";
 export interface IEditorV3TextBlockOptionalParams {
   label?: string;
   style?: string;
@@ -24,6 +24,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
   public style?: string;
   public type: EditorV3TextBlockType = "text";
   public isActive: boolean = false;
+  public isSelected: boolean = false;
   public isLocked: true | undefined;
   public lineStartPosition: number = 0;
   get lineEndPosition() {

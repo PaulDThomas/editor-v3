@@ -1,5 +1,5 @@
+import { EditorV3DropListItem } from "../interface";
 import "./EditorV3Drop.css";
-import { EditorV3AtListItem } from "../interface";
 import { renderListEmpty } from "./renderListEmpty";
 import { renderListError } from "./renderListError";
 import { renderListItem } from "./renderListItem";
@@ -8,40 +8,56 @@ import { renderMoreItems } from "./renderMoreList";
 // Add in dropdown
 export const renderDropdown = (
   span: HTMLSpanElement,
-  listFunction: (typedString: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>,
+  listFunction: (typedString: string) => Promise<EditorV3DropListItem<Record<string, string>>[]>,
   maxAtListLength: number,
   text: string,
 ) => {
   // Double check class list
-  if (!span.classList.contains("is-locked")) {
+  if (span.classList.contains("show-dropdown") && span.offsetParent) {
     // Create download
     const dropdownUl = document.createElement("ul");
-    dropdownUl.style.zIndex = "1000";
     // Append to editor
-    span.appendChild(dropdownUl);
+    span.offsetParent.appendChild(dropdownUl);
+    dropdownUl.style.zIndex = "1000";
     // Set up dropdown internals
     dropdownUl.classList.add("aiev3-dropdown-list", "skip-read");
     dropdownUl.contentEditable = "false";
     dropdownUl.innerHTML = "<li>Loading...</li>";
     // Add event listener
-    dropdownUl.addEventListener("click", (e: MouseEvent) => {
+    dropdownUl.addEventListener("mousedown", (e: MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
       // Set long timeout to enable stack to clear
-      const atItem = e.target;
-      if (atItem && atItem instanceof HTMLElement && atItem.classList.contains("aiev3-drop-item")) {
+      const dropItem = e.target;
+      if (
+        dropItem &&
+        dropItem instanceof HTMLElement &&
+        dropItem.classList.contains("aiev3-drop-item")
+      ) {
         // Update span
-        const thisText = atItem.textContent;
-        span.textContent = atItem.dataset.text ?? thisText;
+        const thisText = dropItem.textContent;
+        span.textContent = dropItem.dataset.text ?? thisText;
+        if (dropItem.dataset.style) {
+          span.dataset.styleName = dropItem.dataset.style;
+          span.classList.add(`editorv3style-${dropItem.dataset.style}`);
+        }
+        if (dropItem.dataset.noStyle) {
+          delete span.dataset.styleName;
+          Array.from(span.classList).forEach((className) => {
+            if (className.startsWith("editorv3style-")) {
+              span.classList.remove(className);
+            }
+          });
+        }
         span.classList.remove("is-active");
         span.classList.add("is-locked");
         span.dataset.isLocked = "true";
         // Copy any other data from the atItem
-        if (atItem.dataset) {
-          Object.keys(atItem.dataset)
+        if (dropItem.dataset) {
+          Object.keys(dropItem.dataset)
             .filter((key) => !["isLocked", "text"].includes(key))
             .forEach((key) => {
-              span.dataset[key] = atItem.dataset[key];
+              span.dataset[key] = dropItem.dataset[key];
             });
         }
         // Remove dropdown
@@ -55,20 +71,22 @@ export const renderDropdown = (
         selection?.addRange(range);
       }
     });
+
     // Add event listener to document
     const clickHandler = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const dropdownUl = span.querySelector(".aiev3-dropdown-list");
+      const dropdownUl =
+        span.offsetParent?.querySelector(".aiev3-dropdown-list") ??
+        span.querySelector(".aiev3-dropdown-list");
       if (dropdownUl && !dropdownUl.contains(target)) {
         dropdownUl.remove();
         span.classList.remove("is-active");
         span.classList.add("is-locked");
         span.dataset.isLocked = "true";
       }
-      document.removeEventListener("click", clickHandler);
+      document.removeEventListener("mousedown", clickHandler);
     };
-
-    document.addEventListener("click", clickHandler);
+    document.addEventListener("mousedown", clickHandler);
 
     // Position dropdown
     const spanRect = span.getBoundingClientRect();
@@ -80,17 +98,17 @@ export const renderDropdown = (
 
     // Add items to dropdown when promise resolves
     listFunction(text)
-      .then((resolvedAtList) => {
+      .then((resolvedList) => {
         dropdownUl.innerHTML = "";
-        if (resolvedAtList.length === 0) {
+        if (resolvedList.length === 0) {
           renderListEmpty(dropdownUl);
         } else {
-          resolvedAtList
+          resolvedList
             .slice(0, maxAtListLength)
             .forEach((atItem) => renderListItem(dropdownUl, atItem));
           // Add in more items list item
-          if (resolvedAtList.length > maxAtListLength) {
-            renderMoreItems(dropdownUl, resolvedAtList.length - maxAtListLength);
+          if (resolvedList.length > maxAtListLength) {
+            renderMoreItems(dropdownUl, resolvedList.length - maxAtListLength);
           }
         }
       })

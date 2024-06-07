@@ -1,4 +1,4 @@
-import { EditorV3AtListItem } from "../../src/classes/interface";
+import { EditorV3DropListItem } from "../../src/classes/interface";
 
 interface IAvailableItem extends Record<string, string> {
   country: string;
@@ -9,7 +9,7 @@ interface IAvailableItem extends Record<string, string> {
 
 export async function loadAvailableItems(
   typedString: string,
-): Promise<EditorV3AtListItem<IAvailableItem>[]> {
+): Promise<EditorV3DropListItem<IAvailableItem>[]> {
   try {
     if (typedString.length < 2) return [];
     if (typedString.includes("qq")) throw new Error("No Q");

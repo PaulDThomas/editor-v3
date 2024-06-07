@@ -42,6 +42,19 @@ export const App = (): JSX.Element => {
           { text: "E", type: "text" },
         ],
       },
+      {
+        textBlocks: [
+          {
+            text: "Select",
+            type: "select",
+            availableOptions: [
+              { text: "one", data: { text: "one", style: "Notes" } },
+              { text: "two", data: { text: "two" } },
+              { text: "three", data: { text: "three", style: "Optional" } },
+            ],
+          },
+        ],
+      },
     ],
   };
 
@@ -142,8 +155,8 @@ export const App = (): JSX.Element => {
                 resize
                 allowMarkdown
                 style={{
-                  width: "240px",
-                  minHeight: "60px",
+                  width: "400px",
+                  minHeight: "100px",
                   height: "60px",
                 }}
               />

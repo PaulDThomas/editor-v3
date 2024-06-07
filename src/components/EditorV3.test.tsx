@@ -62,7 +62,6 @@ describe("Editor and functions", () => {
           id="locked"
           input={lockedBlocks}
           setObject={(ret) => {
-            console.log(ret);
             setLockedBlocks(ret);
           }}
           customStyleMap={{

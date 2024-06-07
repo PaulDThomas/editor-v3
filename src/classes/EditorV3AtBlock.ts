@@ -4,7 +4,7 @@ import {
   IEditorV3TextBlockOptionalParams,
 } from "./EditorV3TextBlock";
 import {
-  EditorV3AtListItem,
+  EditorV3DropListItem,
   EditorV3RenderProps,
   EditorV3Style,
   EditorV3WordPosition,
@@ -12,7 +12,7 @@ import {
 import { renderDropdown } from "./toHtml/renderDropdown";
 
 export interface IEditorV3AtBlockOptionalParams extends IEditorV3TextBlockOptionalParams {
-  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>;
+  atListFunction?: (typedString: string) => Promise<EditorV3DropListItem<Record<string, string>>[]>;
   maxAtListLength?: number;
   atData?: Record<string, string>;
 }
@@ -27,7 +27,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
    */
   public atListFunction: (
     typedString: string,
-  ) => Promise<EditorV3AtListItem<Record<string, string>>[]> = () =>
+  ) => Promise<EditorV3DropListItem<Record<string, string>>[]> = () =>
     new Promise((resolve) => resolve([]));
   /**
    * Maximum number of items to display in the returned list
@@ -70,9 +70,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
       if (arg.childNodes.length !== 1)
         throw new Error("EditorV3AtBlock:Constructor: DocumentFragment must have 1 child node");
       else if (!(arg.childNodes[0] instanceof HTMLSpanElement))
-        throw new Error(
-          "EditorV3AtBlock:Constructor: DocumentFragment child node must be HTMLSpanElement",
-        );
+        throw new Error("EditorV3AtBlock:Constructor: Child node must be HTMLSpanElement");
       this.furtherHtml(arg.childNodes[0] as HTMLSpanElement);
     } else {
       if (arg.atListFunction) this.atListFunction = arg.atListFunction;
@@ -120,7 +118,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     // Add label
     if (this.label) span.title = this.label;
     // Delete any existing dropdown on render
-    const editor = renderProps.editableEl?.closest(".aiev3") as HTMLDivElement | null;
+    const editor = renderProps.currentEl?.closest(".aiev3") as HTMLDivElement | null;
     if (editor) {
       const existingDropdowns = editor.querySelectorAll("ul.aiev3-dropdown-list");
       existingDropdowns.forEach((dropdown) => dropdown.remove());
@@ -142,6 +140,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
       // Throttle render
       let renderTimeout: number | null = null;
       if (!renderTimeout) {
+        span.classList.add("show-dropdown");
         renderTimeout = window.setTimeout(
           () =>
             renderDropdown(
@@ -154,6 +153,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
         );
       }
     }
+
     // Add to current element if specified
     if (renderProps.currentEl) renderProps.currentEl.append(ret);
     // Always return

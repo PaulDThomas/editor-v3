@@ -6,7 +6,7 @@ import { EditorV3Content } from "../classes/EditorV3Content";
 import { defaultContentProps } from "../classes/defaultContentProps";
 import {
   EditorV3Align,
-  EditorV3AtListItem,
+  EditorV3DropListItem,
   EditorV3ContentPropsInput,
   EditorV3Position,
   EditorV3Styles,
@@ -36,7 +36,7 @@ interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   allowWindowView?: boolean;
   markdownSettings?: IMarkdownSettings;
   debounceMilliseconds?: number | null;
-  atListFunction?: (at: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>;
+  atListFunction?: (at: string) => Promise<EditorV3DropListItem<Record<string, string>>[]>;
   maxAtListLength?: number;
 }
 

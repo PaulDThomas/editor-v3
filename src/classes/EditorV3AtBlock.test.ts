@@ -1,6 +1,7 @@
-import { act, fireEvent } from "@testing-library/react";
+import { act } from "react";
+import { fireEvent } from "@testing-library/react";
 import { EditorV3AtBlock } from "./EditorV3AtBlock";
-import { EditorV3AtListItem } from "./interface";
+import { EditorV3DropListItem } from "./interface";
 
 describe("EditorV3AtBlock", () => {
   beforeEach(() => {
@@ -17,7 +18,7 @@ describe("EditorV3AtBlock", () => {
     jest.useRealTimers();
   });
 
-  test("should return a DocumentFragment with the correct structure and attributes", () => {
+  test("should return a DocumentFragment with the correct structure", () => {
     const text = "Hello, world!";
     const style = "bold";
     const block = new EditorV3AtBlock({ text, style });
@@ -58,7 +59,7 @@ describe("EditorV3AtBlock", () => {
       maxAtListLength: 15,
       atData: { tree: "larch" },
       atListFunction: () =>
-        new Promise<EditorV3AtListItem<{ tree: string }>[]>((resolve) =>
+        new Promise<EditorV3DropListItem<{ tree: string }>[]>((resolve) =>
           resolve([{ text: "Birch", data: { tree: "silver birch" } }]),
         ),
     });
@@ -71,7 +72,7 @@ describe("EditorV3AtBlock", () => {
       maxAtListLength: 20,
       atData: { tree: "oak" },
       atListFunction: () =>
-        new Promise<EditorV3AtListItem<{ tree: string }>[]>((resolve) =>
+        new Promise<EditorV3DropListItem<{ tree: string }>[]>((resolve) =>
           resolve([{ text: "Oak", data: { tree: "oak" } }]),
         ),
     });
@@ -80,7 +81,7 @@ describe("EditorV3AtBlock", () => {
     expect(updatedBlock.maxAtListLength).toBe(20);
   });
 
-  test("should return a DocumentFragment with the correct structure and attributes when isActive is false and isLocked is true", () => {
+  test("should return a DocumentFragment when isActive with the correct structure", () => {
     const text = "Hello, world!";
     const style = undefined;
     const block = new EditorV3AtBlock({ text, style, isLocked: true });
@@ -108,8 +109,8 @@ describe("EditorV3AtBlock", () => {
 
 describe("should return a DocumentFragment with a dropdown", () => {
   const atListFunction = (typedString: string) =>
-    new Promise<EditorV3AtListItem<{ email: string }>[]>((resolve) => {
-      const available: EditorV3AtListItem<{ email: string }>[] = [
+    new Promise<EditorV3DropListItem<{ email: string }>[]>((resolve) => {
+      const available: EditorV3DropListItem<{ email: string }>[] = [
         { text: "@one", data: { email: "one" } },
         { text: "@two", data: { email: "two" } },
         { text: "@three", data: { email: "three" } },
@@ -163,6 +164,7 @@ describe("should return a DocumentFragment with a dropdown", () => {
     const line = document.createElement("div");
     line.className = "aiev3-line";
     editable.appendChild(line);
+
     const oldDropdown = document.createElement("ul");
     oldDropdown.className = "aiev3-dropdown-list";
     editor.appendChild(oldDropdown);
@@ -180,7 +182,7 @@ describe("should return a DocumentFragment with a dropdown", () => {
     const items = editor.querySelectorAll(".aiev3-drop-item");
     expect(items).toBeDefined();
     expect(items.length).toBe(10);
-    fireEvent.click(items![0]);
+    fireEvent.mouseDown(items![0]);
     expect(editor.querySelector(".aiev3-drop-item")).toBeNull();
     expect(editor.innerHTML).toMatchSnapshot();
   });
@@ -225,14 +227,14 @@ describe("should return a DocumentFragment with a dropdown", () => {
     expect(items).toBeDefined();
     expect(items?.length).toBe(10);
     const expectedText = items![0].textContent;
-    fireEvent.click(items![0]);
+    fireEvent.mouseDown(items![0]);
     expect(div.querySelector(".aiev3-drop-item")).toBeNull();
     // Check span contents
     const span = div.querySelector(".aiev3-tb.at-block") as HTMLSpanElement;
     expect(span.textContent).toBe(expectedText);
     expect(span.dataset.isLocked).toBe("true");
     expect(span.dataset.email).toBe("one");
-    expect(span.className).toBe("aiev3-tb at-block is-locked");
+    expect(span.className).toBe("aiev3-tb at-block show-dropdown is-locked");
   });
 
   test("Render dropdown and click off", async () => {
@@ -241,21 +243,29 @@ describe("should return a DocumentFragment with a dropdown", () => {
       text,
     });
     block.setActive(true);
-    const div = document.createElement("div");
+    const editor = document.createElement("div");
+    editor.className = "aiev3";
+    const editable = document.createElement("div");
+    editable.className = "aiev3-editable";
+    editable.contentEditable = "true";
+    editor.appendChild(editable);
+    const line = document.createElement("div");
+    line.className = "aiev3-line";
+    editable.appendChild(line);
 
     await act(async () => {
-      block.toHtml({ currentEl: div });
+      block.toHtml({ currentEl: line });
       // Run pending timer from the function to display the dropdown list
       jest.runAllTimers();
     });
     // Check outside dropdown click
-    fireEvent.click(document);
-    expect(div.querySelector(".aiev3-at-dropdown-list")).toBeNull();
-    expect(div.textContent).toBe("@q");
-    expect((div.querySelector(".aiev3-tb.at-block") as HTMLSpanElement)?.dataset.isLocked).toBe(
+    fireEvent.mouseDown(document);
+    expect(line.querySelector(".aiev3-at-dropdown-list")).toBeNull();
+    expect(line.textContent).toBe("@q");
+    expect((line.querySelector(".aiev3-tb.at-block") as HTMLSpanElement)?.dataset.isLocked).toBe(
       "true",
     );
-    expect(div.innerHTML).toMatchSnapshot();
+    expect(line.innerHTML).toMatchSnapshot();
   });
 
   test("Render error in list", async () => {
@@ -291,7 +301,7 @@ describe("should return a DocumentFragment with a dropdown", () => {
         item.toLowerCase().includes(typedString.slice(1).toLowerCase()),
       );
       const ret = filter.map((text, ix) => {
-        const retItem: EditorV3AtListItem<{ email: string }> = {
+        const retItem: EditorV3DropListItem<{ email: string }> = {
           text,
           data: { email: `${text}@${ix}.com` },
         };
@@ -305,26 +315,34 @@ describe("should return a DocumentFragment with a dropdown", () => {
     const text = "@";
     const block = new EditorV3AtBlock({ text, atListFunction, maxAtListLength: 20 });
     block.setActive(true);
-    const div = document.createElement("div");
+    const editor = document.createElement("div");
+    editor.className = "aiev3";
+    const editable = document.createElement("div");
+    editable.className = "aiev3-editable";
+    editable.contentEditable = "true";
+    editor.appendChild(editable);
+    const line = document.createElement("div");
+    line.className = "aiev3-line";
+    editable.appendChild(line);
 
     await act(async () => {
-      block.toHtml({ currentEl: div });
+      block.toHtml({ editableEl: editable, currentEl: line });
       // Run pending timer from the function to display the dropdown list
       jest.runAllTimers();
     });
-    expect(div.innerHTML).toMatchSnapshot();
+    expect(line.innerHTML).toMatchSnapshot();
 
     // Check dropdown click
-    const items = div.querySelectorAll(".aiev3-drop-item");
+    const items = line.querySelectorAll(".aiev3-drop-item");
     expect(items).toBeDefined();
     expect(items.length).toBe(20);
-    fireEvent.click(items![0]);
-    expect(div.querySelector(".aiev3-drop-item")).toBeNull();
-    expect(div.textContent).toBe("aa");
-    expect(div.innerHTML).toMatchSnapshot();
+    fireEvent.mouseDown(items![0]);
+    expect(line.querySelector(".aiev3-drop-item")).toBeNull();
+    expect(line.textContent).toBe("aa");
+    expect(line.innerHTML).toMatchSnapshot();
 
     // Check data
-    const readBack = new EditorV3AtBlock(div.children[0] as HTMLSpanElement);
+    const readBack = new EditorV3AtBlock(line.children[0] as HTMLSpanElement);
     expect(readBack.data).toEqual({
       text: "aa",
       type: "at",
@@ -352,6 +370,6 @@ describe("EditorV3AtBlock errors", () => {
     frag.appendChild(new Text("Bad text!"));
     expect(() => {
       new EditorV3AtBlock(frag);
-    }).toThrow("EditorV3AtBlock:Constructor: DocumentFragment child node must be HTMLSpanElement");
+    }).toThrow("EditorV3AtBlock:Constructor: Child node must be HTMLSpanElement");
   });
 });

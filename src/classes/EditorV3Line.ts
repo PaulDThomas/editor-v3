@@ -52,7 +52,6 @@ export class EditorV3Line implements IEditorV3Line {
     // Need to add a space to the end of the line to allow for the cursor to be placed at the end
     if (this.textBlocks.length > 0 && this.textBlocks[this.textBlocks.length - 1].isLocked) {
       const endBlockEl = new EditorV3TextBlock().toHtml(renderProps);
-      // endBlockEl.children[0].classList.add("");
       h.append(endBlockEl);
     }
     if (renderProps.editableEl) renderProps.editableEl.append(h);
@@ -169,11 +168,24 @@ export class EditorV3Line implements IEditorV3Line {
     pos: EditorV3Position | EditorV3PositionClass,
   ): EditorV3BlockClass | undefined {
     this.textBlocks.forEach((tb) => tb.setActive(false));
+    const activeBlock = this.getBlockAt(Math.max(0, pos.startChar - 1));
+    // if (activeBlock?.type === "select") {
+    //   if (
+    //     pos.endChar > activeBlock.lineStartPosition &&
+    //     pos.startChar < activeBlock.lineEndPosition
+    //   ) {
+    //     activeBlock.setActive(true);
+    //     return activeBlock;
+    //   }
+    //   return undefined;
+    // } else
     if (pos.isCollapsed) {
-      const activeBlock = this.getBlockAt(Math.max(0, pos.startChar - 1));
       activeBlock?.setActive(true);
       return activeBlock;
-    } else return undefined;
+    } else if (activeBlock) {
+      activeBlock.isSelected = true;
+    }
+    return activeBlock;
   }
 
   /**

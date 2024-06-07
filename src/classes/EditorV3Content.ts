@@ -7,7 +7,7 @@ import { EditorV3PositionClass } from "./EditorV3Position";
 import { defaultContentProps } from "./defaultContentProps";
 import {
   EditorV3Align,
-  EditorV3AtListItem,
+  EditorV3DropListItem,
   EditorV3BlockClass,
   EditorV3ContentProps,
   EditorV3ContentPropsInput,
@@ -99,7 +99,7 @@ export class EditorV3Content implements IEditorV3 {
     this._allowWindowView = newAllow;
   }
   private _atListFunction:
-    | ((typedString: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>)
+    | ((typedString: string) => Promise<EditorV3DropListItem<Record<string, string>>[]>)
     | undefined;
   get atListFunction() {
     return this._atListFunction;
@@ -626,6 +626,7 @@ export class EditorV3Content implements IEditorV3 {
         editableEl,
         atListFunction: this._atListFunction,
         maxAtListLength: this._maxAtListLength,
+        caretPosition: this._caretPosition,
       });
     }
     // Set caret position
