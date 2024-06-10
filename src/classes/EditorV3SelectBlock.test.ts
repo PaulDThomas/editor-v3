@@ -258,7 +258,7 @@ describe("should return a DocumentFragment with a dropdown", () => {
     const items = editor.querySelectorAll(".aiev3-drop-item");
     expect(items).toBeDefined();
     expect(items.length).toBe(2);
-    fireEvent.mouseDown(items![1]);
+    fireEvent.mouseDown(items![1].childNodes[0] as HTMLElement);
     expect(editor.querySelector(".aiev3-drop-item")).toBeNull();
     expect(editor.innerHTML).toMatchSnapshot();
   });
@@ -299,7 +299,7 @@ describe("should return a DocumentFragment with a dropdown", () => {
     const items = editor.querySelectorAll(".aiev3-drop-item");
     expect(items).toBeDefined();
     expect(items.length).toBe(2);
-    fireEvent.mouseDown(items![0]);
+    fireEvent.mouseDown(items![0].childNodes[0] as HTMLElement);
     expect(editor.querySelector(".aiev3-drop-item")).toBeNull();
     expect(editor.querySelector(".select-block") as HTMLSpanElement).not.toHaveClass(
       "editorv3style-bold",

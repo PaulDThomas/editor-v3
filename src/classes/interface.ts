@@ -130,4 +130,5 @@ export interface EditorV3RenderProps {
   editableEl?: HTMLDivElement;
   markdownSettings?: IMarkdownSettings;
   maxAtListLength?: number;
+  styles?: EditorV3Styles;
 }

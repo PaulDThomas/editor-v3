@@ -28,12 +28,13 @@ export const renderDropdown = (
       e.preventDefault();
       e.stopPropagation();
       // Set long timeout to enable stack to clear
-      const dropItem = e.target;
-      if (
-        dropItem &&
-        dropItem instanceof HTMLElement &&
-        dropItem.classList.contains("aiev3-drop-item")
-      ) {
+      const dropItem =
+        e.target instanceof Element && e.target.classList.contains("aiev3-drop-item")
+          ? e.target
+          : e.target instanceof Element && e.target.closest(".aiev3-drop-item")
+            ? e.target.closest(".aiev3-drop-item")
+            : undefined;
+      if (dropItem && dropItem instanceof HTMLElement) {
         // Update span
         const thisText = dropItem.textContent;
         span.textContent = dropItem.dataset.text ?? thisText;

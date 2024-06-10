@@ -153,7 +153,24 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
           renderDropdown(
             span,
             async () => {
-              return this.availableOptions ?? [];
+              return (
+                this.availableOptions.map((option) => {
+                  const listItem = document.createElement("li");
+                  const tb = new EditorV3TextBlock({
+                    text: option.text,
+                    style: option.data?.style,
+                  });
+                  tb.toHtml(
+                    { currentEl: listItem },
+                    renderProps.styles?.[option.data?.style ?? ""],
+                  );
+                  return {
+                    text: option.text,
+                    data: option.data,
+                    listRender: listItem,
+                  };
+                }) ?? []
+              );
             },
             Math.max(1, this.availableOptions.length),
             this.text,

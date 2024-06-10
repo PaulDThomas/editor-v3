@@ -86,11 +86,25 @@ describe("Test MarkdownAtClass", () => {
 
 describe("Test MarkdownAtClass errors", () => {
   test("Bad markdown in function", async () => {
-    const testMAC = new MarkdownAtClass();
-    expect(() => testMAC.fromMarkdown("@[@moreContent")).toThrow();
-    expect(() => testMAC.fromMarkdown("@moreContent@")).toThrow();
-    expect(() => testMAC.fromMarkdown("[@@moreContent@]")).toThrow();
-    expect(() => testMAC.fromMarkdown("@[@moreContent@] ")).toThrow();
-    expect(() => testMAC.fromMarkdown(" @[@moreContent@]")).toThrow();
+    expect(() => {
+      const testMAC = new MarkdownAtClass();
+      testMAC.fromMarkdown("@[@moreContent");
+    }).toThrow();
+    expect(() => {
+      const testMAC = new MarkdownAtClass();
+      testMAC.fromMarkdown("@moreContent@");
+    }).toThrow();
+    expect(() => {
+      const testMAC = new MarkdownAtClass();
+      testMAC.fromMarkdown("[@@moreContent@]");
+    }).toThrow();
+    expect(() => {
+      const testMAC = new MarkdownAtClass();
+      testMAC.fromMarkdown("@[@moreContent@] ");
+    }).toThrow();
+    expect(() => {
+      const testMAC = new MarkdownAtClass();
+      testMAC.fromMarkdown(" @[@moreContent@]");
+    }).toThrow();
   });
 });

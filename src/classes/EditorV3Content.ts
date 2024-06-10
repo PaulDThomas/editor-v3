@@ -627,6 +627,7 @@ export class EditorV3Content implements IEditorV3 {
         atListFunction: this._atListFunction,
         maxAtListLength: this._maxAtListLength,
         caretPosition: this._caretPosition,
+        styles: this._styles,
       });
     }
     // Set caret position
