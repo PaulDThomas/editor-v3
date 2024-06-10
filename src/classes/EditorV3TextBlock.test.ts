@@ -125,7 +125,7 @@ describe("Should render an at block in the HTML", () => {
 describe("Should throw trying to render an at block in the HTML", () => {
   test("Create HTML with an @ at the start", async () => {
     const testBlock = new EditorV3TextBlock({ text: "@Hello world", type: "at" });
-    expect(() => testBlock.toHtml({})).toThrow("Use EditorV3AtBlock for at blocks");
+    expect(() => testBlock.toHtml({})).toThrow("Use correct class for non-text blocks");
   });
 });
 
@@ -162,9 +162,9 @@ describe("Should render html chars :(", () => {
 describe("Should throw trying to create the wrong type", () => {
   test("Fail to create at block", async () => {
     expect(() => {
-      const badThing = new EditorV3TextBlock({ text: "Hello world", type: "at" });
+      const badThing = new EditorV3TextBlock({ text: "Hello world", type: "select" });
       badThing.toHtml({});
-    }).toThrow("Use EditorV3AtBlock for at blocks");
+    }).toThrow("Use correct class for non-text blocks");
   });
 });
 

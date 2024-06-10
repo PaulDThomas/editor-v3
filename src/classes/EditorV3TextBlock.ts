@@ -176,8 +176,8 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
   public toHtml(renderProps: EditorV3RenderProps, style?: EditorV3Style): DocumentFragment {
     const text = this.text === "" ? "\u2009" : this.text.replaceAll(" ", "\u00a0\u200c");
     const ret = new DocumentFragment();
-    if (this.type === "at") {
-      throw new Error("Use EditorV3AtBlock for at blocks");
+    if (this.type !== "text") {
+      throw new Error("Use correct class for non-text blocks");
     } else {
       const words =
         renderProps.doNotSplitWordSpans || this.isLocked || style?.isLocked

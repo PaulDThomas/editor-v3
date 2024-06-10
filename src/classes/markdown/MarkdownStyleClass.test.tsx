@@ -102,11 +102,25 @@ describe("Test MarkdownStyleClass", () => {
   });
 
   test("Bad markdown in function", async () => {
-    const testMSC = new MarkdownStyleClass();
-    expect(() => testMSC.fromMarkdown("<<test")).toThrow();
-    expect(() => testMSC.fromMarkdown("test>>")).toThrow();
-    expect(() => testMSC.fromMarkdown(">>test<<")).toThrow();
-    expect(() => testMSC.fromMarkdown("<<test>> ")).toThrow();
-    expect(() => testMSC.fromMarkdown(" <<test>>")).toThrow();
+    expect(() => {
+      const testMSC = new MarkdownStyleClass();
+      testMSC.fromMarkdown("<<test");
+    }).toThrow();
+    expect(() => {
+      const testMSC = new MarkdownStyleClass();
+      testMSC.fromMarkdown("test>>");
+    }).toThrow();
+    expect(() => {
+      const testMSC = new MarkdownStyleClass();
+      testMSC.fromMarkdown(">>test<<");
+    }).toThrow();
+    expect(() => {
+      const testMSC = new MarkdownStyleClass();
+      testMSC.fromMarkdown("<<test>> ");
+    }).toThrow();
+    expect(() => {
+      const testMSC = new MarkdownStyleClass();
+      testMSC.fromMarkdown(" <<test>>");
+    }).toThrow();
   });
 });

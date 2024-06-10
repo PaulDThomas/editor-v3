@@ -441,12 +441,15 @@ export const EditorV3 = ({
 
   const handleMouseUp = useCallback(
     (e: React.MouseEvent) => {
-      // Ensure mouse up event stack is empty before resolving this event
+      // Drop down list last entry can target again resize (current.parentElement)
       if (
         divRef.current &&
         e.target instanceof Node &&
-        (divRef.current === e.target || divRef.current.contains(e.target))
-      )
+        (divRef.current.parentElement === e.target ||
+          divRef.current === e.target ||
+          divRef.current.contains(e.target))
+      ) {
+        // Ensure mouse up event stack is empty before resolving this event
         setTimeout(() => {
           if (divRef.current) {
             const newContent = new EditorV3Content(divRef.current, contentProps);
@@ -454,6 +457,7 @@ export const EditorV3 = ({
             setContent(newContent, "Handle mouse up on timeout");
           }
         }, 0);
+      }
     },
     [contentProps, setContent],
   );
