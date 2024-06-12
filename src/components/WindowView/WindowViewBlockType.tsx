@@ -11,7 +11,10 @@ export const WindowViewBlockType = ({ type, setType, ...rest }: WindowViewBlockT
   const selectTypeId = useId();
 
   return (
-    <div className={baseStyles.holder}>
+    <div
+      className={baseStyles.holder}
+      style={{ flexShrink: 1, width: "auto" }}
+    >
       <label
         id={`label-${selectTypeId}`}
         className={baseStyles.label}
@@ -28,7 +31,7 @@ export const WindowViewBlockType = ({ type, setType, ...rest }: WindowViewBlockT
         onChange={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          setType(e.currentTarget.value as "text" | "at");
+          setType(e.currentTarget.value as EditorV3TextBlockType);
         }}
       >
         <option value="text">Text</option>
@@ -38,6 +41,7 @@ export const WindowViewBlockType = ({ type, setType, ...rest }: WindowViewBlockT
         >
           At
         </option>
+        <option value="select">Select</option>
       </select>
     </div>
   );

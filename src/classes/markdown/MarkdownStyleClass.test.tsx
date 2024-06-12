@@ -101,7 +101,7 @@ describe("Test MarkdownStyleClass", () => {
     });
   });
 
-  test("Bad markdown in function", async () => {
+  test("Bad markdown in function", () => {
     expect(() => {
       const testMSC = new MarkdownStyleClass();
       testMSC.fromMarkdown("<<test");

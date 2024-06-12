@@ -17,7 +17,7 @@ import { useDebounceStack } from "../hooks/useDebounceStack";
 import "./EditorV3.css";
 import { WindowView } from "./WindowView/WindowView";
 
-interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
+export interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   id: string;
   input: string | IEditorV3;
   editable?: boolean;

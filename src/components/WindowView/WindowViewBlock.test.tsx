@@ -3,6 +3,8 @@ import userEvent from "@testing-library/user-event";
 import { defaultContentProps } from "../../classes/defaultContentProps";
 import { WindowViewBlock } from "./WindowViewBlock";
 
+jest.mock("./WindowViewSelectOptions");
+
 describe("WindowViewBlock", () => {
   const user = userEvent.setup();
 
@@ -100,6 +102,44 @@ describe("WindowViewBlock", () => {
       text: "@test",
       style: "blue",
       label: undefined,
+    });
+  });
+
+  test("Select render and update", async () => {
+    const mockSet = jest.fn();
+    render(
+      <WindowViewBlock
+        contentProps={{
+          ...defaultContentProps,
+          styles: { blue: { color: "blue" } },
+        }}
+        textBlock={{
+          text: "current",
+          type: "select",
+          selectedOption: "current",
+          availableOptions: [
+            { text: "post", data: { text: "post", noStyle: "true" } },
+            { text: "current", data: { text: "current", noStyle: "true" } },
+            { text: "future", data: { text: "future", noStyle: "true" } },
+          ],
+        }}
+        setTextBlock={mockSet}
+      />,
+    );
+    const selectedOptionInput = screen.queryByTestId(/selected-:r/) as HTMLInputElement;
+    expect(selectedOptionInput).toBeInTheDocument();
+    await user.clear(selectedOptionInput);
+    await user.type(selectedOptionInput, "future");
+    fireEvent.blur(selectedOptionInput);
+    expect(mockSet).toHaveBeenLastCalledWith({
+      type: "select",
+      text: "future",
+      selectedOption: "future",
+      availableOptions: [
+        { text: "post", data: { text: "post", noStyle: "true" } },
+        { text: "current", data: { text: "current", noStyle: "true" } },
+        { text: "future", data: { text: "future", noStyle: "true" } },
+      ],
     });
   });
 });

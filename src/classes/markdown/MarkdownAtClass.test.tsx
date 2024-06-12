@@ -85,7 +85,7 @@ describe("Test MarkdownAtClass", () => {
 });
 
 describe("Test MarkdownAtClass errors", () => {
-  test("Bad markdown in function", async () => {
+  test("Bad markdown in function", () => {
     expect(() => {
       const testMAC = new MarkdownAtClass();
       testMAC.fromMarkdown("@[@moreContent");

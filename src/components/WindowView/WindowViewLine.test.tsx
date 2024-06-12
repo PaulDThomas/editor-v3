@@ -31,8 +31,8 @@ describe("WindowViewLine", () => {
         lineIndex={0}
         line={{
           textBlocks: [
-            { text: "test1 ", style: "green" },
-            { text: "test2", style: "blue" },
+            { text: "test1 ", type: "text", style: "green" },
+            { text: "test2", type: "text", style: "blue" },
           ],
         }}
         setLine={mockSet}
@@ -41,12 +41,13 @@ describe("WindowViewLine", () => {
     expect(screen.queryByText("Line 1")).toBeInTheDocument();
     expect(screen.queryAllByLabelText("Style").length).toEqual(2);
     const textInput0 = screen.queryAllByLabelText("Text")[0] as HTMLInputElement;
+    expect(textInput0).toBeInTheDocument();
     await user.type(textInput0, " - Bamford's header scores!!! ⚽ ");
     fireEvent.blur(textInput0);
     expect(mockSet).toHaveBeenLastCalledWith({
       textBlocks: [
-        { text: "test1  - Bamford's header scores!!! ⚽ ", style: "green" },
-        { text: "test2", style: "blue" },
+        { text: "test1  - Bamford's header scores!!! ⚽ ", type: "text", style: "green" },
+        { text: "test2", type: "text", style: "blue" },
       ],
     });
   });

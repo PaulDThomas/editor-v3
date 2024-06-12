@@ -16,6 +16,31 @@
   border-bottom: 1px solid #e0e0e0;
 }
 
+.height,
+.noHeight {
+  transition:
+    min-height 0.5s ease-in-out,
+    max-height 0.5s ease-in-out,
+    opacity 0.5s ease-in-out;
+}
+
+.height {
+  max-height: 500px;
+  overflow: auto;
+  opacity: 1;
+}
+
+.noHeight {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.windowViewBlock.height,
+.windowViewBlock.noHeight {
+  margin-left: 32px;
+}
+
 .windowViewLineTitle {
   font-size: 14px;
   line-height: 14px;
@@ -30,4 +55,12 @@
   gap: 10px;
   align-items: left;
   padding: 4px 4px 4px 20px;
+}
+
+.windowViewValidationText {
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  color: #f00;
+  text-align: left;
 }

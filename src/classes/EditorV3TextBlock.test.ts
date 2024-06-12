@@ -13,7 +13,6 @@ describe("Check basic EditorV3TextBlock", () => {
     expect(testBlock.lineStartPosition).toEqual(10);
     expect(testBlock.lineEndPosition).toEqual(21);
     expect(testBlock.typeStyle).toEqual("text:shiny");
-    // eslint-disable-next-line quotes
     expect(testBlock.data).toEqual({ text: "Hello world", style: "shiny", type: "text" });
     // Eat your own tail
     expect(new EditorV3TextBlock(testBlock).data).toEqual(testBlock.data);
@@ -71,7 +70,7 @@ describe("Non-object loads", () => {
     expect(new EditorV3TextBlock(testBlock.toHtml({})).data).toEqual(testBlock.data);
   });
 
-  test("Load bad document fragment", async () => {
+  test("Load bad document fragment", () => {
     const frag = new DocumentFragment();
     const span1 = document.createElement("span");
     const span2 = document.createElement("span");

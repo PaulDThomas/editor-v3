@@ -108,8 +108,8 @@ export const App = (): JSX.Element => {
                 editable={editable}
                 customStyleMap={styleMap}
                 style={{
-                  width: "240px",
-                  height: "100px",
+                  width: "500px",
+                  height: "400px",
                 }}
                 allowWindowView
                 atListFunction={loadAvailableItems}
