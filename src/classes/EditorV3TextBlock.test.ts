@@ -12,7 +12,7 @@ describe("Check basic EditorV3TextBlock", () => {
     expect(new EditorV3TextBlock(testBlock).data).toEqual(testBlock.data);
     expect(testBlock.lineStartPosition).toEqual(10);
     expect(testBlock.lineEndPosition).toEqual(21);
-    expect(testBlock.typeStyle).toEqual("text:shiny");
+    expect(testBlock.mergeKey).toEqual("text:shiny:");
     expect(testBlock.data).toEqual({ text: "Hello world", style: "shiny", type: "text" });
     // Eat your own tail
     expect(new EditorV3TextBlock(testBlock).data).toEqual(testBlock.data);

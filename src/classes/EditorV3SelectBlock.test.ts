@@ -30,14 +30,13 @@ describe("EditorV3SelectBlock", () => {
         data: { text: "World", style: "shiny" },
       },
     ];
-    const selectedOption = undefined;
-    const block = new EditorV3SelectBlock({ text, style, availableOptions, selectedOption });
+    const block = new EditorV3SelectBlock({ text, style, availableOptions });
     expect(block.wordPositions).toEqual([
       {
         line: -1,
         startChar: 0,
         endChar: 12,
-        isLocked: false,
+        isLocked: true,
       },
     ]);
     block.setActive(true);
@@ -54,12 +53,12 @@ describe("EditorV3SelectBlock", () => {
     expect(span.classList.contains("aiev3-tb")).toBe(true);
     expect(span.classList.contains("select-block")).toBe(true);
     expect(span.classList.contains("is-active")).toBe(true);
-    expect(span.classList.contains("is-locked")).toBe(false);
+    expect(span.classList.contains("is-locked")).toBe(true);
     expect(span.classList.contains(`editorv3style-${style}`)).toBe(true);
 
     // Check if the span element has the correct content and attributes
     expect(span.textContent).toBe(text);
-    expect(span.dataset.isLocked).not.toBeDefined();
+    expect(span.dataset.isLocked).toBe("true");
     expect(span.dataset.styleName).toBe(style);
   });
 
@@ -72,11 +71,10 @@ describe("EditorV3SelectBlock", () => {
     span.dataset.availableOptions = JSON.stringify([
       {
         text: "Hello",
-        data: { text: "Hello" },
       },
       {
         text: "World",
-        data: { text: "World", style: "shiny" },
+        data: { style: "shiny" },
       },
     ]);
 
@@ -88,15 +86,58 @@ describe("EditorV3SelectBlock", () => {
       availableOptions: [
         {
           text: "Hello",
-          data: { text: "Hello" },
+          data: { noStyle: "true" },
         },
         {
           text: "World",
-          data: { text: "World", style: "shiny" },
+          data: { style: "shiny" },
         },
       ],
       isLocked: true,
-      selectedOption: undefined,
+    });
+  });
+
+  test("should correctly read a Document fragment", async () => {
+    const frag = new DocumentFragment();
+    const span = document.createElement("span");
+    frag.appendChild(span);
+    span.textContent = "-- Select --";
+    span.classList.add("aiev3-tb", "select-block", "editorv3style-bold");
+    span.title = "Select a number";
+    span.dataset.styleName = "bold";
+    span.dataset.isLocked = "true";
+    span.dataset.availableOptions = JSON.stringify([
+      {
+        text: "one",
+      },
+      {
+        text: "two",
+        data: { style: "shiny" },
+      },
+      {
+        text: "three",
+        data: { style: "dull" },
+      },
+    ]);
+
+    const block = new EditorV3SelectBlock(frag);
+    expect(block.data).toEqual({
+      text: "-- Select --",
+      label: "Select a number",
+      type: "select",
+      style: "bold",
+      availableOptions: [
+        {
+          text: "one",
+          data: { noStyle: "true" },
+        },
+        {
+          text: "two",
+          data: { style: "shiny" },
+        },
+        { text: "three", data: { style: "dull" } },
+      ],
+      isLocked: true,
     });
   });
 
@@ -106,80 +147,74 @@ describe("EditorV3SelectBlock", () => {
     const availableOptions: EditorV3DropListItem<Record<string, string>>[] = [
       {
         text: "Hello",
-        data: { text: "Hello" },
       },
       {
         text: "World",
-        data: { text: "World", style: "shiny" },
+        data: { style: "shiny" },
       },
     ];
-    const selectedOption = undefined;
-    const block = new EditorV3SelectBlock({ text, style, availableOptions, selectedOption });
+    const block = new EditorV3SelectBlock({ text, style, availableOptions });
     expect(block.data).toEqual({
       text,
       type: "select",
+      isLocked: true,
       style,
       availableOptions: [
         {
           text: "Hello",
-          data: { text: "Hello", noStyle: "true" },
+          data: { noStyle: "true" },
         },
         {
           text: "World",
-          data: { text: "World", style: "shiny" },
+          data: { style: "shiny" },
         },
       ],
-      selectedOption,
     });
     const updatedBlock = new EditorV3SelectBlock(block.data, {
       style: "shiny",
-      selectedOption: "World",
       availableOptions: [
         {
           text: "Hello",
-          data: { text: "Hello", noStyle: "true" },
+          data: { noStyle: "true" },
         },
         {
           text: "World",
-          data: { text: "World", style: "shiny" },
+          data: { style: "shiny" },
         },
-        { text: "another", data: { text: "another" } },
+        { text: "another" },
       ],
     });
     expect(updatedBlock.data).toEqual({
       text,
       type: "select",
       style: "shiny",
-      selectedOption: "World",
+      isLocked: true,
       availableOptions: [
         {
           text: "Hello",
-          data: { text: "Hello", noStyle: "true" },
+          data: { noStyle: "true" },
         },
         {
           text: "World",
-          data: { text: "World", style: "shiny" },
+          data: { style: "shiny" },
         },
-        { text: "another", data: { text: "another", noStyle: "true" } },
+        { text: "another", data: { noStyle: "true" } },
       ],
     });
   });
 
   test("should return a DocumentFragment when isSelected with the correct structure", () => {
     const text = "-- Select --";
+    const label = "Select";
     const style = undefined;
     const availableOptions: EditorV3DropListItem<Record<string, string>>[] = [
-      {
-        text: "Hello",
-        data: { text: "Hello" },
-      },
+      { text: "Hello" },
       {
         text: "World",
-        data: { text: "World", style: "shiny" },
+        data: { style: "shiny" },
       },
     ];
-    const selectedOption = undefined;
-    const block = new EditorV3SelectBlock({ text, style, availableOptions, selectedOption });
+    const block = new EditorV3SelectBlock({ text, style, availableOptions, label });
     const result = block.toHtml({});
 
     // Check if the DocumentFragment contains a single span element
@@ -197,7 +232,8 @@ describe("EditorV3SelectBlock", () => {
     expect(span.classList.toString().includes("editorv3style")).toBe(false);
 
     // Check if the span element has the correct content and attributes
-    expect(span.textContent).toBe("-- Select --");
+    expect(span.textContent).toBe(text);
+    expect(span.title).toBe(label);
     expect(span.dataset.isLocked).toBe("true");
     expect(span.dataset.styleName).not.toBeDefined();
   });
@@ -229,8 +265,7 @@ describe("should return a DocumentFragment with a dropdown", () => {
         data: { text: "World", style: "shiny" },
       },
     ];
-    const selectedOption = undefined;
-    const block = new EditorV3SelectBlock({ text, style, availableOptions, selectedOption });
+    const block = new EditorV3SelectBlock({ text, style, availableOptions });
     block.showDropdown();
     const editor = document.createElement("div");
     editor.className = "aiev3";
@@ -276,8 +311,7 @@ describe("should return a DocumentFragment with a dropdown", () => {
         data: { text: "World", style: "shiny" },
       },
     ];
-    const selectedOption = undefined;
-    const block = new EditorV3SelectBlock({ text, style, availableOptions, selectedOption });
+    const block = new EditorV3SelectBlock({ text, style, availableOptions });
     block.showDropdown();
     const editor = document.createElement("div");
     editor.className = "aiev3";

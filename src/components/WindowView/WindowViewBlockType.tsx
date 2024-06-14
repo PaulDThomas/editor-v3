@@ -3,11 +3,17 @@ import { EditorV3TextBlockType } from "../../classes/EditorV3TextBlock";
 import baseStyles from "../BaseInputs.module.css";
 
 interface WindowViewBlockTypeProps extends React.ComponentProps<"select"> {
+  includeAt: boolean;
   type: EditorV3TextBlockType;
   setType: (type: EditorV3TextBlockType) => void;
 }
 
-export const WindowViewBlockType = ({ type, setType, ...rest }: WindowViewBlockTypeProps) => {
+export const WindowViewBlockType = ({
+  type,
+  setType,
+  includeAt,
+  ...rest
+}: WindowViewBlockTypeProps) => {
   const selectTypeId = useId();
 
   return (
@@ -35,13 +41,15 @@ export const WindowViewBlockType = ({ type, setType, ...rest }: WindowViewBlockT
         }}
       >
         <option value="text">Text</option>
-        <option
-          value="at"
-          disabled
-        >
-          At
-        </option>
         <option value="select">Select</option>
+        {includeAt && (
+          <option
+            value="at"
+            disabled
+          >
+            At
+          </option>
+        )}
       </select>
     </div>
   );

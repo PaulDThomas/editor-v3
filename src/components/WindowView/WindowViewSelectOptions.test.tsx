@@ -1,56 +1,21 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { WindowViewSelectOptions } from "./WindowViewSelectOptions";
-import { EditorV3Props } from "../EditorV3";
 import * as ed from "../EditorV3";
+import { EditorV3Props } from "../EditorV3";
+import { WindowViewSelectOptions } from "./WindowViewSelectOptions";
+
+jest.mock("../ObjectEditor/Expander");
 
 describe("WindowViewLine", () => {
-  const user = userEvent.setup();
-
   test("No render without for none select", async () => {
     const mockSet = jest.fn();
-    render(
+    const { container } = render(
       <WindowViewSelectOptions
         type="text"
         options={{}}
         setOptions={mockSet}
       />,
     );
-    const selectedOptionInput = screen.queryByLabelText("Selected option") as HTMLInputElement;
-    expect(selectedOptionInput).toBeInTheDocument();
-    expect(selectedOptionInput.closest(".noHeight")).toBeInTheDocument();
-  });
-
-  test("Basic render & update", async () => {
-    const mockSet = jest.fn();
-    render(
-      <WindowViewSelectOptions
-        type="select"
-        options={{
-          selectedOption: "test2",
-          availableOptions: [
-            { text: "test1", data: { style: "green" } },
-            { text: "test2", data: { style: "blue" } },
-          ],
-        }}
-        setOptions={mockSet}
-      />,
-    );
-    const selectedOptionInput = screen.queryByLabelText("Selected option") as HTMLInputElement;
-    expect(selectedOptionInput).toBeInTheDocument();
-    expect(selectedOptionInput.closest(".height")).toBeInTheDocument();
-    expect(selectedOptionInput.value).toEqual("test2");
-    await user.clear(selectedOptionInput);
-    expect(screen.queryByText(/Required/)).toBeInTheDocument();
-    await user.type(selectedOptionInput, "test1");
-    fireEvent.blur(selectedOptionInput);
-    expect(mockSet).toHaveBeenLastCalledWith({
-      selectedOption: "test1",
-      availableOptions: [
-        { text: "test1", data: { style: "green" } },
-        { text: "test2", data: { style: "blue" } },
-      ],
-    });
+    expect(container.querySelector(".noHeight")).toBeInTheDocument();
   });
 
   test("Update available options", async () => {
@@ -78,7 +43,6 @@ describe("WindowViewLine", () => {
       <WindowViewSelectOptions
         type="select"
         options={{
-          selectedOption: "test2",
           availableOptions: [
             { text: "test1", data: { style: "green" } },
             { text: "test2", data: { style: "blue" } },
@@ -93,11 +57,10 @@ describe("WindowViewLine", () => {
     expect(availableOptionsInput).toBeInTheDocument();
     fireEvent.blur(availableOptionsInput);
     expect(mockSet).toHaveBeenLastCalledWith({
-      selectedOption: "test2",
       availableOptions: [
-        { text: "test1", data: { text: "test1", style: "green" } },
-        { text: "test2", data: { text: "test2", style: "blue" } },
-        { text: "test3", data: { text: "test3", noStyle: "true" } },
+        { text: "test1", data: { style: "green" } },
+        { text: "test2", data: { style: "blue" } },
+        { text: "test3", data: { noStyle: "true" } },
       ],
     });
   });
@@ -127,7 +90,6 @@ describe("WindowViewLine", () => {
       <WindowViewSelectOptions
         type="select"
         options={{
-          selectedOption: "test2",
           availableOptions: [
             { text: "test1", data: { style: "green" } },
             { text: "test2", data: { style: "blue" } },
@@ -174,7 +136,6 @@ describe("WindowViewLine", () => {
       <WindowViewSelectOptions
         type="select"
         options={{
-          selectedOption: "test2",
           availableOptions: [
             { text: "test1", data: { style: "green" } },
             { text: "test2", data: { style: "blue" } },

@@ -5,6 +5,7 @@ import { EditorV3Align } from "./interface";
 import { textBlockFactory } from "./textBlockFactory";
 import { EditorV3AtBlock } from "./EditorV3AtBlock";
 import { EditorV3TextBlock } from "./EditorV3TextBlock";
+import { EditorV3SelectBlock } from "./EditorV3SelectBlock";
 
 describe("Check basic EditorV3Line", () => {
   test("Load string", async () => {
@@ -297,7 +298,8 @@ describe("Check EditorV3Line functions", () => {
     const line2 = new EditorV3Line(
       [
         textBlockFactory({ text: "hello" }, { style: "world" }),
-        textBlockFactory({ text: " slow" }),
+        new EditorV3SelectBlock({ text: " locked" }),
+        textBlockFactory({ text: " slow", label: "end" }),
       ],
       defaultContentProps,
     );
@@ -316,37 +318,70 @@ describe("Check EditorV3Line functions", () => {
     ]);
     expect(line2.subBlocks(1, 6).map((tb) => tb.data)).toEqual([
       { text: "ello", style: "world", type: "text" },
-      { text: " ", type: "text" },
+      { text: " locked", type: "select", availableOptions: [], isLocked: true },
     ]);
-    expect(line2.subBlocks(1, 7).map((tb) => tb.data)).toEqual([
+    expect(line2.subBlocks(1, 12).map((tb) => tb.data)).toEqual([
       { text: "ello", style: "world", type: "text" },
-      { text: " s", type: "text" },
+      { text: " locked", type: "select", availableOptions: [], isLocked: true },
     ]);
-    expect(line2.subBlocks(1, 8).map((tb) => tb.data)).toEqual([
+    expect(line2.subBlocks(1, 13).map((tb) => tb.data)).toEqual([
       { text: "ello", style: "world", type: "text" },
-      { text: " sl", type: "text" },
+      { text: " locked", type: "select", availableOptions: [], isLocked: true },
+      { text: " ", type: "text", label: "end" },
     ]);
-    expect(line2.subBlocks(1, 9).map((tb) => tb.data)).toEqual([
+    expect(line2.subBlocks(1, 14).map((tb) => tb.data)).toEqual([
       { text: "ello", style: "world", type: "text" },
-      { text: " slo", type: "text" },
+      { text: " locked", type: "select", availableOptions: [], isLocked: true },
+      { text: " s", type: "text", label: "end" },
     ]);
-    expect(line2.subBlocks(2, 9).map((tb) => tb.data)).toEqual([
+    expect(line2.subBlocks(1, 15).map((tb) => tb.data)).toEqual([
+      { text: "ello", style: "world", type: "text" },
+      { text: " locked", type: "select", availableOptions: [], isLocked: true },
+      { text: " sl", type: "text", label: "end" },
+    ]);
+    expect(line2.subBlocks(1, 16).map((tb) => tb.data)).toEqual([
+      { text: "ello", style: "world", type: "text" },
+      { text: " locked", type: "select", availableOptions: [], isLocked: true },
+      { text: " slo", type: "text", label: "end" },
+    ]);
+    expect(line2.subBlocks(2, 16).map((tb) => tb.data)).toEqual([
       { text: "llo", style: "world", type: "text" },
-      { text: " slo", type: "text" },
+      { text: " locked", type: "select", availableOptions: [], isLocked: true },
+      { text: " slo", type: "text", label: "end" },
     ]);
-    expect(line2.subBlocks(3, 9).map((tb) => tb.data)).toEqual([
+    expect(line2.subBlocks(3, 16).map((tb) => tb.data)).toEqual([
       { text: "lo", style: "world", type: "text" },
-      { text: " slo", type: "text" },
+      { text: " locked", type: "select", availableOptions: [], isLocked: true },
+      { text: " slo", type: "text", label: "end" },
     ]);
-    expect(line2.subBlocks(4, 9).map((tb) => tb.data)).toEqual([
+    expect(line2.subBlocks(4, 16).map((tb) => tb.data)).toEqual([
       { text: "o", style: "world", type: "text" },
-      { text: " slo", type: "text" },
+      { text: " locked", type: "select", availableOptions: [], isLocked: true },
+      { text: " slo", type: "text", label: "end" },
     ]);
-    expect(line2.subBlocks(5, 9).map((tb) => tb.data)).toEqual([{ text: " slo", type: "text" }]);
-    expect(line2.subBlocks(6, 9).map((tb) => tb.data)).toEqual([{ text: "slo", type: "text" }]);
-    expect(line2.subBlocks(7, 9).map((tb) => tb.data)).toEqual([{ text: "lo", type: "text" }]);
-    expect(line2.subBlocks(8, 9).map((tb) => tb.data)).toEqual([{ text: "o", type: "text" }]);
-    expect(line2.subBlocks(9, 9).map((tb) => tb.data)).toEqual([]);
+    expect(line2.subBlocks(5, 18).map((tb) => tb.data)).toEqual([
+      { text: " locked", type: "select", availableOptions: [], isLocked: true },
+      { text: " slow", type: "text", label: "end" },
+    ]);
+    expect(line2.subBlocks(6, 18).map((tb) => tb.data)).toEqual([
+      { text: " slow", type: "text", label: "end" },
+    ]);
+    expect(line2.subBlocks(12, 18).map((tb) => tb.data)).toEqual([
+      { text: " slow", type: "text", label: "end" },
+    ]);
+    expect(line2.subBlocks(13, 18).map((tb) => tb.data)).toEqual([
+      { text: "slow", type: "text", label: "end" },
+    ]);
+    expect(line2.subBlocks(14, 16).map((tb) => tb.data)).toEqual([
+      { text: "lo", type: "text", label: "end" },
+    ]);
+    expect(line2.subBlocks(15, 16).map((tb) => tb.data)).toEqual([
+      { text: "o", type: "text", label: "end" },
+    ]);
+    expect(line2.subBlocks(16, 17).map((tb) => tb.data)).toEqual([
+      { text: "w", type: "text", label: "end" },
+    ]);
+    expect(line2.subBlocks(17, 17).map((tb) => tb.data)).toEqual([]);
   });
 
   test("splitLine", async () => {
@@ -563,6 +598,150 @@ describe("Write space after at block", () => {
   });
 });
 
+describe("Check active block", () => {
+  const tb = new EditorV3TextBlock({ text: "one " });
+  const ta = new EditorV3AtBlock({ text: "two " });
+  const ts = new EditorV3SelectBlock({ text: "three " });
+  const line = new EditorV3Line([tb, ta, ts]);
+  test("Set first block active", async () => {
+    expect(
+      line.setActiveBlock({
+        isCollapsed: true,
+        startLine: 0,
+        startChar: 0,
+        endLine: 0,
+        endChar: 0,
+      }),
+    ).toEqual(tb);
+    expect(
+      line.setActiveBlock({
+        isCollapsed: true,
+        startLine: 0,
+        startChar: 1,
+        endLine: 0,
+        endChar: 1,
+      }),
+    ).toEqual(tb);
+    expect(
+      line.setActiveBlock({
+        isCollapsed: true,
+        startLine: 0,
+        startChar: 2,
+        endLine: 0,
+        endChar: 2,
+      }),
+    ).toEqual(tb);
+    expect(
+      line.setActiveBlock({
+        isCollapsed: true,
+        startLine: 0,
+        startChar: 3,
+        endLine: 0,
+        endChar: 3,
+      }),
+    ).toEqual(tb);
+    expect(
+      line.setActiveBlock({
+        isCollapsed: true,
+        startLine: 0,
+        startChar: 4,
+        endLine: 0,
+        endChar: 4,
+      }),
+    ).toEqual(ta);
+    expect(
+      line.setActiveBlock({
+        isCollapsed: true,
+        startLine: 0,
+        startChar: 5,
+        endLine: 0,
+        endChar: 5,
+      }),
+    ).toEqual(ta);
+    expect(
+      line.setActiveBlock({
+        isCollapsed: true,
+        startLine: 0,
+        startChar: 6,
+        endLine: 0,
+        endChar: 6,
+      }),
+    ).toEqual(ta);
+    expect(
+      line.setActiveBlock({
+        isCollapsed: true,
+        startLine: 0,
+        startChar: 7,
+        endLine: 0,
+        endChar: 7,
+      }),
+    ).toEqual(ta);
+    expect(
+      line.setActiveBlock({
+        isCollapsed: true,
+        startLine: 0,
+        startChar: 8,
+        endLine: 0,
+        endChar: 8,
+      }),
+    ).toEqual(ta);
+    expect(
+      line.setActiveBlock({
+        isCollapsed: true,
+        startLine: 0,
+        startChar: 9,
+        endLine: 0,
+        endChar: 9,
+      }),
+    ).toEqual(ts);
+    expect(
+      line.setActiveBlock({
+        isCollapsed: true,
+        startLine: 0,
+        startChar: 10,
+        endLine: 0,
+        endChar: 10,
+      }),
+    ).toEqual(ts);
+    expect(
+      line.setActiveBlock({
+        isCollapsed: true,
+        startLine: 0,
+        startChar: 11,
+        endLine: 0,
+        endChar: 11,
+      }),
+    ).toEqual(ts);
+    expect(
+      line.setActiveBlock({
+        isCollapsed: true,
+        startLine: 0,
+        startChar: 12,
+        endLine: 0,
+        endChar: 12,
+      }),
+    ).toEqual(ts);
+    expect(
+      line.setActiveBlock({
+        isCollapsed: true,
+        startLine: 0,
+        startChar: 13,
+        endLine: 0,
+        endChar: 13,
+      }),
+    ).toEqual(ts);
+    expect(
+      line.setActiveBlock({
+        isCollapsed: true,
+        startLine: 0,
+        startChar: 14,
+        endLine: 0,
+        endChar: 14,
+      }),
+    ).toEqual(undefined);
+  });
+});
+
 describe("Get word boundaries", () => {
   test("One word", async () => {
     const line = new EditorV3Line([textBlockFactory({ text: "Hello" })]);
@@ -626,6 +805,73 @@ describe("Don't destroy at block!", () => {
           atData: { email: "Jackie@someEmail.com" },
         },
         { text: ", and what is she doing there?", type: "text", style: "red" },
+      ],
+    });
+  });
+});
+
+describe("Don't destroy select block!", () => {
+  test("Select block preserved", async () => {
+    const line = new EditorV3Line([
+      new EditorV3TextBlock({ text: "Who is " }),
+      new EditorV3SelectBlock({
+        text: "-- person --",
+        label: "Select person",
+        availableOptions: [{ text: "Rita" }, { text: "Bob" }, { text: "Sue" }],
+      }),
+    ]);
+    expect(line.data).toEqual({
+      textBlocks: [
+        { text: "Who is ", type: "text" },
+        {
+          text: "-- person --",
+          type: "select",
+          isLocked: true,
+          availableOptions: [
+            {
+              text: "Rita",
+              data: { noStyle: "true" },
+            },
+            {
+              text: "Bob",
+              data: { noStyle: "true" },
+            },
+            {
+              text: "Sue",
+              data: { noStyle: "true" },
+            },
+          ],
+          label: "Select person",
+        },
+      ],
+    });
+    expect(line.lineText).toEqual("Who is -- person --");
+    // Apply style
+    line.applyStyle("red", 0, line.lineLength - 2);
+    expect(line.data).toEqual({
+      textBlocks: [
+        { text: "Who is ", type: "text", style: "red" },
+        {
+          text: "-- person --",
+          type: "select",
+          style: "red",
+          isLocked: true,
+          availableOptions: [
+            {
+              text: "Rita",
+              data: { noStyle: "true" },
+            },
+            {
+              text: "Bob",
+              data: { noStyle: "true" },
+            },
+            {
+              text: "Sue",
+              data: { noStyle: "true" },
+            },
+          ],
+          label: "Select person",
+        },
       ],
     });
   });

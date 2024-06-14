@@ -22,12 +22,11 @@ export const WindowViewBlock = ({
   return (
     <>
       <div className={styles.windowViewBlock}>
-        {contentProps?.atListFunction && (
-          <WindowViewBlockType
-            type={textBlock.type ?? "text"}
-            setType={(type) => setTextBlock({ ...textBlock, type })}
-          />
-        )}
+        <WindowViewBlockType
+          includeAt={contentProps.atListFunction !== undefined}
+          type={textBlock.type ?? "text"}
+          setType={(type) => setTextBlock({ ...textBlock, type })}
+        />
         {contentProps?.styles && Object.keys(contentProps.styles).length > 0 && (
           <WindowViewBlockStyle
             styles={contentProps.styles}
@@ -50,7 +49,7 @@ export const WindowViewBlock = ({
           style={{ width: "100%", maxWidth: "100%" }}
           grow
           disabled={
-            textBlock.type !== "text" ||
+            textBlock.type === "at" ||
             (contentProps?.styles?.[textBlock.style ?? ""]?.isLocked ?? false)
           }
           text={textBlock.text}
@@ -64,14 +63,11 @@ export const WindowViewBlock = ({
         type={textBlock.type ?? "text"}
         customSytleMap={contentProps.styles}
         options={{
-          selectedOption: (textBlock as IEditorV3SelectBlock).selectedOption ?? "",
           availableOptions: (textBlock as IEditorV3SelectBlock).availableOptions ?? [],
         }}
         setOptions={(options) =>
           setTextBlock({
             ...textBlock,
-            text: options.selectedOption ?? "",
-            selectedOption: options.selectedOption,
             availableOptions: options.availableOptions,
           })
         }

@@ -1,5 +1,5 @@
 import { EditorV3AtBlock, IEditorV3AtBlock } from "./EditorV3AtBlock";
-import { IEditorV3SelectBlock } from "./EditorV3SelectBlock";
+import { EditorV3SelectBlock, IEditorV3SelectBlock } from "./EditorV3SelectBlock";
 import { EditorV3TextBlock, IEditorV3TextBlock } from "./EditorV3TextBlock";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 
@@ -40,7 +40,7 @@ export interface EditorV3DropListItem<T extends Record<string, string>> {
 /**
  * Text block class objects EditorV3
  */
-export type EditorV3BlockClass = EditorV3TextBlock | EditorV3AtBlock;
+export type EditorV3BlockClass = EditorV3TextBlock | EditorV3AtBlock | EditorV3SelectBlock;
 
 /**
  * Content object for EditorV3

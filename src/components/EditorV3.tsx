@@ -6,8 +6,8 @@ import { EditorV3Content } from "../classes/EditorV3Content";
 import { defaultContentProps } from "../classes/defaultContentProps";
 import {
   EditorV3Align,
-  EditorV3DropListItem,
   EditorV3ContentPropsInput,
+  EditorV3DropListItem,
   EditorV3Position,
   EditorV3Styles,
   IEditorV3,
@@ -158,7 +158,19 @@ export const EditorV3 = ({
   const redrawElement = useCallback((ret: EditorV3State) => {
     // console.debug(
     //   "Redraw element:\r\n",
-    //   ret.content.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("|")).join("\n"),
+    //   ret.content.lines
+    //     .map((l) =>
+    //       l.textBlocks
+    //         .map(
+    //           (tb) =>
+    //             tb.text +
+    //             (tb instanceof EditorV3SelectBlock
+    //               ? ">>" + tb.availableOptions?.map((ao) => ao.text).join("*")
+    //               : ""),
+    //         )
+    //         .join("|"),
+    //     )
+    //     .join("\n"),
     // );
     divRef.current && ret.content.redraw(divRef.current, ret.focus);
   }, []);

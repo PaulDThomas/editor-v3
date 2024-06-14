@@ -21,7 +21,18 @@ export const Expander = ({
   disabled = false,
   ...rest
 }: ExpanderProps) => {
-  const [expanded, setExpanded] = useState<ExpanderState>(open ? "open" : "closed");
+  const [expanded, setExpanded] = useState<ExpanderState>("closed");
+  const [lastOpen, setLastOpen] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (open !== lastOpen) {
+      if (open) {
+        setExpanded("placing");
+      } else if (lastOpen !== null) {
+        setExpanded("closing");
+      }
+      setLastOpen(open);
+    }
+  }, [expanded, open, lastOpen]);
 
   const toggle = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {

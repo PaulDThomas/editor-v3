@@ -18,6 +18,8 @@ import {
 } from "./interface";
 import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 import { textBlockFactory } from "./textBlockFactory";
+import { EditorV3SelectBlock } from "./EditorV3SelectBlock";
+import { EditorV3AtBlock } from "./EditorV3AtBlock";
 
 export class EditorV3Line implements IEditorV3Line {
   public textBlocks: EditorV3BlockClass[];
@@ -168,24 +170,18 @@ export class EditorV3Line implements IEditorV3Line {
     pos: EditorV3Position | EditorV3PositionClass,
   ): EditorV3BlockClass | undefined {
     this.textBlocks.forEach((tb) => tb.setActive(false));
-    const activeBlock = this.getBlockAt(Math.max(0, pos.startChar - 1));
-    // if (activeBlock?.type === "select") {
-    //   if (
-    //     pos.endChar > activeBlock.lineStartPosition &&
-    //     pos.startChar < activeBlock.lineEndPosition
-    //   ) {
-    //     activeBlock.setActive(true);
-    //     return activeBlock;
-    //   }
-    //   return undefined;
-    // } else
-    if (pos.isCollapsed) {
-      activeBlock?.setActive(true);
-      return activeBlock;
-    } else if (activeBlock) {
-      activeBlock.isSelected = true;
+    const nextBlock = this.getBlockAt(pos.startChar);
+    const lastBlock = this.getBlockAt(Math.max(0, pos.startChar - 1));
+    if (lastBlock && lastBlock instanceof EditorV3AtBlock && pos.isCollapsed) {
+      lastBlock.setActive(true);
+      return lastBlock;
+    } else if (nextBlock && nextBlock instanceof EditorV3SelectBlock) {
+      nextBlock.showDropdown();
+      return nextBlock;
+    } else {
+      nextBlock?.setActive(true);
+      return nextBlock;
     }
-    return activeBlock;
   }
 
   /**
@@ -203,41 +199,41 @@ export class EditorV3Line implements IEditorV3Line {
     }
     let _counted = 0;
     for (let _i = 0; _i < this.textBlocks.length; _i++) {
+      const block: EditorV3BlockClass = this.textBlocks[_i];
       // Block containing startPos
       if (
         _counted <= startPos &&
-        _counted + this.textBlocks[_i].text.length >= startPos &&
-        this.textBlocks[_i].text.slice(startPos - _counted, endPos - _counted) !== ""
+        _counted + block.text.length >= startPos &&
+        block.text.slice(startPos - _counted, endPos - _counted) !== "" &&
+        (block.lineStartPosition === startPos || !block.isLocked)
       ) {
-        const slicedBlock = textBlockFactory({
-          text: this.textBlocks[_i].text.slice(startPos - _counted, endPos - _counted),
-          style: this.textBlocks[_i].style,
-          type: this.textBlocks[_i].type,
-          isLocked: this.textBlocks[_i].isLocked,
-        });
-        if (this.textBlocks[_i].isActive) slicedBlock.setActive(true);
-        ret.push(slicedBlock);
+        if (block.isLocked) {
+          ret.push(block);
+        } else {
+          const slicedBlock = textBlockFactory({
+            ...block.data,
+            text: block.text.slice(startPos - _counted, endPos - _counted),
+          });
+          ret.push(slicedBlock);
+        }
       }
       // Block after start containing end
-      else if (
-        _counted > startPos &&
-        endPos &&
-        _counted + this.textBlocks[_i].text.length >= endPos
-      ) {
-        const slicedBlock = textBlockFactory({
-          text: this.textBlocks[_i].text.slice(0, endPos - _counted),
-          style: this.textBlocks[_i].style,
-          type: this.textBlocks[_i].type,
-          isLocked: this.textBlocks[_i].isLocked,
-        });
-        if (this.textBlocks[_i].isActive) slicedBlock.setActive(true);
-        ret.push(slicedBlock);
+      else if (_counted > startPos && endPos && _counted + block.text.length >= endPos) {
+        if (block.isLocked) {
+          ret.push(block);
+        } else {
+          const slicedBlock = textBlockFactory({
+            ...block,
+            text: block.text.slice(0, endPos - _counted),
+          });
+          ret.push(slicedBlock);
+        }
       }
       // Block after start and before end
-      else if (_counted > startPos && _counted + this.textBlocks[_i].text.length < endPos) {
-        ret.push(this.textBlocks[_i]);
+      else if (_counted > startPos && _counted + block.text.length < endPos) {
+        ret.push(block);
       }
-      _counted += this.textBlocks[_i].text.length;
+      _counted += block.text.length;
       // Stop if the end is reached
       if (_counted >= endPos) break;
     }
@@ -368,14 +364,14 @@ export class EditorV3Line implements IEditorV3Line {
    * Merge blocks with the same style, that are not locked
    */
   private _mergeBlocks() {
-    if (new Set(this.textBlocks.map((tb) => tb.typeStyle)).size < this.textBlocks.length) {
+    if (new Set(this.textBlocks.map((tb) => tb.mergeKey)).size < this.textBlocks.length) {
       const mergedBlocks: EditorV3BlockClass[] = [];
       let lastTypeStyle: string | null = null;
       for (let _i = 0; _i < this.textBlocks.length; _i++) {
         if (
           !this.textBlocks[_i].isLocked &&
           !this.contentProps.styles?.[this.textBlocks[_i].style ?? ""]?.isLocked &&
-          this.textBlocks[_i].typeStyle === lastTypeStyle &&
+          this.textBlocks[_i].mergeKey === lastTypeStyle &&
           mergedBlocks.length > 0
         ) {
           mergedBlocks[mergedBlocks.length - 1] = textBlockFactory({
@@ -386,7 +382,7 @@ export class EditorV3Line implements IEditorV3Line {
           });
         } else {
           mergedBlocks.push(this.textBlocks[_i]);
-          lastTypeStyle = this.textBlocks[_i].typeStyle;
+          lastTypeStyle = this.textBlocks[_i].mergeKey;
         }
       }
       this.textBlocks = mergedBlocks.filter((tb) => tb.text !== "");

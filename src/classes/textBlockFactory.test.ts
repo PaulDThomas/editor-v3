@@ -133,15 +133,14 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     const testData: IEditorV3SelectBlock = {
       text: "Hello",
       type: "select",
-      selectedOption: "Hello",
       availableOptions: [
-        { text: "Hello", data: { text: "Hello", noStyle: "true" } },
-        { text: "World", data: { text: "World", style: "shiny" } },
+        { text: "Hello", data: { noStyle: "true" } },
+        { text: "World", data: { style: "shiny" } },
       ],
     };
     const testBlock = textBlockFactory(testData);
     expect(testBlock).toBeInstanceOf(EditorV3SelectBlock);
-    expect(testBlock.data).toEqual(testData);
+    expect(testBlock.data).toEqual({ ...testData, isLocked: true });
     // expect(testBlock.toMarkdown()).toEqual("");
 
     const tempDiv = document.createElement("div");
@@ -218,7 +217,7 @@ describe("Check at correctly loaded, and eats its own tail", () => {
       type: "at",
     });
     expect(testBlock.toMarkdown()).toEqual("@[shiny::@Hello world@]");
-    expect(testBlock.typeStyle).toEqual("at:shiny");
+    expect(testBlock.mergeKey).toEqual("at:shiny:Hello@world");
 
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml({}));

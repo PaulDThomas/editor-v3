@@ -31,8 +31,8 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     return this.lineStartPosition + this.text.replaceAll("\u200c", "").length;
   }
 
-  get typeStyle(): string {
-    return `${this.type}:${this.style ?? ""}`;
+  get mergeKey(): string {
+    return `${this.type}:${this.style ?? ""}:${this.label ?? ""}`;
   }
 
   // Read only variables

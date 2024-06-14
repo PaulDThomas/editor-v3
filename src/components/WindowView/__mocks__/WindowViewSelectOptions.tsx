@@ -8,14 +8,6 @@ export const WindowViewSelectOptions = ({
 }: WindowViewSelectOptionsProps): React.ReactNode => {
   const selectOptionsId = useId();
 
-  // Holder for selected option
-  const [currentSelectedOption, setCurrentSelectedOption] = useState<string>(
-    options.selectedOption ?? "",
-  );
-  useEffect(() => {
-    setCurrentSelectedOption(options.selectedOption ?? "");
-  }, [options.selectedOption]);
-
   // Holder for available options
   const [input, setInput] = useState<string>(
     options.availableOptions?.map((o) => o.data?.text ?? "").join("\n") ?? "",
@@ -26,15 +18,7 @@ export const WindowViewSelectOptions = ({
 
   return type !== "select" ? null : (
     <>
-      <input
-        id={`selected-${selectOptionsId}`}
-        data-testid={`selected-${selectOptionsId}`}
-        value={currentSelectedOption}
-        onChange={(e) => {
-          setCurrentSelectedOption(e.currentTarget.value);
-        }}
-        onBlur={() => setOptions({ ...options, selectedOption: currentSelectedOption })}
-      />
+      <label htmlFor={`available-${selectOptionsId}`}>Available options</label>
       <textarea
         id={`available-${selectOptionsId}`}
         data-testid={`available-${selectOptionsId}`}
@@ -45,7 +29,7 @@ export const WindowViewSelectOptions = ({
             ...options,
             availableOptions: input
               .split("\n")
-              .map((o) => ({ text: o, data: { text: o, noStyle: "true" } })),
+              .map((o) => ({ text: o, data: { noStyle: "true" } })),
           });
         }}
       />

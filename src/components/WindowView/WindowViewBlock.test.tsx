@@ -18,7 +18,8 @@ describe("WindowViewBlock", () => {
         setTextBlock={mockSet}
       />,
     );
-    expect(screen.queryByText("Type")).not.toBeInTheDocument();
+    expect(screen.queryByText("Type")).toBeInTheDocument();
+    expect(screen.queryByText("At")).not.toBeInTheDocument();
   });
 
   test("Basic render & update", async () => {
@@ -31,7 +32,8 @@ describe("WindowViewBlock", () => {
       />,
     );
 
-    expect(screen.queryByLabelText("Type")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Type")).toBeInTheDocument();
+    expect(screen.queryByLabelText("At")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Style")).not.toBeInTheDocument();
     const labelInput = screen.queryByLabelText("Label") as HTMLInputElement;
     expect(labelInput).toBeInTheDocument();
@@ -116,29 +118,27 @@ describe("WindowViewBlock", () => {
         textBlock={{
           text: "current",
           type: "select",
-          selectedOption: "current",
           availableOptions: [
-            { text: "post", data: { text: "post", noStyle: "true" } },
-            { text: "current", data: { text: "current", noStyle: "true" } },
-            { text: "future", data: { text: "future", noStyle: "true" } },
+            { text: "post", data: { noStyle: "true" } },
+            { text: "current", data: { noStyle: "true" } },
+            { text: "future", data: { noStyle: "true" } },
           ],
         }}
         setTextBlock={mockSet}
       />,
     );
-    const selectedOptionInput = screen.queryByTestId(/selected-:r/) as HTMLInputElement;
-    expect(selectedOptionInput).toBeInTheDocument();
-    await user.clear(selectedOptionInput);
-    await user.type(selectedOptionInput, "future");
-    fireEvent.blur(selectedOptionInput);
+    const availableOptionsInput = screen.queryByLabelText("Available options") as HTMLInputElement;
+    expect(availableOptionsInput).toBeInTheDocument();
+    await user.clear(availableOptionsInput);
+    await user.type(availableOptionsInput, "bring\nme\ncoffee");
+    fireEvent.blur(availableOptionsInput);
     expect(mockSet).toHaveBeenLastCalledWith({
       type: "select",
-      text: "future",
-      selectedOption: "future",
+      text: "current",
       availableOptions: [
-        { text: "post", data: { text: "post", noStyle: "true" } },
-        { text: "current", data: { text: "current", noStyle: "true" } },
-        { text: "future", data: { text: "future", noStyle: "true" } },
+        { text: "bring", data: { noStyle: "true" } },
+        { text: "me", data: { noStyle: "true" } },
+        { text: "coffee", data: { noStyle: "true" } },
       ],
     });
   });

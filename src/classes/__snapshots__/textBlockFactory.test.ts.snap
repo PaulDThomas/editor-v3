@@ -47,7 +47,7 @@ EditorV3AtBlock {
 }
 `;
 
-exports[`Check at correctly loaded, and eats its own tail Load select 1`] = `"<span class="aiev3-tb select-block is-locked" data-type="select" data-is-locked="true" data-available-options="[{&quot;text&quot;:&quot;Hello&quot;,&quot;data&quot;:{&quot;text&quot;:&quot;Hello&quot;,&quot;noStyle&quot;:&quot;true&quot;}},{&quot;text&quot;:&quot;World&quot;,&quot;data&quot;:{&quot;text&quot;:&quot;World&quot;,&quot;style&quot;:&quot;shiny&quot;}}]" data-selected-option="Hello">Hello</span>"`;
+exports[`Check at correctly loaded, and eats its own tail Load select 1`] = `"<span class="aiev3-tb select-block is-locked" data-type="select" data-is-locked="true" data-available-options="[{&quot;text&quot;:&quot;Hello&quot;,&quot;data&quot;:{&quot;noStyle&quot;:&quot;true&quot;}},{&quot;text&quot;:&quot;World&quot;,&quot;data&quot;:{&quot;style&quot;:&quot;shiny&quot;}}]">Hello</span>"`;
 
 exports[`Check at correctly loaded, and eats its own tail Load span with style and space 1`] = `
 EditorV3AtBlock {

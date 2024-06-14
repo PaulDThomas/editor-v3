@@ -34,6 +34,10 @@
 }
 
 .expander > .holder .label {
+  transition: left 0.5s ease-in-out;
+}
+
+.expander:not(.disabled) > .holder .label {
   left: calc(24px + 0.25rem);
 }
 
@@ -43,7 +47,9 @@
   background-image: var(--down-arrow);
   width: 24px;
   height: 24px;
-  transition: transform 1s ease;
+  transition:
+    transform 1s ease,
+    width 0.5s ease-in-out;
   transform: rotate(-90deg);
   cursor: pointer;
 }
@@ -55,6 +61,7 @@
 
 .expander.disabled > .holder::before {
   background-image: none;
+  width: 0;
 }
 
 .expanderContent {

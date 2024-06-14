@@ -12,7 +12,6 @@ import {
 import { renderDropdown } from "./toHtml/renderDropdown";
 
 export interface IEditorV3SelectBlockOptionalParams extends IEditorV3TextBlockOptionalParams {
-  selectedOption?: string;
   availableOptions?: EditorV3DropListItem<Record<string, string>>[];
 }
 
@@ -25,18 +24,30 @@ export interface IEditorV3SelectBlock
  */
 export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3SelectBlock {
   /**
-   * Currently selected option
-   */
-  public selectedOption: string | undefined;
-
-  /**
    * Available options
    */
-  public availableOptions: EditorV3DropListItem<Record<string, string>>[] = [];
+  private _availableOptions: EditorV3DropListItem<Record<string, string>>[] = [];
+  public get availableOptions(): EditorV3DropListItem<Record<string, string>>[] {
+    return this._availableOptions;
+  }
+  private _styleOrNot = (
+    o: EditorV3DropListItem<Record<string, string>>,
+  ): EditorV3DropListItem<Record<string, string>> => {
+    const option: EditorV3DropListItem<Record<string, string>> = {
+      text: o.text,
+      data: {},
+    };
+    if (o.data?.style && option.data) option.data.style = o.data.style;
+    else if (option.data) option.data.noStyle = "true";
+    return option;
+  };
+
+  public set availableOptions(value: EditorV3DropListItem<Record<string, string>>[]) {
+    this._availableOptions = value.map(this._styleOrNot);
+  }
 
   get data(): IEditorV3SelectBlock {
     const ret: IEditorV3SelectBlock = super.data;
-    ret.selectedOption = this.selectedOption;
     ret.availableOptions = this.availableOptions;
     return ret;
   }
@@ -52,18 +63,6 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
     ];
   }
 
-  private _styleOrNot = (
-    o: EditorV3DropListItem<Record<string, string>>,
-  ): EditorV3DropListItem<Record<string, string>> => {
-    const option: EditorV3DropListItem<Record<string, string>> = {
-      text: o.text,
-      data: { text: o.text },
-    };
-    if (o.data?.style && option.data) option.data.style = o.data.style;
-    else if (option.data) option.data.noStyle = "true";
-    return option;
-  };
-
   constructor(
     arg: IEditorV3SelectBlock | HTMLSpanElement | DocumentFragment,
     forcedParams?: IEditorV3SelectBlockOptionalParams,
@@ -72,6 +71,7 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
     super(arg, forcedParams);
     // Force type
     this.type = "select";
+    this.isLocked = true;
     // Check for at specific information
     if (arg instanceof HTMLSpanElement) {
       this.furtherHtml(arg);
@@ -84,21 +84,17 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
         );
       this.furtherHtml(arg.childNodes[0] as HTMLSpanElement);
     } else {
-      if (arg.selectedOption) this.selectedOption = arg.selectedOption;
-      if (arg.availableOptions) this.availableOptions = arg.availableOptions.map(this._styleOrNot);
+      if (arg.availableOptions) this.availableOptions = arg.availableOptions;
     }
     // Force any parameters
     if (forcedParams) {
-      if (forcedParams.selectedOption) this.selectedOption = forcedParams.selectedOption;
-      if (forcedParams.availableOptions)
-        this.availableOptions = forcedParams.availableOptions.map(this._styleOrNot);
+      if (forcedParams.availableOptions) this.availableOptions = forcedParams.availableOptions;
     }
   }
 
   // Read extra data from HTML
   private furtherHtml(arg: HTMLSpanElement) {
     // Copy dataset to selectFactory
-    if (arg.dataset.selectedOption) this.selectedOption = arg.dataset.selectedOption;
     if (arg.dataset.availableOptions) {
       this.availableOptions = JSON.parse(arg.dataset.availableOptions);
     }
@@ -106,6 +102,7 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
 
   // Show dropdown
   public showDropdown = () => {
+    this.isActive = true;
     this.isSelected = true;
   };
 
@@ -137,47 +134,42 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
     }
 
     // Add locked status
-    if (this.isLocked || !this.isActive) {
-      span.classList.add("is-locked");
-      span.dataset.isLocked = "true";
-      span.contentEditable = "false";
-      // Add other data items from the at item
-      span.dataset.availableOptions = JSON.stringify(this.availableOptions);
-      if (this.selectedOption) span.dataset.selectedOption = this.selectedOption ?? "";
+    span.classList.add("is-locked");
+    span.dataset.isLocked = "true";
+    span.contentEditable = "false";
+    // Add other data items from the at item
+    span.dataset.availableOptions = JSON.stringify(this.availableOptions);
 
-      // Throttle dropdown render
-      let renderTimeout: number | null = null;
-      if (!renderTimeout && this.isSelected && this.availableOptions.length > 0) {
-        span.classList.add("show-dropdown");
-        renderTimeout = window.setTimeout(() => {
-          renderDropdown(
-            span,
-            async () => {
-              return (
-                this.availableOptions.map((option) => {
-                  const listItem = document.createElement("li");
-                  const tb = new EditorV3TextBlock({
-                    text: option.text,
-                    style: option.data?.style,
-                  });
-                  tb.toHtml(
-                    { currentEl: listItem },
-                    renderProps.styles?.[option.data?.style ?? ""],
-                  );
-                  return {
-                    text: option.text,
-                    data: option.data,
-                    listRender: listItem,
-                  };
-                }) ?? []
-              );
-            },
-            Math.max(1, this.availableOptions.length),
-            this.text,
-          );
-        }, 100);
-      }
-    } else if (this.isActive) {
+    // Throttle dropdown render
+    let renderTimeout: number | null = null;
+    if (!renderTimeout && this.isSelected && this.availableOptions.length > 0) {
+      span.classList.add("show-dropdown");
+      renderTimeout = window.setTimeout(() => {
+        renderDropdown(
+          span,
+          async () => {
+            return (
+              this.availableOptions.map((option) => {
+                const listItem = document.createElement("li");
+                const tb = new EditorV3TextBlock({
+                  text: option.text,
+                  style: option.data?.style,
+                });
+                tb.toHtml({ currentEl: listItem }, renderProps.styles?.[option.data?.style ?? ""]);
+                return {
+                  text: option.text,
+                  data: option.data,
+                  listRender: listItem,
+                };
+              }) ?? []
+            );
+          },
+          Math.max(1, this.availableOptions.length),
+          this.text,
+        );
+      }, 100);
+    }
+    if (this.isActive) {
       span.classList.add("is-active");
     }
 
