@@ -541,28 +541,45 @@ describe("Check EditorV3Line functions", () => {
   test("Generate markdown", async () => {
     const mdLine = new EditorV3Line(
       [
-        textBlockFactory({ text: "hello" }, { style: "world" }),
+        textBlockFactory({ text: "hello" }, { style: "world", label: "label" }),
         textBlockFactory({ text: " slow" }),
         textBlockFactory({ text: "and?fat" }, { style: "defaultStyle" }),
       ],
       defaultContentProps,
     );
-    expect(mdLine.toMarkdown()).toEqual("<<world::hello>> slow<<and?fat>>");
+    expect(mdLine.toMarkdown({}).textContent).toEqual("<<world::label::hello>> slow<<and?fat>>");
   });
 
   test("Load markdown div elements", async () => {
+    const mdText =
+      "<<st1::what>> are you doing? @[st2::Hello@bloke@] fancy coming back to my <<green::color::green>>[[choose**home||green::lily pad||garage]]?";
     const div = document.createElement("div");
-    const text = document.createTextNode("<<st1::what>> are you doing? <<with that>> thing?");
+    div.classList.add("aiev3-markdown-line");
+    const text = document.createTextNode(mdText);
     div.appendChild(text);
 
     const result = new EditorV3Line(div, defaultContentProps);
-
-    expect(result.textBlocks).toEqual([
-      textBlockFactory({ text: "what", style: "st1", lineStartPosition: 0 }),
-      textBlockFactory({ text: " are you doing? ", lineStartPosition: 4 }),
-      textBlockFactory({ text: "with that", style: "defaultStyle", lineStartPosition: 20 }),
-      textBlockFactory({ text: " thing?", lineStartPosition: 29 }),
+    expect(result.textBlocks.map((tb) => tb.data)).toEqual([
+      { type: "text", text: "what", style: "st1" },
+      { type: "text", text: " are you doing? " },
+      { type: "at", text: "Hello@bloke", style: "st2" },
+      { type: "text", text: " fancy coming back to my " },
+      { type: "text", text: "green", label: "color", style: "green" },
+      {
+        type: "select",
+        text: "choose",
+        isLocked: true,
+        availableOptions: [
+          { text: "home", data: { noStyle: "true" } },
+          { text: "lily pad", data: { style: "green" } },
+          { text: "garage", data: { noStyle: "true" } },
+        ],
+      },
+      { type: "text", text: "?" },
     ]);
+
+    const result2 = new EditorV3Line(mdText);
+    expect(result2.textBlocks.map((tb) => tb.data)).toEqual(result.textBlocks.map((tb) => tb.data));
   });
 });
 

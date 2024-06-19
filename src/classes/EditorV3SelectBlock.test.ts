@@ -23,11 +23,10 @@ describe("EditorV3SelectBlock", () => {
     const availableOptions: EditorV3DropListItem<Record<string, string>>[] = [
       {
         text: "Hello",
-        data: { text: "Hello" },
       },
       {
         text: "World",
-        data: { text: "World", style: "shiny" },
+        data: { style: "shiny" },
       },
     ];
     const block = new EditorV3SelectBlock({ text, style, availableOptions });
@@ -258,11 +257,10 @@ describe("should return a DocumentFragment with a dropdown", () => {
     const availableOptions: EditorV3DropListItem<Record<string, string>>[] = [
       {
         text: "Hello",
-        data: { text: "Hello" },
       },
       {
         text: "World",
-        data: { text: "World", style: "shiny" },
+        data: { style: "shiny" },
       },
     ];
     const block = new EditorV3SelectBlock({ text, style, availableOptions });
@@ -304,11 +302,10 @@ describe("should return a DocumentFragment with a dropdown", () => {
     const availableOptions: EditorV3DropListItem<Record<string, string>>[] = [
       {
         text: "Hello",
-        data: { text: "Hello" },
       },
       {
         text: "World",
-        data: { text: "World", style: "shiny" },
+        data: { style: "shiny" },
       },
     ];
     const block = new EditorV3SelectBlock({ text, style, availableOptions });
@@ -356,5 +353,26 @@ describe("EditorV3SelectBlock errors", () => {
     }).toThrow(
       "EditorV3SelectBlock:Constructor: DocumentFragment child node must be HTMLSpanElement",
     );
+  });
+});
+
+describe("EditorV3SelectBlock markdown output", () => {
+  test("should return the correct markdown output", async () => {
+    const text = "-- Select --";
+    const style = "bold";
+    const availableOptions: EditorV3DropListItem<Record<string, string>>[] = [
+      {
+        text: "Hello",
+      },
+      {
+        text: "World",
+        data: { style: "shiny" },
+      },
+    ];
+    const testBlock = new EditorV3SelectBlock({ text, style, availableOptions });
+    const result = testBlock.toMarkdown();
+    expect(testBlock.toMarkdown()).toEqual("[[bold::-- Select --**Hello||shiny::World]]");
+    const eatOwnTail = new EditorV3SelectBlock(result);
+    expect(eatOwnTail.data).toEqual(testBlock.data);
   });
 });

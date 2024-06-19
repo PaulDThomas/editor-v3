@@ -9,6 +9,7 @@ import {
   EditorV3Style,
   EditorV3WordPosition,
 } from "./interface";
+import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import { renderDropdown } from "./toHtml/renderDropdown";
 
 export interface IEditorV3AtBlockOptionalParams extends IEditorV3TextBlockOptionalParams {
@@ -56,7 +57,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
   }
 
   constructor(
-    arg: IEditorV3AtBlock | HTMLSpanElement | DocumentFragment,
+    arg: IEditorV3AtBlock | HTMLSpanElement | DocumentFragment | string,
     forcedParams?: IEditorV3AtBlockOptionalParams,
   ) {
     // Usual text block constructor
@@ -64,13 +65,16 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     // Force type
     this.type = "at";
     // Check for at specific information
-    if (arg instanceof HTMLSpanElement) {
+    if (typeof arg === "string") {
+      this.furtherMarkdown(forcedParams?.markdownSettings);
+    } else if (arg instanceof HTMLSpanElement) {
       this.furtherHtml(arg);
     } else if (arg instanceof DocumentFragment) {
       if (arg.childNodes.length !== 1)
         throw new Error("EditorV3AtBlock:Constructor: DocumentFragment must have 1 child node");
       else if (!(arg.childNodes[0] instanceof HTMLSpanElement))
         throw new Error("EditorV3AtBlock:Constructor: Child node must be HTMLSpanElement");
+      // Read element
       this.furtherHtml(arg.childNodes[0] as HTMLSpanElement);
     } else {
       if (arg.atListFunction) this.atListFunction = arg.atListFunction;
@@ -95,6 +99,21 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
         this.atData[key] = arg.dataset[key] as string;
       }
     });
+  }
+
+  // Get markdown information
+  private furtherMarkdown(arg?: IMarkdownSettings) {
+    const markdownSettings = arg ?? this._defaultContentProps.markdownSettings;
+    this.atData = {};
+    if (
+      this.text.startsWith(markdownSettings.atStartTag) &&
+      this.text.endsWith(markdownSettings.atEndTag)
+    ) {
+      this.markdownStyleLabel(
+        this.text.slice(markdownSettings.atStartTag.length, -markdownSettings.atEndTag.length),
+        markdownSettings,
+      );
+    }
   }
 
   // Overload html return
@@ -158,5 +177,15 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     if (renderProps.currentEl) renderProps.currentEl.append(ret);
     // Always return
     return ret;
+  }
+
+  public toMarkdown(markdownSettings = this._defaultContentProps.markdownSettings): string {
+    // Set base text
+    let text = markdownSettings.atStartTag;
+    // Update text with style and label
+    text += this.toMarkdownStyleLabel(markdownSettings);
+    // Complete tag
+    text += this.text + markdownSettings.atEndTag;
+    return text;
   }
 }

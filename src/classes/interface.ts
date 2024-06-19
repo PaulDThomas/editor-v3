@@ -1,7 +1,7 @@
 import { EditorV3AtBlock, IEditorV3AtBlock } from "./EditorV3AtBlock";
 import { EditorV3SelectBlock, IEditorV3SelectBlock } from "./EditorV3SelectBlock";
 import { EditorV3TextBlock, IEditorV3TextBlock } from "./EditorV3TextBlock";
-import { IMarkdownSettings } from "./markdown/MarkdownSettings";
+import { IMarkdownSettings } from "./defaultMarkdownSettings";
 
 /**
  * Available text alignments

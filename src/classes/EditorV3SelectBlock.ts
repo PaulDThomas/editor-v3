@@ -9,6 +9,7 @@ import {
   EditorV3Style,
   EditorV3WordPosition,
 } from "./interface";
+import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import { renderDropdown } from "./toHtml/renderDropdown";
 
 export interface IEditorV3SelectBlockOptionalParams extends IEditorV3TextBlockOptionalParams {
@@ -64,7 +65,7 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
   }
 
   constructor(
-    arg: IEditorV3SelectBlock | HTMLSpanElement | DocumentFragment,
+    arg: IEditorV3SelectBlock | HTMLSpanElement | DocumentFragment | string,
     forcedParams?: IEditorV3SelectBlockOptionalParams,
   ) {
     // Usual text block constructor
@@ -73,7 +74,9 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
     this.type = "select";
     this.isLocked = true;
     // Check for at specific information
-    if (arg instanceof HTMLSpanElement) {
+    if (typeof arg === "string") {
+      this.furtherMarkdown(forcedParams?.markdownSettings);
+    } else if (arg instanceof HTMLSpanElement) {
       this.furtherHtml(arg);
     } else if (arg instanceof DocumentFragment) {
       if (arg.childNodes.length !== 1)
@@ -82,6 +85,7 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
         throw new Error(
           "EditorV3SelectBlock:Constructor: DocumentFragment child node must be HTMLSpanElement",
         );
+      // Read element
       this.furtherHtml(arg.childNodes[0] as HTMLSpanElement);
     } else {
       if (arg.availableOptions) this.availableOptions = arg.availableOptions;
@@ -97,6 +101,37 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
     // Copy dataset to selectFactory
     if (arg.dataset.availableOptions) {
       this.availableOptions = JSON.parse(arg.dataset.availableOptions);
+    }
+  }
+
+  // Get markdown information
+  private furtherMarkdown(arg?: IMarkdownSettings) {
+    const markdownSettings = arg ?? this._defaultContentProps.markdownSettings;
+    this.availableOptions = [];
+    if (
+      this.text.startsWith(markdownSettings.dropDownStartTag) &&
+      this.text.endsWith(markdownSettings.dropDownEndTag) &&
+      this.text.includes(markdownSettings.dropDownSelectedValueTag)
+    ) {
+      this.text = this.text.slice(
+        markdownSettings.dropDownStartTag.length,
+        -markdownSettings.dropDownEndTag.length,
+      );
+      const dd = this.text.indexOf(markdownSettings.dropDownSelectedValueTag);
+
+      const current = this.text.slice(0, dd);
+      const optionsTexts = this.text
+        .slice(dd + markdownSettings.dropDownSelectedValueTag.length)
+        .split(markdownSettings.dropDownValueSeparator);
+
+      this.markdownStyleLabel(current, markdownSettings);
+      this.availableOptions = optionsTexts.map((optionText) => {
+        const ret = this.markdownStyleLabel(optionText, markdownSettings, false);
+        return {
+          text: ret.text,
+          data: ret.style ? { style: ret.style } : undefined,
+        };
+      });
     }
   }
 
@@ -179,5 +214,22 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
     }
     // Always return
     return ret;
+  }
+
+  public toMarkdown(markdownSettings = this._defaultContentProps.markdownSettings): string {
+    let text = markdownSettings.dropDownStartTag;
+    text += this.toMarkdownStyleLabel(markdownSettings);
+    text +=
+      this.text +
+      markdownSettings.dropDownSelectedValueTag +
+      this._availableOptions
+        .map(
+          (option) =>
+            (option.data?.style ? option.data.style + markdownSettings.styleNameEndTag : "") +
+            option.text,
+        )
+        .join(markdownSettings.dropDownValueSeparator);
+    text += markdownSettings.dropDownEndTag;
+    return text;
   }
 }

@@ -178,7 +178,6 @@ describe("External update", () => {
       await user.click(opnBtn);
       jest.runAllTimers();
     });
-    screen.debug();
     expect(expander).toHaveClass("placing");
     await act(async () => jest.runAllTimers());
     expect(expander).toHaveClass("opening");

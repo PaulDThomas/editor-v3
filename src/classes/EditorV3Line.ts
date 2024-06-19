@@ -1,7 +1,8 @@
 import { cloneDeep, isEqual } from "lodash";
 import { readV3DivElement } from "../functions/readV3DivElement";
-import { readV3MarkdownElement } from "../functions/readV3MarkdownElement";
+import { EditorV3AtBlock } from "./EditorV3AtBlock";
 import { EditorV3PositionClass } from "./EditorV3Position";
+import { EditorV3SelectBlock } from "./EditorV3SelectBlock";
 import { EditorV3TextBlock, EditorV3TextBlockType } from "./EditorV3TextBlock";
 import { defaultContentProps } from "./defaultContentProps";
 import { drawHtmlDecimalAlign } from "./drawHtmlDecimalAlign";
@@ -16,10 +17,7 @@ import {
   EditorV3WordPosition,
   IEditorV3Line,
 } from "./interface";
-import { IMarkdownSettings } from "./markdown/MarkdownSettings";
 import { textBlockFactory } from "./textBlockFactory";
-import { EditorV3SelectBlock } from "./EditorV3SelectBlock";
-import { EditorV3AtBlock } from "./EditorV3AtBlock";
 
 export class EditorV3Line implements IEditorV3Line {
   public textBlocks: EditorV3BlockClass[];
@@ -56,6 +54,24 @@ export class EditorV3Line implements IEditorV3Line {
       const endBlockEl = new EditorV3TextBlock().toHtml(renderProps);
       h.append(endBlockEl);
     }
+    if (renderProps.editableEl) renderProps.editableEl.append(h);
+    return h;
+  }
+
+  /**
+   * Get a markdown DocumentFragment for the line
+   * @param markdownSettings Settings for the markdown string
+   * @returns The markdown for the line
+   */
+  public toMarkdown(renderProps: EditorV3RenderProps): HTMLDivElement {
+    const h = document.createElement("div");
+    renderProps.currentEl = h;
+    h.className = "aiev3-markdown-line";
+    h.textContent = this.textBlocks
+      .map((tb) =>
+        tb.toMarkdown(renderProps.markdownSettings ?? this.contentProps.markdownSettings),
+      )
+      .join("");
     if (renderProps.editableEl) renderProps.editableEl.append(h);
     return h;
   }
@@ -98,37 +114,44 @@ export class EditorV3Line implements IEditorV3Line {
     return Object.keys(contentProps).length === 0 ? { textBlocks } : { contentProps, textBlocks };
   }
 
-  /**
-   * Get a markdown string for the line
-   * @param markdownSettings Settings for the markdown string
-   * @returns The markdown for the line
-   */
-  public toMarkdown(
-    markdownSettings: IMarkdownSettings = this.contentProps.markdownSettings,
-  ): string {
-    return this.textBlocks.map((tb) => tb.toMarkdown(markdownSettings)).join("");
-  }
-
   // Constructor
   constructor(
-    arg?: IEditorV3Line | HTMLDivElement | EditorV3BlockClass[],
+    arg?: IEditorV3Line | HTMLDivElement | EditorV3BlockClass[] | string,
     contentProps?: EditorV3ContentPropsInput,
   ) {
     // Set defaults
     this.textBlocks = [];
     this.contentProps = cloneDeep(this._defaultContentProps);
 
-    // HTMLDivElement
-    if (arg instanceof HTMLDivElement) {
-      const ret = Array.from(arg.classList).includes("aiev3-line")
-        ? readV3DivElement(arg)
-        : readV3MarkdownElement(arg, this.contentProps);
+    // Markdown HTMLDivElement
+    if (arg instanceof HTMLDivElement && arg.classList.contains("aiev3-markdown-line")) {
+      this.contentProps = {
+        ...contentProps,
+        ...this._defaultContentProps,
+      };
+      this.fromMarkdown(arg.textContent ?? "");
+    }
+    // Standard HTMLDivElement
+    else if (arg instanceof HTMLDivElement) {
+      const ret = readV3DivElement(arg);
       this.textBlocks = ret.textBlocks;
       this.contentProps.textAlignment = ret.textAlignment;
       this.contentProps.decimalAlignPercent = ret.decimalAlignPercent;
-    } else if (Array.isArray(arg)) {
+    }
+    // Markdown text
+    else if (typeof arg === "string") {
+      this.contentProps = {
+        ...contentProps,
+        ...this._defaultContentProps,
+      };
+      this.fromMarkdown(arg);
+    }
+    // Block array
+    else if (Array.isArray(arg)) {
       this.textBlocks = arg;
-    } else {
+    }
+    // JSON object/undefined
+    else {
       this.textBlocks = arg?.textBlocks.map((tb) => textBlockFactory(tb)) ?? [
         new EditorV3TextBlock(),
       ];
@@ -141,6 +164,108 @@ export class EditorV3Line implements IEditorV3Line {
     // Fix any problems
     this._lockTextBlocksByStyle();
     this._mergeBlocks();
+  }
+
+  /**
+   * Read markdown string
+   * @param markdown Markdown string to read
+   * @param markdownSettings Settings for the markdown string
+   */
+  private fromMarkdown(markdown: string) {
+    if (this.contentProps.markdownSettings) {
+      let remainingMarkdown = markdown;
+      let safety = 0;
+      while (remainingMarkdown.length > 0 && safety < 100) {
+        safety++;
+        // Start of complete select block
+        if (
+          remainingMarkdown.startsWith(this.contentProps.markdownSettings.dropDownStartTag) &&
+          remainingMarkdown.indexOf(this.contentProps.markdownSettings.dropDownSelectedValueTag) >
+            -1 &&
+          remainingMarkdown.indexOf(this.contentProps.markdownSettings.dropDownEndTag) > -1
+        ) {
+          const blockEnd = remainingMarkdown.indexOf(
+            this.contentProps.markdownSettings.dropDownEndTag,
+          );
+          this.textBlocks.push(
+            new EditorV3SelectBlock(
+              remainingMarkdown.slice(
+                0,
+                blockEnd + this.contentProps.markdownSettings.dropDownEndTag.length,
+              ),
+              { markdownSettings: this.contentProps.markdownSettings },
+            ),
+          );
+          remainingMarkdown = remainingMarkdown.slice(
+            blockEnd + this.contentProps.markdownSettings.dropDownEndTag.length,
+          );
+        }
+        // Start of complete at block
+        else if (
+          remainingMarkdown.startsWith(this.contentProps.markdownSettings.atStartTag) &&
+          remainingMarkdown.indexOf(this.contentProps.markdownSettings.atEndTag) > -1
+        ) {
+          const blockEnd = remainingMarkdown.indexOf(this.contentProps.markdownSettings.atEndTag);
+          this.textBlocks.push(
+            new EditorV3AtBlock(
+              remainingMarkdown.slice(
+                0,
+                blockEnd + this.contentProps.markdownSettings.atEndTag.length,
+              ),
+              { markdownSettings: this.contentProps.markdownSettings },
+            ),
+          );
+          remainingMarkdown = remainingMarkdown.slice(
+            blockEnd + this.contentProps.markdownSettings.atEndTag.length,
+          );
+        }
+        // Start of complete style block
+        else if (
+          remainingMarkdown.startsWith(this.contentProps.markdownSettings.styleStartTag) &&
+          remainingMarkdown.indexOf(this.contentProps.markdownSettings.styleEndTag) > -1
+        ) {
+          const blockEnd = remainingMarkdown.indexOf(
+            this.contentProps.markdownSettings.styleEndTag,
+          );
+          this.textBlocks.push(
+            new EditorV3TextBlock(
+              remainingMarkdown.slice(
+                0,
+                blockEnd + this.contentProps.markdownSettings.styleEndTag.length,
+              ),
+              { markdownSettings: this.contentProps.markdownSettings },
+            ),
+          );
+          remainingMarkdown = remainingMarkdown.slice(
+            blockEnd + this.contentProps.markdownSettings.styleEndTag.length,
+          );
+        }
+        // Text block until next tag
+        else {
+          const nextDropTag = remainingMarkdown
+            .slice(1)
+            .indexOf(this.contentProps.markdownSettings.dropDownStartTag);
+          const nextAtTag = remainingMarkdown
+            .slice(1)
+            .indexOf(this.contentProps.markdownSettings.atStartTag);
+          const nextStyleTag = remainingMarkdown
+            .slice(1)
+            .indexOf(this.contentProps.markdownSettings.styleStartTag);
+          const blockEnd = Math.min(
+            nextDropTag > -1 ? nextDropTag + 1 : Infinity,
+            nextAtTag > -1 ? nextAtTag + 1 : Infinity,
+            nextStyleTag > -1 ? nextStyleTag + 1 : Infinity,
+            remainingMarkdown.length,
+          );
+          this.textBlocks.push(
+            new EditorV3TextBlock(remainingMarkdown.slice(0, blockEnd), {
+              markdownSettings: this.contentProps.markdownSettings,
+            }),
+          );
+          remainingMarkdown = remainingMarkdown.slice(blockEnd);
+        }
+      }
+    }
   }
 
   /**

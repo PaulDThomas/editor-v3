@@ -4,7 +4,6 @@ import { EditorV3ContentPropsInput, IEditorV3 } from "../classes/interface";
 import { textBlockFactory } from "../classes/textBlockFactory";
 import { readContentPropsNode } from "./readContentPropsNode";
 import { readV3DivElement } from "./readV3DivElement";
-import { readV3MarkdownElement } from "./readV3MarkdownElement";
 
 export const readV3Html = (text: string, contentProps?: EditorV3ContentPropsInput): IEditorV3 => {
   const ret: IEditorV3 = {
@@ -36,8 +35,7 @@ export const readV3Html = (text: string, contentProps?: EditorV3ContentPropsInpu
 
     // Read line nodes
     [...frag.querySelectorAll("div.aiev3-markdown-line")].forEach((el) => {
-      const div = el as HTMLDivElement;
-      const lineRet = readV3MarkdownElement(div, {
+      const lineRet = new EditorV3Line(el.textContent ?? "", {
         ...defaultContentProps,
         ...ret.contentProps,
         ...contentProps,

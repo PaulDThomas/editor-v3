@@ -20,7 +20,6 @@ EditorV3AtBlock {
       "calcStartTag": "[![",
       "defaultStyle": "defaultStyle",
       "dropDownEndTag": "]]",
-      "dropDownNameEndTag": "::",
       "dropDownSelectedValueTag": "**",
       "dropDownStartTag": "[[",
       "dropDownValueSeparator": "||",
@@ -67,7 +66,6 @@ EditorV3AtBlock {
       "calcStartTag": "[![",
       "defaultStyle": "defaultStyle",
       "dropDownEndTag": "]]",
-      "dropDownNameEndTag": "::",
       "dropDownSelectedValueTag": "**",
       "dropDownStartTag": "[[",
       "dropDownValueSeparator": "||",
@@ -85,7 +83,7 @@ EditorV3AtBlock {
   "isActive": false,
   "isLocked": undefined,
   "isSelected": false,
-  "label": "Hello@world",
+  "label": "label",
   "lineStartPosition": 0,
   "maxAtListLength": 10,
   "style": "shiny",
@@ -94,7 +92,9 @@ EditorV3AtBlock {
 }
 `;
 
-exports[`Check at correctly loaded, and eats its own tail Load word with style 1`] = `
+exports[`Check at correctly loaded, and eats its own tail Load word with style 1`] = `"<span class="aiev3-tb at-block editorv3style-shiny is-locked" data-type="at" data-style-name="shiny" title="label" data-is-locked="true">@Hello</span>"`;
+
+exports[`Check at correctly loaded, and eats its own tail Load word with style 2`] = `
 EditorV3AtBlock {
   "_defaultContentProps": {
     "allowMarkdown": false,
@@ -112,7 +112,6 @@ EditorV3AtBlock {
       "calcStartTag": "[![",
       "defaultStyle": "defaultStyle",
       "dropDownEndTag": "]]",
-      "dropDownNameEndTag": "::",
       "dropDownSelectedValueTag": "**",
       "dropDownStartTag": "[[",
       "dropDownValueSeparator": "||",
@@ -130,7 +129,7 @@ EditorV3AtBlock {
   "isActive": false,
   "isLocked": undefined,
   "isSelected": false,
-  "label": undefined,
+  "label": "label",
   "lineStartPosition": 0,
   "maxAtListLength": 10,
   "style": "shiny",

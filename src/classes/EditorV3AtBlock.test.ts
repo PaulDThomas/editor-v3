@@ -373,3 +373,13 @@ describe("EditorV3AtBlock errors", () => {
     }).toThrow("EditorV3AtBlock:Constructor: Child node must be HTMLSpanElement");
   });
 });
+
+describe("EditorV3AtBlock markdown output", () => {
+  test("should return the correct markdown output", async () => {
+    const testBlock = new EditorV3AtBlock({ text: "@Hello", style: "shiny", label: "label" });
+    const result = testBlock.toMarkdown();
+    expect(testBlock.toMarkdown()).toEqual("@[shiny::label::@Hello@]");
+    const eatOwnTail = new EditorV3AtBlock(result);
+    expect(eatOwnTail.data).toEqual(testBlock.data);
+  });
+});

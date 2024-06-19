@@ -1,5 +1,5 @@
 import { EditorV3Align, EditorV3ContentProps } from "./interface";
-import { defaultMarkdownSettings } from "./markdown/MarkdownSettings";
+import { defaultMarkdownSettings } from "./defaultMarkdownSettings";
 
 export const defaultContentProps: EditorV3ContentProps = {
   allowMarkdown: false,

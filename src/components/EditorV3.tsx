@@ -4,6 +4,7 @@ import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from
 import { EditorV3AtBlock, EditorV3Line } from "../classes";
 import { EditorV3Content } from "../classes/EditorV3Content";
 import { defaultContentProps } from "../classes/defaultContentProps";
+import { IMarkdownSettings } from "../classes/defaultMarkdownSettings";
 import {
   EditorV3Align,
   EditorV3ContentPropsInput,
@@ -12,7 +13,6 @@ import {
   EditorV3Styles,
   IEditorV3,
 } from "../classes/interface";
-import { IMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 import { useDebounceStack } from "../hooks/useDebounceStack";
 import "./EditorV3.css";
 import { WindowView } from "./WindowView/WindowView";
@@ -158,19 +158,8 @@ export const EditorV3 = ({
   const redrawElement = useCallback((ret: EditorV3State) => {
     // console.debug(
     //   "Redraw element:\r\n",
-    //   ret.content.lines
-    //     .map((l) =>
-    //       l.textBlocks
-    //         .map(
-    //           (tb) =>
-    //             tb.text +
-    //             (tb instanceof EditorV3SelectBlock
-    //               ? ">>" + tb.availableOptions?.map((ao) => ao.text).join("*")
-    //               : ""),
-    //         )
-    //         .join("|"),
-    //     )
-    //     .join("\n"),
+    //   ret.content.lines.map((l) => l.toMarkdown({}).textContent).join("\n"),
+    //   JSON.stringify(ret.content.caretPosition),
     // );
     divRef.current && ret.content.redraw(divRef.current, ret.focus);
   }, []);
@@ -207,7 +196,7 @@ export const EditorV3 = ({
     (newContent: EditorV3Content, calledFrom?: string, focus?: boolean) => {
       // console.debug(
       //   "SetContent:" + calledFrom + ":\r\n",
-      //   newContent.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("|")).join("\n"),
+      //   newContent.lines.map((l) => l.toMarkdown({}).textContent).join("\n"),
       // );
       setLastCaretPosition(newContent.caretPosition);
       setCurrentValue({

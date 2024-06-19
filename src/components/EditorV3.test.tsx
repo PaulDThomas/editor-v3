@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { act, useState } from "react";
 import { EditorV3Content } from "../classes/EditorV3Content";
 import { EditorV3Align, IEditorV3 } from "../classes/interface";
-import { defaultMarkdownSettings } from "../classes/markdown/MarkdownSettings";
+import { defaultMarkdownSettings } from "../classes/defaultMarkdownSettings";
 import { getCaretPosition } from "../functions/getCaretPosition";
 import { EditorV3 } from "./EditorV3";
 

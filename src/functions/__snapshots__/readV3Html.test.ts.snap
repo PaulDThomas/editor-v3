@@ -19,7 +19,6 @@ exports[`readV3Html tests Read in at block 1`] = `
         "calcStartTag": "[![",
         "defaultStyle": "defaultStyle",
         "dropDownEndTag": "]]",
-        "dropDownNameEndTag": "::",
         "dropDownSelectedValueTag": "**",
         "dropDownStartTag": "[[",
         "dropDownValueSeparator": "||",

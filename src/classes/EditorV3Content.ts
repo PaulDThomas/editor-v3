@@ -18,7 +18,7 @@ import {
   IEditorV3,
   IEditorV3Line,
 } from "./interface";
-import { IMarkdownSettings } from "./markdown/MarkdownSettings";
+import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import { textBlockFactory } from "./textBlockFactory";
 
 /**
@@ -83,6 +83,7 @@ export class EditorV3Content implements IEditorV3 {
   }
   set markdownSettings(newSettings: IMarkdownSettings) {
     this._markdownSettings = newSettings;
+    this.lines.forEach((l) => (l.contentProps.markdownSettings = newSettings));
   }
   private _showMarkdown = this._defaultContentProps.showMarkdown;
   get showMarkdown() {
@@ -261,26 +262,9 @@ export class EditorV3Content implements IEditorV3 {
    */
   public toMarkdownHtml(renderProps: EditorV3RenderProps): DocumentFragment {
     const ret = new DocumentFragment();
-    // Use any passed markdown settings
-    const markdownSettings = renderProps.markdownSettings ?? this._markdownSettings;
-    this.lines.forEach((line) => {
-      const l = document.createElement("div");
-      l.classList.add("aiev3-markdown-line");
-      const tn = document.createTextNode(line.toMarkdown(markdownSettings));
-      l.append(tn);
-      ret.append(l);
-    });
-    // Ensure props node indicates this is markdown
-    let revert = false;
-    if (!this._showMarkdown) {
-      revert = true;
-      this._showMarkdown = true;
-    }
-    const cpn = this._contentPropsNode();
-    ret.append(cpn);
-    if (revert) {
-      this._showMarkdown = false;
-    }
+    // Add content to the element
+    this.lines.forEach((l) => ret.append(l.toMarkdown(renderProps)));
+    ret.append(this._contentPropsNode());
     if (renderProps.editableEl) renderProps.editableEl.append(ret);
     return ret;
   }
