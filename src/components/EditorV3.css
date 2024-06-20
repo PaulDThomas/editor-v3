@@ -31,7 +31,7 @@
 }
 
 .aiev3-resize-border .aiev3-editing {
-  margin: -1px;
+  width: calc(100% - 4px);
 }
 
 .aiev3.editing .aiev3-editing {
