@@ -40,13 +40,6 @@
 
 .aiev3-line {
   width: 100%;
-}
-
-.singleline .aiev3-line {
-  flex-wrap: nowrap;
-}
-
-.multiline .aiev3-line {
   flex-wrap: wrap;
   max-width: 100%;
 }
