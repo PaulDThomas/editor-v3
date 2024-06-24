@@ -154,6 +154,7 @@ export const App = (): JSX.Element => {
                 }}
                 resize
                 allowMarkdown
+                allowWindowView
                 style={{
                   width: "400px",
                   minHeight: "100px",

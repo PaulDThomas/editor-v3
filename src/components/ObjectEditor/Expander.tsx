@@ -8,6 +8,7 @@ interface ExpanderProps extends React.HTMLAttributes<HTMLDivElement> {
   timeMs?: number;
   disabled?: boolean;
   height?: number;
+  contentBoxStyle?: React.CSSProperties;
 }
 
 type ExpanderState = "open" | "closing" | "closed" | "placing" | "opening";
@@ -19,6 +20,7 @@ export const Expander = ({
   timeMs = 300,
   height = 300,
   disabled = false,
+  contentBoxStyle,
   ...rest
 }: ExpanderProps) => {
   const [expanded, setExpanded] = useState<ExpanderState>("closed");
@@ -93,6 +95,7 @@ export const Expander = ({
         <div
           className={baseStyles.expanderContent}
           style={{
+            ...contentBoxStyle,
             transition: `min-height ${timeMs}ms ease-in-out, max-height ${timeMs}ms ease-in-out, opacity ${timeMs}ms ease-in-out`,
             maxHeight: ["open", "opening"].includes(expanded) ? `${height}px` : "0",
             minHeight: ["open", "opening"].includes(expanded) ? `${height}px` : "0",
