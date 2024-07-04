@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { EditorV3, EditorV3Align, EditorV3Styles, IEditorV3, StylesEditor } from "../../src/main";
 import { loadAvailableItems } from "./loadAvailableItems";
+import { BaseEditorV3 } from "../../src/components/BaseEditorv3";
 
 export const App = (): JSX.Element => {
   // First input content
@@ -138,37 +139,36 @@ export const App = (): JSX.Element => {
           </div>
 
           <div className="row">
-            <span className="label">JSON input</span>
-            <span className="content">
-              <EditorV3
-                id={"e2"}
-                input={testObject}
-                setObject={(ret) => {
-                  console.log(ret);
-                }}
-                allowNewLine={allowNewLine}
-                editable={editable}
-                customStyleMap={{
-                  Notes: { color: "royalblue" },
-                  Optional: { color: "green" },
-                }}
-                resize
-                allowMarkdown
-                allowWindowView
-                style={{
-                  width: "400px",
-                  minHeight: "100px",
-                  height: "60px",
-                }}
-              />
-            </span>
+            <BaseEditorV3
+              label={"JSON input"}
+              id={"e2"}
+              input={testObject}
+              setObject={(ret) => {
+                console.log(ret);
+              }}
+              allowNewLine={allowNewLine}
+              editable={editable}
+              customStyleMap={{
+                Notes: { color: "royalblue" },
+                Optional: { color: "green" },
+              }}
+              resize
+              allowMarkdown
+              allowWindowView
+              style={{
+                width: "400px",
+                minHeight: "100px",
+                height: "60px",
+              }}
+            />
           </div>
 
           <div className="row">
             <span className="label">Text input (spelling)</span>
             <span className="content">
-              <EditorV3
+              <BaseEditorV3
                 id={"e3"}
+                label="Text input (spelling)"
                 input={input3}
                 setObject={setInput3}
                 allowMarkdown
@@ -176,7 +176,6 @@ export const App = (): JSX.Element => {
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}
                 editable={editable}
-                noBorder
                 customStyleMap={{
                   ...styleMap,
                   red: { color: "red", isLocked: true },

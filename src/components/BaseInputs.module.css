@@ -169,6 +169,7 @@
   border: 1px solid black;
   border-radius: 4px;
   margin-top: 16px;
-  height: 200px;
+  min-height: 26px;
+  height: fit-content;
   padding: 1px;
 }

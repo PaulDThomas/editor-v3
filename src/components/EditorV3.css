@@ -36,6 +36,7 @@
 }
 
 .aiev3-resize-border .aiev3-editing {
+  height: calc(100% - 4px);
   width: calc(100% - 4px);
 }
 

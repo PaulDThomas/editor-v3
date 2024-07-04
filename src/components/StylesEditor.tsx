@@ -35,7 +35,6 @@ export const defaultStyleItems: ObjectEditorItemOptions[] = [
     type: "select",
     options: [
       { value: undefined, label: "None" },
-      { value: "bold", label: "Bold" },
       { value: "italic", label: "Italic" },
     ],
   },

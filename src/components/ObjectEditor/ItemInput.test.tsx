@@ -115,7 +115,7 @@ describe("ItemInput tests", () => {
     const item = screen.getByTestId("item");
     expect(item).toBeInTheDocument();
     expect(item).toBeInstanceOf(HTMLSelectElement);
-    expect(item).toHaveValue("None");
+    expect(item).toHaveValue("0-None");
     await user.selectOptions(item, "16pt");
     expect(mockSet).toHaveBeenCalledTimes(1);
     expect(mockSet).toHaveBeenCalledWith({
