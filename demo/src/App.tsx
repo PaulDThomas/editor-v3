@@ -67,7 +67,16 @@ export const App = (): JSX.Element => {
         defaultStyle: { color: "green", fontWeight: 700 },
       },
     },
-    lines: [{ textBlocks: [{ text: "two words", style: "defaultStyle" }] }],
+    lines: [
+      {
+        textBlocks: [
+          { text: "two words", style: "defaultStyle" },
+          { text: "2nd locked line", style: "green" },
+          { text: "2nd locked line", style: "green" },
+          { text: "lots of locks", style: "red" },
+        ],
+      },
+    ],
   });
 
   const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.left);
@@ -78,9 +87,9 @@ export const App = (): JSX.Element => {
   const [styleMap, setStyleMap] = useState<EditorV3Styles>({
     green: {
       color: "green",
-      fontFamily: "'Courier New', monospace",
-      fontSize: "18pt",
-      fontWeight: 1000,
+      // fontFamily: "'Courier New', monospace",
+      // fontSize: "18pt",
+      // fontWeight: 1000,
       isLocked: true,
     },
     blue: { color: "blue", fontWeight: 700 },
