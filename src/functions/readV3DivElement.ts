@@ -1,17 +1,18 @@
 import { EditorV3AtBlock } from "../classes/EditorV3AtBlock";
+import { EditorV3SelectBlock } from "../classes/EditorV3SelectBlock";
 import { EditorV3TextBlock } from "../classes/EditorV3TextBlock";
-import { EditorV3Align } from "../classes/interface";
+import { EditorV3Align, EditorV3BlockClass } from "../classes/interface";
 import { textBlockFactory } from "../classes/textBlockFactory";
 
 export const readV3DivElement = (
   arg: HTMLDivElement,
 ): {
-  textBlocks: (EditorV3TextBlock | EditorV3AtBlock)[];
+  textBlocks: EditorV3BlockClass[];
   decimalAlignPercent: number;
   textAlignment: EditorV3Align;
 } => {
   const ret: {
-    textBlocks: (EditorV3TextBlock | EditorV3AtBlock)[];
+    textBlocks: (EditorV3TextBlock | EditorV3AtBlock | EditorV3SelectBlock)[];
     decimalAlignPercent: number;
     textAlignment: EditorV3Align;
   } = {
@@ -59,13 +60,15 @@ export const readV3DivElement = (
             ].filter((tb) => tb.text !== "" && tb.text !== "\u2009");
     }
     // Standard alignment
-    else if (["left", "center", "right"].includes(arg.classList[1])) {
+    else {
       ret.textBlocks = [
         ...[...arg.childNodes].map((el) =>
           textBlockFactory(el instanceof HTMLSpanElement || el instanceof Text ? el : { text: "" }),
         ),
       ].filter((tb) => tb.text !== "");
-      ret.textAlignment = arg.classList[1] as EditorV3Align;
+      ret.textAlignment = ["left", "center", "right"].includes(arg.classList[1])
+        ? (arg.classList[1] as EditorV3Align)
+        : EditorV3Align.left;
     }
   }
   // Ensure there is at least something

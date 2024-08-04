@@ -12,8 +12,7 @@ describe("Check basic EditorV3TextBlock", () => {
     expect(new EditorV3TextBlock(testBlock).data).toEqual(testBlock.data);
     expect(testBlock.lineStartPosition).toEqual(10);
     expect(testBlock.lineEndPosition).toEqual(21);
-    expect(testBlock.typeStyle).toEqual("text:shiny");
-    // eslint-disable-next-line quotes
+    expect(testBlock.mergeKey).toEqual("text:shiny:");
     expect(testBlock.data).toEqual({ text: "Hello world", style: "shiny", type: "text" });
     // Eat your own tail
     expect(new EditorV3TextBlock(testBlock).data).toEqual(testBlock.data);
@@ -71,7 +70,7 @@ describe("Non-object loads", () => {
     expect(new EditorV3TextBlock(testBlock.toHtml({})).data).toEqual(testBlock.data);
   });
 
-  test("Load bad document fragment", async () => {
+  test("Load bad document fragment", () => {
     const frag = new DocumentFragment();
     const span1 = document.createElement("span");
     const span2 = document.createElement("span");
@@ -125,7 +124,7 @@ describe("Should render an at block in the HTML", () => {
 describe("Should throw trying to render an at block in the HTML", () => {
   test("Create HTML with an @ at the start", async () => {
     const testBlock = new EditorV3TextBlock({ text: "@Hello world", type: "at" });
-    expect(() => testBlock.toHtml({})).toThrow("Use EditorV3AtBlock for at blocks");
+    expect(() => testBlock.toHtml({})).toThrow("Use correct class for non-text blocks");
   });
 });
 
@@ -162,9 +161,9 @@ describe("Should render html chars :(", () => {
 describe("Should throw trying to create the wrong type", () => {
   test("Fail to create at block", async () => {
     expect(() => {
-      const badThing = new EditorV3TextBlock({ text: "Hello world", type: "at" });
+      const badThing = new EditorV3TextBlock({ text: "Hello world", type: "select" });
       badThing.toHtml({});
-    }).toThrow("Use EditorV3AtBlock for at blocks");
+    }).toThrow("Use correct class for non-text blocks");
   });
 });
 
@@ -181,7 +180,6 @@ describe("Locked text block", () => {
     const tempDiv = document.createElement("div");
     testBlock.toHtml({ currentEl: tempDiv }, { isLocked: true });
     expect(tempDiv.innerHTML).toMatchSnapshot();
-    expect(testBlock.toMarkdown()).toEqual("<<red::Locked block>>");
     expect(testBlock.wordPositions).toEqual([
       { line: -1, startChar: 0, endChar: 12, isLocked: true },
     ]);
@@ -192,5 +190,74 @@ describe("Locked text block", () => {
     const tempDiv = document.createElement("div");
     testBlock.toHtml({ currentEl: tempDiv }, { color: "red" });
     expect(tempDiv.innerHTML).toMatchSnapshot();
+  });
+});
+
+describe("Markdown text block", () => {
+  test("Render markdown with no label or style", async () => {
+    const testBlock = new EditorV3TextBlock({
+      text: "Hello",
+    });
+    const result = testBlock.toMarkdown();
+    expect(result).toEqual("Hello");
+    const eatOwnTail = new EditorV3TextBlock(result);
+    expect(eatOwnTail.data).toEqual(testBlock.data);
+  });
+
+  test("Render markdown with label", async () => {
+    const testBlock = new EditorV3TextBlock({
+      text: "Hello",
+      label: "world",
+    });
+    const result = testBlock.toMarkdown();
+    expect(result).toEqual("<<::world::Hello>>");
+    const eatOwnTail = new EditorV3TextBlock(result);
+    expect(eatOwnTail.data).toEqual(testBlock.data);
+  });
+
+  test("Render markdown with style", async () => {
+    const testBlock = new EditorV3TextBlock({
+      text: "Hello",
+      style: "shiny",
+    });
+    const result = testBlock.toMarkdown();
+    expect(result).toEqual("<<shiny::Hello>>");
+    const eatOwnTail = new EditorV3TextBlock(result);
+    expect(eatOwnTail.data).toEqual(testBlock.data);
+  });
+
+  test("Render markdown with default style", async () => {
+    const testBlock = new EditorV3TextBlock({
+      text: "Hello",
+      style: "defaultStyle",
+    });
+    const result = testBlock.toMarkdown();
+    expect(result).toEqual("<<Hello>>");
+    const eatOwnTail = new EditorV3TextBlock(result);
+    expect(eatOwnTail.data).toEqual(testBlock.data);
+  });
+
+  test("Render markdown with label and style", async () => {
+    const testBlock = new EditorV3TextBlock({
+      text: "Hello",
+      style: "shiny",
+      label: "world",
+    });
+    const result = testBlock.toMarkdown();
+    expect(result).toEqual("<<shiny::world::Hello>>");
+    const eatOwnTail = new EditorV3TextBlock(result);
+    expect(eatOwnTail.data).toEqual(testBlock.data);
+  });
+
+  test("Render markdown with label and default style", async () => {
+    const testBlock = new EditorV3TextBlock({
+      text: "Hello",
+      style: "defaultStyle",
+      label: "world",
+    });
+    const result = testBlock.toMarkdown();
+    expect(result).toEqual("<<defaultStyle::world::Hello>>");
+    const eatOwnTail = new EditorV3TextBlock(result);
+    expect(eatOwnTail.data).toEqual(testBlock.data);
   });
 });

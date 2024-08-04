@@ -8,6 +8,11 @@
   overflow: hidden;
 }
 
+.aiev3-resize {
+  width: 100%;
+  height: 100%;
+}
+
 .aiev3:focus,
 .aiev3:hover {
   overflow: visible;
@@ -31,7 +36,8 @@
 }
 
 .aiev3-resize-border .aiev3-editing {
-  margin: -1px;
+  height: calc(100% - 4px);
+  width: calc(100% - 4px);
 }
 
 .aiev3.editing .aiev3-editing {
@@ -40,13 +46,6 @@
 
 .aiev3-line {
   width: 100%;
-}
-
-.singleline .aiev3-line {
-  flex-wrap: nowrap;
-}
-
-.multiline .aiev3-line {
   flex-wrap: wrap;
   max-width: 100%;
 }

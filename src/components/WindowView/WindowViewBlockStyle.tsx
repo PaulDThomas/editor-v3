@@ -16,7 +16,10 @@ export const WindowViewBlockStyle = ({
 }: WindowViewBlockStyleProps) => {
   const selectStyleId = useId();
   return (
-    <div className={baseStyles.holder}>
+    <div
+      className={baseStyles.holder}
+      style={{ flexShrink: 1, width: "auto" }}
+    >
       <label
         id={`label-${selectStyleId}`}
         className={baseStyles.label}
@@ -46,3 +49,5 @@ export const WindowViewBlockStyle = ({
     </div>
   );
 };
+
+WindowViewBlockStyle.displayName = "WindowViewBlockStyle";

@@ -6,6 +6,8 @@ interface WindowViewBlockTextProps extends React.ComponentProps<"input"> {
   disabled: boolean;
   text?: string;
   setText: (label: string) => void;
+  grow?: boolean;
+  shrink?: boolean;
 }
 
 export const WindowViewBlockText = ({
@@ -13,6 +15,8 @@ export const WindowViewBlockText = ({
   disabled,
   text,
   setText,
+  grow = false,
+  shrink = false,
   ...rest
 }: WindowViewBlockTextProps) => {
   const thisId = useId();
@@ -24,7 +28,7 @@ export const WindowViewBlockText = ({
   return (
     <div
       className={baseStyles.holder}
-      style={{ resize: "horizontal" }}
+      style={{ flexGrow: grow ? 1 : undefined, flexShrink: shrink ? 1 : undefined, width: "auto" }}
     >
       <label
         id={`label-${thisId}`}
@@ -46,3 +50,5 @@ export const WindowViewBlockText = ({
     </div>
   );
 };
+
+WindowViewBlockText.displayName = "WindowViewBlockText";

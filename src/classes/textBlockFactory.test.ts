@@ -1,6 +1,7 @@
 /* eslint-disable quotes */
 import { EditorV3AtBlock } from "./EditorV3AtBlock";
 import { EditorV3Line } from "./EditorV3Line";
+import { EditorV3SelectBlock, IEditorV3SelectBlock } from "./EditorV3SelectBlock";
 import { textBlockFactory } from "./textBlockFactory";
 
 describe("Text block factory tests", () => {
@@ -84,6 +85,14 @@ describe("Text block factory tests", () => {
       type: "text",
     });
   });
+
+  test("Bad document fragment", async () => {
+    const frag = new DocumentFragment();
+    const div = document.createElement("div");
+    div.textContent = "Hello world";
+    frag.appendChild(div);
+    expect(() => textBlockFactory(frag)).toThrow();
+  });
 });
 
 describe("Check markdown output on text block", () => {
@@ -98,7 +107,7 @@ describe("Check markdown output on text block", () => {
 });
 
 describe("Check at correctly loaded, and eats its own tail", () => {
-  test("Load word", async () => {
+  test("Load at", async () => {
     const testBlock = textBlockFactory({ text: "@Hello", type: "at" });
     expect(testBlock).toBeInstanceOf(EditorV3AtBlock);
     expect(testBlock.data).toEqual({ text: "@Hello", type: "at" });
@@ -106,9 +115,7 @@ describe("Check at correctly loaded, and eats its own tail", () => {
 
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml({}));
-    expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb at-block is-locked" data-type="at" data-is-locked="true">@Hello</span>',
-    );
+    expect(tempDiv.innerHTML).toMatchSnapshot();
     expect(textBlockFactory(testBlock.toHtml({})).data).toEqual({
       ...testBlock.data,
       isLocked: true,
@@ -120,6 +127,34 @@ describe("Check at correctly loaded, and eats its own tail", () => {
 
     expect(testBlock.data).toEqual({ text: "@Hello", type: "at" });
     expect(textBlockFactory(testBlock).data).toEqual(testBlock.data);
+  });
+
+  test("Load select", async () => {
+    const testData: IEditorV3SelectBlock = {
+      text: "Hello",
+      type: "select",
+      availableOptions: [
+        { text: "Hello", data: { noStyle: "true" } },
+        { text: "World", data: { style: "shiny" } },
+      ],
+    };
+    const testBlock = textBlockFactory(testData);
+    expect(testBlock).toBeInstanceOf(EditorV3SelectBlock);
+    expect(testBlock.data).toEqual({ ...testData, isLocked: true });
+    // expect(testBlock.toMarkdown()).toEqual("");
+
+    const tempDiv = document.createElement("div");
+    const toHtml = testBlock.toHtml({});
+    tempDiv.appendChild(toHtml);
+    expect(tempDiv.innerHTML).toMatchSnapshot();
+    expect(textBlockFactory(testBlock.toHtml({})).data).toEqual({
+      ...testBlock.data,
+      isLocked: true,
+    });
+    expect(textBlockFactory(tempDiv.firstChild as HTMLSpanElement).data).toEqual({
+      ...testBlock.data,
+      isLocked: true,
+    });
   });
 
   test("Load with with spaces", async () => {
@@ -141,26 +176,28 @@ describe("Check at correctly loaded, and eats its own tail", () => {
   });
 
   test("Load word with style", async () => {
-    const testBlock = textBlockFactory({ type: "at", text: "@Hello" }, { style: "shiny" });
+    const testBlock = textBlockFactory(
+      { type: "at", text: "@Hello" },
+      { style: "shiny", label: "label" },
+    );
     expect(testBlock.data).toEqual({
       text: "@Hello",
       style: "shiny",
+      label: "label",
       type: "at",
       isLocked: undefined,
     });
-    expect(testBlock.toMarkdown()).toEqual("@[shiny::@Hello@]");
+    expect(testBlock.toMarkdown()).toEqual("@[shiny::label::@Hello@]");
 
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml({}));
-    expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb at-block editorv3style-shiny is-locked" data-type="at" data-style-name="shiny" data-is-locked="true">@Hello</span>',
-    );
+    expect(tempDiv.innerHTML).toMatchSnapshot();
     expect(textBlockFactory(testBlock.toHtml({})).data).toEqual({
       ...testBlock.data,
       isLocked: true,
     });
 
-    expect(testBlock.data).toEqual({ text: "@Hello", style: "shiny", type: "at" });
+    expect(testBlock.data).toEqual({ text: "@Hello", style: "shiny", type: "at", label: "label" });
     expect(textBlockFactory(testBlock).data).toEqual(testBlock.data);
     expect(textBlockFactory(testBlock)).toMatchSnapshot();
   });
@@ -170,24 +207,24 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     testSpan.className = "editorv3style-shiny";
     testSpan.dataset.styleName = "shiny";
     testSpan.dataset.type = "at";
-    testSpan.title = "Hello@world";
+    testSpan.title = "label";
     testSpan.innerHTML = "@Hello world";
     const testBlock = textBlockFactory(testSpan);
     testBlock.setActive(true);
 
     expect(testBlock.data).toEqual({
       text: "@Hello world",
-      label: "Hello@world",
+      label: "label",
       style: "shiny",
       type: "at",
     });
-    expect(testBlock.toMarkdown()).toEqual("@[shiny::@Hello world@]");
-    expect(testBlock.typeStyle).toEqual("at:shiny");
+    expect(testBlock.toMarkdown()).toEqual("@[shiny::label::@Hello world@]");
+    expect(testBlock.mergeKey).toEqual("at:shiny:label");
 
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml({}));
     expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb at-block editorv3style-shiny is-active" data-type="at" data-style-name="shiny" title="Hello@world">@Hello world</span>',
+      '<span class="aiev3-tb at-block editorv3style-shiny is-active show-dropdown" data-type="at" data-style-name="shiny" title="label">@Hello world</span>',
     );
     expect(textBlockFactory(testBlock.toHtml({})).data).toEqual(testBlock.data);
     expect(textBlockFactory(testBlock.toHtml({}))).toMatchSnapshot();

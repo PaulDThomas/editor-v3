@@ -119,9 +119,7 @@ describe("readV3DivElement", () => {
       atData: { email: "some@email" },
     });
   });
-});
 
-describe("Read in multiple space text blocks", () => {
   test("Read in non-breaking spaces only", () => {
     const div = document.createElement("div");
     div.classList.add("aiev3-line", "left");

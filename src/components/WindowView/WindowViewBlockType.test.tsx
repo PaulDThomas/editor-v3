@@ -9,6 +9,7 @@ describe("WindowViewBlockType", () => {
     const mockSet = jest.fn();
     render(
       <WindowViewBlockType
+        includeAt={true}
         type="at"
         setType={mockSet}
       />,

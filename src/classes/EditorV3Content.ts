@@ -7,7 +7,7 @@ import { EditorV3PositionClass } from "./EditorV3Position";
 import { defaultContentProps } from "./defaultContentProps";
 import {
   EditorV3Align,
-  EditorV3AtListItem,
+  EditorV3DropListItem,
   EditorV3BlockClass,
   EditorV3ContentProps,
   EditorV3ContentPropsInput,
@@ -18,7 +18,7 @@ import {
   IEditorV3,
   IEditorV3Line,
 } from "./interface";
-import { IMarkdownSettings } from "./markdown/MarkdownSettings";
+import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import { textBlockFactory } from "./textBlockFactory";
 
 /**
@@ -83,6 +83,7 @@ export class EditorV3Content implements IEditorV3 {
   }
   set markdownSettings(newSettings: IMarkdownSettings) {
     this._markdownSettings = newSettings;
+    this.lines.forEach((l) => (l.contentProps.markdownSettings = newSettings));
   }
   private _showMarkdown = this._defaultContentProps.showMarkdown;
   get showMarkdown() {
@@ -99,7 +100,7 @@ export class EditorV3Content implements IEditorV3 {
     this._allowWindowView = newAllow;
   }
   private _atListFunction:
-    | ((typedString: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>)
+    | ((typedString: string) => Promise<EditorV3DropListItem<Record<string, string>>[]>)
     | undefined;
   get atListFunction() {
     return this._atListFunction;
@@ -261,26 +262,9 @@ export class EditorV3Content implements IEditorV3 {
    */
   public toMarkdownHtml(renderProps: EditorV3RenderProps): DocumentFragment {
     const ret = new DocumentFragment();
-    // Use any passed markdown settings
-    const markdownSettings = renderProps.markdownSettings ?? this._markdownSettings;
-    this.lines.forEach((line) => {
-      const l = document.createElement("div");
-      l.classList.add("aiev3-markdown-line");
-      const tn = document.createTextNode(line.toMarkdown(markdownSettings));
-      l.append(tn);
-      ret.append(l);
-    });
-    // Ensure props node indicates this is markdown
-    let revert = false;
-    if (!this._showMarkdown) {
-      revert = true;
-      this._showMarkdown = true;
-    }
-    const cpn = this._contentPropsNode();
-    ret.append(cpn);
-    if (revert) {
-      this._showMarkdown = false;
-    }
+    // Add content to the element
+    this.lines.forEach((l) => ret.append(l.toMarkdown(renderProps)));
+    ret.append(this._contentPropsNode());
     if (renderProps.editableEl) renderProps.editableEl.append(ret);
     return ret;
   }
@@ -357,6 +341,10 @@ export class EditorV3Content implements IEditorV3 {
     );
   }
 
+  /**
+   * Loads a string into the content.  Will attempt to parse as JSON, then as HTML/text
+   * @param arg string input
+   */
   public loadString(arg: string) {
     try {
       // Check for stringified class input
@@ -370,6 +358,11 @@ export class EditorV3Content implements IEditorV3 {
     }
   }
 
+  /**
+   * Returns the content specified by a position
+   * @param pos Position of the content to return
+   * @returns Lines specified by the position
+   */
   public subLines(pos: EditorV3Position): EditorV3Line[] {
     const ret: EditorV3Line[] = [];
     if (
@@ -410,10 +403,22 @@ export class EditorV3Content implements IEditorV3 {
     return ret;
   }
 
+  /**
+   * Returns the content from the start to a position
+   * @param endLine
+   * @param endChar
+   * @returns Lines up to the end position
+   */
   public upToPos(endLine: number, endChar: number): EditorV3Line[] {
     return this.subLines({ startLine: 0, startChar: 0, endLine, endChar });
   }
 
+  /**
+   * Returns the content from a position to the end
+   * @param startLine
+   * @param startChar
+   * @returns Lines from the start position to the end
+   */
   public fromPos(startLine: number, startChar: number): EditorV3Line[] {
     return this.subLines({
       startLine,
@@ -423,11 +428,21 @@ export class EditorV3Content implements IEditorV3 {
     });
   }
 
+  /**
+   * Returns the current style at a position
+   * @param line Line to check
+   * @param character character number to check
+   * @returns string Style name or undefined
+   */
   public getStyleAt(line: number, character: number): string | undefined {
     return line < this.lines.length ? this.lines[line].getStyleAt(character) : undefined;
   }
 
-  // Split line in two
+  /**
+   * Add a line break at the caret position, removes selection
+   * @param pos Portion of content to replace with a new line
+   * @returns Position at the start of the new line
+   */
   public splitLine(pos: EditorV3Position): EditorV3Position {
     const u = this.upToPos(pos.startLine, pos.startChar);
     const f = this.fromPos(pos.endLine, pos.endChar);
@@ -442,7 +457,10 @@ export class EditorV3Content implements IEditorV3 {
     };
   }
 
-  // Merge line with next line
+  /**
+   * Merge line and the following line
+   * @param line First line that will be merged
+   */
   public mergeLines(line: number) {
     if (this.lines.length > line + 1) {
       this.lines[line].insertBlocks(this.lines[line + 1].textBlocks, this.lines[line].lineLength);
@@ -470,6 +488,34 @@ export class EditorV3Content implements IEditorV3 {
     if (this._caretPosition) {
       this.splice(this._caretPosition.pos);
     }
+  }
+
+  /**
+   * Find text within the content
+   * @param text String to search for
+   * @returns Array of positions or null if not found
+   */
+  public getTextPosition(text: string): EditorV3Position[] | null {
+    const ret: EditorV3Position[] = [];
+    this.lines.forEach((l, ix) => {
+      l.textBlocks.forEach((tb) => {
+        let pos = 0;
+        while (tb.text.indexOf(text, pos) >= 0) {
+          const found = tb.text.indexOf(text, pos);
+          if (found >= 0) {
+            ret.push({
+              isCollapsed: false,
+              startLine: ix,
+              startChar: tb.lineStartPosition + found,
+              endLine: ix,
+              endChar: tb.lineStartPosition + found + text.length,
+            });
+            pos = found + text.length;
+          }
+        }
+      });
+    });
+    return ret.length > 0 ? ret : null;
   }
 
   /**
@@ -598,6 +644,8 @@ export class EditorV3Content implements IEditorV3 {
         editableEl,
         atListFunction: this._atListFunction,
         maxAtListLength: this._maxAtListLength,
+        caretPosition: this._caretPosition,
+        styles: this._styles,
       });
     }
     // Set caret position

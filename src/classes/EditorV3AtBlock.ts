@@ -1,19 +1,19 @@
-import "./EditorV3AtBlock.css";
 import {
   EditorV3TextBlock,
   IEditorV3TextBlock,
   IEditorV3TextBlockOptionalParams,
 } from "./EditorV3TextBlock";
 import {
-  EditorV3AtListItem,
+  EditorV3DropListItem,
   EditorV3RenderProps,
   EditorV3Style,
   EditorV3WordPosition,
 } from "./interface";
-import { renderDropdown } from "../functions/renderDropdown";
+import { IMarkdownSettings } from "./defaultMarkdownSettings";
+import { renderDropdown } from "./toHtml/renderDropdown";
 
 export interface IEditorV3AtBlockOptionalParams extends IEditorV3TextBlockOptionalParams {
-  atListFunction?: (typedString: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>;
+  atListFunction?: (typedString: string) => Promise<EditorV3DropListItem<Record<string, string>>[]>;
   maxAtListLength?: number;
   atData?: Record<string, string>;
 }
@@ -28,7 +28,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
    */
   public atListFunction: (
     typedString: string,
-  ) => Promise<EditorV3AtListItem<Record<string, string>>[]> = () =>
+  ) => Promise<EditorV3DropListItem<Record<string, string>>[]> = () =>
     new Promise((resolve) => resolve([]));
   /**
    * Maximum number of items to display in the returned list
@@ -57,7 +57,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
   }
 
   constructor(
-    arg: IEditorV3AtBlock | HTMLSpanElement | DocumentFragment,
+    arg: IEditorV3AtBlock | HTMLSpanElement | DocumentFragment | string,
     forcedParams?: IEditorV3AtBlockOptionalParams,
   ) {
     // Usual text block constructor
@@ -65,15 +65,16 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     // Force type
     this.type = "at";
     // Check for at specific information
-    if (arg instanceof HTMLSpanElement) {
+    if (typeof arg === "string") {
+      this.furtherMarkdown(forcedParams?.markdownSettings);
+    } else if (arg instanceof HTMLSpanElement) {
       this.furtherHtml(arg);
     } else if (arg instanceof DocumentFragment) {
       if (arg.childNodes.length !== 1)
         throw new Error("EditorV3AtBlock:Constructor: DocumentFragment must have 1 child node");
       else if (!(arg.childNodes[0] instanceof HTMLSpanElement))
-        throw new Error(
-          "EditorV3AtBlock:Constructor: DocumentFragment child node must be HTMLSpanElement",
-        );
+        throw new Error("EditorV3AtBlock:Constructor: Child node must be HTMLSpanElement");
+      // Read element
       this.furtherHtml(arg.childNodes[0] as HTMLSpanElement);
     } else {
       if (arg.atListFunction) this.atListFunction = arg.atListFunction;
@@ -100,6 +101,21 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     });
   }
 
+  // Get markdown information
+  private furtherMarkdown(arg?: IMarkdownSettings) {
+    const markdownSettings = arg ?? this._defaultContentProps.markdownSettings;
+    this.atData = {};
+    if (
+      this.text.startsWith(markdownSettings.atStartTag) &&
+      this.text.endsWith(markdownSettings.atEndTag)
+    ) {
+      this.markdownStyleLabel(
+        this.text.slice(markdownSettings.atStartTag.length, -markdownSettings.atEndTag.length),
+        markdownSettings,
+      );
+    }
+  }
+
   // Overload html return
   public toHtml(renderProps: EditorV3RenderProps, style?: EditorV3Style): DocumentFragment {
     // Create holder
@@ -121,9 +137,9 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     // Add label
     if (this.label) span.title = this.label;
     // Delete any existing dropdown on render
-    const editor = renderProps.editableEl?.closest(".aiev3") as HTMLDivElement | null;
+    const editor = renderProps.currentEl?.closest(".aiev3") as HTMLDivElement | null;
     if (editor) {
-      const existingDropdowns = editor.querySelectorAll("ul.aiev3-at-dropdown-list");
+      const existingDropdowns = editor.querySelectorAll("ul.aiev3-dropdown-list");
       existingDropdowns.forEach((dropdown) => dropdown.remove());
     }
 
@@ -143,6 +159,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
       // Throttle render
       let renderTimeout: number | null = null;
       if (!renderTimeout) {
+        span.classList.add("show-dropdown");
         renderTimeout = window.setTimeout(
           () =>
             renderDropdown(
@@ -155,9 +172,20 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
         );
       }
     }
+
     // Add to current element if specified
     if (renderProps.currentEl) renderProps.currentEl.append(ret);
     // Always return
     return ret;
+  }
+
+  public toMarkdown(markdownSettings = this._defaultContentProps.markdownSettings): string {
+    // Set base text
+    let text = markdownSettings.atStartTag;
+    // Update text with style and label
+    text += this.toMarkdownStyleLabel(markdownSettings);
+    // Complete tag
+    text += this.text + markdownSettings.atEndTag;
+    return text;
   }
 }

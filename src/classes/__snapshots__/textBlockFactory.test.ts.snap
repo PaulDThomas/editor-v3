@@ -1,5 +1,53 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Check at correctly loaded, and eats its own tail Load at 1`] = `"<span class="aiev3-tb at-block is-locked" data-type="at" data-is-locked="true">@Hello</span>"`;
+
+exports[`Check at correctly loaded, and eats its own tail Load at 2`] = `
+EditorV3AtBlock {
+  "_defaultContentProps": {
+    "allowMarkdown": false,
+    "allowNewLine": false,
+    "allowWindowView": false,
+    "atListFunction": undefined,
+    "decimalAlignPercent": 60,
+    "markdownSettings": {
+      "atEndTag": "@]",
+      "atStartTag": "@[",
+      "calcAndSeparator": "&&",
+      "calcConditionSeparator": "||",
+      "calcEndTag": "]!]",
+      "calcNameEndTag": "::",
+      "calcStartTag": "[![",
+      "defaultStyle": "defaultStyle",
+      "dropDownEndTag": "]]",
+      "dropDownSelectedValueTag": "**",
+      "dropDownStartTag": "[[",
+      "dropDownValueSeparator": "||",
+      "styleEndTag": ">>",
+      "styleNameEndTag": "::",
+      "styleStartTag": "<<",
+    },
+    "maxAtListLength": 10,
+    "showMarkdown": false,
+    "styles": undefined,
+    "textAlignment": "left",
+  },
+  "atData": {},
+  "atListFunction": [Function],
+  "isActive": false,
+  "isLocked": undefined,
+  "isSelected": false,
+  "label": undefined,
+  "lineStartPosition": 0,
+  "maxAtListLength": 10,
+  "style": undefined,
+  "text": "@Hello",
+  "type": "at",
+}
+`;
+
+exports[`Check at correctly loaded, and eats its own tail Load select 1`] = `"<span class="aiev3-tb select-block is-locked" data-type="select" data-is-locked="true" data-available-options="[{&quot;text&quot;:&quot;Hello&quot;,&quot;data&quot;:{&quot;noStyle&quot;:&quot;true&quot;}},{&quot;text&quot;:&quot;World&quot;,&quot;data&quot;:{&quot;style&quot;:&quot;shiny&quot;}}]">Hello</span>"`;
+
 exports[`Check at correctly loaded, and eats its own tail Load span with style and space 1`] = `
 EditorV3AtBlock {
   "_defaultContentProps": {
@@ -18,7 +66,6 @@ EditorV3AtBlock {
       "calcStartTag": "[![",
       "defaultStyle": "defaultStyle",
       "dropDownEndTag": "]]",
-      "dropDownNameEndTag": "::",
       "dropDownSelectedValueTag": "**",
       "dropDownStartTag": "[[",
       "dropDownValueSeparator": "||",
@@ -35,7 +82,8 @@ EditorV3AtBlock {
   "atListFunction": [Function],
   "isActive": false,
   "isLocked": undefined,
-  "label": "Hello@world",
+  "isSelected": false,
+  "label": "label",
   "lineStartPosition": 0,
   "maxAtListLength": 10,
   "style": "shiny",
@@ -44,51 +92,9 @@ EditorV3AtBlock {
 }
 `;
 
-exports[`Check at correctly loaded, and eats its own tail Load word 1`] = `
-EditorV3AtBlock {
-  "_defaultContentProps": {
-    "allowMarkdown": false,
-    "allowNewLine": false,
-    "allowWindowView": false,
-    "atListFunction": undefined,
-    "decimalAlignPercent": 60,
-    "markdownSettings": {
-      "atEndTag": "@]",
-      "atStartTag": "@[",
-      "calcAndSeparator": "&&",
-      "calcConditionSeparator": "||",
-      "calcEndTag": "]!]",
-      "calcNameEndTag": "::",
-      "calcStartTag": "[![",
-      "defaultStyle": "defaultStyle",
-      "dropDownEndTag": "]]",
-      "dropDownNameEndTag": "::",
-      "dropDownSelectedValueTag": "**",
-      "dropDownStartTag": "[[",
-      "dropDownValueSeparator": "||",
-      "styleEndTag": ">>",
-      "styleNameEndTag": "::",
-      "styleStartTag": "<<",
-    },
-    "maxAtListLength": 10,
-    "showMarkdown": false,
-    "styles": undefined,
-    "textAlignment": "left",
-  },
-  "atData": {},
-  "atListFunction": [Function],
-  "isActive": false,
-  "isLocked": undefined,
-  "label": undefined,
-  "lineStartPosition": 0,
-  "maxAtListLength": 10,
-  "style": undefined,
-  "text": "@Hello",
-  "type": "at",
-}
-`;
+exports[`Check at correctly loaded, and eats its own tail Load word with style 1`] = `"<span class="aiev3-tb at-block editorv3style-shiny is-locked" data-type="at" data-style-name="shiny" title="label" data-is-locked="true">@Hello</span>"`;
 
-exports[`Check at correctly loaded, and eats its own tail Load word with style 1`] = `
+exports[`Check at correctly loaded, and eats its own tail Load word with style 2`] = `
 EditorV3AtBlock {
   "_defaultContentProps": {
     "allowMarkdown": false,
@@ -106,7 +112,6 @@ EditorV3AtBlock {
       "calcStartTag": "[![",
       "defaultStyle": "defaultStyle",
       "dropDownEndTag": "]]",
-      "dropDownNameEndTag": "::",
       "dropDownSelectedValueTag": "**",
       "dropDownStartTag": "[[",
       "dropDownValueSeparator": "||",
@@ -123,7 +128,8 @@ EditorV3AtBlock {
   "atListFunction": [Function],
   "isActive": false,
   "isLocked": undefined,
-  "label": undefined,
+  "isSelected": false,
+  "label": "label",
   "lineStartPosition": 0,
   "maxAtListLength": 10,
   "style": "shiny",

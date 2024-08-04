@@ -135,3 +135,5 @@ export const WindowView = ({
     </ContextWindow>
   );
 };
+
+WindowView.displayName = "WindowView";

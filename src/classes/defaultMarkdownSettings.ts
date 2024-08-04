@@ -4,7 +4,6 @@ export interface IMarkdownSettings {
   styleEndTag: string;
   defaultStyle: string;
   dropDownStartTag: string;
-  dropDownNameEndTag: string;
   dropDownEndTag: string;
   dropDownValueSeparator: string;
   dropDownSelectedValueTag: string;
@@ -23,7 +22,6 @@ export const defaultMarkdownSettings = {
   styleEndTag: ">>",
   defaultStyle: "defaultStyle",
   dropDownStartTag: "[[",
-  dropDownNameEndTag: "::",
   dropDownEndTag: "]]",
   dropDownValueSeparator: "||",
   dropDownSelectedValueTag: "**",

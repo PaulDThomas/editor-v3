@@ -4,7 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { act, useState } from "react";
 import { EditorV3Content } from "../classes/EditorV3Content";
 import { EditorV3Align, IEditorV3 } from "../classes/interface";
-import { defaultMarkdownSettings } from "../classes/markdown/MarkdownSettings";
+import { defaultMarkdownSettings } from "../classes/defaultMarkdownSettings";
 import { getCaretPosition } from "../functions/getCaretPosition";
 import { EditorV3 } from "./EditorV3";
 
@@ -62,7 +62,6 @@ describe("Editor and functions", () => {
           id="locked"
           input={lockedBlocks}
           setObject={(ret) => {
-            console.log(ret);
             setLockedBlocks(ret);
           }}
           customStyleMap={{
@@ -849,7 +848,7 @@ describe("Add at block and escape out", () => {
     await user.keyboard("@");
 
     await runTimers();
-    expect(editor.querySelectorAll("li.aiev3-at-item").length).toEqual(5);
+    expect(editor.querySelectorAll("li.aiev3-drop-item").length).toEqual(5);
     expect(screen.queryByText("...24 more")).toBeInTheDocument();
     expect(editor.outerHTML).toMatchSnapshot();
   });

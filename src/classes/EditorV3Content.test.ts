@@ -729,3 +729,87 @@ describe("handleKeydown", () => {
     });
   });
 });
+
+describe("Search for text", () => {
+  test("Find string", async () => {
+    const testContent = new EditorV3Content("Hello, World!");
+
+    expect(testContent.getTextPosition("x")).toEqual(null);
+
+    expect(testContent.getTextPosition("Wor")).toEqual([
+      {
+        isCollapsed: false,
+        startLine: 0,
+        startChar: 7,
+        endLine: 0,
+        endChar: 10,
+      },
+    ]);
+
+    expect(testContent.getTextPosition("o")).toEqual([
+      { isCollapsed: false, startLine: 0, startChar: 4, endLine: 0, endChar: 5 },
+      { isCollapsed: false, startLine: 0, startChar: 8, endLine: 0, endChar: 9 },
+    ]);
+  });
+
+  test("Find string across multiple lines and blocks", async () => {
+    const contentProps = {
+      ...defaultContentProps,
+      allowMarkdown: true,
+      allowNewLine: true,
+      decimalAlignPercent: 80,
+      showMarkdown: true,
+      styles: { shiny: { color: "pink" }, dull: { color: "grey" } },
+      textAlignment: EditorV3Align.center,
+    };
+    const testContent = new EditorV3Content(
+      JSON.stringify({
+        lines: [
+          { textBlocks: [{ text: "34.56", style: "shiny" }] },
+          {
+            textBlocks: [
+              { text: "Hello" },
+              { text: ", World", style: "dull", type: "at", isLocked: true, atData: { id: "123" } },
+            ],
+          },
+          { textBlocks: [{ text: "th" }, { text: "is is it", style: "dull" }] },
+        ],
+        contentProps: contentProps,
+      }),
+    );
+    expect(testContent.text).toEqual("34.56\nHello, World\nthis is it");
+    expect(testContent.getTextPosition("o")).toEqual([
+      {
+        isCollapsed: false,
+        startLine: 1,
+        startChar: 4,
+        endLine: 1,
+        endChar: 5,
+      },
+      {
+        isCollapsed: false,
+        startLine: 1,
+        startChar: 8,
+        endLine: 1,
+        endChar: 9,
+      },
+    ]);
+    expect(testContent.getTextPosition("this")).toEqual(null);
+    expect(testContent.getTextPosition("is")).toEqual([
+      {
+        isCollapsed: false,
+        startLine: 2,
+        startChar: 2,
+        endLine: 2,
+        endChar: 4,
+      },
+      {
+        isCollapsed: false,
+        startLine: 2,
+        startChar: 5,
+        endLine: 2,
+        endChar: 7,
+      },
+    ]);
+  });
+});

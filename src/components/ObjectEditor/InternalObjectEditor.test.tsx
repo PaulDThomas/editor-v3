@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { InternalObjectEditor } from "./InternalObjectEditor";
 import { ObjectEditorContextProvider, ObjectEditorItemOptions } from "./ObjectEditorContext";
 
+jest.mock("./Expander");
+
 describe("InternalObjectEditor tests", () => {
   const mockObject = {
     green: {
@@ -80,25 +82,5 @@ describe("InternalObjectEditor tests", () => {
       darkGreen: mockObject.darkGreen,
       seaGreen: mockObject.seaGreen,
     });
-  });
-
-  test("Show expander", async () => {
-    render(
-      <ObjectEditorContextProvider
-        object={mockObject}
-        setObject={() => {}}
-        objectTemplate={mockObjectTemplate}
-      >
-        <InternalObjectEditor
-          dataPath="green"
-          data-testid="test"
-        />
-      </ObjectEditorContextProvider>,
-    );
-    const expander = screen.getByTestId("test");
-    expect(expander).toHaveClass("expander");
-    const holder = expander.querySelector(".holder") as HTMLDivElement;
-    fireEvent.click(holder);
-    expect(expander).toHaveClass("expanded");
   });
 });

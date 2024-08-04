@@ -1,15 +1,16 @@
 import { cloneDeep } from "lodash";
 import { defaultContentProps } from "./defaultContentProps";
-import { IMarkdownSettings } from "./markdown/MarkdownSettings";
+import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import { EditorV3RenderProps, EditorV3Style, EditorV3WordPosition } from "./interface";
 
-export type EditorV3TextBlockType = "text" | "at";
+export type EditorV3TextBlockType = "text" | "at" | "select";
 export interface IEditorV3TextBlockOptionalParams {
   label?: string;
   style?: string;
   type?: EditorV3TextBlockType;
   isLocked?: true | undefined;
   lineStartPosition?: number;
+  markdownSettings?: IMarkdownSettings;
 }
 export interface IEditorV3TextBlock extends IEditorV3TextBlockOptionalParams {
   text: string;
@@ -17,21 +18,22 @@ export interface IEditorV3TextBlock extends IEditorV3TextBlockOptionalParams {
 
 // Class
 export class EditorV3TextBlock implements IEditorV3TextBlock {
-  private _defaultContentProps = cloneDeep(defaultContentProps);
+  protected _defaultContentProps = cloneDeep(defaultContentProps);
   // Variables
   public text: string = "";
   public label?: string;
   public style?: string;
   public type: EditorV3TextBlockType = "text";
   public isActive: boolean = false;
+  public isSelected: boolean = false;
   public isLocked: true | undefined;
   public lineStartPosition: number = 0;
   get lineEndPosition() {
     return this.lineStartPosition + this.text.replaceAll("\u200c", "").length;
   }
 
-  get typeStyle(): string {
-    return `${this.type}:${this.style ?? ""}`;
+  get mergeKey(): string {
+    return `${this.type}:${this.style ?? ""}:${this.label ?? ""}`;
   }
 
   // Read only variables
@@ -79,7 +81,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
 
   // Constructor
   constructor(
-    arg?: IEditorV3TextBlock | HTMLSpanElement | DocumentFragment,
+    arg?: IEditorV3TextBlock | HTMLSpanElement | DocumentFragment | string,
     forcedParams?: IEditorV3TextBlockOptionalParams,
   ) {
     // Document Fragment processing
@@ -106,6 +108,13 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
         } else errors.push("Unknown node type in fragment");
       });
       if (errors.length > 0) throw new Error("EditorV3TextBlock:Constructor:" + errors.join(", "));
+    }
+    // Markdown processing for string
+    else if (typeof arg === "string") {
+      this.fromMarkdown(
+        arg,
+        forcedParams?.markdownSettings ?? this._defaultContentProps.markdownSettings,
+      );
     }
     // Span or Text element processing
     else if (arg instanceof HTMLSpanElement || arg instanceof Text) {
@@ -151,6 +160,72 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     return spanData;
   }
 
+  protected markdownStyleLabel(
+    markdownText: string,
+    markdownSettings: IMarkdownSettings,
+    set = true,
+  ): { style: string | undefined; label: string | undefined; text: string } {
+    const styleTag = markdownText.indexOf(markdownSettings.styleNameEndTag);
+
+    let style: string | undefined = undefined;
+    let label: string | undefined = undefined;
+    let text: string | undefined = undefined;
+    // No style tag, return text
+    if (styleTag === -1) {
+      text = markdownText;
+    } else {
+      const labelTag = markdownText.indexOf(
+        markdownSettings.styleNameEndTag,
+        styleTag + markdownSettings.styleNameEndTag.length,
+      );
+      // No label tag, return text
+      if (labelTag === -1) {
+        style = markdownText.slice(0, styleTag);
+        text = markdownText.slice(styleTag + markdownSettings.styleNameEndTag.length);
+      } else {
+        // Style and label tags found
+        if (styleTag > 0) {
+          style = markdownText.slice(0, styleTag);
+        }
+        if (labelTag > styleTag + markdownSettings.styleNameEndTag.length) {
+          label = markdownText.slice(styleTag + markdownSettings.styleNameEndTag.length, labelTag);
+        }
+        text = markdownText.slice(labelTag + markdownSettings.styleNameEndTag.length);
+      }
+    }
+    // Set if required
+    if (set) {
+      this.style = style;
+      this.label = label;
+      this.text = text;
+    }
+    // Return results
+    return { style, label, text };
+  }
+
+  private fromMarkdown(markdown: string, arg?: IMarkdownSettings) {
+    const markdownSettings = arg ?? this._defaultContentProps.markdownSettings;
+    this.isLocked = undefined;
+    this.style = undefined;
+    this.label = undefined;
+    this.text = markdown.replaceAll(/u00a0/g, " ").replaceAll(/[\u2009-\u200f]/g, "");
+    if (
+      this.text.startsWith(markdownSettings.styleStartTag) &&
+      this.text.endsWith(markdownSettings.styleEndTag)
+    ) {
+      this.text = this.text.slice(
+        markdownSettings.styleStartTag.length,
+        -markdownSettings.styleEndTag.length,
+      );
+      // Only time default style is used
+      const defaultStyle = !this.text.includes(markdownSettings.styleNameEndTag);
+      // Read style and label
+      this.markdownStyleLabel(this.text, markdownSettings);
+      // Update default style if required
+      if (defaultStyle) this.style = markdownSettings.defaultStyle;
+    }
+  }
+
   // Status updated functions
   public setActive(active: boolean) {
     this.isActive = active;
@@ -175,8 +250,8 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
   public toHtml(renderProps: EditorV3RenderProps, style?: EditorV3Style): DocumentFragment {
     const text = this.text === "" ? "\u2009" : this.text.replaceAll(" ", "\u00a0\u200c");
     const ret = new DocumentFragment();
-    if (this.type === "at") {
-      throw new Error("Use EditorV3AtBlock for at blocks");
+    if (this.type !== "text") {
+      throw new Error("Use correct class for non-text blocks");
     } else {
       const words =
         renderProps.doNotSplitWordSpans || this.isLocked || style?.isLocked
@@ -207,14 +282,30 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     if (renderProps.currentEl) renderProps.currentEl.append(ret);
     return ret;
   }
-  public toMarkdown(
-    markdownSettings: IMarkdownSettings = this._defaultContentProps.markdownSettings,
-  ): string {
-    return (
-      `${this.type === "at" ? markdownSettings.atStartTag : this.style ? markdownSettings.styleStartTag : ""}` +
-      `${this.style && this.style !== markdownSettings.defaultStyle ? this.style + markdownSettings.styleNameEndTag : ""}` +
-      this.text +
-      `${this.type === "at" ? markdownSettings.atEndTag : this.style ? markdownSettings.styleEndTag : ""}`
-    );
+
+  protected toMarkdownStyleLabel(markdownSettings: IMarkdownSettings): string {
+    if (this.label) {
+      return (
+        (this.style ?? "") +
+        markdownSettings.styleNameEndTag +
+        (this.label ?? "") +
+        markdownSettings.styleNameEndTag
+      );
+    } else if (this.style && this.style !== markdownSettings.defaultStyle) {
+      return this.style + markdownSettings.styleNameEndTag;
+    } else return "";
+  }
+
+  public toMarkdown(markdownSettings = this._defaultContentProps.markdownSettings): string {
+    // Set base text
+    let text = this.text;
+    // Update text with style and label
+    if (this.style || this.label) {
+      text = markdownSettings.styleStartTag;
+      text += this.toMarkdownStyleLabel(markdownSettings);
+      text += this.text;
+      text += markdownSettings.styleEndTag;
+    }
+    return text;
   }
 }

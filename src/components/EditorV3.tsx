@@ -4,20 +4,20 @@ import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from
 import { EditorV3AtBlock, EditorV3Line } from "../classes";
 import { EditorV3Content } from "../classes/EditorV3Content";
 import { defaultContentProps } from "../classes/defaultContentProps";
+import { IMarkdownSettings } from "../classes/defaultMarkdownSettings";
 import {
   EditorV3Align,
-  EditorV3AtListItem,
   EditorV3ContentPropsInput,
+  EditorV3DropListItem,
   EditorV3Position,
   EditorV3Styles,
   IEditorV3,
 } from "../classes/interface";
-import { IMarkdownSettings } from "../classes/markdown/MarkdownSettings";
 import { useDebounceStack } from "../hooks/useDebounceStack";
 import "./EditorV3.css";
 import { WindowView } from "./WindowView/WindowView";
 
-interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
+export interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   id: string;
   input: string | IEditorV3;
   editable?: boolean;
@@ -36,7 +36,7 @@ interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   allowWindowView?: boolean;
   markdownSettings?: IMarkdownSettings;
   debounceMilliseconds?: number | null;
-  atListFunction?: (at: string) => Promise<EditorV3AtListItem<Record<string, string>>[]>;
+  atListFunction?: (at: string) => Promise<EditorV3DropListItem<Record<string, string>>[]>;
   maxAtListLength?: number;
 }
 
@@ -158,7 +158,8 @@ export const EditorV3 = ({
   const redrawElement = useCallback((ret: EditorV3State) => {
     // console.debug(
     //   "Redraw element:\r\n",
-    //   ret.content.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("|")).join("\n"),
+    //   ret.content.lines.map((l) => l.toMarkdown({}).textContent).join("\n"),
+    //   JSON.stringify(ret.content.caretPosition),
     // );
     divRef.current && ret.content.redraw(divRef.current, ret.focus);
   }, []);
@@ -195,7 +196,7 @@ export const EditorV3 = ({
     (newContent: EditorV3Content, calledFrom?: string, focus?: boolean) => {
       // console.debug(
       //   "SetContent:" + calledFrom + ":\r\n",
-      //   newContent.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("|")).join("\n"),
+      //   newContent.lines.map((l) => l.toMarkdown({}).textContent).join("\n"),
       // );
       setLastCaretPosition(newContent.caretPosition);
       setCurrentValue({
@@ -441,12 +442,15 @@ export const EditorV3 = ({
 
   const handleMouseUp = useCallback(
     (e: React.MouseEvent) => {
-      // Ensure mouse up event stack is empty before resolving this event
+      // Drop down list last entry can target again resize (current.parentElement)
       if (
         divRef.current &&
         e.target instanceof Node &&
-        (divRef.current === e.target || divRef.current.contains(e.target))
-      )
+        (divRef.current.parentElement === e.target ||
+          divRef.current === e.target ||
+          divRef.current.contains(e.target))
+      ) {
+        // Ensure mouse up event stack is empty before resolving this event
         setTimeout(() => {
           if (divRef.current) {
             const newContent = new EditorV3Content(divRef.current, contentProps);
@@ -454,6 +458,7 @@ export const EditorV3 = ({
             setContent(newContent, "Handle mouse up on timeout");
           }
         }, 0);
+      }
     },
     [contentProps, setContent],
   );

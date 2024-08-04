@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { EditorV3, EditorV3Align, EditorV3Styles, IEditorV3, StylesEditor } from "../../src/main";
 import { loadAvailableItems } from "./loadAvailableItems";
+import { BaseEditorV3 } from "../../src/components/BaseEditorv3";
 
 export const App = (): JSX.Element => {
   // First input content
@@ -42,6 +43,19 @@ export const App = (): JSX.Element => {
           { text: "E", type: "text" },
         ],
       },
+      {
+        textBlocks: [
+          {
+            text: "Select",
+            type: "select",
+            availableOptions: [
+              { text: "one", data: { text: "one", style: "Notes" } },
+              { text: "two", data: { text: "two" } },
+              { text: "three", data: { text: "three", style: "Optional" } },
+            ],
+          },
+        ],
+      },
     ],
   };
 
@@ -53,7 +67,16 @@ export const App = (): JSX.Element => {
         defaultStyle: { color: "green", fontWeight: 700 },
       },
     },
-    lines: [{ textBlocks: [{ text: "two words", style: "defaultStyle" }] }],
+    lines: [
+      {
+        textBlocks: [
+          { text: "two words", style: "defaultStyle" },
+          { text: "2nd locked line", style: "green" },
+          { text: "2nd locked line", style: "green" },
+          { text: "lots of locks", style: "red" },
+        ],
+      },
+    ],
   });
 
   const [align, setAlign] = useState<EditorV3Align>(EditorV3Align.left);
@@ -64,9 +87,9 @@ export const App = (): JSX.Element => {
   const [styleMap, setStyleMap] = useState<EditorV3Styles>({
     green: {
       color: "green",
-      fontFamily: "'Courier New', monospace",
-      fontSize: "18pt",
-      fontWeight: 1000,
+      // fontFamily: "'Courier New', monospace",
+      // fontSize: "18pt",
+      // fontWeight: 1000,
       isLocked: true,
     },
     blue: { color: "blue", fontWeight: 700 },
@@ -95,8 +118,8 @@ export const App = (): JSX.Element => {
                 editable={editable}
                 customStyleMap={styleMap}
                 style={{
-                  width: "240px",
-                  height: "100px",
+                  width: "500px",
+                  height: "400px",
                 }}
                 allowWindowView
                 atListFunction={loadAvailableItems}
@@ -125,36 +148,36 @@ export const App = (): JSX.Element => {
           </div>
 
           <div className="row">
-            <span className="label">JSON input</span>
-            <span className="content">
-              <EditorV3
-                id={"e2"}
-                input={testObject}
-                setObject={(ret) => {
-                  console.log(ret);
-                }}
-                allowNewLine={allowNewLine}
-                editable={editable}
-                customStyleMap={{
-                  Notes: { color: "royalblue" },
-                  Optional: { color: "green" },
-                }}
-                resize
-                allowMarkdown
-                style={{
-                  width: "240px",
-                  minHeight: "60px",
-                  height: "60px",
-                }}
-              />
-            </span>
+            <BaseEditorV3
+              label={"JSON input"}
+              id={"e2"}
+              input={testObject}
+              setObject={(ret) => {
+                console.log(ret);
+              }}
+              allowNewLine={allowNewLine}
+              editable={editable}
+              customStyleMap={{
+                Notes: { color: "royalblue" },
+                Optional: { color: "green" },
+              }}
+              resize
+              allowMarkdown
+              allowWindowView
+              style={{
+                width: "400px",
+                minHeight: "100px",
+                height: "60px",
+              }}
+            />
           </div>
 
           <div className="row">
             <span className="label">Text input (spelling)</span>
             <span className="content">
-              <EditorV3
+              <BaseEditorV3
                 id={"e3"}
+                label="Text input (spelling)"
                 input={input3}
                 setObject={setInput3}
                 allowMarkdown
@@ -162,7 +185,6 @@ export const App = (): JSX.Element => {
                 decimalAlignPercent={decPct}
                 allowNewLine={allowNewLine}
                 editable={editable}
-                noBorder
                 customStyleMap={{
                   ...styleMap,
                   red: { color: "red", isLocked: true },
