@@ -46,6 +46,7 @@
 
 .aiev3-line {
   width: 100%;
+  min-height: 1em;
   flex-wrap: wrap;
   max-width: 100%;
 }
