@@ -5,10 +5,10 @@ import { EditorV3Content, EditorV3Line } from "../../classes";
 import { IEditorV3Line } from "../../classes/interface";
 import { useDebounceStack } from "../../hooks";
 import { EditorV3State } from "../EditorV3";
-import styles from "./WindowView.module.css";
+import { AddLine, RedoBtn, RemoveLine, UndoBtn } from "../icons";
 import iconStyles from "../icons/IconStyles.module.css";
+import styles from "./WindowView.module.css";
 import { WindowViewLine } from "./WindowViewLine";
-import { AddLine, RedoBtn, RemoveLine, SaveBtn, UndoBtn } from "../icons";
 
 interface WindowViewProps {
   id: string;
@@ -87,6 +87,19 @@ export const WindowView = ({
       id={id}
       visible={showWindowView}
       title={"Editor contents"}
+      titleElement={
+        <>
+          Editor contents
+          <UndoBtn
+            fill={stackIndex > 0 ? "black" : "gray"}
+            onClick={() => undo()}
+          />
+          <RedoBtn
+            fill={stackIndex < (stack?.length ?? 0) - 1 ? "black" : "gray"}
+            onClick={() => redo()}
+          />
+        </>
+      }
       style={{
         height: "400px",
         width: "700px",
@@ -99,21 +112,6 @@ export const WindowView = ({
       }}
     >
       <div className={styles.windowViewBody}>
-        <SaveBtn
-          onClick={() => {
-            forceUpdate();
-            setShowWindowView(false);
-          }}
-        />
-        <UndoBtn
-          fill={stackIndex > 0 ? "black" : "gray"}
-          onClick={() => undo()}
-        />
-        <RedoBtn
-          fill={stackIndex < (stack?.length ?? 0) - 1 ? "black" : "gray"}
-          onClick={() => redo()}
-        />
-
         {contentProps.allowNewLine && <AddLine onClick={() => addLine(0)} />}
         {lines.map((line, ix) => (
           <div

@@ -567,7 +567,7 @@ export const EditorV3 = ({
           showWindowView={showWindowView}
           setShowWindowView={setShowWindowView}
           state={state}
-          setState={(state: EditorV3State) => setContent(state.content, "Window", false)}
+          setState={(state: EditorV3State) => forceReturn(state)}
         />
       )}
     </>

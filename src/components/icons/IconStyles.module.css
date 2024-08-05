@@ -1,23 +1,15 @@
 .undoBtn {
   position: absolute;
-  top: 0;
-  right: 60px;
+  top: 8px;
+  right: 44px;
   z-index: 4;
   cursor: pointer;
 }
 
 .redoBtn {
   position: absolute;
-  top: 0;
-  right: 42px;
-  z-index: 4;
-  cursor: pointer;
-}
-
-.saveBtn {
-  position: absolute;
-  top: 4px;
-  right: 12px;
+  top: 8px;
+  right: 24px;
   z-index: 4;
   cursor: pointer;
 }
