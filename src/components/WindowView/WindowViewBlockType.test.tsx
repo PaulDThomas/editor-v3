@@ -11,6 +11,7 @@ describe("WindowViewBlockType", () => {
       <WindowViewBlockType
         includeAt={true}
         type="at"
+        disabled={false}
         setType={mockSet}
       />,
     );

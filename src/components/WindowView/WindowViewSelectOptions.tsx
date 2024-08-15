@@ -11,6 +11,7 @@ import styles from "./WindowView.module.css";
 export interface WindowViewSelectOptionsProps extends React.ComponentProps<"div"> {
   type?: EditorV3TextBlockType;
   options: IEditorV3SelectBlockOptionalParams;
+  editable: boolean;
   setOptions: (options: IEditorV3SelectBlockOptionalParams) => void;
   customSytleMap?: EditorV3Styles;
 }
@@ -18,6 +19,7 @@ export interface WindowViewSelectOptionsProps extends React.ComponentProps<"div"
 export const WindowViewSelectOptions = ({
   type,
   options,
+  editable,
   setOptions,
   customSytleMap,
 }: WindowViewSelectOptionsProps): JSX.Element => {
@@ -63,6 +65,7 @@ export const WindowViewSelectOptions = ({
                 id={`available-${selectOptionsId}`}
                 className={baseStyles.baseEditorV3}
                 allowNewLine
+                editable={editable}
                 customStyleMap={customSytleMap}
                 style={{ border: "none", height: "100%" }}
                 input={input}

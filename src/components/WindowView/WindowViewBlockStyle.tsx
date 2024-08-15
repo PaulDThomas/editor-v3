@@ -5,6 +5,7 @@ import baseStyles from "../BaseInputs.module.css";
 interface WindowViewBlockStyleProps extends React.ComponentProps<"select"> {
   styles: EditorV3Styles;
   styleName?: string;
+  disabled: boolean;
   setStyleName: (style: string) => void;
 }
 

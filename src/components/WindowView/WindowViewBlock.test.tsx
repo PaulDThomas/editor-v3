@@ -15,6 +15,7 @@ describe("WindowViewBlock", () => {
       <WindowViewBlock
         contentProps={defaultContentProps}
         textBlock={{ text: "test" }}
+        editable={true}
         setTextBlock={mockSet}
       />,
     );
@@ -28,6 +29,7 @@ describe("WindowViewBlock", () => {
       <WindowViewBlock
         contentProps={defaultContentProps}
         textBlock={{ text: "test", type: "text", label: undefined, style: undefined }}
+        editable={true}
         setTextBlock={mockSet}
       />,
     );
@@ -74,6 +76,7 @@ describe("WindowViewBlock", () => {
           style: "blue",
           type: "at",
         }}
+        editable={true}
         setTextBlock={mockSet}
       />,
     );
@@ -115,6 +118,7 @@ describe("WindowViewBlock", () => {
           ...defaultContentProps,
           styles: { blue: { color: "blue" } },
         }}
+        editable={true}
         textBlock={{
           text: "current",
           type: "select",

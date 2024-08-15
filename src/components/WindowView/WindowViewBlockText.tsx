@@ -12,7 +12,6 @@ interface WindowViewBlockTextProps extends React.ComponentProps<"input"> {
 
 export const WindowViewBlockText = ({
   label,
-  disabled,
   text,
   setText,
   grow = false,
@@ -41,7 +40,6 @@ export const WindowViewBlockText = ({
         {...rest}
         aria-labelledby={`label-${thisId}`}
         id={thisId}
-        disabled={disabled}
         className={baseStyles.baseInput}
         value={currentText}
         onChange={(e) => setCurrentText(e.currentTarget.value)}

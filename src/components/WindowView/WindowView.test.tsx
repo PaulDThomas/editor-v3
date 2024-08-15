@@ -19,6 +19,7 @@ describe("WindowView", () => {
         state={{
           content: new EditorV3Content("test"),
           focus: false,
+          editable: true,
         }}
         setState={mockSetState}
       />,
@@ -39,6 +40,7 @@ describe("WindowView", () => {
           state={{
             content,
             focus: false,
+            editable: true,
           }}
           setState={mockSetState}
         />
@@ -66,6 +68,7 @@ describe("WindowView", () => {
           state={{
             content,
             focus: false,
+            editable: true,
           }}
           setState={mockSetState}
         />
@@ -93,6 +96,7 @@ describe("Add and remove lines", () => {
           state={{
             content,
             focus: false,
+            editable: true,
           }}
           setState={mockSetState}
         />
@@ -126,6 +130,7 @@ describe("Add and remove lines", () => {
           state={{
             content,
             focus: false,
+            editable: true,
           }}
           setState={mockSetState}
         />
@@ -161,6 +166,7 @@ describe("Add and remove lines", () => {
           state={{
             content,
             focus: false,
+            editable: true,
           }}
           setState={mockSetState}
         />

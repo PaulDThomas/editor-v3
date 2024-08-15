@@ -13,6 +13,7 @@ describe("WindowViewLine", () => {
         contentProps={defaultContentProps}
         lineIndex={2}
         line={{ textBlocks: [] }}
+        editable={true}
         setLine={mockSet}
       />,
     );
@@ -35,6 +36,7 @@ describe("WindowViewLine", () => {
             { text: "test2", type: "text", style: "blue" },
           ],
         }}
+        editable={true}
         setLine={mockSet}
       />,
     );
@@ -65,6 +67,7 @@ describe("Add and remove text blocks", () => {
         }}
         lineIndex={0}
         line={{ textBlocks: [] }}
+        editable={true}
         setLine={mockSet}
       />,
     );
@@ -85,6 +88,7 @@ describe("Add and remove text blocks", () => {
         }}
         lineIndex={0}
         line={{ textBlocks: [{ text: "@test1", type: "at" }] }}
+        editable={true}
         setLine={mockSet}
       />,
     );
@@ -110,6 +114,7 @@ describe("Add and remove text blocks", () => {
         }}
         lineIndex={0}
         line={{ textBlocks: [{ text: "@test1", type: "at" }] }}
+        editable={true}
         setLine={mockSet}
       />,
     );

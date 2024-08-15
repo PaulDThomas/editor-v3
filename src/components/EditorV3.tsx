@@ -43,6 +43,7 @@ export interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
 export interface EditorV3State {
   content: EditorV3Content;
   focus: boolean;
+  editable: boolean;
 }
 
 export const EditorV3 = ({
@@ -84,6 +85,7 @@ export const EditorV3 = ({
       allowNewLine,
     }),
     focus: false,
+    editable,
   });
 
   const contentProps = useMemo((): EditorV3ContentPropsInput => {
@@ -202,9 +204,10 @@ export const EditorV3 = ({
       setCurrentValue({
         content: newContent,
         focus: focus ?? state?.focus ?? false,
+        editable,
       });
     },
-    [setCurrentValue, state],
+    [editable, setCurrentValue, state?.focus],
   );
 
   // Update any content property from parent
@@ -213,7 +216,7 @@ export const EditorV3 = ({
       const newContent = new EditorV3Content(divRef.current, contentProps);
       setContent(newContent, "Update content props from parent");
     }
-  });
+  }, [contentProps, editable, setContent, state]);
 
   // Update input from parent, need to track the last string input separately from the debounce stack
   useEffect(() => {
@@ -246,7 +249,7 @@ export const EditorV3 = ({
   const menuItems = useMemo((): MenuItem[] => {
     if (state) {
       const styleMenuItem: MenuItem[] =
-        !state.content.styles || Object.keys(state.content.styles).length === 0
+        !editable || !state.content.styles || Object.keys(state.content.styles).length === 0
           ? []
           : [
               {
@@ -316,7 +319,7 @@ export const EditorV3 = ({
       return [...styleMenuItem, ...showMarkdownMenu, ...showWindowViewMenu];
     }
     return [];
-  }, [state, allowMarkdown, allowWindowView, showWindowView, contentProps, setContent]);
+  }, [state, editable, allowMarkdown, allowWindowView, showWindowView, contentProps, setContent]);
 
   // Focus and blur events are container not contenteditable level events!
   const handleFocus = useCallback(
@@ -353,9 +356,9 @@ export const EditorV3 = ({
       newContent.caretPosition = null;
       setLastAction("Blur");
       setLastCaretPosition(null);
-      forceReturn({ content: newContent, focus: false });
+      forceReturn({ content: newContent, focus: false, editable });
     }
-  }, [state, contentProps, forceReturn]);
+  }, [state, contentProps, forceReturn, editable]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -492,7 +495,7 @@ export const EditorV3 = ({
       s.overflow = "auto";
     }
     if (showWindowView) {
-      s.backgroundColor = "rgba(0, 0, 0, 0.3)";
+      s.backgroundColor = "rgba(0, 0, 0, 0.2)";
     }
     return s;
   }, [resize, showWindowView, style]);
@@ -501,7 +504,14 @@ export const EditorV3 = ({
     <>
       <div
         {...rest}
-        className={`aiev3${state?.focus ? " editing" : ""}${rest.className ? ` ${rest.className}` : ""}`}
+        className={[
+          "aiev3",
+          editable ? "" : "disabled",
+          state?.focus ? "editing" : "",
+          rest.className ?? "",
+        ]
+          .filter((c) => c.trim() !== "")
+          .join(" ")}
         id={id}
         onFocusCapture={(e) => {
           e.preventDefault();

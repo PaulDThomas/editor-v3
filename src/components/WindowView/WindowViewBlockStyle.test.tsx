@@ -15,6 +15,7 @@ describe("WindowViewBlockStyle", () => {
       <WindowViewBlockStyle
         styles={styles}
         styleName={"Blue"}
+        disabled={false}
         setStyleName={mockSet}
       />,
     );

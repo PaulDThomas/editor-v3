@@ -11,12 +11,14 @@ import { WindowViewSelectOptions } from "./WindowViewSelectOptions";
 interface WindowViewBlockProps {
   contentProps: EditorV3ContentPropsInput;
   textBlock: IEditorV3AtBlock | IEditorV3TextBlock | IEditorV3SelectBlock;
+  editable: boolean;
   setTextBlock: (textBlock: IEditorV3AtBlock | IEditorV3TextBlock | IEditorV3SelectBlock) => void;
 }
 
 export const WindowViewBlock = ({
   contentProps,
   textBlock,
+  editable,
   setTextBlock,
 }: WindowViewBlockProps) => {
   return (
@@ -24,12 +26,14 @@ export const WindowViewBlock = ({
       <div className={styles.windowViewBlock}>
         <WindowViewBlockType
           includeAt={contentProps.atListFunction !== undefined}
+          disabled={!editable}
           type={textBlock.type ?? "text"}
           setType={(type) => setTextBlock({ ...textBlock, type })}
         />
         {contentProps?.styles && Object.keys(contentProps.styles).length > 0 && (
           <WindowViewBlockStyle
             styles={contentProps.styles}
+            disabled={!editable}
             styleName={textBlock.style}
             setStyleName={(style) =>
               setTextBlock({ ...textBlock, style: style === "" ? undefined : style })
@@ -38,7 +42,7 @@ export const WindowViewBlock = ({
         )}
         <WindowViewBlockText
           label="Label"
-          disabled={false}
+          disabled={!editable}
           style={{ width: "200px" }}
           shrink
           text={textBlock.label}
@@ -49,6 +53,7 @@ export const WindowViewBlock = ({
           style={{ width: "100%", maxWidth: "100%" }}
           grow
           disabled={
+            !editable ||
             textBlock.type === "at" ||
             (contentProps?.styles?.[textBlock.style ?? ""]?.isLocked ?? false)
           }
@@ -62,6 +67,7 @@ export const WindowViewBlock = ({
       <WindowViewSelectOptions
         type={textBlock.type ?? "text"}
         customSytleMap={contentProps.styles}
+        editable={editable}
         options={{
           availableOptions: (textBlock as IEditorV3SelectBlock).availableOptions ?? [],
         }}

@@ -12,6 +12,7 @@ describe("WindowViewLine", () => {
       <WindowViewSelectOptions
         type="text"
         options={{}}
+        editable={true}
         setOptions={mockSet}
       />,
     );
@@ -48,6 +49,7 @@ describe("WindowViewLine", () => {
             { text: "test2", data: { style: "blue" } },
           ],
         }}
+        editable={true}
         setOptions={mockSet}
       />,
     );
@@ -95,6 +97,7 @@ describe("WindowViewLine", () => {
             { text: "test2", data: { style: "blue" } },
           ],
         }}
+        editable={true}
         setOptions={mockSet}
       />,
     );
@@ -141,6 +144,7 @@ describe("WindowViewLine", () => {
             { text: "test2", data: { style: "blue" } },
           ],
         }}
+        editable={true}
         setOptions={mockSet}
       />,
     );

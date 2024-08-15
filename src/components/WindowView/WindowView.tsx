@@ -37,7 +37,7 @@ export const WindowView = ({
     state.content.lines.map((line) => (line instanceof EditorV3Line ? line.data : line)),
     (value: IEditorV3Line[]) => {
       const ret = new EditorV3Content({ lines: value }, state.content.contentProps);
-      setState({ content: ret, focus: false });
+      setState({ content: ret, focus: false, editable: state.editable });
     },
     null,
   );
@@ -112,21 +112,24 @@ export const WindowView = ({
       }}
     >
       <div className={styles.windowViewBody}>
-        {contentProps.allowNewLine && <AddLine onClick={() => addLine(0)} />}
+        {state.editable && contentProps.allowNewLine && <AddLine onClick={() => addLine(0)} />}
         {lines.map((line, ix) => (
           <div
             key={ix}
             className={iconStyles.relativeDiv}
           >
-            <RemoveLine onClick={() => removeLine(ix)} />
+            {state.editable && <RemoveLine onClick={() => removeLine(ix)} />}
             <WindowViewLine
               key={ix}
               contentProps={contentProps}
               lineIndex={ix}
               line={line}
+              editable={state.editable}
               setLine={(line) => setLine(line, ix)}
             />
-            {contentProps.allowNewLine && <AddLine onClick={() => addLine(ix + 1)} />}
+            {state.editable && contentProps.allowNewLine && (
+              <AddLine onClick={() => addLine(ix + 1)} />
+            )}
           </div>
         ))}
       </div>
