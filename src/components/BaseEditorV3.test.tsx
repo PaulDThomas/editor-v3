@@ -23,8 +23,17 @@ describe("BaseEditorV3", () => {
           label="Base editor test"
           id="test-editor"
           input={mockContent}
+          style={{
+            minWidth: "200px",
+            width: "600px",
+            maxWidth: "800px",
+            minHeight: "100px",
+            height: "200px",
+            maxHeight: "400px",
+          }}
           customStyleMap={{ shiny: { color: "pink", fontWeight: "700" } }}
           allowNewLine
+          resize
         />
       </div>,
     );

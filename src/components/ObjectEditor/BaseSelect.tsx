@@ -34,7 +34,6 @@ export const BaseSelect = ({
     const newValueIx = availableOptionsStrings.findIndex((item) => item.value === e.target.value);
     setThisValueString(e.target.value);
     if (newValueIx !== -1) {
-      console.log("Sending value", availableOptions[newValueIx].value);
       change(availableOptions[newValueIx].value);
     }
   };
