@@ -67,7 +67,7 @@ export const defaultStyleItems: ObjectEditorItemOptions[] = [
     type: "boolean",
   },
   {
-    name: "isNotAvailabe",
+    name: "isNotAvailable",
     type: "boolean",
   },
 ];

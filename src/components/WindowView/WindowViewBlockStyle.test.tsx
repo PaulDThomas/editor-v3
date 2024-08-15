@@ -8,8 +8,8 @@ describe("WindowViewBlockStyle", () => {
   test("Basic render & select", async () => {
     const mockSet = jest.fn();
     const styles = {
-      Green: { isNotAvailabe: false, color: "green" },
-      Blue: { isNotAvailabe: true, color: "blue" },
+      Green: { isNotAvailable: false, color: "green" },
+      Blue: { isNotAvailable: true, color: "blue" },
     };
     render(
       <WindowViewBlockStyle

@@ -93,7 +93,7 @@ export const App = (): JSX.Element => {
       isLocked: true,
     },
     blue: { color: "blue", fontWeight: 700 },
-    red: { color: "red", isNotAvailabe: true },
+    red: { color: "red", isNotAvailable: true },
   });
 
   return (

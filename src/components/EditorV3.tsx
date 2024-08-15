@@ -259,7 +259,7 @@ export const EditorV3 = ({
                       disabled:
                         state.content.showMarkdown ||
                         state.content.isCaretLocked() ||
-                        (state.content.styles as EditorV3Styles)[s].isNotAvailabe ||
+                        (state.content.styles as EditorV3Styles)[s].isNotAvailable ||
                         state.content.caretPosition?.isCollapsed,
                       action: () => {
                         if (divRef.current) {

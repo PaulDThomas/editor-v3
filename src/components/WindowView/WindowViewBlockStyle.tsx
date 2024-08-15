@@ -40,7 +40,7 @@ export const WindowViewBlockStyle = ({
           <option
             key={ix}
             value={sn}
-            disabled={(styles as EditorV3Styles)[sn].isNotAvailabe}
+            disabled={(styles as EditorV3Styles)[sn].isNotAvailable}
           >
             {sn}
           </option>
