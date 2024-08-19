@@ -33,6 +33,16 @@ describe("Check basic EditorV3Content", () => {
     });
   });
 
+  test("Load 0 lines", async () => {
+    // eslint-disable-next-line quotes
+    const testContent = new EditorV3Content('{"lines":[]}');
+    expect(testContent.text).toEqual("");
+    expect(testContent.lines.length).toEqual(1);
+    expect(testContent.data).toEqual({
+      lines: [{ textBlocks: [{ text: "", type: "text" }] }],
+    });
+  });
+
   test("Load string with style info", async () => {
     const testProps: EditorV3ContentPropsInput = {
       styles: { shiny: { color: "pink" } },

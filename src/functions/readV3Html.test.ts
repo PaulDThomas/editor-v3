@@ -83,4 +83,35 @@ describe("readV3Html tests", () => {
     expect(result.lines.length).toEqual(1);
     expect(result.lines[0].textBlocks).toMatchSnapshot();
   });
+
+  test("Read contentProps node", async () => {
+    const text =
+      '<div class="aiev3-line left"></div><div class="aiev3-contents-info" data-allow-markdown="true" data-allow-new-line="true" data-styles="{&quot;Notes&quot;:{&quot;color&quot;:&quot;royalblue&quot;},&quot;Optional&quot;:{&quot;color&quot;:&quot;green&quot;}}"></div>';
+    const result = readV3Html(text);
+    const updatedContentProps = {
+      ...defaultContentProps,
+      allowMarkdown: true,
+      allowNewLine: true,
+      styles: { Notes: { color: "royalblue" }, Optional: { color: "green" } },
+    };
+    expect(result).toEqual({
+      lines: [
+        {
+          textBlocks: [
+            {
+              text: "",
+              type: "text",
+              isActive: false,
+              isSelected: false,
+              _defaultContentProps: defaultContentProps,
+              lineStartPosition: 0,
+            },
+          ],
+          decimalAlignPercent: 60,
+          textAlignment: "left",
+        },
+      ],
+      contentProps: updatedContentProps,
+    });
+  });
 });

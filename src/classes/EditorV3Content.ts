@@ -308,6 +308,9 @@ export class EditorV3Content implements IEditorV3 {
       this._updateProps(props);
       this.lines.map((l) => (l.contentProps = this.contentProps));
     }
+    if (this.lines.length === 0) {
+      this.lines = [new EditorV3Line()];
+    }
   }
 
   private _updateProps(props: EditorV3ContentPropsInput) {
