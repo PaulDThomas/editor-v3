@@ -22,6 +22,29 @@
   overflow: visible;
 }
 
+.aiev3-resize {
+  overflow: auto;
+}
+
+.aiev3-resize::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.aiev3-resize::-webkit-scrollbar-track {
+  border-radius: 100px;
+}
+
+.aiev3-resize::-webkit-scrollbar-thumb {
+  background: grey;
+  border: none;
+  border-radius: 100px;
+}
+
+.aiev3-resize::-webkit-scrollbar-thumb:hover {
+  background: darkslategrey;
+}
+
 .aiev3-resize-border {
   border: 1px dashed rgb(190, 190, 189);
   border-radius: 6px;

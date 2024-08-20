@@ -106,7 +106,6 @@ export const App = (): JSX.Element => {
               <EditorV3
                 id={"e1"}
                 input={editorV3_1}
-                resize
                 setText={setText}
                 setObject={(ret) => {
                   console.log(ret);
@@ -119,7 +118,7 @@ export const App = (): JSX.Element => {
                 customStyleMap={styleMap}
                 style={{
                   width: "500px",
-                  height: "400px",
+                  height: "100px",
                 }}
                 allowWindowView
                 atListFunction={loadAvailableItems}

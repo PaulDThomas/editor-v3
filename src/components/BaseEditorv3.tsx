@@ -15,15 +15,15 @@ export const BaseEditorV3 = ({ label, style, resize, ...rest }: BaseEdivotV3Prop
     if (style) {
       if (style.width) {
         outer.width = style.width;
-        recalc.width = "calc(100% - 4px)";
+        recalc.width = "100%";
       }
       if (style.maxWidth) {
         outer.maxWidth = style.maxWidth;
-        recalc.maxWidth = "calc(100% - 4px)";
+        recalc.maxWidth = "100%";
       }
       if (style.minWidth) {
         outer.minWidth = style.minWidth;
-        recalc.minWidth = "calc(100% - 4px)";
+        recalc.minWidth = "100%";
       }
       if (style.height) {
         outer.height = style.height;
