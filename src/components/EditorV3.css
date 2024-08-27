@@ -2,6 +2,7 @@
   position: relative;
   width: 100%;
   height: 100%;
+  min-height: fit-content;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -9,7 +10,7 @@
 }
 
 .aiev3.disabled {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .aiev3-resize {
@@ -24,6 +25,7 @@
 
 .aiev3-resize {
   overflow: auto;
+  position: relative;
 }
 
 .aiev3-resize::-webkit-scrollbar {
@@ -53,13 +55,17 @@
 .aiev3-editing {
   padding: 2px;
   outline: 0;
-  align-content: start;
   vertical-align: top;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
   min-height: calc(100% - 5px);
   height: fit-content;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 .aiev3-resize-border .aiev3-editing {

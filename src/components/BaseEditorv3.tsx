@@ -28,6 +28,9 @@ export const BaseEditorV3 = ({ label, style, resize, ...rest }: BaseEdivotV3Prop
       if (style.height) {
         outer.height = style.height;
         recalc.height = "100%";
+      } else {
+        outer.height = "48px";
+        recalc.height = "100%";
       }
       if (style.maxHeight) {
         outer.maxHeight = style.maxHeight;
@@ -35,6 +38,9 @@ export const BaseEditorV3 = ({ label, style, resize, ...rest }: BaseEdivotV3Prop
       }
       if (style.minHeight) {
         outer.minHeight = style.minHeight;
+        recalc.minHeight = "100%";
+      } else {
+        outer.minHeight = "48px";
         recalc.minHeight = "100%";
       }
       if (resize) {
