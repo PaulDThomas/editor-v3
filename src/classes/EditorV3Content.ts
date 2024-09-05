@@ -279,6 +279,9 @@ export class EditorV3Content implements IEditorV3 {
     // Process incoming data
     try {
       if (arg instanceof HTMLDivElement) {
+        // Remove skip-read elements
+        const skipRead = arg.querySelectorAll(".skip-read");
+        skipRead.forEach((el) => el.remove());
         // Read in HTML
         const r = readV3Html(arg.innerHTML, props);
         this._copyImport(r);

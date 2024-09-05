@@ -4,6 +4,7 @@ import { EditorV3SelectBlock } from "./EditorV3SelectBlock";
 
 describe("EditorV3SelectBlock", () => {
   beforeEach(() => {
+    document.body.innerHTML = "";
     jest.useFakeTimers();
     // Define offsetParent for HTMLElement
     Object.defineProperty(HTMLElement.prototype, "offsetParent", {
@@ -14,6 +15,9 @@ describe("EditorV3SelectBlock", () => {
   });
 
   afterEach(() => {
+    document.body.innerHTML = "";
+    jest.clearAllMocks();
+    jest.clearAllTimers();
     jest.useRealTimers();
   });
 
@@ -40,6 +44,7 @@ describe("EditorV3SelectBlock", () => {
     ]);
     block.setActive(true);
     block.showDropdown();
+    expect(block.text).toEqual(text);
     const result = block.toHtml({});
 
     // Check if the DocumentFragment contains a single span element
@@ -240,6 +245,7 @@ describe("EditorV3SelectBlock", () => {
 
 describe("should return a DocumentFragment with a dropdown", () => {
   beforeEach(() => {
+    document.body.innerHTML = "";
     jest.useFakeTimers();
     // Define offsetParent for HTMLElement
     Object.defineProperty(HTMLElement.prototype, "offsetParent", {
@@ -248,7 +254,11 @@ describe("should return a DocumentFragment with a dropdown", () => {
       },
     });
   });
+
   afterEach(() => {
+    document.body.innerHTML = "";
+    jest.clearAllMocks();
+    jest.clearAllTimers();
     jest.useRealTimers();
   });
   test("Ensure previous dropdowns are removed", async () => {
@@ -266,6 +276,7 @@ describe("should return a DocumentFragment with a dropdown", () => {
     const block = new EditorV3SelectBlock({ text, style, availableOptions });
     block.showDropdown();
     const editor = document.createElement("div");
+    document.body.appendChild(editor);
     editor.className = "aiev3";
     const editable = document.createElement("div");
     editable.className = "aiev3-editable";
@@ -274,24 +285,29 @@ describe("should return a DocumentFragment with a dropdown", () => {
     const line = document.createElement("div");
     line.className = "aiev3-line";
     editable.appendChild(line);
+    // Add an old dropdown
     const oldDropdown = document.createElement("ul");
     oldDropdown.className = "aiev3-dropdown-list";
-    editor.appendChild(oldDropdown);
     oldDropdown.innerHTML = "<li class='aiev3-drop-item'>Old item</li>";
-    expect(editor.querySelector(".aiev3-dropdown-list")?.textContent).toEqual("Old item");
+    document.body.appendChild(oldDropdown);
 
     await act(async () => {
-      block.toHtml({ editableEl: editable, currentEl: line });
+      block.toHtml({
+        editableEl: editable,
+        currentEl: line,
+        caretPosition: { isCollapsed: false, startLine: 0, startChar: 0, endLine: 0, endChar: 10 },
+      });
       // Run pending timer from the function to display the dropdown list
       jest.runAllTimers();
     });
     expect(editor.querySelector(".aiev3-dropdown-list")?.textContent).not.toEqual("Old item");
-    expect(editor.innerHTML).toMatchSnapshot();
+    expect(document.body.innerHTML).toMatchSnapshot();
     // Check dropdown click
-    const items = editor.querySelectorAll(".aiev3-drop-item");
+    const items = document.body.querySelectorAll(".aiev3-drop-item");
     expect(items).toBeDefined();
     expect(items.length).toBe(2);
     fireEvent.mouseDown(items![1].childNodes[0] as HTMLElement);
+    await act(async () => jest.runAllTimers());
     expect(editor.querySelector(".aiev3-drop-item")).toBeNull();
     expect(editor.innerHTML).toMatchSnapshot();
   });
@@ -311,6 +327,7 @@ describe("should return a DocumentFragment with a dropdown", () => {
     const block = new EditorV3SelectBlock({ text, style, availableOptions });
     block.showDropdown();
     const editor = document.createElement("div");
+    document.body.appendChild(editor);
     editor.className = "aiev3";
     const editable = document.createElement("div");
     editable.className = "aiev3-editable";
@@ -321,25 +338,51 @@ describe("should return a DocumentFragment with a dropdown", () => {
     editable.appendChild(line);
 
     await act(async () => {
-      block.toHtml({ editableEl: editable, currentEl: line });
+      block.toHtml({
+        editableEl: editable,
+        currentEl: line,
+        caretPosition: { isCollapsed: false, startLine: 0, startChar: 0, endLine: 0, endChar: 10 },
+      });
       // Run pending timer from the function to display the dropdown list
       jest.runAllTimers();
     });
-    expect(editor.innerHTML).toMatchSnapshot();
+    expect(document.body.innerHTML).toMatchSnapshot();
+    expect(document.body.querySelector(".select-block") as HTMLSpanElement).toHaveClass(
+      "editorv3style-bold",
+    );
+
     // Check dropdown click
-    const items = editor.querySelectorAll(".aiev3-drop-item");
+    const items = document.body.querySelectorAll(".aiev3-drop-item");
     expect(items).toBeDefined();
     expect(items.length).toBe(2);
     fireEvent.mouseDown(items![0].childNodes[0] as HTMLElement);
-    expect(editor.querySelector(".aiev3-drop-item")).toBeNull();
-    expect(editor.querySelector(".select-block") as HTMLSpanElement).not.toHaveClass(
+    await act(async () => jest.runAllTimers());
+    expect(document.body.querySelector(".aiev3-drop-item")).toBeNull();
+    expect(document.body.querySelector(".select-block") as HTMLSpanElement).not.toHaveClass(
       "editorv3style-bold",
     );
-    expect(editor.innerHTML).toMatchSnapshot();
+    expect(document.body.innerHTML).toMatchSnapshot();
   });
 });
 
 describe("EditorV3SelectBlock errors", () => {
+  beforeEach(() => {
+    document.body.innerHTML = "";
+    jest.useFakeTimers();
+    // Define offsetParent for HTMLElement
+    Object.defineProperty(HTMLElement.prototype, "offsetParent", {
+      get() {
+        return this.parentNode;
+      },
+    });
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = "";
+    jest.clearAllMocks();
+    jest.clearAllTimers();
+    jest.useRealTimers();
+  });
   test("should throw an error from an empty document fragment", async () => {
     expect(() => {
       new EditorV3SelectBlock(document.createDocumentFragment());

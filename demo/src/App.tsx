@@ -72,7 +72,16 @@ export const App = (): JSX.Element => {
         textBlocks: [
           { text: "two words", style: "defaultStyle" },
           { text: "2nd locked line", style: "green" },
-          { text: "2nd locked line", style: "green" },
+          { text: " 2nd locked line ", style: "green" },
+          {
+            text: "select-block",
+            type: "select",
+            availableOptions: [
+              { text: "green", data: { text: "green", style: "green" } },
+              { text: "red", data: { text: "red", style: "red" } },
+              { text: "black", data: { text: "black" } },
+            ],
+          },
           { text: "lots of locks", style: "red" },
         ],
       },

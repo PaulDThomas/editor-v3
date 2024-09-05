@@ -143,6 +143,10 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
       existingDropdowns.forEach((dropdown) => dropdown.remove());
     }
 
+    // Remove any existing dropdowns
+    const previousDropdown = document.querySelectorAll(".aiev3-dropdown-list");
+    previousDropdown.forEach((dropdown) => dropdown.remove());
+
     // Add locked status
     if (this.isLocked || !this.isActive) {
       span.classList.add("is-locked");
@@ -162,12 +166,11 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
         span.classList.add("show-dropdown");
         renderTimeout = window.setTimeout(
           () =>
-            renderDropdown(
-              span,
-              renderProps.atListFunction ?? this.atListFunction,
-              renderProps.maxAtListLength ?? this.maxAtListLength,
-              this.text,
-            ),
+            renderDropdown(span, this.text, {
+              ...renderProps,
+              atListFunction: renderProps.atListFunction ?? this.atListFunction,
+              maxAtListLength: renderProps.maxAtListLength ?? this.maxAtListLength,
+            }),
           100,
         );
       }

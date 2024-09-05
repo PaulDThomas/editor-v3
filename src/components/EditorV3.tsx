@@ -117,7 +117,7 @@ export const EditorV3 = ({
   const [hasFocused, setHasFocused] = useState<boolean>(false);
   const [lastInput, setLastInput] = useState<string | IEditorV3>(input);
   const [lastCaretPosition, setLastCaretPosition] = useState<EditorV3Position | null>(null);
-  const [lastAction, setLastAction] = useState<"Focus" | "Blur" | "Key" | "">("");
+  const [lastAction, setLastAction] = useState<"Focus" | "Blur" | "Key" | "Refresh" | "">("");
   const [lastTextSent, setLastTextSent] = useState<string>(
     typeof input === "object"
       ? input.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("")).join("\n")
@@ -161,7 +161,7 @@ export const EditorV3 = ({
     // console.debug(
     //   "Redraw element:\r\n",
     //   ret.content.lines.map((l) => l.toMarkdown({}).textContent).join("\n"),
-    //   JSON.stringify(ret.content.caretPosition),
+    //   `\n${JSON.stringify(ret.content.caretPosition)}`,
     // );
     divRef.current && ret.content.redraw(divRef.current, ret.focus);
   }, []);
@@ -320,6 +320,37 @@ export const EditorV3 = ({
     }
     return [];
   }, [state, editable, allowMarkdown, allowWindowView, showWindowView, contentProps, setContent]);
+
+  const handleRefreshEvent = useCallback(
+    (e: Event) => {
+      e.stopPropagation();
+      e.preventDefault();
+      setLastAction("Refresh");
+      if (divRef.current) {
+        const newContent = new EditorV3Content(divRef.current, contentProps);
+        newContent.caretPosition = {
+          startLine: newContent.caretPosition?.endLine ?? 0,
+          startChar: newContent.caretPosition?.endChar ?? 0,
+          endLine: newContent.caretPosition?.endLine ?? 0,
+          endChar: newContent.caretPosition?.endChar ?? 0,
+        };
+        window.setTimeout(() => {
+          setContent(newContent, "Handle refresh event");
+        }, 100);
+      }
+    },
+    [contentProps, setContent],
+  );
+
+  useEffect(() => {
+    if (divRef.current) {
+      const divRefCurrent = divRef.current;
+      divRefCurrent.addEventListener("editorv3refresh", handleRefreshEvent);
+      return () => {
+        divRefCurrent?.removeEventListener("editorv3refresh", handleRefreshEvent);
+      };
+    }
+  }, [handleRefreshEvent]);
 
   // Focus and blur events are container not contenteditable level events!
   const handleFocus = useCallback(
