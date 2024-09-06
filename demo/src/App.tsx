@@ -100,6 +100,7 @@ export const App = (): JSX.Element => {
       // fontSize: "18pt",
       // fontWeight: 1000,
       isLocked: true,
+      isNotAvailable: true,
     },
     blue: { color: "blue", fontWeight: 700 },
     red: { color: "red", isNotAvailable: true },
@@ -197,6 +198,7 @@ export const App = (): JSX.Element => {
                   ...styleMap,
                   red: { color: "red", isLocked: true },
                 }}
+                resize="vertical"
                 spellCheck
                 style={{
                   width: "600px",

@@ -43,8 +43,8 @@ export const BaseEditorV3 = ({ label, style, resize, ...rest }: BaseEdivotV3Prop
         outer.minHeight = "48px";
         recalc.minHeight = "100%";
       }
-      if (resize) {
-        outer.resize = "both";
+      if (resize === true || resize === "vertical") {
+        outer.resize = "vertical";
         outer.overflow = "auto";
       }
     }

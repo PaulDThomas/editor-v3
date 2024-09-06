@@ -28,7 +28,7 @@ export interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   textAlignment?: EditorV3Align;
   decimalAlignPercent?: number;
   style?: CSSProperties;
-  resize?: boolean;
+  resize?: boolean | "vertical";
   noBorder?: boolean;
   spellCheck?: boolean;
   styleOnContextMenu?: boolean;
@@ -521,9 +521,15 @@ export const EditorV3 = ({
 
   const styleRecalc = useMemo(() => {
     const s = { ...style };
-    if (resize) {
-      s.resize = "both";
-      s.overflow = "auto";
+    switch (resize) {
+      case "vertical":
+        s.resize = "vertical";
+        s.overflow = "auto";
+        break;
+      case true:
+        s.resize = "both";
+        s.overflow = "auto";
+        break;
     }
     if (showWindowView) {
       s.backgroundColor = "rgba(0, 0, 0, 0.2)";
