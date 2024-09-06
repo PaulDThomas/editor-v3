@@ -11,6 +11,7 @@ import {
 } from "./interface";
 import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import { renderDropdown } from "./toHtml/renderDropdown";
+import { stopDragOnto } from "./toHtml/stopDragOnto";
 
 export interface IEditorV3AtBlockOptionalParams extends IEditorV3TextBlockOptionalParams {
   atListFunction?: (typedString: string) => Promise<EditorV3DropListItem<Record<string, string>>[]>;
@@ -151,7 +152,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     if (this.isLocked || !this.isActive) {
       span.classList.add("is-locked");
       span.dataset.isLocked = "true";
-      span.contentEditable = "false";
+      stopDragOnto(span);
       // Add any other data items from the at item
       this.atData &&
         Object.keys(this.atData).forEach((key) => {

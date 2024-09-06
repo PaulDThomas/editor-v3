@@ -11,6 +11,7 @@ import {
 } from "./interface";
 import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import { renderDropdown } from "./toHtml/renderDropdown";
+import { stopDragOnto } from "./toHtml/stopDragOnto";
 
 export interface IEditorV3SelectBlockOptionalParams extends IEditorV3TextBlockOptionalParams {
   availableOptions?: EditorV3DropListItem<Record<string, string>>[];
@@ -165,7 +166,7 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
     // Add locked status
     span.classList.add("is-locked");
     span.dataset.isLocked = "true";
-    span.contentEditable = "false";
+    stopDragOnto(span);
     // Add other data items from the at item
     span.dataset.availableOptions = JSON.stringify(this.availableOptions);
 
