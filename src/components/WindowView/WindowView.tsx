@@ -1,6 +1,6 @@
 import { ContextWindow } from "@asup/context-menu";
-import { cloneDeep } from "lodash";
-import { useCallback, useMemo } from "react";
+import { cloneDeep, isEqual } from "lodash";
+import { useCallback } from "react";
 import { EditorV3Content, EditorV3Line } from "../../classes";
 import { IEditorV3Line } from "../../classes/interface";
 import { useDebounceStack } from "../../hooks";
@@ -26,8 +26,8 @@ export const WindowView = ({
   setState,
 }: WindowViewProps) => {
   const {
-    currentValue: lines,
-    setCurrentValue: setLines,
+    currentValue,
+    setCurrentValue,
     forceUpdate,
     undo,
     redo,
@@ -37,50 +37,52 @@ export const WindowView = ({
     state.content.lines.map((line) => (line instanceof EditorV3Line ? line.data : line)),
     (value: IEditorV3Line[]) => {
       const ret = new EditorV3Content({ lines: value }, state.content.contentProps);
-      setState({ content: ret, focus: false, editable: state.editable });
+      if (
+        !isEqual(
+          ret.lines.map((l) => l.data),
+          state.content.lines.map((l) => l.data),
+        )
+      ) {
+        setState({ content: ret, focus: false, editable: state.editable });
+      }
     },
     null,
   );
 
-  const contentProps = useMemo(
-    () => state.content.contentProps ?? {},
-    [state.content.contentProps],
-  );
-
   const setLine = useCallback(
     (line: IEditorV3Line, ix: number) => {
-      if (lines) {
-        const newLines = cloneDeep(lines);
+      if (currentValue) {
+        const newLines = cloneDeep(currentValue);
         newLines[ix] = line;
-        setLines(newLines);
+        if (!isEqual(newLines, currentValue)) setCurrentValue(newLines);
       }
     },
-    [lines, setLines],
+    [currentValue, setCurrentValue],
   );
 
   const addLine = useCallback(
     (ix: number) => {
-      if (lines) {
-        const newLines = cloneDeep(lines);
+      if (currentValue) {
+        const newLines = cloneDeep(currentValue);
         newLines.splice(ix, 0, { textBlocks: [{ type: "text", text: "" }] });
-        setLines(newLines);
+        setCurrentValue(newLines);
       }
     },
-    [lines, setLines],
+    [currentValue, setCurrentValue],
   );
 
   const removeLine = useCallback(
     (ix: number) => {
-      if (lines) {
-        const newLines = cloneDeep(lines);
+      if (currentValue) {
+        const newLines = cloneDeep(currentValue);
         newLines.splice(ix, 1);
-        setLines(newLines);
+        setCurrentValue(newLines);
       }
     },
-    [lines, setLines],
+    [currentValue, setCurrentValue],
   );
 
-  return !lines ? (
+  return !currentValue ? (
     <></>
   ) : (
     <ContextWindow
@@ -112,8 +114,10 @@ export const WindowView = ({
       }}
     >
       <div className={styles.windowViewBody}>
-        {state.editable && contentProps.allowNewLine && <AddLine onClick={() => addLine(0)} />}
-        {lines.map((line, ix) => (
+        {state.editable && (state.content.contentProps ?? {}).allowNewLine && (
+          <AddLine onClick={() => addLine(0)} />
+        )}
+        {currentValue.map((line, ix) => (
           <div
             key={ix}
             className={iconStyles.relativeDiv}
@@ -121,13 +125,13 @@ export const WindowView = ({
             {state.editable && <RemoveLine onClick={() => removeLine(ix)} />}
             <WindowViewLine
               key={ix}
-              contentProps={contentProps}
+              contentProps={state.content.contentProps ?? {}}
               lineIndex={ix}
               line={line}
               editable={state.editable}
               setLine={(line) => setLine(line, ix)}
             />
-            {state.editable && contentProps.allowNewLine && (
+            {state.editable && (state.content.contentProps ?? {}).allowNewLine && (
               <AddLine onClick={() => addLine(ix + 1)} />
             )}
           </div>
