@@ -21,11 +21,25 @@ export const App = (): JSX.Element => {
         ],
       },
       { textBlocks: [{ text: "56.78", style: "blue" }] },
+      {
+        textBlocks: [
+          {
+            text: "Optional long line-that includes hyphen-s--s, it does needs to be really really long though",
+            style: "green",
+          },
+        ],
+      },
+      {
+        textBlocks: [{ text: "Another line to test" }],
+      },
+      {
+        textBlocks: [{ text: "Notes line", style: "blue" }],
+      },
     ],
     contentProps: {
       textAlignment: EditorV3Align.left,
       styles: {
-        blue: { color: "blue", fontWeight: 700 },
+        blue: { color: "blue", fontWeight: 700, fontSize: "22pt" },
       },
     },
   };
@@ -102,7 +116,7 @@ export const App = (): JSX.Element => {
       isLocked: true,
       isNotAvailable: true,
     },
-    blue: { color: "blue", fontWeight: 700 },
+    blue: { color: "blue", fontWeight: 700, fontSize: "22pt" },
     red: { color: "red", isNotAvailable: true },
   });
 
@@ -130,6 +144,7 @@ export const App = (): JSX.Element => {
                   width: "500px",
                   height: "100px",
                 }}
+                resize
                 allowWindowView
                 atListFunction={loadAvailableItems}
                 debounceMilliseconds={1000}

@@ -51,8 +51,9 @@ export class EditorV3Line implements IEditorV3Line {
     }
     // Need to add a space to the end of the line to allow for the cursor to be placed at the end
     if (this.textBlocks.length > 0 && this.textBlocks[this.textBlocks.length - 1].isLocked) {
-      const endBlockEl = new EditorV3TextBlock().toHtml(renderProps);
-      h.append(endBlockEl);
+      const endLineEl = document.createElement("span");
+      endLineEl.textContent = "\u200b";
+      h.append(endLineEl);
     }
     if (renderProps.editableEl) renderProps.editableEl.append(h);
     return h;

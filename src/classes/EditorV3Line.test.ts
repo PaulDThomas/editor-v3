@@ -1,11 +1,11 @@
 /* eslint-disable quotes */
 import { defaultContentProps } from "./defaultContentProps";
+import { EditorV3AtBlock } from "./EditorV3AtBlock";
 import { EditorV3Line } from "./EditorV3Line";
+import { EditorV3SelectBlock } from "./EditorV3SelectBlock";
+import { EditorV3TextBlock } from "./EditorV3TextBlock";
 import { EditorV3Align } from "./interface";
 import { textBlockFactory } from "./textBlockFactory";
-import { EditorV3AtBlock } from "./EditorV3AtBlock";
-import { EditorV3TextBlock } from "./EditorV3TextBlock";
-import { EditorV3SelectBlock } from "./EditorV3SelectBlock";
 
 describe("Check basic EditorV3Line", () => {
   test("Load string", async () => {
@@ -596,7 +596,7 @@ describe("Write space after at block", () => {
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line left">' +
         '<span class="aiev3-tb at-block is-locked" data-type="at" data-is-locked="true">@Hello</span>' +
-        '<span class="aiev3-tb">\u2009</span>' +
+        "<span>\u200b</span>" +
         "</div>",
     );
     // Set active

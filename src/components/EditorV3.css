@@ -71,10 +71,18 @@
 
 .aiev3-line,
 .aiev3-markdown-line {
+  display: flex;
   width: 100%;
-  min-height: 1rem;
+  min-width: fit-content;
+  line-height: 1em;
+  padding-top: 1px;
+  padding-bottom: 1px;
   flex-wrap: wrap;
   max-width: 100%;
+  flex-shrink: 0;
+  min-height: 1em;
+  white-space: nowrap;
+  align-items: center;
 }
 
 .aiev3-line.decimal {
@@ -124,4 +132,11 @@
 .aiev3-span-point.rhs {
   text-align: left;
   grid-column: 2;
+}
+
+.aiev3-tb {
+  height: 1em;
+  min-height: 1em;
+  line-height: 1em;
+  white-space: nowrap;
 }
