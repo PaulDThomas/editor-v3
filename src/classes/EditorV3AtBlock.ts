@@ -137,12 +137,6 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     this.applyStyle(span, style);
     // Add label
     if (this.label) span.title = this.label;
-    // Delete any existing dropdown on render
-    const editor = renderProps.currentEl?.closest(".aiev3") as HTMLDivElement | null;
-    if (editor) {
-      const existingDropdowns = editor.querySelectorAll("ul.aiev3-dropdown-list");
-      existingDropdowns.forEach((dropdown) => dropdown.remove());
-    }
 
     // Remove any existing dropdowns
     const previousDropdown = document.querySelectorAll(".aiev3-dropdown-list");

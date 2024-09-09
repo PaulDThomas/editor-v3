@@ -336,7 +336,7 @@ export const EditorV3 = ({
         };
         window.setTimeout(() => {
           setContent(newContent, "Handle refresh event");
-        }, 100);
+        }, 5);
       }
     },
     [contentProps, setContent],

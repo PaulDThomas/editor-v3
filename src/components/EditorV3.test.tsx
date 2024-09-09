@@ -1017,3 +1017,48 @@ describe("Window view", () => {
     await user.type(textInput, " - added text");
   });
 });
+
+describe("Check custom refresh event", () => {
+  test("Click on select block", async () => {
+    const mockSet = jest.fn();
+    await act(async () =>
+      render(
+        <EditorV3
+          data-testid="test-editor"
+          id="test-editor"
+          input="Initial text"
+          setText={mockSet}
+          resize="vertical"
+        />,
+      ),
+    );
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
+    expect(editor).toBeInTheDocument();
+    const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    // Focus firtt
+    await act(async () => {
+      fireEvent.focus(editable);
+    });
+    // Hard coded javascript text change + event
+    await act(async () => {
+      const text = editable.querySelectorAll("span")[1] as HTMLSpanElement;
+      expect(text).toBeInTheDocument();
+      text.innerHTML = "text with extra";
+      const refreshEvent = new CustomEvent("editorv3refresh", {
+        bubbles: true,
+        detail: {
+          target: text,
+        },
+      });
+      text.dispatchEvent(refreshEvent);
+      jest.runAllTimers();
+    });
+    // Blur and check update has been picked up
+    await act(async () => {
+      fireEvent.blur(editable);
+    });
+    expect(mockSet).toHaveBeenCalledTimes(1);
+    expect(mockSet).toHaveBeenLastCalledWith("Initial text with extra");
+  });
+});

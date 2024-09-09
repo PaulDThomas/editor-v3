@@ -59,7 +59,8 @@ export const BaseEditorV3 = ({ label, style, resize, ...rest }: BaseEdivotV3Prop
       {label !== undefined && (
         <label
           className={baseStyles.label}
-          htmlFor={rest.id}
+          id={`${rest.id}-label`}
+          htmlFor={`${rest.id}`}
         >
           {label}
         </label>
@@ -67,6 +68,7 @@ export const BaseEditorV3 = ({ label, style, resize, ...rest }: BaseEdivotV3Prop
       <div className={baseStyles.editorHolder}>
         <EditorV3
           {...rest}
+          aria-labelledby={`${rest.id}-label`}
           style={innerStyle}
           noBorder
           resize={false}
