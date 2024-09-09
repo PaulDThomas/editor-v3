@@ -6,7 +6,7 @@ import { WindowViewBlock } from "./WindowViewBlock";
 jest.mock("./WindowViewSelectOptions");
 
 describe("WindowViewBlock", () => {
-  const user = userEvent.setup();
+  const user = userEvent.setup({ delay: null });
 
   test("No render without textBlock", async () => {
     const mockSet = jest.fn();

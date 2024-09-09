@@ -4,14 +4,6 @@ import { act, useState } from "react";
 import { Expander } from "./Expander";
 
 describe("Expander", () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
   test("Renders lineChild and children when open", async () => {
     const { container } = render(
       <Expander
@@ -131,14 +123,6 @@ describe("Expander", () => {
 });
 
 describe("External update", () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
   const TestComponent = () => {
     const [open, setOpen] = useState(false);
 

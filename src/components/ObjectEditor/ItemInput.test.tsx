@@ -34,7 +34,7 @@ describe("ItemInput tests", () => {
     { name: "fontWeight", type: "number" },
     { name: "isLocked", type: "boolean" },
   ];
-  const user = userEvent.setup();
+  const user = userEvent.setup({ delay: null });
 
   test("Blank render", () => {
     render(

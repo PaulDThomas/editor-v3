@@ -4,7 +4,7 @@ import { defaultContentProps } from "../../classes/defaultContentProps";
 import { WindowViewLine } from "./WindowViewLine";
 
 describe("WindowViewLine", () => {
-  const user = userEvent.setup();
+  const user = userEvent.setup({ delay: null });
 
   test("No render without textBlock", async () => {
     const mockSet = jest.fn();
@@ -56,6 +56,7 @@ describe("WindowViewLine", () => {
 });
 
 describe("Add and remove text blocks", () => {
+  const user = userEvent.setup({ delay: null });
   test("Add first block", async () => {
     const mockSet = jest.fn();
     render(
@@ -73,7 +74,7 @@ describe("Add and remove text blocks", () => {
     );
     const addBlock = screen.queryByLabelText("Add text block") as Element;
     expect(addBlock).toBeInTheDocument();
-    await userEvent.click(addBlock);
+    await user.click(addBlock);
     expect(mockSet).toHaveBeenLastCalledWith({ textBlocks: [{ text: "", type: "text" }] });
   });
 
@@ -94,7 +95,7 @@ describe("Add and remove text blocks", () => {
     );
     const addBlock = screen.queryAllByLabelText("Add text block")[1] as Element;
     expect(addBlock).toBeInTheDocument();
-    await userEvent.click(addBlock);
+    await user.click(addBlock);
     expect(mockSet).toHaveBeenLastCalledWith({
       textBlocks: [
         { text: "@test1", type: "at" },
@@ -120,7 +121,7 @@ describe("Add and remove text blocks", () => {
     );
     const removeBlock = screen.queryByLabelText("Remove text block") as Element;
     expect(removeBlock).toBeInTheDocument();
-    await userEvent.click(removeBlock);
+    await user.click(removeBlock);
     expect(mockSet).toHaveBeenLastCalledWith({ textBlocks: [] });
   });
 });

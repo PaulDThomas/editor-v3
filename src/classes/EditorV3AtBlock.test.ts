@@ -4,20 +4,6 @@ import { EditorV3AtBlock } from "./EditorV3AtBlock";
 import { EditorV3DropListItem } from "./interface";
 
 describe("EditorV3AtBlock", () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-    // Define offsetParent for HTMLElement
-    Object.defineProperty(HTMLElement.prototype, "offsetParent", {
-      get() {
-        return this.parentNode;
-      },
-    });
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
   test("should return a DocumentFragment with the correct structure", () => {
     const text = "Hello, world!";
     const style = "bold";
@@ -138,24 +124,6 @@ describe("should return a DocumentFragment with a dropdown", () => {
         );
       }, 1000),
     );
-
-  beforeEach(() => {
-    document.body.innerHTML = "";
-    jest.useFakeTimers();
-    // Define offsetParent for HTMLElement
-    Object.defineProperty(HTMLElement.prototype, "offsetParent", {
-      get() {
-        return this.parentNode;
-      },
-    });
-  });
-
-  afterEach(() => {
-    document.body.innerHTML = "";
-    jest.clearAllMocks();
-    jest.clearAllTimers();
-    jest.useRealTimers();
-  });
 
   test("Ensure previous dropdowns are removed", async () => {
     const text = "@";

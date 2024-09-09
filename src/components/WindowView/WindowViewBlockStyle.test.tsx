@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { WindowViewBlockStyle } from "./WindowViewBlockStyle";
 
 describe("WindowViewBlockStyle", () => {
-  const user = userEvent.setup();
+  const user = userEvent.setup({ delay: null });
 
   test("Basic render & select", async () => {
     const mockSet = jest.fn();

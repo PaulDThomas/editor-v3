@@ -20,8 +20,8 @@ const mockContent = new EditorV3Content("34.45\n\nx.xx", {
 mockContent.applyStyle("shiny", { startLine: 2, startChar: 0, endLine: 2, endChar: 4 });
 
 describe("Editor and functions", () => {
+  const user = userEvent.setup({ delay: null });
   test("Draw and fire cursor events", async () => {
-    const user = userEvent.setup();
     render(
       <div data-testid="container">
         <EditorV3
@@ -185,8 +185,8 @@ describe("Editor and functions", () => {
 });
 
 describe("Menu styling - add", () => {
+  const user = userEvent.setup({ delay: null });
   test("Add style", async () => {
-    const user = userEvent.setup();
     const mockSetText = jest.fn();
     render(
       <EditorV3
@@ -243,8 +243,8 @@ describe("Menu styling - add", () => {
 });
 
 describe("Menu styling - change", () => {
+  const user = userEvent.setup({ delay: null });
   test("Change style", async () => {
-    const user = userEvent.setup();
     const mockSetText = jest.fn();
     render(
       <div data-testid="container">
@@ -291,8 +291,8 @@ describe("Menu styling - change", () => {
 });
 
 describe("Menu styling - remove", () => {
+  const user = userEvent.setup({ delay: null });
   test("Remove style", async () => {
-    const user = userEvent.setup();
     const mockSetText = jest.fn();
     render(
       <EditorV3
@@ -338,8 +338,8 @@ describe("Menu styling - remove", () => {
 });
 
 describe("Menu styling - markdown", () => {
+  const user = userEvent.setup({ delay: null });
   test("Show markdown", async () => {
-    const user = userEvent.setup();
     render(
       <div data-testid="container">
         <EditorV3
@@ -369,8 +369,8 @@ describe("Menu styling - markdown", () => {
 });
 
 describe("Cut and paste", () => {
+  const user = userEvent.setup({ delay: null });
   test("Cut", async () => {
-    const user = userEvent.setup();
     const mockSetText = jest.fn();
     render(
       <EditorV3
@@ -418,7 +418,6 @@ describe("Cut and paste", () => {
   });
 
   test("Paste", async () => {
-    const user = userEvent.setup();
     const mockSetText = jest.fn();
     render(
       <EditorV3
@@ -453,7 +452,6 @@ describe("Cut and paste", () => {
   });
 
   test("Paste into single line", async () => {
-    const user = userEvent.setup();
     const mockSetText1 = jest.fn();
     const mockSetText2 = jest.fn();
     render(
@@ -494,6 +492,7 @@ describe("Cut and paste", () => {
 });
 
 describe("Edge events", () => {
+  const user = userEvent.setup({ delay: null });
   test("Initial focus", async () => {
     const mockSetText = jest.fn();
     render(
@@ -511,7 +510,6 @@ describe("Edge events", () => {
     fireEvent.focus(editorHolder);
   });
   test("Paste error - cannot work out how to accurately throw", async () => {
-    const user = userEvent.setup();
     const mockSetText = jest.fn();
     render(
       <div data-testid="container">
@@ -530,8 +528,8 @@ describe("Edge events", () => {
 });
 
 describe("Select all", () => {
+  const user = userEvent.setup({ delay: null });
   test("Programmer notes", async () => {
-    const user = userEvent.setup();
     const mockSet = jest.fn();
     render(
       <EditorV3
@@ -584,6 +582,7 @@ describe("Select all", () => {
 });
 
 describe("Undo/redo", () => {
+  const user = userEvent.setup({ delay: null });
   const TestContainer = () => {
     const [input, setInput] = useState<IEditorV3>(new EditorV3Content());
     return (
@@ -601,7 +600,6 @@ describe("Undo/redo", () => {
     );
   };
   test("Undo/redo", async () => {
-    const user = userEvent.setup();
     render(<TestContainer />);
     const editable = screen
       .queryByTestId("test-editor")
@@ -629,6 +627,7 @@ describe("Undo/redo", () => {
 });
 
 describe("Updates from above", () => {
+  const user = userEvent.setup({ delay: null });
   const TestContainer = () => {
     const [input, setInput] = useState("Before");
     const [textAlignment, setTextAlignment] = useState<EditorV3Align>(EditorV3Align.left);
@@ -679,7 +678,6 @@ describe("Updates from above", () => {
   };
 
   test("Change input", async () => {
-    const user = userEvent.setup();
     render(<TestContainer />);
     const editor = screen.getByTestId("editor");
     expect(screen.queryByText("Before")).toBeInTheDocument();
@@ -691,7 +689,6 @@ describe("Updates from above", () => {
   });
 
   test("Change alignment", async () => {
-    const user = userEvent.setup();
     render(<TestContainer />);
     const editor = screen.getByTestId("editor");
     expect(screen.queryByText("Before")).toBeInTheDocument();
@@ -701,7 +698,6 @@ describe("Updates from above", () => {
   });
 
   test("Change decimal align percent", async () => {
-    const user = userEvent.setup();
     render(<TestContainer />);
     const editor = screen.getByTestId("editor");
     expect(screen.queryByText("Before")).toBeInTheDocument();
@@ -711,7 +707,6 @@ describe("Updates from above", () => {
   });
 
   test("Change styles", async () => {
-    const user = userEvent.setup();
     render(<TestContainer />);
     const editor = screen.getByTestId("editor");
     expect(screen.queryByText("Before")).toBeInTheDocument();
@@ -721,7 +716,6 @@ describe("Updates from above", () => {
   });
 
   test("Change markdown settings", async () => {
-    const user = userEvent.setup();
     render(<TestContainer />);
     const editor = screen.getByTestId("editor");
     // Click show markdown
@@ -746,22 +740,6 @@ describe("Updates from above", () => {
 });
 
 describe("Add at block and escape out", () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-    // Define offsetParent for HTMLElement
-    Object.defineProperty(HTMLElement.prototype, "offsetParent", {
-      get() {
-        return this.parentNode;
-      },
-    });
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
-  const runTimers = async () => jest.runAllTimers();
-
   const user = userEvent.setup({ delay: null });
   const TestEditor = (props: {
     setText: (ret: string) => void;
@@ -847,7 +825,7 @@ describe("Add at block and escape out", () => {
     await user.click(editable);
     await user.keyboard("@");
 
-    await runTimers();
+    await act(async () => jest.runAllTimers());
     expect(document.body.querySelectorAll("li.aiev3-drop-item").length).toEqual(5);
     expect(screen.queryByText("...24 more")).toBeInTheDocument();
     expect(document.body.innerHTML).toMatchSnapshot();
@@ -1012,12 +990,6 @@ describe("Move left to start over at block", () => {
 
 describe("Window view", () => {
   const user = userEvent.setup({ delay: null });
-  beforeEach(() => {
-    jest.useFakeTimers();
-  });
-  afterEach(() => {
-    jest.useRealTimers();
-  });
   test("Show window view", async () => {
     render(
       <ContextWindowStack>

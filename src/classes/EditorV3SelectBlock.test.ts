@@ -3,24 +3,6 @@ import { EditorV3DropListItem } from "./interface";
 import { EditorV3SelectBlock } from "./EditorV3SelectBlock";
 
 describe("EditorV3SelectBlock", () => {
-  beforeEach(() => {
-    document.body.innerHTML = "";
-    jest.useFakeTimers();
-    // Define offsetParent for HTMLElement
-    Object.defineProperty(HTMLElement.prototype, "offsetParent", {
-      get() {
-        return this.parentNode;
-      },
-    });
-  });
-
-  afterEach(() => {
-    document.body.innerHTML = "";
-    jest.clearAllMocks();
-    jest.clearAllTimers();
-    jest.useRealTimers();
-  });
-
   test("should return a DocumentFragment with the correct structure", () => {
     const text = "-- Select --";
     const style = "bold";
@@ -244,23 +226,6 @@ describe("EditorV3SelectBlock", () => {
 });
 
 describe("should return a DocumentFragment with a dropdown", () => {
-  beforeEach(() => {
-    document.body.innerHTML = "";
-    jest.useFakeTimers();
-    // Define offsetParent for HTMLElement
-    Object.defineProperty(HTMLElement.prototype, "offsetParent", {
-      get() {
-        return this.parentNode;
-      },
-    });
-  });
-
-  afterEach(() => {
-    document.body.innerHTML = "";
-    jest.clearAllMocks();
-    jest.clearAllTimers();
-    jest.useRealTimers();
-  });
   test("Ensure previous dropdowns are removed", async () => {
     const text = "-- Select --";
     const style = "bold";
@@ -366,23 +331,6 @@ describe("should return a DocumentFragment with a dropdown", () => {
 });
 
 describe("EditorV3SelectBlock errors", () => {
-  beforeEach(() => {
-    document.body.innerHTML = "";
-    jest.useFakeTimers();
-    // Define offsetParent for HTMLElement
-    Object.defineProperty(HTMLElement.prototype, "offsetParent", {
-      get() {
-        return this.parentNode;
-      },
-    });
-  });
-
-  afterEach(() => {
-    document.body.innerHTML = "";
-    jest.clearAllMocks();
-    jest.clearAllTimers();
-    jest.useRealTimers();
-  });
   test("should throw an error from an empty document fragment", async () => {
     expect(() => {
       new EditorV3SelectBlock(document.createDocumentFragment());
