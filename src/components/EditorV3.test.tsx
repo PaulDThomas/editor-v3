@@ -579,6 +579,57 @@ describe("Select all", () => {
       ],
     });
   });
+
+  test("Cannot type in locked block + extra", async () => {
+    const mockSet = jest.fn();
+    const greenStyle = { green: { backgroundColor: "green", isLocked: true } };
+    render(
+      <EditorV3
+        data-testid="locked"
+        id="locked"
+        input={{
+          lines: [
+            {
+              textBlocks: [
+                { text: "Locked block", type: "text", style: "green", isLocked: true },
+                {
+                  text: " - unlocked",
+                  type: "text",
+                },
+              ],
+            },
+          ],
+        }}
+        setObject={mockSet}
+        customStyleMap={greenStyle}
+      />,
+    );
+    const editable = screen
+      .queryByTestId("locked")
+      ?.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    await user.click(editable);
+    // Try and type into everything selected
+    await user.keyboard("x");
+    expect(screen.queryByText("Locked block")).toBeInTheDocument();
+    // Try and type after removing whole selection
+    await user.keyboard("{Home}x");
+    screen.debug();
+    fireEvent.blur(editable);
+    expect(mockSet).toHaveBeenCalledTimes(1);
+    expect(mockSet.mock.calls[0][0]).toEqual({
+      lines: [
+        {
+          textBlocks: [
+            { text: "x", type: "text" },
+            { text: "Locked block", type: "text", style: "green", isLocked: true },
+            { text: " - unlocked", type: "text" },
+          ],
+        },
+      ],
+      contentProps: { styles: greenStyle },
+    });
+  });
 });
 
 describe("Undo/redo", () => {

@@ -159,9 +159,7 @@ export const EditorV3 = ({
   // Redraw element, used in debounced stack as onChange callback
   const redrawElement = useCallback((ret: EditorV3State) => {
     // console.debug(
-    //   "Redraw element:\r\n",
-    //   ret.content.lines.map((l) => l.toMarkdown({}).textContent).join("\n"),
-    //   `\n${JSON.stringify(ret.content.caretPosition)}`,
+    //   `Redraw element:\r\n${ret.content.lines.map((l) => l.toMarkdown({}).textContent).join("\n")}\n${JSON.stringify(ret.content.caretPosition)}`,
     // );
     divRef.current && ret.content.redraw(divRef.current, ret.focus);
   }, []);
@@ -197,8 +195,7 @@ export const EditorV3 = ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (newContent: EditorV3Content, calledFrom?: string, focus?: boolean) => {
       // console.debug(
-      //   "SetContent:" + calledFrom + ":\r\n",
-      //   newContent.lines.map((l) => l.toMarkdown({}).textContent).join("\n"),
+      //   `SetContent:${calledFrom}\r\n${newContent.lines.map((l) => l.toMarkdown({}).textContent).join("\n")}\n${JSON.stringify(newContent.caretPosition)}`,
       // );
       setLastCaretPosition(newContent.caretPosition);
       setCurrentValue({
@@ -403,20 +400,28 @@ export const EditorV3 = ({
           e.stopPropagation();
           e.preventDefault();
           redo();
+        }
+        // Block (non-movement) key down when the caret is locked
+        else if (
+          state.content.isCaretLocked() &&
+          !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
         } else if (
           !(
             // Ignore key down on metakeys
             ["Control", "Shift", "Alt"].includes(e.key)
           )
         ) {
-          // Get current information and update content buffer
+          // Get current information and update content buffer for positions
           const newContent = new EditorV3Content(divRef.current, contentProps);
           newContent.handleKeydown(e);
           setContent(newContent, `Handle key down: ${e.key}`);
         }
       }
     },
-    [state, contentProps, redo, setContent, undo],
+    [contentProps, redo, setContent, state, undo],
   );
 
   const handleKeyUp = useCallback(

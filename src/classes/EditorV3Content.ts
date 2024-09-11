@@ -168,14 +168,15 @@ export class EditorV3Content implements IEditorV3 {
       );
     }
   }
-  public isCaretLocked(pos = this._caretPosition) {
-    let ret = false;
-    if (pos && pos.startLine >= 0 && pos.endLine < this.lines.length) {
-      const startBlock = this.lines[pos.startLine].getBlockAt(pos.startChar);
-      const endBlock = this.lines[pos.endLine].getBlockAt(pos.endChar);
-      ret = (startBlock && startBlock.isLocked) || (endBlock && endBlock.isLocked) || false;
-    }
-    return ret;
+  /**
+   * Indicates if the current content can be updated with this selection
+   * @param pos
+   * @returns boolean
+   */
+  public isCaretLocked(pos = this._caretPosition): boolean {
+    if (!pos || pos.isCollapsed) return false;
+    const selectedBlocks = this.subLines(pos).flatMap((l) => l.textBlocks);
+    return selectedBlocks.length > 1 && selectedBlocks.some((b) => b.isLocked);
   }
   private get _isLockable() {
     return this.lines.some((l) => l.textBlocks.some((tb) => tb.type === "at" && !tb.isLocked));
