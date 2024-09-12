@@ -1,7 +1,8 @@
-import { IEditorV3AtBlock } from "../../classes/EditorV3AtBlock";
-import { IEditorV3SelectBlock } from "../../classes/EditorV3SelectBlock";
-import { IEditorV3TextBlock } from "../../classes/EditorV3TextBlock";
+import { EditorV3AtBlock } from "../../classes/EditorV3AtBlock";
+import { EditorV3SelectBlock } from "../../classes/EditorV3SelectBlock";
+import { EditorV3TextBlock } from "../../classes/EditorV3TextBlock";
 import { EditorV3ContentPropsInput } from "../../classes/interface";
+import { textBlockFactory } from "../../classes/textBlockFactory";
 import styles from "./WindowView.module.css";
 import { WindowViewBlockStyle } from "./WindowViewBlockStyle";
 import { WindowViewBlockText } from "./WindowViewBlockText";
@@ -10,9 +11,9 @@ import { WindowViewSelectOptions } from "./WindowViewSelectOptions";
 
 interface WindowViewBlockProps {
   contentProps: EditorV3ContentPropsInput;
-  textBlock: IEditorV3AtBlock | IEditorV3TextBlock | IEditorV3SelectBlock;
+  textBlock: EditorV3AtBlock | EditorV3TextBlock | EditorV3SelectBlock;
   editable: boolean;
-  setTextBlock: (textBlock: IEditorV3AtBlock | IEditorV3TextBlock | IEditorV3SelectBlock) => void;
+  setTextBlock: (textBlock: EditorV3AtBlock | EditorV3TextBlock | EditorV3SelectBlock) => void;
 }
 
 export const WindowViewBlock = ({
@@ -28,7 +29,7 @@ export const WindowViewBlock = ({
           includeAt={contentProps.atListFunction !== undefined}
           disabled={!editable}
           type={textBlock.type ?? "text"}
-          setType={(type) => setTextBlock({ ...textBlock, type })}
+          setType={(type) => setTextBlock(textBlockFactory({ ...textBlock, type }))}
         />
         {contentProps?.styles && Object.keys(contentProps.styles).length > 0 && (
           <WindowViewBlockStyle
@@ -36,7 +37,9 @@ export const WindowViewBlock = ({
             disabled={!editable}
             styleName={textBlock.style}
             setStyleName={(style) =>
-              setTextBlock({ ...textBlock, style: style === "" ? undefined : style })
+              setTextBlock(
+                textBlockFactory({ ...textBlock, style: style === "" ? undefined : style }),
+              )
             }
           />
         )}
@@ -46,7 +49,9 @@ export const WindowViewBlock = ({
           style={{ width: "200px" }}
           shrink
           text={textBlock.label}
-          setText={(text) => setTextBlock({ ...textBlock, label: text === "" ? undefined : text })}
+          setText={(text) =>
+            setTextBlock(textBlockFactory({ ...textBlock, label: text === "" ? undefined : text }))
+          }
         />
         <WindowViewBlockText
           label="Text"
@@ -59,7 +64,7 @@ export const WindowViewBlock = ({
           }
           text={textBlock.text}
           setText={(text) => {
-            setTextBlock({ ...textBlock, text });
+            setTextBlock(textBlockFactory({ ...textBlock, text }));
           }}
         />
       </div>
@@ -69,13 +74,15 @@ export const WindowViewBlock = ({
         customSytleMap={contentProps.styles}
         editable={editable}
         options={{
-          availableOptions: (textBlock as IEditorV3SelectBlock).availableOptions ?? [],
+          availableOptions: (textBlock as EditorV3SelectBlock).availableOptions ?? [],
         }}
         setOptions={(options) =>
-          setTextBlock({
-            ...textBlock,
-            availableOptions: options.availableOptions,
-          })
+          setTextBlock(
+            textBlockFactory({
+              ...textBlock,
+              availableOptions: options.availableOptions,
+            }),
+          )
         }
       />
     </>

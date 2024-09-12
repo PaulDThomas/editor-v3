@@ -68,6 +68,7 @@ describe("Check basic EditorV3Content", () => {
         },
       ],
     });
+    expect(testContent.markdownText).toEqual("34.56");
     const div = document.createElement("div");
     div.append(testContent.toHtml({}));
     expect(div.innerHTML).toMatchSnapshot();

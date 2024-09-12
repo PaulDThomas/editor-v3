@@ -125,6 +125,7 @@ describe("Check basic EditorV3Line", () => {
         "</div>",
     );
     expect(testLine.lineText).toEqual("Hello\u00a0world. How is it going?");
+    expect(testLine.lineMarkdown).toEqual("Hello\u00a0world. <<shiny::How is it going?>>");
     expect(testLine.contentProps.textAlignment).toEqual(EditorV3Align.decimal);
   });
 

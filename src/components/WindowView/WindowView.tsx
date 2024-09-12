@@ -2,7 +2,6 @@ import { ContextWindow } from "@asup/context-menu";
 import { cloneDeep, isEqual } from "lodash";
 import { useCallback } from "react";
 import { EditorV3Content, EditorV3Line } from "../../classes";
-import { IEditorV3Line } from "../../classes/interface";
 import { useDebounceStack } from "../../hooks";
 import { EditorV3State } from "../EditorV3";
 import { AddLine, RedoBtn, RemoveLine, UndoBtn } from "../icons";
@@ -33,9 +32,9 @@ export const WindowView = ({
     redo,
     stack,
     index: stackIndex,
-  } = useDebounceStack<IEditorV3Line[]>(
-    state.content.lines.map((line) => (line instanceof EditorV3Line ? line.data : line)),
-    (value: IEditorV3Line[]) => {
+  } = useDebounceStack<EditorV3Line[]>(
+    state.content.lines.map((line) => new EditorV3Line(line)),
+    (value: EditorV3Line[]) => {
       const ret = new EditorV3Content({ lines: value }, state.content.contentProps);
       if (
         !isEqual(
@@ -50,7 +49,7 @@ export const WindowView = ({
   );
 
   const setLine = useCallback(
-    (line: IEditorV3Line, ix: number) => {
+    (line: EditorV3Line, ix: number) => {
       if (currentValue) {
         const newLines = cloneDeep(currentValue);
         newLines[ix] = line;
@@ -64,7 +63,7 @@ export const WindowView = ({
     (ix: number) => {
       if (currentValue) {
         const newLines = cloneDeep(currentValue);
-        newLines.splice(ix, 0, { textBlocks: [{ type: "text", text: "" }] });
+        newLines.splice(ix, 0, new EditorV3Line({ textBlocks: [{ type: "text", text: "" }] }));
         setCurrentValue(newLines);
       }
     },

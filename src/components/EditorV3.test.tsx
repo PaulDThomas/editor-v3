@@ -614,7 +614,6 @@ describe("Select all", () => {
     expect(screen.queryByText("Locked block")).toBeInTheDocument();
     // Try and type after removing whole selection
     await user.keyboard("{Home}x");
-    screen.debug();
     fireEvent.blur(editable);
     expect(mockSet).toHaveBeenCalledTimes(1);
     expect(mockSet.mock.calls[0][0]).toEqual({

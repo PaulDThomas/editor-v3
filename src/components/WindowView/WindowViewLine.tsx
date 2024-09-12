@@ -1,8 +1,9 @@
 import { cloneDeep } from "lodash";
 import { useCallback } from "react";
-import { IEditorV3AtBlock } from "../../classes/EditorV3AtBlock";
-import { IEditorV3TextBlock } from "../../classes/EditorV3TextBlock";
-import { EditorV3ContentPropsInput, IEditorV3Line } from "../../classes/interface";
+import { EditorV3AtBlock } from "../../classes/EditorV3AtBlock";
+import { EditorV3Line } from "../../classes/EditorV3Line";
+import { EditorV3TextBlock } from "../../classes/EditorV3TextBlock";
+import { EditorV3ContentPropsInput } from "../../classes/interface";
 import { AddBlock, RemoveBlock } from "../icons";
 import styles from "./WindowView.module.css";
 import { WindowViewBlock } from "./WindowViewBlock";
@@ -10,9 +11,9 @@ import { WindowViewBlock } from "./WindowViewBlock";
 interface WindowViewLineProps {
   contentProps: EditorV3ContentPropsInput;
   lineIndex: number;
-  line: IEditorV3Line;
+  line: EditorV3Line;
   editable: boolean;
-  setLine: (line: IEditorV3Line) => void;
+  setLine: (line: EditorV3Line) => void;
 }
 
 export const WindowViewLine = ({
@@ -23,7 +24,7 @@ export const WindowViewLine = ({
   setLine,
 }: WindowViewLineProps) => {
   const setTextBlock = useCallback(
-    (textBlock: IEditorV3AtBlock | IEditorV3TextBlock, ix: number) => {
+    (textBlock: EditorV3AtBlock | EditorV3TextBlock, ix: number) => {
       if (line) {
         const newLine = cloneDeep(line);
         newLine.textBlocks[ix] = textBlock;
@@ -36,7 +37,7 @@ export const WindowViewLine = ({
     (ix: number) => {
       if (line) {
         const newLine = cloneDeep(line);
-        newLine.textBlocks.splice(ix, 0, { text: "", type: "text" });
+        newLine.textBlocks.splice(ix, 0, new EditorV3TextBlock());
         setLine(newLine);
       }
     },

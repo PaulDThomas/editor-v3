@@ -1,7 +1,10 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { defaultContentProps } from "../../classes/defaultContentProps";
+import { textBlockFactory } from "../../classes/textBlockFactory";
 import { WindowViewBlock } from "./WindowViewBlock";
+import { EditorV3AtBlock, EditorV3TextBlock } from "../../classes";
+import { EditorV3SelectBlock } from "../../classes/EditorV3SelectBlock";
 
 jest.mock("./WindowViewSelectOptions");
 
@@ -10,11 +13,11 @@ describe("WindowViewBlock", () => {
 
   test("No render without textBlock", async () => {
     const mockSet = jest.fn();
-
+    const mockTb = textBlockFactory({ text: "test" });
     render(
       <WindowViewBlock
         contentProps={defaultContentProps}
-        textBlock={{ text: "test" }}
+        textBlock={mockTb}
         editable={true}
         setTextBlock={mockSet}
       />,
@@ -25,10 +28,16 @@ describe("WindowViewBlock", () => {
 
   test("Basic render & update", async () => {
     const mockSet = jest.fn();
+    const mockTb = textBlockFactory({
+      text: "test",
+      type: "text",
+      label: undefined,
+      style: undefined,
+    });
     render(
       <WindowViewBlock
         contentProps={defaultContentProps}
-        textBlock={{ text: "test", type: "text", label: undefined, style: undefined }}
+        textBlock={mockTb}
         editable={true}
         setTextBlock={mockSet}
       />,
@@ -45,25 +54,35 @@ describe("WindowViewBlock", () => {
 
     await user.type(labelInput, "new label");
     fireEvent.blur(labelInput);
-    expect(mockSet).toHaveBeenLastCalledWith({
-      type: "text",
-      text: "test",
-      label: "new label",
-      style: undefined,
-    });
+    expect(mockSet.mock.calls[0][0].data).toEqual(
+      new EditorV3TextBlock({
+        type: "text",
+        text: "test",
+        label: "new label",
+        style: undefined,
+      }).data,
+    );
 
     await user.type(textInput, " - stunning volley Yeboah!!! ⚽");
     fireEvent.blur(textInput);
-    expect(mockSet).toHaveBeenLastCalledWith({
-      type: "text",
-      text: "test - stunning volley Yeboah!!! ⚽",
-      label: undefined,
-      style: undefined,
-    });
+    // TODO: This should be 1, but it's 2. Why?
+    expect(mockSet.mock.calls[2][0].data).toEqual(
+      new EditorV3TextBlock({
+        type: "text",
+        text: "test - stunning volley Yeboah!!! ⚽",
+        label: undefined,
+        style: undefined,
+      }).data,
+    );
   });
 
   test("At render and update", async () => {
     const mockSet = jest.fn();
+    const mockTb = textBlockFactory({
+      text: "@test",
+      style: "blue",
+      type: "at",
+    });
     render(
       <WindowViewBlock
         contentProps={{
@@ -71,11 +90,7 @@ describe("WindowViewBlock", () => {
           atListFunction: jest.fn(),
           styles: { blue: { color: "blue" } },
         }}
-        textBlock={{
-          text: "@test",
-          style: "blue",
-          type: "at",
-        }}
+        textBlock={mockTb}
         editable={true}
         setTextBlock={mockSet}
       />,
@@ -94,24 +109,37 @@ describe("WindowViewBlock", () => {
     expect(screen.queryByLabelText("Text")).toBeDisabled();
 
     await user.selectOptions(styleSelect, "None");
-    expect(mockSet).toHaveBeenLastCalledWith({
-      type: "at",
-      text: "@test",
-      style: undefined,
-      label: undefined,
-    });
+    expect(mockSet.mock.calls[0][0].data).toEqual(
+      new EditorV3AtBlock({
+        type: "at",
+        text: "@test",
+        style: undefined,
+        label: undefined,
+      }).data,
+    );
 
     await user.selectOptions(typeSelect, "Text");
-    expect(mockSet).toHaveBeenLastCalledWith({
-      type: "text",
-      text: "@test",
-      style: "blue",
-      label: undefined,
-    });
+    expect(mockSet.mock.calls[1][0].data).toEqual(
+      new EditorV3TextBlock({
+        type: "text",
+        text: "@test",
+        style: "blue",
+        label: undefined,
+      }).data,
+    );
   });
 
   test("Select render and update", async () => {
     const mockSet = jest.fn();
+    const mockTb = textBlockFactory({
+      text: "current",
+      type: "select",
+      availableOptions: [
+        { text: "post", data: { noStyle: "true" } },
+        { text: "current", data: { noStyle: "true" } },
+        { text: "future", data: { noStyle: "true" } },
+      ],
+    });
     render(
       <WindowViewBlock
         contentProps={{
@@ -119,15 +147,7 @@ describe("WindowViewBlock", () => {
           styles: { blue: { color: "blue" } },
         }}
         editable={true}
-        textBlock={{
-          text: "current",
-          type: "select",
-          availableOptions: [
-            { text: "post", data: { noStyle: "true" } },
-            { text: "current", data: { noStyle: "true" } },
-            { text: "future", data: { noStyle: "true" } },
-          ],
-        }}
+        textBlock={mockTb}
         setTextBlock={mockSet}
       />,
     );
@@ -136,14 +156,16 @@ describe("WindowViewBlock", () => {
     await user.clear(availableOptionsInput);
     await user.type(availableOptionsInput, "bring\nme\ncoffee");
     fireEvent.blur(availableOptionsInput);
-    expect(mockSet).toHaveBeenLastCalledWith({
-      type: "select",
-      text: "current",
-      availableOptions: [
-        { text: "bring", data: { noStyle: "true" } },
-        { text: "me", data: { noStyle: "true" } },
-        { text: "coffee", data: { noStyle: "true" } },
-      ],
-    });
+    expect(mockSet.mock.calls[0][0].data).toEqual(
+      new EditorV3SelectBlock({
+        type: "select",
+        text: "current",
+        availableOptions: [
+          { text: "bring", data: { noStyle: "true" } },
+          { text: "me", data: { noStyle: "true" } },
+          { text: "coffee", data: { noStyle: "true" } },
+        ],
+      }).data,
+    );
   });
 });

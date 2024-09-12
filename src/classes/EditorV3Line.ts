@@ -87,6 +87,13 @@ export class EditorV3Line implements IEditorV3Line {
   }
 
   /**
+   * Get the markdown for the line
+   */
+  get lineMarkdown(): string {
+    return this.textBlocks.map((tb) => tb.toMarkdown()).join("");
+  }
+
+  /**
    * Return position of each word in the lineText
    * @param checkText Text to check, if not provided uses this.lineText
    * @returns Array of word positions

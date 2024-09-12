@@ -186,7 +186,14 @@ export class EditorV3Content implements IEditorV3 {
    * Text from the element
    */
   get text(): string {
-    return this.lines.map((l) => l.textBlocks.map((b) => b.text).join("")).join("\n");
+    return this.lines.map((l) => l.lineText).join("\n");
+  }
+
+  /**
+   * Markdown text from the element
+   */
+  get markdownText(): string {
+    return this.lines.map((l) => l.lineMarkdown).join("\n");
   }
 
   /**
