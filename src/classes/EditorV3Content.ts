@@ -773,6 +773,18 @@ export class EditorV3Content implements IEditorV3 {
       this.caretPosition = this.splitLine(this._caretPosition);
     } else if (this._caretPosition) {
       this._caretPosition.lastAction = "keydown";
+      // Reset a locked block to no style if it is the active block
+      const activeBlock = this.lines[this._caretPosition.startLine].getBlockAt(
+        this._caretPosition.startChar,
+      );
+      if (
+        activeBlock &&
+        (activeBlock ===
+          this.lines[this._caretPosition.endLine].getBlockAt(this._caretPosition.endChar),
+        activeBlock.isLocked && !this._caretPosition.isCollapsed)
+      ) {
+        activeBlock.style = undefined;
+      }
     }
   }
 
