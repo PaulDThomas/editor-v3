@@ -495,16 +495,13 @@ describe("Edge events", () => {
   const user = userEvent.setup({ delay: null });
   test("Initial focus", async () => {
     const mockSetText = jest.fn();
-    render(
-      <div data-testid="container">
-        <EditorV3
-          id="test-editor"
-          input={mockContent}
-          setText={mockSetText}
-        />
-      </div>,
+    const { container } = render(
+      <EditorV3
+        id="test-editor"
+        input={mockContent}
+        setText={mockSetText}
+      />,
     );
-    const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
     const editorHolder = container.querySelector("#test-editor-editable") as HTMLDivElement;
     expect(editorHolder).toBeInTheDocument();
     fireEvent.focus(editorHolder);
@@ -524,6 +521,52 @@ describe("Edge events", () => {
     const editorHolder = container.querySelector("#test-editor-editable") as HTMLDivElement;
     expect(editorHolder).toBeInTheDocument();
     await user.click(editorHolder.querySelector("span") as HTMLSpanElement);
+  });
+
+  test("First letter in locked block is locked", async () => {
+    const mockContent = new EditorV3Content({
+      lines: [
+        {
+          textBlocks: [
+            { text: "Locked block", type: "text", style: "green", isLocked: true },
+            { text: "Another locked block", type: "text", style: "green", isLocked: true },
+          ],
+        },
+      ],
+    });
+    const mockSet = jest.fn();
+    const greenStyle = {
+      green: { backgroundColor: "green", isLocked: true },
+    };
+    const { container } = render(
+      <>
+        <EditorV3
+          data-testid="locked"
+          id="locked"
+          input={mockContent}
+          setObject={mockSet}
+          customStyleMap={greenStyle}
+        />
+        <button
+          data-testid="debug"
+          onClick={() => {
+            const debugEvent = new CustomEvent("editorv3debug", {
+              bubbles: true,
+            });
+            const editable = container.querySelector("#locked .aiev3-editing") as HTMLDivElement;
+            editable.dispatchEvent(debugEvent);
+          }}
+        />
+      </>,
+    );
+    expect(screen.queryByText("Locked block")).toBeInTheDocument();
+    expect(screen.queryByText("Locked block")).toHaveClass("editorv3style-green");
+    expect(screen.queryByText("Another locked block")).toBeInTheDocument();
+    await user.click(screen.queryByText(/locked/) as HTMLElement);
+    await user.keyboard("{Home}{ArrowRight}x");
+    const x = screen.queryByText("x") as HTMLSpanElement;
+    expect(x).toBeInTheDocument();
+    expect(x).not.toHaveClass("editorv3style-green");
   });
 });
 

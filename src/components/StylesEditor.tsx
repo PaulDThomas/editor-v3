@@ -5,6 +5,7 @@ import { ObjectEditorItemOptions } from "./ObjectEditor/ObjectEditorContext";
 export const defaultStyleItems: ObjectEditorItemOptions[] = [
   {
     name: "fontFamily",
+    label: "Font family",
     type: "select",
     options: [
       {
@@ -17,6 +18,7 @@ export const defaultStyleItems: ObjectEditorItemOptions[] = [
   },
   {
     name: "fontSize",
+    label: "Font size",
     type: "select",
     options: [
       { value: undefined, label: "None" },
@@ -31,7 +33,8 @@ export const defaultStyleItems: ObjectEditorItemOptions[] = [
     ],
   },
   {
-    name: "font-style",
+    name: "fontStyle",
+    label: "Font style",
     type: "select",
     options: [
       { value: undefined, label: "None" },
@@ -40,6 +43,7 @@ export const defaultStyleItems: ObjectEditorItemOptions[] = [
   },
   {
     name: "fontWeight",
+    label: "Font weight",
     type: "select",
     options: [
       { value: undefined, label: "None" },
@@ -51,10 +55,12 @@ export const defaultStyleItems: ObjectEditorItemOptions[] = [
   },
   {
     name: "color",
+    label: "Colour",
     type: "string",
   },
   {
     name: "textDecoration",
+    label: "Text decoration",
     type: "select",
     options: [
       { value: undefined, label: "None" },
@@ -64,10 +70,12 @@ export const defaultStyleItems: ObjectEditorItemOptions[] = [
   },
   {
     name: "isLocked",
+    label: "Stop blocks being edited (isLocked)",
     type: "boolean",
   },
   {
     name: "isNotAvailable",
+    label: "Stop user from choosing this style (isNotAvailable)",
     type: "boolean",
   },
 ];
