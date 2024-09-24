@@ -10,38 +10,38 @@ export const BaseEditorV3 = ({ label, style, resize, ...rest }: BaseEdivotV3Prop
   const [outerStyle, setOuterStyle] = useState<React.CSSProperties>(style ?? {});
   const [innerStyle, setInnerStyle] = useState<React.CSSProperties>(style ?? {});
   useLayoutEffect(() => {
-    const recalc: React.CSSProperties = { ...style };
     const outer: React.CSSProperties = {};
+    const inner: React.CSSProperties = { ...style };
     if (style) {
       if (style.width) {
         outer.width = style.width;
-        recalc.width = "100%";
+        inner.width = "100%";
       }
       if (style.maxWidth) {
         outer.maxWidth = style.maxWidth;
-        recalc.maxWidth = "100%";
+        inner.maxWidth = "100%";
       }
       if (style.minWidth) {
         outer.minWidth = style.minWidth;
-        recalc.minWidth = "100%";
+        inner.minWidth = "100%";
       }
       if (style.height) {
         outer.height = style.height;
-        recalc.height = "100%";
+        inner.height = "100%";
       } else {
-        outer.height = "48px";
-        recalc.height = "100%";
+        outer.height = "calc(1.5em + 26px)";
+        inner.height = "100%";
       }
       if (style.maxHeight) {
         outer.maxHeight = style.maxHeight;
-        recalc.maxHeight = "100%";
+        inner.maxHeight = "100%";
       }
       if (style.minHeight) {
         outer.minHeight = style.minHeight;
-        recalc.minHeight = "100%";
+        inner.minHeight = "100%";
       } else {
-        outer.minHeight = "48px";
-        recalc.minHeight = "100%";
+        outer.minHeight = "calc(1.5em + 26px)";
+        inner.minHeight = "100%";
       }
       if (resize === true || resize === "vertical") {
         outer.resize = "vertical";
@@ -49,7 +49,7 @@ export const BaseEditorV3 = ({ label, style, resize, ...rest }: BaseEdivotV3Prop
       }
     }
     setOuterStyle(outer);
-    setInnerStyle(recalc);
+    setInnerStyle(inner);
   }, [style, resize]);
   return (
     <div

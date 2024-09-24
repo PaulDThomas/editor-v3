@@ -21,6 +21,7 @@
 .aiev3-resize {
   width: 100%;
   height: 100%;
+  min-height: 1.5em;
   overflow: auto;
   position: relative;
 }
@@ -81,7 +82,7 @@
   flex-shrink: 0;
   white-space: nowrap;
   align-items: center;
-  min-height: 1.4em;
+  min-height: 1.5em;
 }
 
 .aiev3-line.decimal {

@@ -172,5 +172,5 @@
   min-height: 26px;
   height: calc(100% - 20px);
   padding: 1px;
-  width: 100%;
+  width: calc(100% - 4px);
 }
