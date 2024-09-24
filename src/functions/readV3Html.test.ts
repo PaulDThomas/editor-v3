@@ -34,8 +34,8 @@ describe("readV3Html tests", () => {
 
   test("Read v3-markdown string input with line nodes", async () => {
     const text = `
-      <div class="aiev3-markdown-line">&lt;&lt;Hello world&gt;&gt;</div>
-      <div class="aiev3-markdown-line">&lt;&lt;st1::How are you?&gt;&gt;</div>
+      <div class="aiev3-markdown-line">(~(Hello world)~)</div>
+      <div class="aiev3-markdown-line">(~(st1::How are you?)~)</div>
       `
       .replaceAll(/[\r\n\t]/g, "")
       .replaceAll(/>\s{2,}</g, "><")

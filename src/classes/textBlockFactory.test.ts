@@ -98,11 +98,11 @@ describe("Text block factory tests", () => {
 describe("Check markdown output on text block", () => {
   test("Markdown is correctly shown", async () => {
     const testBlock = textBlockFactory({ text: "Hello world", style: "shiny" });
-    expect(testBlock.toMarkdown()).toEqual("<<shiny::Hello world>>");
+    expect(testBlock.toMarkdown()).toEqual("(~(shiny::Hello world)~)");
   });
   test("Markdown is correctly shown for defaultStyle", async () => {
     const testBlock = textBlockFactory({ text: "Hello world", style: "defaultStyle" });
-    expect(testBlock.toMarkdown()).toEqual("<<Hello world>>");
+    expect(testBlock.toMarkdown()).toEqual("(~(Hello world)~)");
   });
 });
 

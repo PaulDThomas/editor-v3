@@ -109,7 +109,7 @@ describe("Should render an at block in the HTML", () => {
     expect(testBlock.toHtml({}).textContent).toEqual(
       "Hello\u00a0massive\u00a0and\u00a0impressive\u00a0@world",
     );
-    expect(testBlock.toMarkdown()).toEqual("<<shiny::Hello\u00a0massive and impressive @world>>");
+    expect(testBlock.toMarkdown()).toEqual("(~(shiny::Hello\u00a0massive and impressive @world)~)");
     // Expect HTML to split block into two spans
     const tempDiv = document.createElement("div");
     testBlock.toHtml({ currentEl: tempDiv });
@@ -210,7 +210,7 @@ describe("Markdown text block", () => {
       label: "world",
     });
     const result = testBlock.toMarkdown();
-    expect(result).toEqual("<<::world::Hello>>");
+    expect(result).toEqual("(~(::world::Hello)~)");
     const eatOwnTail = new EditorV3TextBlock(result);
     expect(eatOwnTail.data).toEqual(testBlock.data);
   });
@@ -221,7 +221,7 @@ describe("Markdown text block", () => {
       style: "shiny",
     });
     const result = testBlock.toMarkdown();
-    expect(result).toEqual("<<shiny::Hello>>");
+    expect(result).toEqual("(~(shiny::Hello)~)");
     const eatOwnTail = new EditorV3TextBlock(result);
     expect(eatOwnTail.data).toEqual(testBlock.data);
   });
@@ -232,7 +232,7 @@ describe("Markdown text block", () => {
       style: "defaultStyle",
     });
     const result = testBlock.toMarkdown();
-    expect(result).toEqual("<<Hello>>");
+    expect(result).toEqual("(~(Hello)~)");
     const eatOwnTail = new EditorV3TextBlock(result);
     expect(eatOwnTail.data).toEqual(testBlock.data);
   });
@@ -244,7 +244,7 @@ describe("Markdown text block", () => {
       label: "world",
     });
     const result = testBlock.toMarkdown();
-    expect(result).toEqual("<<shiny::world::Hello>>");
+    expect(result).toEqual("(~(shiny::world::Hello)~)");
     const eatOwnTail = new EditorV3TextBlock(result);
     expect(eatOwnTail.data).toEqual(testBlock.data);
   });
@@ -256,7 +256,7 @@ describe("Markdown text block", () => {
       label: "world",
     });
     const result = testBlock.toMarkdown();
-    expect(result).toEqual("<<defaultStyle::world::Hello>>");
+    expect(result).toEqual("(~(defaultStyle::world::Hello)~)");
     const eatOwnTail = new EditorV3TextBlock(result);
     expect(eatOwnTail.data).toEqual(testBlock.data);
   });

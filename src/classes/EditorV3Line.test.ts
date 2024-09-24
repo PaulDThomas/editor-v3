@@ -125,7 +125,7 @@ describe("Check basic EditorV3Line", () => {
         "</div>",
     );
     expect(testLine.lineText).toEqual("Hello\u00a0world. How is it going?");
-    expect(testLine.lineMarkdown).toEqual("Hello\u00a0world. <<shiny::How is it going?>>");
+    expect(testLine.lineMarkdown).toEqual("Hello\u00a0world. (~(shiny::How is it going?)~)");
     expect(testLine.contentProps.textAlignment).toEqual(EditorV3Align.decimal);
   });
 
@@ -548,12 +548,14 @@ describe("Check EditorV3Line functions", () => {
       ],
       defaultContentProps,
     );
-    expect(mdLine.toMarkdown({}).textContent).toEqual("<<world::label::hello>> slow<<and?fat>>");
+    expect(mdLine.toMarkdown({}).textContent).toEqual(
+      "(~(world::label::hello)~) slow(~(and?fat)~)",
+    );
   });
 
   test("Load markdown div elements", async () => {
     const mdText =
-      "<<st1::what>> are you doing? @[st2::Hello@bloke@] fancy coming back to my <<green::color::green>>[[choose**home||green::lily pad||garage]]?";
+      "(~(st1::what)~) are you doing? @[st2::Hello@bloke@] fancy coming back to my (~(green::color::green)~)(¬(choose**home||green::lily pad||garage)¬)?";
     const div = document.createElement("div");
     div.classList.add("aiev3-markdown-line");
     const text = document.createTextNode(mdText);

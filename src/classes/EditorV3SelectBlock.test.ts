@@ -362,7 +362,7 @@ describe("EditorV3SelectBlock markdown output", () => {
     ];
     const testBlock = new EditorV3SelectBlock({ text, style, availableOptions });
     const result = testBlock.toMarkdown();
-    expect(testBlock.toMarkdown()).toEqual("[[bold::-- Select --**Hello||shiny::World]]");
+    expect(testBlock.toMarkdown()).toEqual("(¬(bold::-- Select --**Hello||shiny::World)¬)");
     const eatOwnTail = new EditorV3SelectBlock(result);
     expect(eatOwnTail.data).toEqual(testBlock.data);
   });

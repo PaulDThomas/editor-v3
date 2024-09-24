@@ -574,7 +574,7 @@ describe("Splice markdown tests", () => {
         contentProps: contentProps,
       }),
     );
-    expect(testContent.toMarkdownHtml({}).textContent).toEqual("<<shiny::34.56>>");
+    expect(testContent.toMarkdownHtml({}).textContent).toEqual("(~(shiny::34.56)~)");
     const pasteContent = new EditorV3Line(
       { textBlocks: [{ text: "abc", style: "dull" }] },
       contentProps,
@@ -588,7 +588,7 @@ describe("Splice markdown tests", () => {
     };
     const splice = testContent.splice(pos, [pasteContent]);
     expect(testContent.toMarkdownHtml({}).textContent).toEqual(
-      "<<shiny::3>><<dull::abc>><<shiny::4.56>>",
+      "(~(shiny::3)~)(~(dull::abc)~)(~(shiny::4.56)~)",
     );
     expect(testContent.text).toEqual("3abc4.56");
     expect(splice.map((l) => l.lineText).join("\n")).toEqual("");
