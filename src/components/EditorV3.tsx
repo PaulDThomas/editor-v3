@@ -365,7 +365,9 @@ export const EditorV3 = ({
           startLine: 0,
           startChar: 0,
           endLine: newContent.lines.length - 1,
-          endChar: newContent.lines[newContent.lines.length - 1].lineLength,
+          endChar: newContent.showMarkdown
+            ? newContent.lines[newContent.lines.length - 1].lineMarkdown.length
+            : newContent.lines[newContent.lines.length - 1].lineLength,
           isCollapsed: false,
         };
         setLastAction("Focus");
