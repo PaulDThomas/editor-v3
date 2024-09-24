@@ -85,10 +85,10 @@ export const App = (): JSX.Element => {
       {
         textBlocks: [
           { text: "two words", style: "defaultStyle" },
-          { text: "2nd locked line", style: "green" },
-          { text: " 2nd locked line ", style: "green" },
+          { text: "1st locked block", style: "green" },
+          { text: " [[2nd locked block]] ", style: "green" },
           {
-            text: "select-block",
+            text: "[[select-block]]",
             type: "select",
             availableOptions: [
               { text: "green", data: { text: "green", style: "green" } },
