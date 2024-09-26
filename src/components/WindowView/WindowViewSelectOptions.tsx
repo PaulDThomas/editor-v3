@@ -1,114 +1,84 @@
-import { useEffect, useId, useState } from "react";
-import { IEditorV3SelectBlockOptionalParams } from "../../classes/EditorV3SelectBlock";
-import { EditorV3TextBlockType } from "../../classes/EditorV3TextBlock";
-import { EditorV3DropListItem, EditorV3Styles, IEditorV3 } from "../../classes/interface";
+import { useCallback, useContext, useId, useMemo, useState } from "react";
+import { EditorV3Content } from "../../classes";
+import { EditorV3SelectBlock } from "../../classes/EditorV3SelectBlock";
+import { EditorV3DropListItem, IEditorV3 } from "../../classes/interface";
 import { joinV3intoBlock } from "../../functions/joinV3intoBlock";
-import { splitV3intoLines } from "../../functions/splitV3intoLines";
-import baseStyles from "../BaseInputs.module.css";
-import { EditorV3 } from "../EditorV3";
+import { BaseEditorV3 } from "../BaseEditorv3";
+import { WindowViewContext } from "./WindowView";
 import styles from "./WindowView.module.css";
+import { UPDATE_BLOCK_OPTIONS } from "./windowViewReducer";
 
 export interface WindowViewSelectOptionsProps extends React.ComponentProps<"div"> {
-  type?: EditorV3TextBlockType;
-  options: IEditorV3SelectBlockOptionalParams;
-  editable: boolean;
-  setOptions: (options: IEditorV3SelectBlockOptionalParams) => void;
-  customSytleMap?: EditorV3Styles;
+  lineIndex: number;
+  blockIndex: number;
 }
 
 export const WindowViewSelectOptions = ({
-  type,
-  options,
-  editable,
-  setOptions,
-  customSytleMap,
+  lineIndex,
+  blockIndex,
 }: WindowViewSelectOptionsProps): JSX.Element => {
+  const wvc = useContext(WindowViewContext);
+  const thisLine = wvc?.lines[lineIndex];
+  const thisBlock = thisLine?.textBlocks[blockIndex];
   const selectOptionsId = useId();
 
   // Holder for available options
-  const [input, setInput] = useState<IEditorV3>({ lines: [{ textBlocks: [{ text: "" }] }] });
-  useEffect(() => {
-    const translate: IEditorV3 = joinV3intoBlock(
-      options.availableOptions && options.availableOptions.length > 0
-        ? options.availableOptions.map((o) => ({
-            lines: [{ textBlocks: [{ text: o.text, style: o.data?.style }] }],
-          }))
-        : [{ lines: [{ textBlocks: [{ text: "" }] }] }],
-    );
-    setInput(translate);
-  }, [options.availableOptions]);
+  const input: IEditorV3 = useMemo(() => {
+    if (thisBlock && thisBlock.type === "select") {
+      const availableOptions: EditorV3DropListItem<Record<string, string>>[] = (
+        thisBlock as EditorV3SelectBlock
+      ).availableOptions;
+      return joinV3intoBlock(
+        availableOptions.map((o) => ({
+          lines: [{ textBlocks: [{ text: o.text, style: o.data?.style }] }],
+        })),
+      );
+    } else return new EditorV3Content().data;
+  }, [thisBlock]);
 
-  // Validation text
-  const [validationText, setValidationText] = useState<string>("");
+  const [validationText, setValidationText] = useState<string[]>([]);
+  const setObject = useCallback(
+    (value: IEditorV3) => {
+      const validationText: string[] = [];
+      if (value.lines.some((l) => l.textBlocks.length > 1))
+        validationText.push("Each line must have only one style");
+      if (value.lines.some((l) => l.textBlocks.map((tb) => tb.text.trim()).join("") === ""))
+        validationText.push("Each line must have at least one character");
+      setValidationText(validationText);
 
-  return (
+      if (validationText.length === 0) {
+        wvc?.dispatch({
+          operation: UPDATE_BLOCK_OPTIONS,
+          lineIndex,
+          blockIndex,
+          blockOptions: value,
+        });
+      }
+    },
+    [blockIndex, lineIndex, wvc],
+  );
+
+  return !wvc || !thisLine || !thisBlock ? (
+    <></>
+  ) : (
     <div
-      className={[styles.windowViewBlock, type !== "select" ? styles.noHeight : styles.height].join(
-        " ",
-      )}
+      className={[
+        styles.windowViewBlock,
+        thisBlock.type !== "select" ? styles.noHeight : styles.height,
+      ].join(" ")}
     >
-      {type !== "select" ? null : (
-        <>
-          <div
-            className={baseStyles.holder}
-            style={{ flexGrow: 1 }}
-          >
-            <label
-              id={`label-available-${selectOptionsId}`}
-              className={baseStyles.label}
-              htmlFor={`available-${selectOptionsId}`}
-            >
-              Available options
-            </label>
-            <div className={baseStyles.editorHolder}>
-              <EditorV3
-                id={`available-${selectOptionsId}`}
-                className={baseStyles.baseEditorV3}
-                allowNewLine
-                editable={editable}
-                customStyleMap={customSytleMap}
-                style={{ border: "none", height: "100%" }}
-                input={input}
-                setObject={(value) => {
-                  const chkBlocks = value.lines.some((l) => l.textBlocks.length > 1);
-                  const chkEmpty = value.lines.some(
-                    (l) => l.textBlocks.map((tb) => tb.text.trim()).join("") === "",
-                  );
-                  if (chkBlocks) {
-                    setValidationText("Each line must have only one style");
-                  } else if (chkEmpty) {
-                    setValidationText("Each line must have at least one character");
-                  } else {
-                    setValidationText("");
-                    const newObject: EditorV3DropListItem<Record<string, string>>[] =
-                      splitV3intoLines(value).map((l) => {
-                        const ret: EditorV3DropListItem<Record<string, string>> = {
-                          text: l.lines[0].textBlocks[0].text,
-                          data: {},
-                        };
-                        if (l.lines[0].textBlocks[0].style) {
-                          ret.data!.style = l.lines[0].textBlocks[0].style;
-                        } else {
-                          ret.data!.noStyle = "true";
-                        }
-                        return ret;
-                      });
-                    setOptions({ ...options, availableOptions: newObject });
-                  }
-                }}
-              />
-            </div>
-            <div
-              className={[
-                styles.windowViewValidationText,
-                validationText !== "" ? styles.height : styles.noHeight,
-              ].join(" ")}
-              style={{ maxHeight: "1.5em" }}
-            >
-              {validationText}
-            </div>
-          </div>
-        </>
+      {thisBlock.type !== "select" ? null : (
+        <BaseEditorV3
+          id={`available-${selectOptionsId}`}
+          label="Available options"
+          errorText={validationText.join("\n")}
+          allowNewLine
+          editable={wvc.editable}
+          customStyleMap={wvc.contentProps.styles}
+          input={input}
+          debounceMilliseconds={1}
+          setObject={setObject}
+        />
       )}
     </div>
   );

@@ -65,7 +65,7 @@ export const textBlockFactory = (
   }
   // Must be object
   else {
-    switch (arg.type || forcedParams?.type) {
+    switch (forcedParams?.type ?? arg.type) {
       case "at":
         return new EditorV3AtBlock(arg, forcedParams);
       case "select":

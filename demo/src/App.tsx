@@ -188,6 +188,7 @@ export const App = (): JSX.Element => {
               resize
               allowMarkdown
               allowWindowView
+              errorText={"Some\nerror\nmessage"}
               style={{
                 width: "400px",
                 minHeight: "100px",

@@ -1,3 +1,4 @@
+import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import {
   EditorV3TextBlock,
   IEditorV3TextBlock,
@@ -9,7 +10,6 @@ import {
   EditorV3Style,
   EditorV3WordPosition,
 } from "./interface";
-import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import { renderDropdown } from "./toHtml/renderDropdown";
 import { stopDragOnto } from "./toHtml/stopDragOnto";
 
@@ -108,12 +108,26 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     this.atData = {};
     if (
       this.text.startsWith(markdownSettings.atStartTag) &&
-      this.text.endsWith(markdownSettings.atEndTag)
+      this.text.endsWith(markdownSettings.atEndTag) &&
+      this.text.includes(markdownSettings.dropDownSelectedValueTag)
     ) {
-      this.markdownStyleLabel(
-        this.text.slice(markdownSettings.atStartTag.length, -markdownSettings.atEndTag.length),
-        markdownSettings,
+      // Remove start and end tags
+      this.text = this.text.slice(
+        markdownSettings.atStartTag.length,
+        -markdownSettings.atEndTag.length,
       );
+      // Find the dropdown selected value tag
+      const dd = this.text.indexOf(markdownSettings.dropDownSelectedValueTag);
+      // Get the data text
+      const atDataText = this.text.slice(dd + markdownSettings.dropDownSelectedValueTag.length);
+      try {
+        this.atData = JSON.parse(atDataText);
+      } catch {
+        this.atData = {};
+      }
+      // Get the text/style/label
+      const current = this.text.slice(0, dd);
+      this.markdownStyleLabel(current, markdownSettings);
     }
   }
 
@@ -182,8 +196,14 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     let text = markdownSettings.atStartTag;
     // Update text with style and label
     text += this.toMarkdownStyleLabel(markdownSettings);
+    // Add text
+    text += this.text;
+    // Add atData
+    text += this.atData
+      ? markdownSettings.dropDownSelectedValueTag + JSON.stringify(this.atData)
+      : "";
     // Complete tag
-    text += this.text + markdownSettings.atEndTag;
+    text += markdownSettings.atEndTag;
     return text;
   }
 }

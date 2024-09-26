@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import baseStyles from "../BaseInputs.module.css";
 
-interface BaseSelectProps extends React.HTMLAttributes<HTMLSelectElement> {
+interface BaseSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   id: string;
-  value: string | number | boolean | undefined;
-  availableOptions: { label: string; value: string | number | boolean | undefined }[];
+  value: string | number | undefined;
+  availableOptions: {
+    label: string;
+    value: string | number | boolean | undefined;
+    disabled?: boolean;
+  }[];
   change: (ret: string | number | boolean | undefined) => void;
   label?: string;
 }
@@ -26,6 +30,7 @@ export const BaseSelect = ({
   const availableOptionsStrings = availableOptions.map((item, ix) => ({
     label: item.label,
     value: `${ix}-${item.value?.toString() ?? "None"}`,
+    disabled: item.disabled,
   }));
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -68,6 +73,7 @@ export const BaseSelect = ({
           <option
             key={`${ix}-${o.value}`}
             value={o.value}
+            disabled={o.disabled}
           >
             {o.label}
           </option>

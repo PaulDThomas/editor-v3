@@ -1,13 +1,15 @@
 import { ContextWindow } from "@asup/context-menu";
 import { cloneDeep, isEqual } from "lodash";
-import { useCallback } from "react";
+import { createContext, useCallback } from "react";
 import { EditorV3Content, EditorV3Line } from "../../classes";
+import { EditorV3ContentProps, IEditorV3Line } from "../../classes/interface";
 import { useDebounceStack } from "../../hooks";
 import { EditorV3State } from "../EditorV3";
 import { AddLine, RedoBtn, RemoveLine, UndoBtn } from "../icons";
 import iconStyles from "../icons/IconStyles.module.css";
 import styles from "./WindowView.module.css";
 import { WindowViewLine } from "./WindowViewLine";
+import { WindowViewAction, windowViewReducer } from "./windowViewReducer";
 
 interface WindowViewProps {
   id: string;
@@ -15,7 +17,19 @@ interface WindowViewProps {
   setShowWindowView: (show: boolean) => void;
   state: EditorV3State;
   setState: (state: EditorV3State) => void;
+  includeAt?: boolean;
 }
+
+export interface WindowViewContextProps {
+  id: string;
+  lines: IEditorV3Line[];
+  dispatch: (action: WindowViewAction) => void;
+  editable: boolean;
+  contentProps: EditorV3ContentProps;
+  includeAt: boolean;
+}
+
+export const WindowViewContext = createContext<WindowViewContextProps | null>(null);
 
 export const WindowView = ({
   id,
@@ -23,6 +37,7 @@ export const WindowView = ({
   setShowWindowView,
   state,
   setState,
+  includeAt = false,
 }: WindowViewProps) => {
   const {
     currentValue,
@@ -32,9 +47,9 @@ export const WindowView = ({
     redo,
     stack,
     index: stackIndex,
-  } = useDebounceStack<EditorV3Line[]>(
-    state.content.lines.map((line) => new EditorV3Line(line)),
-    (value: EditorV3Line[]) => {
+  } = useDebounceStack<IEditorV3Line[]>(
+    state.content.lines.map((i) => i.data),
+    (value: IEditorV3Line[]) => {
       const ret = new EditorV3Content({ lines: value }, state.content.contentProps);
       if (
         !isEqual(
@@ -46,17 +61,6 @@ export const WindowView = ({
       }
     },
     null,
-  );
-
-  const setLine = useCallback(
-    (line: EditorV3Line, ix: number) => {
-      if (currentValue) {
-        const newLines = cloneDeep(currentValue);
-        newLines[ix] = line;
-        if (!isEqual(newLines, currentValue)) setCurrentValue(newLines);
-      }
-    },
-    [currentValue, setCurrentValue],
   );
 
   const addLine = useCallback(
@@ -112,30 +116,40 @@ export const WindowView = ({
         setShowWindowView(false);
       }}
     >
-      <div className={styles.windowViewBody}>
-        {state.editable && (state.content.contentProps ?? {}).allowNewLine && (
-          <AddLine onClick={() => addLine(0)} />
-        )}
-        {currentValue.map((line, ix) => (
-          <div
-            key={ix}
-            className={iconStyles.relativeDiv}
-          >
-            {state.editable && <RemoveLine onClick={() => removeLine(ix)} />}
-            <WindowViewLine
+      <WindowViewContext.Provider
+        value={{
+          id,
+          lines: currentValue,
+          dispatch: (action) => {
+            const newLines = windowViewReducer(currentValue, action);
+            setCurrentValue(newLines);
+          },
+          editable: state.editable,
+          contentProps: state.content.contentProps,
+          includeAt,
+        }}
+      >
+        <div className={styles.windowViewBody}>
+          {state.editable && (state.content.contentProps ?? {}).allowNewLine && (
+            <AddLine onClick={() => addLine(0)} />
+          )}
+          {currentValue.map((line, ix) => (
+            <div
               key={ix}
-              contentProps={state.content.contentProps ?? {}}
-              lineIndex={ix}
-              line={line}
-              editable={state.editable}
-              setLine={(line) => setLine(line, ix)}
-            />
-            {state.editable && (state.content.contentProps ?? {}).allowNewLine && (
-              <AddLine onClick={() => addLine(ix + 1)} />
-            )}
-          </div>
-        ))}
-      </div>
+              className={iconStyles.relativeDiv}
+            >
+              {state.editable && <RemoveLine onClick={() => removeLine(ix)} />}
+              <WindowViewLine
+                key={ix}
+                lineIndex={ix}
+              />
+              {state.editable && (state.content.contentProps ?? {}).allowNewLine && (
+                <AddLine onClick={() => addLine(ix + 1)} />
+              )}
+            </div>
+          ))}
+        </div>
+      </WindowViewContext.Provider>
     </ContextWindow>
   );
 };

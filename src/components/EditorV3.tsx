@@ -69,8 +69,11 @@ export const EditorV3 = ({
   maxAtListLength = 10,
   ...rest
 }: EditorV3Props): JSX.Element => {
+  // Set up reference to main div
+  const mainRef = useRef<HTMLDivElement | null>(null);
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
+  // other state variables
   const [showMarkdown, setShowMarkdown] = useState<boolean>(false);
   const [showWindowView, setShowWindowView] = useState<boolean>(false);
   const [inputDecode, setInputDecode] = useState<EditorV3State>({
@@ -87,7 +90,6 @@ export const EditorV3 = ({
     focus: false,
     editable,
   });
-
   const contentProps = useMemo((): EditorV3ContentPropsInput => {
     return {
       ...defaultContentProps,
@@ -354,9 +356,10 @@ export const EditorV3 = ({
     (e: React.FocusEvent | React.MouseEvent) => {
       if (
         state &&
+        mainRef.current &&
         divRef.current &&
         e.target instanceof Node &&
-        (divRef.current === e.target || divRef.current.contains(e.target))
+        (mainRef.current === e.target || mainRef.current.contains(e.target))
       ) {
         // Get current content
         const newContent = new EditorV3Content(divRef.current, contentProps);
@@ -548,6 +551,7 @@ export const EditorV3 = ({
     <>
       <div
         {...rest}
+        ref={mainRef}
         className={[
           "aiev3",
           editable ? "" : "disabled",
@@ -622,6 +626,7 @@ export const EditorV3 = ({
           setShowWindowView={setShowWindowView}
           state={state}
           setState={forceReturn}
+          includeAt={atListFunction !== undefined}
         />
       )}
     </>

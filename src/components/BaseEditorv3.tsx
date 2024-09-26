@@ -4,9 +4,16 @@ import { EditorV3, EditorV3Props } from "./EditorV3";
 
 interface BaseEdivotV3Props extends EditorV3Props {
   label?: string;
+  errorText?: string;
 }
 
-export const BaseEditorV3 = ({ label, style, resize, ...rest }: BaseEdivotV3Props): JSX.Element => {
+export const BaseEditorV3 = ({
+  label,
+  errorText,
+  style,
+  resize,
+  ...rest
+}: BaseEdivotV3Props): JSX.Element => {
   const [outerStyle, setOuterStyle] = useState<React.CSSProperties>(style ?? {});
   const [innerStyle, setInnerStyle] = useState<React.CSSProperties>(style ?? {});
   useLayoutEffect(() => {
@@ -64,6 +71,15 @@ export const BaseEditorV3 = ({ label, style, resize, ...rest }: BaseEdivotV3Prop
         >
           {label}
         </label>
+      )}
+      {errorText !== undefined && (
+        <div className={baseStyles.errorText}>
+          <>
+            {errorText.split("\n").map((errorLine, ix) => (
+              <div key={ix}>{errorLine}</div>
+            ))}
+          </>
+        </div>
       )}
       <div className={baseStyles.editorHolder}>
         <EditorV3

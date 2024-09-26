@@ -5,6 +5,8 @@ import { EditorV3Content } from "../../classes";
 import { defaultContentProps } from "../../classes/defaultContentProps";
 import { WindowView } from "./WindowView";
 
+jest.mock("./WindowViewSelectOptions");
+
 describe("WindowView", () => {
   const user = userEvent.setup({ delay: null });
 

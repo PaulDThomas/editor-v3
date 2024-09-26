@@ -27,6 +27,23 @@
   background-color: white;
 }
 
+.errorText {
+  position: absolute;
+  top: 0;
+  right: 0.25rem;
+  z-index: 2;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 400;
+  color: #f00;
+  text-align: left;
+  color: red;
+  padding: 1px 3px;
+  border-radius: 4px;
+  border: 1px dotted red;
+  background-color: white;
+}
+
 .expander {
   display: flex;
   flex-direction: column;

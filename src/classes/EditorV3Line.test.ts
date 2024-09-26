@@ -555,7 +555,7 @@ describe("Check EditorV3Line functions", () => {
 
   test("Load markdown div elements", async () => {
     const mdText =
-      "(~(st1::what)~) are you doing? @[st2::Hello@bloke@] fancy coming back to my (~(green::color::green)~)(¬(choose**home||green::lily pad||garage)¬)?";
+      "(~(st1::what)~) are you doing? @[st2::Hello@bloke**{}@] fancy coming back to my (~(green::color::green)~)(¬(choose**home||green::lily pad||garage)¬)?";
     const div = document.createElement("div");
     div.classList.add("aiev3-markdown-line");
     const text = document.createTextNode(mdText);

@@ -52,7 +52,7 @@ export const ItemInput = ({ dataPoint, ...rest }: ItemInputProps) => {
       ) : thisOptionType === "select" && thisOptionValues ? (
         <BaseSelect
           id={`id-${dataPoint}`}
-          value={thisValueRaw}
+          value={thisValueRaw as string | number | undefined}
           availableOptions={thisOptionValues}
           change={handleChange}
           label={thisOptionLabel}
@@ -61,7 +61,7 @@ export const ItemInput = ({ dataPoint, ...rest }: ItemInputProps) => {
       ) : (
         <BaseInput
           id={`id-${dataPoint}`}
-          value={thisValueRaw}
+          value={thisValueRaw as string | number | undefined}
           change={handleChange}
           label={thisOptionLabel}
           {...rest}

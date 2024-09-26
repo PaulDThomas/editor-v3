@@ -367,10 +367,30 @@ describe("EditorV3AtBlock errors", () => {
 
 describe("EditorV3AtBlock markdown output", () => {
   test("should return the correct markdown output", async () => {
-    const testBlock = new EditorV3AtBlock({ text: "@Hello", style: "shiny", label: "label" });
+    const testBlock = new EditorV3AtBlock({
+      text: "@Hello",
+      style: "shiny",
+      label: "label",
+      atData: {
+        email: "aa@0.com",
+      },
+    });
     const result = testBlock.toMarkdown();
-    expect(testBlock.toMarkdown()).toEqual("@[shiny::label::@Hello@]");
+    // eslint-disable-next-line quotes
+    expect(testBlock.toMarkdown()).toEqual('@[shiny::label::@Hello**{"email":"aa@0.com"}@]');
     const eatOwnTail = new EditorV3AtBlock(result);
     expect(eatOwnTail.data).toEqual(testBlock.data);
+  });
+
+  test("should have no data from bad JSON in tyhe markdown", async () => {
+    // eslint-disable-next-line quotes
+    const testMarkdown = '@[shiny::label::@Hello**{"email":wooo!}@]';
+    const testBlock = new EditorV3AtBlock(testMarkdown);
+    expect(testBlock.data).toEqual({
+      text: "@Hello",
+      type: "at",
+      style: "shiny",
+      label: "label",
+    });
   });
 });
