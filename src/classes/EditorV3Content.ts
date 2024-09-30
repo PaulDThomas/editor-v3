@@ -235,22 +235,6 @@ export class EditorV3Content implements IEditorV3 {
   }
 
   /**
-   * Create a new EditorV3Content instance for this object
-   * @returns HTMLDivElement with content properties
-   */
-  private _contentPropsNode(): HTMLDivElement {
-    const cpn = document.createElement("div");
-    cpn.className = "aiev3-contents-info";
-    Object.keys(this.data.contentProps ?? {})
-      .sort((a, b) => a.localeCompare(b))
-      .forEach((k) => {
-        const key = k as keyof typeof defaultContentProps;
-        cpn.dataset[key] = JSON.stringify(this[key]);
-      });
-    return cpn;
-  }
-
-  /**
    * Element to render
    */
   public toHtml(renderProps: EditorV3RenderProps): DocumentFragment {
@@ -258,7 +242,6 @@ export class EditorV3Content implements IEditorV3 {
     // Add each line to the element
     this.lines.forEach((l) => ret.append(l.toHtml(renderProps)));
     // Add content properties node
-    ret.append(this._contentPropsNode());
     if (renderProps.editableEl) renderProps.editableEl.append(ret);
     return ret;
   }
@@ -272,7 +255,6 @@ export class EditorV3Content implements IEditorV3 {
     const ret = new DocumentFragment();
     // Add content to the element
     this.lines.forEach((l) => ret.append(l.toMarkdown(renderProps)));
-    ret.append(this._contentPropsNode());
     if (renderProps.editableEl) renderProps.editableEl.append(ret);
     return ret;
   }
@@ -291,7 +273,7 @@ export class EditorV3Content implements IEditorV3 {
         const skipRead = arg.querySelectorAll(".skip-read");
         skipRead.forEach((el) => el.remove());
         // Read in HTML
-        const r = readV3Html(arg.innerHTML, props);
+        const r = readV3Html(arg.innerHTML, props ?? this.contentProps);
         this._copyImport(r);
         this.caretPositionF = getCaretPosition(arg);
       } else if (typeof arg === "string") {
@@ -310,7 +292,7 @@ export class EditorV3Content implements IEditorV3 {
       // Establish input as string
       const inputString = (arg instanceof HTMLDivElement ? arg.outerHTML : arg) as string;
       // Read in v3 HTML/text
-      const r = readV3Html(inputString, props);
+      const r = readV3Html(inputString, props ?? this.contentProps);
       this._copyImport(r, props);
     }
 
@@ -359,15 +341,15 @@ export class EditorV3Content implements IEditorV3 {
    * Loads a string into the content.  Will attempt to parse as JSON, then as HTML/text
    * @param arg string input
    */
-  public loadString(arg: string) {
+  public loadString(arg: string, props?: EditorV3ContentPropsInput) {
     try {
       // Check for stringified class input
       const jsonInput: IEditorV3 = JSON.parse(arg);
       if (!Array.isArray(jsonInput.lines)) throw "No lines";
-      this._copyImport(jsonInput);
+      this._copyImport(jsonInput, props);
     } catch {
       // Read in v3 HTML/text
-      const r = readV3Html(arg);
+      const r = readV3Html(arg, props ?? this.contentProps);
       this._copyImport(r);
     }
   }

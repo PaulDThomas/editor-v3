@@ -76,7 +76,6 @@ export const WindowViewSelectOptions = ({
           editable={wvc.editable}
           customStyleMap={wvc.contentProps.styles}
           input={input}
-          debounceMilliseconds={1}
           setObject={setObject}
         />
       )}

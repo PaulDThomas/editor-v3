@@ -130,6 +130,63 @@ describe("Editor and functions", () => {
     expect(editor.outerHTML).toMatchSnapshot();
   });
 
+  test("Enter", async () => {
+    const user = userEvent.setup({ delay: null });
+    const mockSetObject = jest.fn();
+    const mockSetText = jest.fn();
+    render(
+      <EditorV3
+        data-testid="test-editor"
+        id="test-editor"
+        input={mockContent}
+        setObject={(ret) => {
+          mockSetObject(ret);
+        }}
+        setText={(ret) => {
+          mockSetText(ret);
+        }}
+        style={{ width: "200px" }}
+        allowNewLine
+        decimalAlignPercent={70}
+        textAlignment={EditorV3Align.decimal}
+      />,
+    );
+
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
+    expect(editor).toBeInTheDocument();
+    const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    await user.click(editor.querySelector(".aiev3-editing") as HTMLElement);
+    await user.keyboard("{Home}{ArrowRight}{ArrowRight}{Enter}");
+    fireEvent.blur(editor);
+
+    expect(mockSetText).toHaveBeenCalledTimes(1);
+    expect(mockSetText).toHaveBeenLastCalledWith("34\n.45\n\nx.xx");
+    expect(mockSetObject).toHaveBeenCalledTimes(1);
+    expect(mockSetObject).toHaveBeenLastCalledWith({
+      contentProps: {
+        textAlignment: "decimal",
+        decimalAlignPercent: 70,
+        allowNewLine: true,
+      },
+      lines: [
+        {
+          textBlocks: [{ text: "34", type: "text" }],
+        },
+        {
+          textBlocks: [{ text: ".45", type: "text" }],
+        },
+        {
+          textBlocks: [{ text: "", type: "text" }],
+        },
+        {
+          textBlocks: [{ text: "x.xx", style: "shiny", type: "text" }],
+        },
+      ],
+    });
+    expect(editor.outerHTML).toMatchSnapshot();
+  });
+
   test("Delete", async () => {
     const user = userEvent.setup({ delay: null });
     const mockSetObject = jest.fn();

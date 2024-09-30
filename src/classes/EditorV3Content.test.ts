@@ -77,15 +77,15 @@ describe("Check basic EditorV3Content", () => {
     const read1 = new EditorV3Content(testContent.data);
     expect(read1.data).toEqual(testContent.data);
     const read2 = new EditorV3Content(div);
-    expect(read2.data).toEqual(testContent.data);
-    expect(new EditorV3Content(div.innerHTML).data).toEqual(testContent.data);
+    expect(read2.data.lines).toEqual(testContent.data.lines);
+    expect(new EditorV3Content(div.innerHTML).data.lines).toEqual(testContent.data.lines);
 
     // Repeat as decimal
     testContent.textAlignment = EditorV3Align.decimal;
     expect(new EditorV3Content(testContent).data).toEqual(testContent.data);
     div.innerHTML = "";
     div.appendChild(testContent.toHtml({}));
-    expect(new EditorV3Content(div.innerHTML).data).toEqual(testContent.data);
+    expect(new EditorV3Content(div.innerHTML).data.lines).toEqual(testContent.data.lines);
   });
 
   test("Load multiline string", async () => {
@@ -128,8 +128,8 @@ describe("Check basic EditorV3Content", () => {
     div.innerHTML = "";
     div.appendChild(testContent.toHtml({}));
     expect(div.innerHTML).toMatchSnapshot();
-    expect(new EditorV3Content(div.innerHTML).data).toEqual(testContent.data);
-    expect(new EditorV3Content(testContent.data).data).toEqual(testContent.data);
+    expect(new EditorV3Content(div.innerHTML).data.lines).toEqual(testContent.data.lines);
+    expect(new EditorV3Content(testContent.data).data.lines).toEqual(testContent.data.lines);
   });
 });
 
@@ -462,9 +462,16 @@ describe("Render markdown text from content", () => {
     div.append(result);
     expect(div.innerHTML).toMatchSnapshot();
     // Eat your own tail
-    const readDiv = new EditorV3Content(div.innerHTML);
+    const newProps = {
+      ...props,
+      allowWindowView: true,
+      allowMarkdown: true,
+      allowNewLine: true,
+      showMarkdown: true,
+    };
+    const readDiv = new EditorV3Content(div.innerHTML, newProps);
     expect(readDiv.data).toEqual(testContent.data);
-    const readDiv2 = new EditorV3Content(div);
+    const readDiv2 = new EditorV3Content(div, newProps);
     expect(readDiv2.data).toEqual(testContent.data);
   });
 });
