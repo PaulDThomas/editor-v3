@@ -72,7 +72,7 @@ export const BaseEditorV3 = ({
           {label}
         </label>
       )}
-      {errorText !== undefined && (
+      {errorText !== undefined && errorText.trim() !== "" && (
         <div className={baseStyles.errorText}>
           <>
             {errorText.split("\n").map((errorLine, ix) => (
