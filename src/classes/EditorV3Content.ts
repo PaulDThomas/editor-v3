@@ -667,7 +667,7 @@ export class EditorV3Content implements IEditorV3 {
       setCaretPosition(editableEl, this._caretPosition);
     }
     // Remove window selection if not focused, but the current window selection is inside the editableEl's parent
-    if (
+    else if (
       !focus &&
       window.getSelection()?.anchorNode instanceof HTMLElement &&
       (window.getSelection()?.anchorNode as HTMLElement).closest(".aiev3")?.contains(editableEl)
@@ -729,6 +729,10 @@ export class EditorV3Content implements IEditorV3 {
     ) {
       e.stopPropagation();
       e.preventDefault();
+      if (this._caretPosition === null) {
+        // console.warn("Setting caret position to 0,0");
+        this.caretPosition = { startLine: 0, startChar: 0, endLine: 0, endChar: 0 };
+      }
       switch (e.key) {
         case "ArrowLeft":
           this._caretPosition.moveLeft(e.shiftKey, e.ctrlKey);

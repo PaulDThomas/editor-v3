@@ -477,11 +477,19 @@ export const EditorV3 = ({
               ]);
             }
           }
+          // Handle cursor null after pressing enter
+          else if (
+            e.key === "Enter" &&
+            newContent.caretPosition === null &&
+            lastCaretPosition !== null
+          ) {
+            newContent.caretPosition = lastCaretPosition;
+          }
           setContent(newContent, `Handle key up: ${e.key}`);
         }
       }
     },
-    [atListFunction, contentProps, setContent, state],
+    [atListFunction, contentProps, lastCaretPosition, setContent, state],
   );
 
   const handleMouseUp = useCallback(
