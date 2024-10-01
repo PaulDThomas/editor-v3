@@ -190,4 +190,5 @@
   height: calc(100% - 20px);
   padding: 1px;
   width: calc(100% - 4px);
+  box-sizing: content-box;
 }

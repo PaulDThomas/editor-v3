@@ -7,11 +7,8 @@
   flex-direction: column;
   justify-content: center;
   overflow: hidden;
+  box-sizing: content-box;
 }
-
-/* .aiev3.disabled {
-  background-color: rgba(0, 0, 0, 0.1);
-} */
 
 .aiev3:focus,
 .aiev3:hover {
