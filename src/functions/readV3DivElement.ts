@@ -28,10 +28,8 @@ export const readV3DivElement = (
     if (arg.classList.contains("decimal")) {
       ret.textAlignment = EditorV3Align.decimal;
       ret.decimalAlignPercent =
-        arg.children.length === 2 &&
-        arg.children[0] instanceof HTMLSpanElement &&
-        arg.children[0].style.minWidth
-          ? parseFloat(arg.children[0].style.minWidth)
+        arg.children.length === 2 && arg.style.gridTemplateColumns
+          ? parseFloat(arg.style.gridTemplateColumns.split("%")[0])
           : 60;
       // This will skip the inner offcanvas span
       ret.textBlocks =
