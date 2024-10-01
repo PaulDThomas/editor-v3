@@ -98,11 +98,11 @@ describe("Text block factory tests", () => {
 describe("Check markdown output on text block", () => {
   test("Markdown is correctly shown", async () => {
     const testBlock = textBlockFactory({ text: "Hello world", style: "shiny" });
-    expect(testBlock.toMarkdown()).toEqual("<<shiny::Hello world>>");
+    expect(testBlock.toMarkdown()).toEqual("(~(shiny::Hello world)~)");
   });
   test("Markdown is correctly shown for defaultStyle", async () => {
     const testBlock = textBlockFactory({ text: "Hello world", style: "defaultStyle" });
-    expect(testBlock.toMarkdown()).toEqual("<<Hello world>>");
+    expect(testBlock.toMarkdown()).toEqual("(~(Hello world)~)");
   });
 });
 
@@ -111,7 +111,7 @@ describe("Check at correctly loaded, and eats its own tail", () => {
     const testBlock = textBlockFactory({ text: "@Hello", type: "at" });
     expect(testBlock).toBeInstanceOf(EditorV3AtBlock);
     expect(testBlock.data).toEqual({ text: "@Hello", type: "at" });
-    expect(testBlock.toMarkdown()).toEqual("@[@Hello@]");
+    expect(testBlock.toMarkdown()).toEqual("@[@Hello**{}@]");
 
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml({}));
@@ -187,7 +187,7 @@ describe("Check at correctly loaded, and eats its own tail", () => {
       type: "at",
       isLocked: undefined,
     });
-    expect(testBlock.toMarkdown()).toEqual("@[shiny::label::@Hello@]");
+    expect(testBlock.toMarkdown()).toEqual("@[shiny::label::@Hello**{}@]");
 
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml({}));
@@ -218,7 +218,7 @@ describe("Check at correctly loaded, and eats its own tail", () => {
       style: "shiny",
       type: "at",
     });
-    expect(testBlock.toMarkdown()).toEqual("@[shiny::label::@Hello world@]");
+    expect(testBlock.toMarkdown()).toEqual("@[shiny::label::@Hello world**{}@]");
     expect(testBlock.mergeKey).toEqual("at:shiny:label");
 
     const tempDiv = document.createElement("div");

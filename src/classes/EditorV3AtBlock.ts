@@ -1,3 +1,4 @@
+import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import {
   EditorV3TextBlock,
   IEditorV3TextBlock,
@@ -9,8 +10,8 @@ import {
   EditorV3Style,
   EditorV3WordPosition,
 } from "./interface";
-import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import { renderDropdown } from "./toHtml/renderDropdown";
+import { stopDragOnto } from "./toHtml/stopDragOnto";
 
 export interface IEditorV3AtBlockOptionalParams extends IEditorV3TextBlockOptionalParams {
   atListFunction?: (typedString: string) => Promise<EditorV3DropListItem<Record<string, string>>[]>;
@@ -107,12 +108,26 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     this.atData = {};
     if (
       this.text.startsWith(markdownSettings.atStartTag) &&
-      this.text.endsWith(markdownSettings.atEndTag)
+      this.text.endsWith(markdownSettings.atEndTag) &&
+      this.text.includes(markdownSettings.dropDownSelectedValueTag)
     ) {
-      this.markdownStyleLabel(
-        this.text.slice(markdownSettings.atStartTag.length, -markdownSettings.atEndTag.length),
-        markdownSettings,
+      // Remove start and end tags
+      this.text = this.text.slice(
+        markdownSettings.atStartTag.length,
+        -markdownSettings.atEndTag.length,
       );
+      // Find the dropdown selected value tag
+      const dd = this.text.indexOf(markdownSettings.dropDownSelectedValueTag);
+      // Get the data text
+      const atDataText = this.text.slice(dd + markdownSettings.dropDownSelectedValueTag.length);
+      try {
+        this.atData = JSON.parse(atDataText);
+      } catch {
+        this.atData = {};
+      }
+      // Get the text/style/label
+      const current = this.text.slice(0, dd);
+      this.markdownStyleLabel(current, markdownSettings);
     }
   }
 
@@ -136,18 +151,16 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     this.applyStyle(span, style);
     // Add label
     if (this.label) span.title = this.label;
-    // Delete any existing dropdown on render
-    const editor = renderProps.currentEl?.closest(".aiev3") as HTMLDivElement | null;
-    if (editor) {
-      const existingDropdowns = editor.querySelectorAll("ul.aiev3-dropdown-list");
-      existingDropdowns.forEach((dropdown) => dropdown.remove());
-    }
+
+    // Remove any existing dropdowns
+    const previousDropdown = document.querySelectorAll(".aiev3-dropdown-list");
+    previousDropdown.forEach((dropdown) => dropdown.remove());
 
     // Add locked status
     if (this.isLocked || !this.isActive) {
       span.classList.add("is-locked");
       span.dataset.isLocked = "true";
-      span.contentEditable = "false";
+      stopDragOnto(span);
       // Add any other data items from the at item
       this.atData &&
         Object.keys(this.atData).forEach((key) => {
@@ -162,12 +175,11 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
         span.classList.add("show-dropdown");
         renderTimeout = window.setTimeout(
           () =>
-            renderDropdown(
-              span,
-              renderProps.atListFunction ?? this.atListFunction,
-              renderProps.maxAtListLength ?? this.maxAtListLength,
-              this.text,
-            ),
+            renderDropdown(span, this.text, {
+              ...renderProps,
+              atListFunction: renderProps.atListFunction ?? this.atListFunction,
+              maxAtListLength: renderProps.maxAtListLength ?? this.maxAtListLength,
+            }),
           100,
         );
       }
@@ -184,8 +196,14 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     let text = markdownSettings.atStartTag;
     // Update text with style and label
     text += this.toMarkdownStyleLabel(markdownSettings);
+    // Add text
+    text += this.text;
+    // Add atData
+    text += this.atData
+      ? markdownSettings.dropDownSelectedValueTag + JSON.stringify(this.atData)
+      : "";
     // Complete tag
-    text += this.text + markdownSettings.atEndTag;
+    text += markdownSettings.atEndTag;
     return text;
   }
 }

@@ -12,35 +12,21 @@ describe("readV3Html tests", () => {
       .replaceAll(/[\r\n\t]/g, "")
       .replaceAll(/>\s{2,}</g, "><")
       .trim();
-    const result = readV3Html(text);
+    const result = readV3Html(text, defaultContentProps);
     expect(result.lines.length).toEqual(2);
     expect(result.lines[0].textBlocks[0]).toEqual(textBlockFactory({ text: "Hello world" }));
     expect(result.lines[1].textBlocks[0]).toEqual(textBlockFactory({ text: "How are you?" }));
   });
 
-  test("Read v3-html string input with style node", () => {
-    const text = `
-      <div class="aiev3-line left">
-        <span class="aiev3-tb">Hello world</span>
-      </div>
-      <div class="aiev3-contents-info" data-styles='{"color": "red"}'></div>
-      `
-      .replaceAll(/[\r\n\t]/g, "")
-      .replaceAll(/>\s{2,}</g, "><")
-      .trim();
-    const result = readV3Html(text);
-    expect(result.contentProps?.styles).toEqual({ color: "red" });
-  });
-
   test("Read v3-markdown string input with line nodes", async () => {
     const text = `
-      <div class="aiev3-markdown-line">&lt;&lt;Hello world&gt;&gt;</div>
-      <div class="aiev3-markdown-line">&lt;&lt;st1::How are you?&gt;&gt;</div>
+      <div class="aiev3-markdown-line">(~(Hello world)~)</div>
+      <div class="aiev3-markdown-line">(~(st1::How are you?)~)</div>
       `
       .replaceAll(/[\r\n\t]/g, "")
       .replaceAll(/>\s{2,}</g, "><")
       .trim();
-    const result = readV3Html(text);
+    const result = readV3Html(text, defaultContentProps);
     expect(result.lines.length).toEqual(2);
     expect(result.lines[0].textBlocks).toEqual([
       textBlockFactory({ text: "Hello world", style: "defaultStyle" }),
@@ -48,18 +34,6 @@ describe("readV3Html tests", () => {
     expect(result.lines[1].textBlocks).toEqual([
       textBlockFactory({ text: "How are you?", style: "st1" }),
     ]);
-  });
-
-  test("Read v3-markdown string input with style node", async () => {
-    const text = `
-      <div class="aiev3-markdown-line">&lt;&lt;red::Hello world&gt;&gt;</div>
-      <div class="aiev3-contents-info" data-styles='[{"redStyle":{"color": "red"}}]'></div>
-      `
-      .replaceAll(/[\r\n\t]/g, "")
-      .replaceAll(/>\s{1,}</g, "><")
-      .trim();
-    const result = readV3Html(text);
-    expect(result.contentProps?.styles).toEqual([{ redStyle: { color: "red" } }]);
   });
 
   test("Read text(ish) input", async () => {

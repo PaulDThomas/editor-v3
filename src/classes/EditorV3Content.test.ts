@@ -33,6 +33,16 @@ describe("Check basic EditorV3Content", () => {
     });
   });
 
+  test("Load 0 lines", async () => {
+    // eslint-disable-next-line quotes
+    const testContent = new EditorV3Content('{"lines":[]}');
+    expect(testContent.text).toEqual("");
+    expect(testContent.lines.length).toEqual(1);
+    expect(testContent.data).toEqual({
+      lines: [{ textBlocks: [{ text: "", type: "text" }] }],
+    });
+  });
+
   test("Load string with style info", async () => {
     const testProps: EditorV3ContentPropsInput = {
       styles: { shiny: { color: "pink" } },
@@ -58,6 +68,7 @@ describe("Check basic EditorV3Content", () => {
         },
       ],
     });
+    expect(testContent.markdownText).toEqual("34.56");
     const div = document.createElement("div");
     div.append(testContent.toHtml({}));
     expect(div.innerHTML).toMatchSnapshot();
@@ -66,15 +77,15 @@ describe("Check basic EditorV3Content", () => {
     const read1 = new EditorV3Content(testContent.data);
     expect(read1.data).toEqual(testContent.data);
     const read2 = new EditorV3Content(div);
-    expect(read2.data).toEqual(testContent.data);
-    expect(new EditorV3Content(div.innerHTML).data).toEqual(testContent.data);
+    expect(read2.data.lines).toEqual(testContent.data.lines);
+    expect(new EditorV3Content(div.innerHTML).data.lines).toEqual(testContent.data.lines);
 
     // Repeat as decimal
     testContent.textAlignment = EditorV3Align.decimal;
     expect(new EditorV3Content(testContent).data).toEqual(testContent.data);
     div.innerHTML = "";
     div.appendChild(testContent.toHtml({}));
-    expect(new EditorV3Content(div.innerHTML).data).toEqual(testContent.data);
+    expect(new EditorV3Content(div.innerHTML).data.lines).toEqual(testContent.data.lines);
   });
 
   test("Load multiline string", async () => {
@@ -117,8 +128,8 @@ describe("Check basic EditorV3Content", () => {
     div.innerHTML = "";
     div.appendChild(testContent.toHtml({}));
     expect(div.innerHTML).toMatchSnapshot();
-    expect(new EditorV3Content(div.innerHTML).data).toEqual(testContent.data);
-    expect(new EditorV3Content(testContent.data).data).toEqual(testContent.data);
+    expect(new EditorV3Content(div.innerHTML).data.lines).toEqual(testContent.data.lines);
+    expect(new EditorV3Content(testContent.data).data.lines).toEqual(testContent.data.lines);
   });
 });
 
@@ -451,9 +462,16 @@ describe("Render markdown text from content", () => {
     div.append(result);
     expect(div.innerHTML).toMatchSnapshot();
     // Eat your own tail
-    const readDiv = new EditorV3Content(div.innerHTML);
+    const newProps = {
+      ...props,
+      allowWindowView: true,
+      allowMarkdown: true,
+      allowNewLine: true,
+      showMarkdown: true,
+    };
+    const readDiv = new EditorV3Content(div.innerHTML, newProps);
     expect(readDiv.data).toEqual(testContent.data);
-    const readDiv2 = new EditorV3Content(div);
+    const readDiv2 = new EditorV3Content(div, newProps);
     expect(readDiv2.data).toEqual(testContent.data);
   });
 });
@@ -563,7 +581,7 @@ describe("Splice markdown tests", () => {
         contentProps: contentProps,
       }),
     );
-    expect(testContent.toMarkdownHtml({}).textContent).toEqual("<<shiny::34.56>>");
+    expect(testContent.toMarkdownHtml({}).textContent).toEqual("(~(shiny::34.56)~)");
     const pasteContent = new EditorV3Line(
       { textBlocks: [{ text: "abc", style: "dull" }] },
       contentProps,
@@ -577,7 +595,7 @@ describe("Splice markdown tests", () => {
     };
     const splice = testContent.splice(pos, [pasteContent]);
     expect(testContent.toMarkdownHtml({}).textContent).toEqual(
-      "<<shiny::3>><<dull::abc>><<shiny::4.56>>",
+      "(~(shiny::3)~)(~(dull::abc)~)(~(shiny::4.56)~)",
     );
     expect(testContent.text).toEqual("3abc4.56");
     expect(splice.map((l) => l.lineText).join("\n")).toEqual("");

@@ -1,121 +1,83 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen } from "@testing-library/react";
+import { EditorV3Line } from "../../classes";
 import { defaultContentProps } from "../../classes/defaultContentProps";
+import { IEditorV3Line } from "../../classes/interface";
+import { WindowViewContext, WindowViewContextProps } from "./WindowView";
 import { WindowViewBlock } from "./WindowViewBlock";
 
 jest.mock("./WindowViewSelectOptions");
 
 describe("WindowViewBlock", () => {
-  const user = userEvent.setup();
+  const mockContext: WindowViewContextProps = {
+    id: "test",
+    lines: [],
+    dispatch: jest.fn(),
+    editable: true,
+    contentProps: {
+      ...defaultContentProps,
+      styles: { shiny: { color: "pink" } },
+    },
+    includeAt: false,
+  };
 
   test("No render without textBlock", async () => {
-    const mockSet = jest.fn();
-
+    const mockDispatch = jest.fn();
+    const mockLine = new EditorV3Line("test").data;
     render(
-      <WindowViewBlock
-        contentProps={defaultContentProps}
-        textBlock={{ text: "test" }}
-        setTextBlock={mockSet}
-      />,
+      <WindowViewContext.Provider
+        value={{
+          ...mockContext,
+          dispatch: mockDispatch,
+          lines: [mockLine],
+        }}
+      >
+        <WindowViewBlock
+          lineIndex={0}
+          blockIndex={1}
+        />
+      </WindowViewContext.Provider>,
     );
-    expect(screen.queryByText("Type")).toBeInTheDocument();
-    expect(screen.queryByText("At")).not.toBeInTheDocument();
+    expect(screen.queryByText("Type")).not.toBeInTheDocument();
+    expect(screen.queryByText("Style")).not.toBeInTheDocument();
+    expect(screen.queryByText("Label")).not.toBeInTheDocument();
+    expect(screen.queryByText("Text")).not.toBeInTheDocument();
+    expect(screen.queryByText("Available options")).not.toBeInTheDocument();
   });
 
-  test("Basic render & update", async () => {
-    const mockSet = jest.fn();
+  test("Basic render for text", async () => {
+    const mockDispatch = jest.fn();
+    const mockLine: IEditorV3Line = { textBlocks: [{ text: "test", type: "text" }] };
     render(
-      <WindowViewBlock
-        contentProps={defaultContentProps}
-        textBlock={{ text: "test", type: "text", label: undefined, style: undefined }}
-        setTextBlock={mockSet}
-      />,
+      <WindowViewContext.Provider
+        value={{
+          ...mockContext,
+          dispatch: mockDispatch,
+          lines: [mockLine],
+        }}
+      >
+        <WindowViewBlock
+          lineIndex={0}
+          blockIndex={0}
+        />
+      </WindowViewContext.Provider>,
     );
-
     expect(screen.queryByLabelText("Type")).toBeInTheDocument();
-    expect(screen.queryByLabelText("At")).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("Style")).not.toBeInTheDocument();
-    const labelInput = screen.queryByLabelText("Label") as HTMLInputElement;
-    expect(labelInput).toBeInTheDocument();
-    const textInput = screen.queryByLabelText("Text") as HTMLInputElement;
-    expect(textInput).toHaveDisplayValue(["test"]);
-    expect(textInput).not.toBeDisabled();
-
-    await user.type(labelInput, "new label");
-    fireEvent.blur(labelInput);
-    expect(mockSet).toHaveBeenLastCalledWith({
-      type: "text",
-      text: "test",
-      label: "new label",
-      style: undefined,
-    });
-
-    await user.type(textInput, " - stunning volley Yeboah!!! ⚽");
-    fireEvent.blur(textInput);
-    expect(mockSet).toHaveBeenLastCalledWith({
-      type: "text",
-      text: "test - stunning volley Yeboah!!! ⚽",
-      label: undefined,
-      style: undefined,
-    });
-  });
-
-  test("At render and update", async () => {
-    const mockSet = jest.fn();
-    render(
-      <WindowViewBlock
-        contentProps={{
-          ...defaultContentProps,
-          atListFunction: jest.fn(),
-          styles: { blue: { color: "blue" } },
-        }}
-        textBlock={{
-          text: "@test",
-          style: "blue",
-          type: "at",
-        }}
-        setTextBlock={mockSet}
-      />,
-    );
-
-    const typeSelect = screen.queryByLabelText("Type") as HTMLSelectElement;
-    expect(typeSelect).toBeInTheDocument();
-    expect(typeSelect).toHaveDisplayValue("At");
-    const styleSelect = screen.queryByLabelText("Style") as HTMLSelectElement;
-    expect(styleSelect).toBeInTheDocument();
-    expect(styleSelect).toHaveDisplayValue(["blue"]);
+    expect(screen.queryByLabelText("Style")).toBeInTheDocument();
     expect(screen.queryByLabelText("Label")).toBeInTheDocument();
-    expect(screen.queryByLabelText("Label")).toHaveDisplayValue([""]);
     expect(screen.queryByLabelText("Text")).toBeInTheDocument();
-    expect(screen.queryByLabelText("Text")).toHaveDisplayValue(["@test"]);
-    expect(screen.queryByLabelText("Text")).toBeDisabled();
+    expect(screen.queryByLabelText("Available options")).not.toBeInTheDocument();
 
-    await user.selectOptions(styleSelect, "None");
-    expect(mockSet).toHaveBeenLastCalledWith({
-      type: "at",
-      text: "@test",
-      style: undefined,
-      label: undefined,
-    });
-
-    await user.selectOptions(typeSelect, "Text");
-    expect(mockSet).toHaveBeenLastCalledWith({
-      type: "text",
-      text: "@test",
-      style: "blue",
-      label: undefined,
-    });
+    expect(screen.queryByLabelText("Type")).toHaveDisplayValue("Text");
+    expect(screen.queryByLabelText("Style")).toHaveDisplayValue(["None"]);
+    expect(screen.queryByLabelText("Label")).toHaveDisplayValue([""]);
+    expect(screen.queryByLabelText("Text")).toHaveDisplayValue(["test"]);
   });
 
   test("Select render and update", async () => {
     const mockSet = jest.fn();
-    render(
-      <WindowViewBlock
-        contentProps={{
-          ...defaultContentProps,
-          styles: { blue: { color: "blue" } },
-        }}
-        textBlock={{
+    const mockLine: IEditorV3Line = {
+      textBlocks: [
+        {
           text: "current",
           type: "select",
           availableOptions: [
@@ -123,23 +85,25 @@ describe("WindowViewBlock", () => {
             { text: "current", data: { noStyle: "true" } },
             { text: "future", data: { noStyle: "true" } },
           ],
+        },
+      ],
+    };
+    render(
+      <WindowViewContext.Provider
+        value={{
+          ...mockContext,
+          dispatch: mockSet,
+          lines: [mockLine],
         }}
-        setTextBlock={mockSet}
-      />,
+      >
+        <WindowViewBlock
+          lineIndex={0}
+          blockIndex={0}
+        />
+      </WindowViewContext.Provider>,
     );
     const availableOptionsInput = screen.queryByLabelText("Available options") as HTMLInputElement;
     expect(availableOptionsInput).toBeInTheDocument();
-    await user.clear(availableOptionsInput);
-    await user.type(availableOptionsInput, "bring\nme\ncoffee");
-    fireEvent.blur(availableOptionsInput);
-    expect(mockSet).toHaveBeenLastCalledWith({
-      type: "select",
-      text: "current",
-      availableOptions: [
-        { text: "bring", data: { noStyle: "true" } },
-        { text: "me", data: { noStyle: "true" } },
-        { text: "coffee", data: { noStyle: "true" } },
-      ],
-    });
+    expect(availableOptionsInput).toHaveDisplayValue(["post\ncurrent\nfuture"]);
   });
 });

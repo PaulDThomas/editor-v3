@@ -3,3 +3,19 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import "@testing-library/jest-dom";
+
+beforeEach(() => {
+  document.body.innerHTML = "";
+  jest.useFakeTimers();
+  // Define offsetParent for HTMLElement
+  Object.defineProperty(HTMLElement.prototype, "offsetParent", {
+    get() {
+      return this.parentNode;
+    },
+  });
+});
+
+afterEach(() => {
+  jest.clearAllTimers();
+  jest.useRealTimers();
+});

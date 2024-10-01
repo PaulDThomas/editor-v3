@@ -1,52 +1,54 @@
-import { useId } from "react";
+import { useContext, useId, useMemo } from "react";
 import { EditorV3Styles } from "../../classes";
-import baseStyles from "../BaseInputs.module.css";
+import { BaseSelect } from "../ObjectEditor/BaseSelect";
+import { WindowViewContext } from "./WindowView";
+import { UPDATE_BLOCK_STYLE } from "./windowViewReducer";
 
-interface WindowViewBlockStyleProps extends React.ComponentProps<"select"> {
-  styles: EditorV3Styles;
-  styleName?: string;
-  setStyleName: (style: string) => void;
+interface WindowViewBlockStyleProps {
+  lineIndex: number;
+  blockIndex: number;
 }
 
-export const WindowViewBlockStyle = ({
-  styles,
-  styleName,
-  setStyleName,
-  ...rest
-}: WindowViewBlockStyleProps) => {
+export const WindowViewBlockStyle = ({ lineIndex, blockIndex }: WindowViewBlockStyleProps) => {
+  const wvc = useContext(WindowViewContext);
+  const thisLine = wvc?.lines[lineIndex];
+  const thisBlock = thisLine?.textBlocks[blockIndex];
   const selectStyleId = useId();
-  return (
-    <div
-      className={baseStyles.holder}
-      style={{ flexShrink: 1, width: "auto" }}
-    >
-      <label
-        id={`label-${selectStyleId}`}
-        className={baseStyles.label}
-        htmlFor={selectStyleId}
-      >
-        Style
-      </label>
-      <select
-        {...rest}
-        aria-labelledby=""
-        id={selectStyleId}
-        className={baseStyles.baseSelect}
-        value={styleName}
-        onChange={(e) => setStyleName(e.currentTarget.value)}
-      >
-        <option value="">None</option>
-        {Object.keys(styles).map((sn, ix) => (
-          <option
-            key={ix}
-            value={sn}
-            disabled={(styles as EditorV3Styles)[sn].isNotAvailabe}
-          >
-            {sn}
-          </option>
-        ))}
-      </select>
-    </div>
+
+  const availableOptions = useMemo(() => {
+    const ret: { label: string; value: string; disabled?: boolean }[] = [
+      { label: "None", value: "" },
+    ];
+    if (wvc && wvc.contentProps.styles) {
+      ret.push(
+        ...Object.keys(wvc.contentProps.styles).map((sn) => ({
+          label: sn,
+          value: sn,
+          disabled: (wvc.contentProps.styles as EditorV3Styles)[sn].isNotAvailable,
+        })),
+      );
+    }
+    return ret;
+  }, [wvc]);
+
+  return !wvc || !thisBlock ? (
+    <></>
+  ) : (
+    <BaseSelect
+      id={selectStyleId}
+      label="Style"
+      value={thisBlock.style}
+      availableOptions={availableOptions}
+      disabled={!wvc.editable}
+      change={(ret) => {
+        wvc.dispatch({
+          operation: UPDATE_BLOCK_STYLE,
+          lineIndex,
+          blockIndex,
+          blockStyle: ret as string,
+        });
+      }}
+    />
   );
 };
 

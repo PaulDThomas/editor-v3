@@ -5,8 +5,10 @@ import { EditorV3Content } from "../../classes";
 import { defaultContentProps } from "../../classes/defaultContentProps";
 import { WindowView } from "./WindowView";
 
+jest.mock("./WindowViewSelectOptions");
+
 describe("WindowView", () => {
-  const user = userEvent.setup();
+  const user = userEvent.setup({ delay: null });
 
   test("Hidden window", async () => {
     const mockSetState = jest.fn();
@@ -19,6 +21,7 @@ describe("WindowView", () => {
         state={{
           content: new EditorV3Content("test"),
           focus: false,
+          editable: true,
         }}
         setState={mockSetState}
       />,
@@ -39,6 +42,7 @@ describe("WindowView", () => {
           state={{
             content,
             focus: false,
+            editable: true,
           }}
           setState={mockSetState}
         />
@@ -66,6 +70,7 @@ describe("WindowView", () => {
           state={{
             content,
             focus: false,
+            editable: true,
           }}
           setState={mockSetState}
         />
@@ -74,12 +79,13 @@ describe("WindowView", () => {
     const textInput = screen.queryByLabelText("Text") as HTMLInputElement;
     await user.type(textInput, " - Summerville's overhead kick hits the back of the net!!! ⚽ ");
     expect(mockSetState).not.toHaveBeenCalled();
-    await user.click(screen.queryByLabelText("Close window") as Element);
+    await user.click(screen.queryByLabelText("Close") as Element);
     expect(mockSetState).toHaveBeenCalled();
   });
 });
 
 describe("Add and remove lines", () => {
+  const user = userEvent.setup({ delay: null });
   test("Add new first line", async () => {
     const mockSetState = jest.fn();
     const mockSetShow = jest.fn();
@@ -93,6 +99,7 @@ describe("Add and remove lines", () => {
           state={{
             content,
             focus: false,
+            editable: true,
           }}
           setState={mockSetState}
         />
@@ -100,8 +107,8 @@ describe("Add and remove lines", () => {
     );
     const addLine = screen.queryAllByLabelText("Add line")[0] as Element;
     expect(addLine).toBeInTheDocument();
-    await userEvent.click(addLine);
-    await userEvent.click(screen.getByLabelText(/Save/));
+    await user.click(addLine);
+    await user.click(screen.getByLabelText("Close"));
     expect(mockSetState).toHaveBeenCalledTimes(1);
     const calls = mockSetState.mock.calls[0][0];
     expect(calls.content).toBeInstanceOf(EditorV3Content);
@@ -126,6 +133,7 @@ describe("Add and remove lines", () => {
           state={{
             content,
             focus: false,
+            editable: true,
           }}
           setState={mockSetState}
         />
@@ -133,8 +141,8 @@ describe("Add and remove lines", () => {
     );
     const addLine = screen.queryAllByLabelText("Add line")[1] as Element;
     expect(addLine).toBeInTheDocument();
-    await userEvent.click(addLine);
-    await userEvent.click(screen.getByLabelText(/Save/));
+    await user.click(addLine);
+    await user.click(screen.getByLabelText("Close"));
     expect(mockSetState).toHaveBeenCalledTimes(1);
     const calls = mockSetState.mock.calls[0][0];
     expect(calls.content).toBeInstanceOf(EditorV3Content);
@@ -161,6 +169,7 @@ describe("Add and remove lines", () => {
           state={{
             content,
             focus: false,
+            editable: true,
           }}
           setState={mockSetState}
         />
@@ -168,8 +177,8 @@ describe("Add and remove lines", () => {
     );
     const removeLine = screen.queryAllByLabelText("Remove line")[1] as Element;
     expect(removeLine).toBeInTheDocument();
-    await userEvent.click(removeLine);
-    await userEvent.click(screen.getByLabelText(/Save/));
+    await user.click(removeLine);
+    await user.click(screen.getByLabelText("Close"));
     expect(mockSetState).toHaveBeenCalledTimes(1);
     const calls = mockSetState.mock.calls[0][0];
     expect(calls.content).toBeInstanceOf(EditorV3Content);

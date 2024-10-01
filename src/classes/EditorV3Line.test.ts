@@ -1,11 +1,11 @@
 /* eslint-disable quotes */
 import { defaultContentProps } from "./defaultContentProps";
+import { EditorV3AtBlock } from "./EditorV3AtBlock";
 import { EditorV3Line } from "./EditorV3Line";
+import { EditorV3SelectBlock } from "./EditorV3SelectBlock";
+import { EditorV3TextBlock } from "./EditorV3TextBlock";
 import { EditorV3Align } from "./interface";
 import { textBlockFactory } from "./textBlockFactory";
-import { EditorV3AtBlock } from "./EditorV3AtBlock";
-import { EditorV3TextBlock } from "./EditorV3TextBlock";
-import { EditorV3SelectBlock } from "./EditorV3SelectBlock";
 
 describe("Check basic EditorV3Line", () => {
   test("Load string", async () => {
@@ -125,6 +125,7 @@ describe("Check basic EditorV3Line", () => {
         "</div>",
     );
     expect(testLine.lineText).toEqual("Hello\u00a0world. How is it going?");
+    expect(testLine.lineMarkdown).toEqual("Hello\u00a0world. (~(shiny::How is it going?)~)");
     expect(testLine.contentProps.textAlignment).toEqual(EditorV3Align.decimal);
   });
 
@@ -547,12 +548,14 @@ describe("Check EditorV3Line functions", () => {
       ],
       defaultContentProps,
     );
-    expect(mdLine.toMarkdown({}).textContent).toEqual("<<world::label::hello>> slow<<and?fat>>");
+    expect(mdLine.toMarkdown({}).textContent).toEqual(
+      "(~(world::label::hello)~) slow(~(and?fat)~)",
+    );
   });
 
   test("Load markdown div elements", async () => {
     const mdText =
-      "<<st1::what>> are you doing? @[st2::Hello@bloke@] fancy coming back to my <<green::color::green>>[[choose**home||green::lily pad||garage]]?";
+      "(~(st1::what)~) are you doing? @[st2::Hello@bloke**{}@] fancy coming back to my (~(green::color::green)~)(¬(choose**home||green::lily pad||garage)¬)?";
     const div = document.createElement("div");
     div.classList.add("aiev3-markdown-line");
     const text = document.createTextNode(mdText);
@@ -596,7 +599,7 @@ describe("Write space after at block", () => {
     expect(div.innerHTML).toEqual(
       '<div class="aiev3-line left">' +
         '<span class="aiev3-tb at-block is-locked" data-type="at" data-is-locked="true">@Hello</span>' +
-        '<span class="aiev3-tb">\u2009</span>' +
+        "<span>\u200b</span>" +
         "</div>",
     );
     // Set active

@@ -20,8 +20,8 @@ const mockContent = new EditorV3Content("34.45\n\nx.xx", {
 mockContent.applyStyle("shiny", { startLine: 2, startChar: 0, endLine: 2, endChar: 4 });
 
 describe("Editor and functions", () => {
+  const user = userEvent.setup({ delay: null });
   test("Draw and fire cursor events", async () => {
-    const user = userEvent.setup();
     render(
       <div data-testid="container">
         <EditorV3
@@ -130,6 +130,63 @@ describe("Editor and functions", () => {
     expect(editor.outerHTML).toMatchSnapshot();
   });
 
+  test("Enter", async () => {
+    const user = userEvent.setup({ delay: null });
+    const mockSetObject = jest.fn();
+    const mockSetText = jest.fn();
+    render(
+      <EditorV3
+        data-testid="test-editor"
+        id="test-editor"
+        input={mockContent}
+        setObject={(ret) => {
+          mockSetObject(ret);
+        }}
+        setText={(ret) => {
+          mockSetText(ret);
+        }}
+        style={{ width: "200px" }}
+        allowNewLine
+        decimalAlignPercent={70}
+        textAlignment={EditorV3Align.decimal}
+      />,
+    );
+
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
+    expect(editor).toBeInTheDocument();
+    const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    await user.click(editor.querySelector(".aiev3-editing") as HTMLElement);
+    await user.keyboard("{Home}{ArrowRight}{ArrowRight}{Enter}");
+    fireEvent.blur(editor);
+
+    expect(mockSetText).toHaveBeenCalledTimes(1);
+    expect(mockSetText).toHaveBeenLastCalledWith("34\n.45\n\nx.xx");
+    expect(mockSetObject).toHaveBeenCalledTimes(1);
+    expect(mockSetObject).toHaveBeenLastCalledWith({
+      contentProps: {
+        textAlignment: "decimal",
+        decimalAlignPercent: 70,
+        allowNewLine: true,
+      },
+      lines: [
+        {
+          textBlocks: [{ text: "34", type: "text" }],
+        },
+        {
+          textBlocks: [{ text: ".45", type: "text" }],
+        },
+        {
+          textBlocks: [{ text: "", type: "text" }],
+        },
+        {
+          textBlocks: [{ text: "x.xx", style: "shiny", type: "text" }],
+        },
+      ],
+    });
+    expect(editor.outerHTML).toMatchSnapshot();
+  });
+
   test("Delete", async () => {
     const user = userEvent.setup({ delay: null });
     const mockSetObject = jest.fn();
@@ -185,8 +242,8 @@ describe("Editor and functions", () => {
 });
 
 describe("Menu styling - add", () => {
+  const user = userEvent.setup({ delay: null });
   test("Add style", async () => {
-    const user = userEvent.setup();
     const mockSetText = jest.fn();
     render(
       <EditorV3
@@ -243,8 +300,8 @@ describe("Menu styling - add", () => {
 });
 
 describe("Menu styling - change", () => {
+  const user = userEvent.setup({ delay: null });
   test("Change style", async () => {
-    const user = userEvent.setup();
     const mockSetText = jest.fn();
     render(
       <div data-testid="container">
@@ -291,8 +348,8 @@ describe("Menu styling - change", () => {
 });
 
 describe("Menu styling - remove", () => {
+  const user = userEvent.setup({ delay: null });
   test("Remove style", async () => {
-    const user = userEvent.setup();
     const mockSetText = jest.fn();
     render(
       <EditorV3
@@ -338,8 +395,8 @@ describe("Menu styling - remove", () => {
 });
 
 describe("Menu styling - markdown", () => {
+  const user = userEvent.setup({ delay: null });
   test("Show markdown", async () => {
-    const user = userEvent.setup();
     render(
       <div data-testid="container">
         <EditorV3
@@ -369,8 +426,8 @@ describe("Menu styling - markdown", () => {
 });
 
 describe("Cut and paste", () => {
+  const user = userEvent.setup({ delay: null });
   test("Cut", async () => {
-    const user = userEvent.setup();
     const mockSetText = jest.fn();
     render(
       <EditorV3
@@ -418,7 +475,6 @@ describe("Cut and paste", () => {
   });
 
   test("Paste", async () => {
-    const user = userEvent.setup();
     const mockSetText = jest.fn();
     render(
       <EditorV3
@@ -453,7 +509,6 @@ describe("Cut and paste", () => {
   });
 
   test("Paste into single line", async () => {
-    const user = userEvent.setup();
     const mockSetText1 = jest.fn();
     const mockSetText2 = jest.fn();
     render(
@@ -491,27 +546,47 @@ describe("Cut and paste", () => {
     fireEvent.blur(editor2);
     expect(mockSetText2).toHaveBeenCalledWith("Initialtext");
   });
+
+  test("Stop drag and drop", async () => {
+    await act(async () =>
+      render(
+        <div data-testid="container">
+          <EditorV3
+            id="test-editor"
+            input={"Initial\ntext\n"}
+            setText={jest.fn()}
+            style={{ width: "200px" }}
+            allowNewLine
+            textAlignment={EditorV3Align.center}
+          />
+        </div>,
+      ),
+    );
+    // Get components
+    const editor = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
+    // Click to select all
+    await user.click(editor.querySelector("span") as HTMLSpanElement);
+    fireEvent.dragStart(editor.querySelector("span") as HTMLSpanElement);
+    expect(editor.querySelector("span")?.hasAttribute("draggable")).toBeFalsy();
+  });
 });
 
 describe("Edge events", () => {
+  const user = userEvent.setup({ delay: null });
   test("Initial focus", async () => {
     const mockSetText = jest.fn();
-    render(
-      <div data-testid="container">
-        <EditorV3
-          id="test-editor"
-          input={mockContent}
-          setText={mockSetText}
-        />
-      </div>,
+    const { container } = render(
+      <EditorV3
+        id="test-editor"
+        input={mockContent}
+        setText={mockSetText}
+      />,
     );
-    const container = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
     const editorHolder = container.querySelector("#test-editor-editable") as HTMLDivElement;
     expect(editorHolder).toBeInTheDocument();
     fireEvent.focus(editorHolder);
   });
   test("Paste error - cannot work out how to accurately throw", async () => {
-    const user = userEvent.setup();
     const mockSetText = jest.fn();
     render(
       <div data-testid="container">
@@ -527,11 +602,57 @@ describe("Edge events", () => {
     expect(editorHolder).toBeInTheDocument();
     await user.click(editorHolder.querySelector("span") as HTMLSpanElement);
   });
+
+  test("First letter in locked block is locked", async () => {
+    const mockContent = new EditorV3Content({
+      lines: [
+        {
+          textBlocks: [
+            { text: "Locked block", type: "text", style: "green", isLocked: true },
+            { text: "Another locked block", type: "text", style: "green", isLocked: true },
+          ],
+        },
+      ],
+    });
+    const mockSet = jest.fn();
+    const greenStyle = {
+      green: { backgroundColor: "green", isLocked: true },
+    };
+    const { container } = render(
+      <>
+        <EditorV3
+          data-testid="locked"
+          id="locked"
+          input={mockContent}
+          setObject={mockSet}
+          customStyleMap={greenStyle}
+        />
+        <button
+          data-testid="debug"
+          onClick={() => {
+            const debugEvent = new CustomEvent("editorv3debug", {
+              bubbles: true,
+            });
+            const editable = container.querySelector("#locked .aiev3-editing") as HTMLDivElement;
+            editable.dispatchEvent(debugEvent);
+          }}
+        />
+      </>,
+    );
+    expect(screen.queryByText("Locked block")).toBeInTheDocument();
+    expect(screen.queryByText("Locked block")).toHaveClass("editorv3style-green");
+    expect(screen.queryByText("Another locked block")).toBeInTheDocument();
+    await user.click(screen.queryByText(/locked/) as HTMLElement);
+    await user.keyboard("{Home}{ArrowRight}x");
+    const x = screen.queryByText("x") as HTMLSpanElement;
+    expect(x).toBeInTheDocument();
+    expect(x).not.toHaveClass("editorv3style-green");
+  });
 });
 
 describe("Select all", () => {
+  const user = userEvent.setup({ delay: null });
   test("Programmer notes", async () => {
-    const user = userEvent.setup();
     const mockSet = jest.fn();
     render(
       <EditorV3
@@ -581,9 +702,60 @@ describe("Select all", () => {
       ],
     });
   });
+
+  test("Cannot type in locked block + extra", async () => {
+    const mockSet = jest.fn();
+    const greenStyle = { green: { backgroundColor: "green", isLocked: true } };
+    render(
+      <EditorV3
+        data-testid="locked"
+        id="locked"
+        input={{
+          lines: [
+            {
+              textBlocks: [
+                { text: "Locked block", type: "text", style: "green", isLocked: true },
+                {
+                  text: " - unlocked",
+                  type: "text",
+                },
+              ],
+            },
+          ],
+        }}
+        setObject={mockSet}
+        customStyleMap={greenStyle}
+      />,
+    );
+    const editable = screen
+      .queryByTestId("locked")
+      ?.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    await user.click(editable);
+    // Try and type into everything selected
+    await user.keyboard("x");
+    expect(screen.queryByText("Locked block")).toBeInTheDocument();
+    // Try and type after removing whole selection
+    await user.keyboard("{Home}x");
+    fireEvent.blur(editable);
+    expect(mockSet).toHaveBeenCalledTimes(1);
+    expect(mockSet.mock.calls[0][0]).toEqual({
+      lines: [
+        {
+          textBlocks: [
+            { text: "x", type: "text" },
+            { text: "Locked block", type: "text", style: "green", isLocked: true },
+            { text: " - unlocked", type: "text" },
+          ],
+        },
+      ],
+      contentProps: { styles: greenStyle },
+    });
+  });
 });
 
 describe("Undo/redo", () => {
+  const user = userEvent.setup({ delay: null });
   const TestContainer = () => {
     const [input, setInput] = useState<IEditorV3>(new EditorV3Content());
     return (
@@ -601,7 +773,6 @@ describe("Undo/redo", () => {
     );
   };
   test("Undo/redo", async () => {
-    const user = userEvent.setup();
     render(<TestContainer />);
     const editable = screen
       .queryByTestId("test-editor")
@@ -629,6 +800,7 @@ describe("Undo/redo", () => {
 });
 
 describe("Updates from above", () => {
+  const user = userEvent.setup({ delay: null });
   const TestContainer = () => {
     const [input, setInput] = useState("Before");
     const [textAlignment, setTextAlignment] = useState<EditorV3Align>(EditorV3Align.left);
@@ -679,7 +851,6 @@ describe("Updates from above", () => {
   };
 
   test("Change input", async () => {
-    const user = userEvent.setup();
     render(<TestContainer />);
     const editor = screen.getByTestId("editor");
     expect(screen.queryByText("Before")).toBeInTheDocument();
@@ -691,7 +862,6 @@ describe("Updates from above", () => {
   });
 
   test("Change alignment", async () => {
-    const user = userEvent.setup();
     render(<TestContainer />);
     const editor = screen.getByTestId("editor");
     expect(screen.queryByText("Before")).toBeInTheDocument();
@@ -701,7 +871,6 @@ describe("Updates from above", () => {
   });
 
   test("Change decimal align percent", async () => {
-    const user = userEvent.setup();
     render(<TestContainer />);
     const editor = screen.getByTestId("editor");
     expect(screen.queryByText("Before")).toBeInTheDocument();
@@ -711,7 +880,6 @@ describe("Updates from above", () => {
   });
 
   test("Change styles", async () => {
-    const user = userEvent.setup();
     render(<TestContainer />);
     const editor = screen.getByTestId("editor");
     expect(screen.queryByText("Before")).toBeInTheDocument();
@@ -721,7 +889,6 @@ describe("Updates from above", () => {
   });
 
   test("Change markdown settings", async () => {
-    const user = userEvent.setup();
     render(<TestContainer />);
     const editor = screen.getByTestId("editor");
     // Click show markdown
@@ -746,22 +913,6 @@ describe("Updates from above", () => {
 });
 
 describe("Add at block and escape out", () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-    // Define offsetParent for HTMLElement
-    Object.defineProperty(HTMLElement.prototype, "offsetParent", {
-      get() {
-        return this.parentNode;
-      },
-    });
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
-  const runTimers = async () => jest.runAllTimers();
-
   const user = userEvent.setup({ delay: null });
   const TestEditor = (props: {
     setText: (ret: string) => void;
@@ -847,10 +998,10 @@ describe("Add at block and escape out", () => {
     await user.click(editable);
     await user.keyboard("@");
 
-    await runTimers();
-    expect(editor.querySelectorAll("li.aiev3-drop-item").length).toEqual(5);
+    await act(async () => jest.runAllTimers());
+    expect(document.body.querySelectorAll("li.aiev3-drop-item").length).toEqual(5);
     expect(screen.queryByText("...24 more")).toBeInTheDocument();
-    expect(editor.outerHTML).toMatchSnapshot();
+    expect(document.body.innerHTML).toMatchSnapshot();
   });
 });
 
@@ -1012,12 +1163,6 @@ describe("Move left to start over at block", () => {
 
 describe("Window view", () => {
   const user = userEvent.setup({ delay: null });
-  beforeEach(() => {
-    jest.useFakeTimers();
-  });
-  afterEach(() => {
-    jest.useRealTimers();
-  });
   test("Show window view", async () => {
     render(
       <ContextWindowStack>
@@ -1043,5 +1188,50 @@ describe("Window view", () => {
 
     const textInput = screen.queryByLabelText("Text") as HTMLInputElement;
     await user.type(textInput, " - added text");
+  });
+});
+
+describe("Check custom refresh event", () => {
+  test("Click on select block", async () => {
+    const mockSet = jest.fn();
+    await act(async () =>
+      render(
+        <EditorV3
+          data-testid="test-editor"
+          id="test-editor"
+          input="Initial text"
+          setText={mockSet}
+          resize="vertical"
+        />,
+      ),
+    );
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
+    expect(editor).toBeInTheDocument();
+    const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    // Focus firtt
+    await act(async () => {
+      fireEvent.focus(editable);
+    });
+    // Hard coded javascript text change + event
+    await act(async () => {
+      const text = editable.querySelectorAll("span")[1] as HTMLSpanElement;
+      expect(text).toBeInTheDocument();
+      text.innerHTML = "text with extra";
+      const refreshEvent = new CustomEvent("editorv3refresh", {
+        bubbles: true,
+        detail: {
+          target: text,
+        },
+      });
+      text.dispatchEvent(refreshEvent);
+      jest.runAllTimers();
+    });
+    // Blur and check update has been picked up
+    await act(async () => {
+      fireEvent.blur(editable);
+    });
+    expect(mockSet).toHaveBeenCalledTimes(1);
+    expect(mockSet).toHaveBeenLastCalledWith("Initial text with extra");
   });
 });

@@ -168,14 +168,15 @@ export class EditorV3Content implements IEditorV3 {
       );
     }
   }
-  public isCaretLocked(pos = this._caretPosition) {
-    let ret = false;
-    if (pos && pos.startLine >= 0 && pos.endLine < this.lines.length) {
-      const startBlock = this.lines[pos.startLine].getBlockAt(pos.startChar);
-      const endBlock = this.lines[pos.endLine].getBlockAt(pos.endChar);
-      ret = (startBlock && startBlock.isLocked) || (endBlock && endBlock.isLocked) || false;
-    }
-    return ret;
+  /**
+   * Indicates if the current content can be updated with this selection
+   * @param pos
+   * @returns boolean
+   */
+  public isCaretLocked(pos = this._caretPosition): boolean {
+    if (!pos || pos.isCollapsed) return false;
+    const selectedBlocks = this.subLines(pos).flatMap((l) => l.textBlocks);
+    return selectedBlocks.length > 1 && selectedBlocks.some((b) => b.isLocked);
   }
   private get _isLockable() {
     return this.lines.some((l) => l.textBlocks.some((tb) => tb.type === "at" && !tb.isLocked));
@@ -185,7 +186,14 @@ export class EditorV3Content implements IEditorV3 {
    * Text from the element
    */
   get text(): string {
-    return this.lines.map((l) => l.textBlocks.map((b) => b.text).join("")).join("\n");
+    return this.lines.map((l) => l.lineText).join("\n");
+  }
+
+  /**
+   * Markdown text from the element
+   */
+  get markdownText(): string {
+    return this.lines.map((l) => l.lineMarkdown).join("\n");
   }
 
   /**
@@ -227,22 +235,6 @@ export class EditorV3Content implements IEditorV3 {
   }
 
   /**
-   * Create a new EditorV3Content instance for this object
-   * @returns HTMLDivElement with content properties
-   */
-  private _contentPropsNode(): HTMLDivElement {
-    const cpn = document.createElement("div");
-    cpn.className = "aiev3-contents-info";
-    Object.keys(this.data.contentProps ?? {})
-      .sort((a, b) => a.localeCompare(b))
-      .forEach((k) => {
-        const key = k as keyof typeof defaultContentProps;
-        cpn.dataset[key] = JSON.stringify(this[key]);
-      });
-    return cpn;
-  }
-
-  /**
    * Element to render
    */
   public toHtml(renderProps: EditorV3RenderProps): DocumentFragment {
@@ -250,7 +242,6 @@ export class EditorV3Content implements IEditorV3 {
     // Add each line to the element
     this.lines.forEach((l) => ret.append(l.toHtml(renderProps)));
     // Add content properties node
-    ret.append(this._contentPropsNode());
     if (renderProps.editableEl) renderProps.editableEl.append(ret);
     return ret;
   }
@@ -264,7 +255,6 @@ export class EditorV3Content implements IEditorV3 {
     const ret = new DocumentFragment();
     // Add content to the element
     this.lines.forEach((l) => ret.append(l.toMarkdown(renderProps)));
-    ret.append(this._contentPropsNode());
     if (renderProps.editableEl) renderProps.editableEl.append(ret);
     return ret;
   }
@@ -279,8 +269,11 @@ export class EditorV3Content implements IEditorV3 {
     // Process incoming data
     try {
       if (arg instanceof HTMLDivElement) {
+        // Remove skip-read elements
+        const skipRead = arg.querySelectorAll(".skip-read");
+        skipRead.forEach((el) => el.remove());
         // Read in HTML
-        const r = readV3Html(arg.innerHTML, props);
+        const r = readV3Html(arg.innerHTML, props ?? this.contentProps);
         this._copyImport(r);
         this.caretPositionF = getCaretPosition(arg);
       } else if (typeof arg === "string") {
@@ -299,7 +292,7 @@ export class EditorV3Content implements IEditorV3 {
       // Establish input as string
       const inputString = (arg instanceof HTMLDivElement ? arg.outerHTML : arg) as string;
       // Read in v3 HTML/text
-      const r = readV3Html(inputString, props);
+      const r = readV3Html(inputString, props ?? this.contentProps);
       this._copyImport(r, props);
     }
 
@@ -307,6 +300,9 @@ export class EditorV3Content implements IEditorV3 {
     if (props) {
       this._updateProps(props);
       this.lines.map((l) => (l.contentProps = this.contentProps));
+    }
+    if (this.lines.length === 0) {
+      this.lines = [new EditorV3Line()];
     }
   }
 
@@ -345,15 +341,15 @@ export class EditorV3Content implements IEditorV3 {
    * Loads a string into the content.  Will attempt to parse as JSON, then as HTML/text
    * @param arg string input
    */
-  public loadString(arg: string) {
+  public loadString(arg: string, props?: EditorV3ContentPropsInput) {
     try {
       // Check for stringified class input
       const jsonInput: IEditorV3 = JSON.parse(arg);
       if (!Array.isArray(jsonInput.lines)) throw "No lines";
-      this._copyImport(jsonInput);
+      this._copyImport(jsonInput, props);
     } catch {
       // Read in v3 HTML/text
-      const r = readV3Html(arg);
+      const r = readV3Html(arg, props ?? this.contentProps);
       this._copyImport(r);
     }
   }
@@ -653,7 +649,7 @@ export class EditorV3Content implements IEditorV3 {
       setCaretPosition(editableEl, this._caretPosition);
     }
     // Remove window selection if not focused, but the current window selection is inside the editableEl's parent
-    if (
+    else if (
       !focus &&
       window.getSelection()?.anchorNode instanceof HTMLElement &&
       (window.getSelection()?.anchorNode as HTMLElement).closest(".aiev3")?.contains(editableEl)
@@ -715,6 +711,10 @@ export class EditorV3Content implements IEditorV3 {
     ) {
       e.stopPropagation();
       e.preventDefault();
+      if (this._caretPosition === null) {
+        // console.warn("Setting caret position to 0,0");
+        this.caretPosition = { startLine: 0, startChar: 0, endLine: 0, endChar: 0 };
+      }
       switch (e.key) {
         case "ArrowLeft":
           this._caretPosition.moveLeft(e.shiftKey, e.ctrlKey);
@@ -759,6 +759,18 @@ export class EditorV3Content implements IEditorV3 {
       this.caretPosition = this.splitLine(this._caretPosition);
     } else if (this._caretPosition) {
       this._caretPosition.lastAction = "keydown";
+      // Reset a locked block to no style if it is the active block
+      const activeBlock = this.lines[this._caretPosition.startLine].getBlockAt(
+        this._caretPosition.startChar,
+      );
+      if (
+        activeBlock &&
+        (activeBlock ===
+          this.lines[this._caretPosition.endLine].getBlockAt(this._caretPosition.endChar),
+        activeBlock.isLocked && !this._caretPosition.isCollapsed)
+      ) {
+        activeBlock.style = undefined;
+      }
     }
   }
 

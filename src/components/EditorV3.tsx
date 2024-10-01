@@ -28,7 +28,7 @@ export interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
   textAlignment?: EditorV3Align;
   decimalAlignPercent?: number;
   style?: CSSProperties;
-  resize?: boolean;
+  resize?: boolean | "vertical";
   noBorder?: boolean;
   spellCheck?: boolean;
   styleOnContextMenu?: boolean;
@@ -43,6 +43,7 @@ export interface EditorV3Props extends React.HTMLAttributes<HTMLDivElement> {
 export interface EditorV3State {
   content: EditorV3Content;
   focus: boolean;
+  editable: boolean;
 }
 
 export const EditorV3 = ({
@@ -68,8 +69,11 @@ export const EditorV3 = ({
   maxAtListLength = 10,
   ...rest
 }: EditorV3Props): JSX.Element => {
+  // Set up reference to main div
+  const mainRef = useRef<HTMLDivElement | null>(null);
   // Set up reference to inner div
   const divRef = useRef<HTMLDivElement | null>(null);
+  // other state variables
   const [showMarkdown, setShowMarkdown] = useState<boolean>(false);
   const [showWindowView, setShowWindowView] = useState<boolean>(false);
   const [inputDecode, setInputDecode] = useState<EditorV3State>({
@@ -84,8 +88,8 @@ export const EditorV3 = ({
       allowNewLine,
     }),
     focus: false,
+    editable,
   });
-
   const contentProps = useMemo((): EditorV3ContentPropsInput => {
     return {
       ...defaultContentProps,
@@ -115,7 +119,7 @@ export const EditorV3 = ({
   const [hasFocused, setHasFocused] = useState<boolean>(false);
   const [lastInput, setLastInput] = useState<string | IEditorV3>(input);
   const [lastCaretPosition, setLastCaretPosition] = useState<EditorV3Position | null>(null);
-  const [lastAction, setLastAction] = useState<"Focus" | "Blur" | "Key" | "">("");
+  const [lastAction, setLastAction] = useState<"Focus" | "Blur" | "Key" | "Refresh" | "">("");
   const [lastTextSent, setLastTextSent] = useState<string>(
     typeof input === "object"
       ? input.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("")).join("\n")
@@ -127,6 +131,7 @@ export const EditorV3 = ({
       : { lines: input.split("\n").map((l) => ({ textBlocks: [{ text: l }] })) },
   );
 
+  // #region Handling update
   const returnData = useCallback(
     (ret: EditorV3State) => {
       // Block return when there is an active at-block, or if the editor has never been focused
@@ -157,9 +162,7 @@ export const EditorV3 = ({
   // Redraw element, used in debounced stack as onChange callback
   const redrawElement = useCallback((ret: EditorV3State) => {
     // console.debug(
-    //   "Redraw element:\r\n",
-    //   ret.content.lines.map((l) => l.toMarkdown({}).textContent).join("\n"),
-    //   JSON.stringify(ret.content.caretPosition),
+    //   `Redraw element:\r\n${ret.content.lines.map((l) => l.toMarkdown({}).textContent).join("\n")}\n${JSON.stringify(ret.content.caretPosition)}`,
     // );
     divRef.current && ret.content.redraw(divRef.current, ret.focus);
   }, []);
@@ -195,16 +198,16 @@ export const EditorV3 = ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (newContent: EditorV3Content, calledFrom?: string, focus?: boolean) => {
       // console.debug(
-      //   "SetContent:" + calledFrom + ":\r\n",
-      //   newContent.lines.map((l) => l.toMarkdown({}).textContent).join("\n"),
+      //   `SetContent:${calledFrom}\r\n${newContent.lines.map((l) => l.toMarkdown({}).textContent).join("\n")}\n${JSON.stringify(newContent.caretPosition)}`,
       // );
       setLastCaretPosition(newContent.caretPosition);
       setCurrentValue({
         content: newContent,
         focus: focus ?? state?.focus ?? false,
+        editable,
       });
     },
-    [setCurrentValue, state],
+    [editable, setCurrentValue, state?.focus],
   );
 
   // Update any content property from parent
@@ -213,7 +216,7 @@ export const EditorV3 = ({
       const newContent = new EditorV3Content(divRef.current, contentProps);
       setContent(newContent, "Update content props from parent");
     }
-  });
+  }, [contentProps, editable, setContent, state]);
 
   // Update input from parent, need to track the last string input separately from the debounce stack
   useEffect(() => {
@@ -241,12 +244,14 @@ export const EditorV3 = ({
     redrawElement,
     setContent,
   ]);
+  // #endregion Handling update
 
+  // #region Input utilities
   // Set up menu items
   const menuItems = useMemo((): MenuItem[] => {
     if (state) {
       const styleMenuItem: MenuItem[] =
-        !state.content.styles || Object.keys(state.content.styles).length === 0
+        !editable || !state.content.styles || Object.keys(state.content.styles).length === 0
           ? []
           : [
               {
@@ -259,7 +264,7 @@ export const EditorV3 = ({
                       disabled:
                         state.content.showMarkdown ||
                         state.content.isCaretLocked() ||
-                        (state.content.styles as EditorV3Styles)[s].isNotAvailabe ||
+                        (state.content.styles as EditorV3Styles)[s].isNotAvailable ||
                         state.content.caretPosition?.isCollapsed,
                       action: () => {
                         if (divRef.current) {
@@ -316,16 +321,48 @@ export const EditorV3 = ({
       return [...styleMenuItem, ...showMarkdownMenu, ...showWindowViewMenu];
     }
     return [];
-  }, [state, allowMarkdown, allowWindowView, showWindowView, contentProps, setContent]);
+  }, [state, editable, allowMarkdown, allowWindowView, showWindowView, contentProps, setContent]);
+
+  const handleRefreshEvent = useCallback(
+    (e: Event) => {
+      e.stopPropagation();
+      e.preventDefault();
+      setLastAction("Refresh");
+      if (divRef.current) {
+        const newContent = new EditorV3Content(divRef.current, contentProps);
+        newContent.caretPosition = {
+          startLine: newContent.caretPosition?.endLine ?? 0,
+          startChar: newContent.caretPosition?.endChar ?? 0,
+          endLine: newContent.caretPosition?.endLine ?? 0,
+          endChar: newContent.caretPosition?.endChar ?? 0,
+        };
+        window.setTimeout(() => {
+          setContent(newContent, "Handle refresh event");
+        }, 5);
+      }
+    },
+    [contentProps, setContent],
+  );
+
+  useEffect(() => {
+    if (divRef.current) {
+      const divRefCurrent = divRef.current;
+      divRefCurrent.addEventListener("editorv3refresh", handleRefreshEvent);
+      return () => {
+        divRefCurrent?.removeEventListener("editorv3refresh", handleRefreshEvent);
+      };
+    }
+  }, [handleRefreshEvent]);
 
   // Focus and blur events are container not contenteditable level events!
   const handleFocus = useCallback(
     (e: React.FocusEvent | React.MouseEvent) => {
       if (
         state &&
+        mainRef.current &&
         divRef.current &&
         e.target instanceof Node &&
-        (divRef.current === e.target || divRef.current.contains(e.target))
+        (mainRef.current === e.target || mainRef.current.contains(e.target))
       ) {
         // Get current content
         const newContent = new EditorV3Content(divRef.current, contentProps);
@@ -334,7 +371,9 @@ export const EditorV3 = ({
           startLine: 0,
           startChar: 0,
           endLine: newContent.lines.length - 1,
-          endChar: newContent.lines[newContent.lines.length - 1].lineLength,
+          endChar: newContent.showMarkdown
+            ? newContent.lines[newContent.lines.length - 1].lineMarkdown.length
+            : newContent.lines[newContent.lines.length - 1].lineLength,
           isCollapsed: false,
         };
         setLastAction("Focus");
@@ -353,10 +392,12 @@ export const EditorV3 = ({
       newContent.caretPosition = null;
       setLastAction("Blur");
       setLastCaretPosition(null);
-      forceReturn({ content: newContent, focus: false });
+      forceReturn({ content: newContent, focus: false, editable });
     }
-  }, [state, contentProps, forceReturn]);
+  }, [state, contentProps, forceReturn, editable]);
+  // #endregion Input utilities
 
+  // #region Handle key/mouse events
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (divRef.current && state && !state.content.showMarkdown) {
@@ -369,20 +410,28 @@ export const EditorV3 = ({
           e.stopPropagation();
           e.preventDefault();
           redo();
+        }
+        // Block (non-movement) key down when the caret is locked
+        else if (
+          state.content.isCaretLocked() &&
+          !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(e.key)
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
         } else if (
           !(
             // Ignore key down on metakeys
             ["Control", "Shift", "Alt"].includes(e.key)
           )
         ) {
-          // Get current information and update content buffer
+          // Get current information and update content buffer for positions
           const newContent = new EditorV3Content(divRef.current, contentProps);
           newContent.handleKeydown(e);
           setContent(newContent, `Handle key down: ${e.key}`);
         }
       }
     },
-    [state, contentProps, redo, setContent, undo],
+    [contentProps, redo, setContent, state, undo],
   );
 
   const handleKeyUp = useCallback(
@@ -433,11 +482,21 @@ export const EditorV3 = ({
               ]);
             }
           }
+          // Handle cursor null after pressing enter - jest does not cover this, browser specific
+          /* c8 ignore start */
+          else if (
+            e.key === "Enter" &&
+            newContent.caretPosition === null &&
+            lastCaretPosition !== null
+          ) {
+            newContent.caretPosition = lastCaretPosition;
+          }
+          /* c8 ignore end */
           setContent(newContent, `Handle key up: ${e.key}`);
         }
       }
     },
-    [atListFunction, contentProps, setContent, state],
+    [atListFunction, contentProps, lastCaretPosition, setContent, state],
   );
 
   const handleMouseUp = useCallback(
@@ -462,7 +521,9 @@ export const EditorV3 = ({
     },
     [contentProps, setContent],
   );
+  // #endregion Handle key/mouse events
 
+  // #region Handle clipboard events
   const handleCopy = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
       if (divRef.current) {
@@ -485,23 +546,45 @@ export const EditorV3 = ({
     [contentProps, setContent],
   );
 
+  const handleBlock = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+  // #endregion Handle clipboard events
+
+  // #region Style recalculation
   const styleRecalc = useMemo(() => {
     const s = { ...style };
-    if (resize) {
-      s.resize = "both";
-      s.overflow = "auto";
+    switch (resize) {
+      case "vertical":
+        s.resize = "vertical";
+        s.overflow = "auto";
+        break;
+      case true:
+        s.resize = "both";
+        s.overflow = "auto";
+        break;
     }
     if (showWindowView) {
-      s.backgroundColor = "rgba(0, 0, 0, 0.3)";
+      s.backgroundColor = "rgba(0, 0, 0, 0.2)";
     }
     return s;
   }, [resize, showWindowView, style]);
+  // #endregion Style recalculation
 
   return (
     <>
       <div
         {...rest}
-        className={`aiev3${state?.focus ? " editing" : ""}${rest.className ? ` ${rest.className}` : ""}`}
+        ref={mainRef}
+        className={[
+          "aiev3",
+          editable ? "" : "disabled",
+          state?.focus ? "editing" : "",
+          rest.className ?? "",
+        ]
+          .filter((c) => c.trim() !== "")
+          .join(" ")}
         id={id}
         onFocusCapture={(e) => {
           e.preventDefault();
@@ -552,11 +635,17 @@ export const EditorV3 = ({
               }
               spellCheck={spellCheck}
               ref={divRef}
-              onCopyCapture={handleCopy}
-              onCutCapture={handleCopy}
               onKeyDownCapture={handleKeyDown}
               onKeyUpCapture={handleKeyUp}
+              onCutCapture={handleCopy}
+              onCopyCapture={handleCopy}
               onPasteCapture={handlePaste}
+              onDragStart={handleBlock}
+              onDragOver={handleBlock}
+              onDrop={handleBlock}
+              onDragEnter={handleBlock}
+              onDragLeave={handleBlock}
+              onDragEnd={handleBlock}
             />
           </div>
         </ContextMenuHandler>
@@ -567,7 +656,8 @@ export const EditorV3 = ({
           showWindowView={showWindowView}
           setShowWindowView={setShowWindowView}
           state={state}
-          setState={(state: EditorV3State) => setContent(state.content, "Window", false)}
+          setState={forceReturn}
+          includeAt={atListFunction !== undefined}
         />
       )}
     </>

@@ -10,7 +10,7 @@ describe("Styles Editor tests", () => {
       isLocked: true,
     },
     Blue: { color: "blue", fontWeight: 700 },
-    Red: { color: "red", isNotAvailabe: true, fontSize: "LARGE" },
+    Red: { color: "red", isNotAvailable: true, fontSize: "LARGE" },
   };
 
   test("Basic render", async () => {

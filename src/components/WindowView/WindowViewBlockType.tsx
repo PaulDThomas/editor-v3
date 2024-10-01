@@ -1,57 +1,63 @@
-import { useId } from "react";
+import { useContext, useId, useMemo } from "react";
 import { EditorV3TextBlockType } from "../../classes/EditorV3TextBlock";
-import baseStyles from "../BaseInputs.module.css";
+import { BaseSelect } from "../ObjectEditor/BaseSelect";
+import { WindowViewContext } from "./WindowView";
+import { UPDATE_BLOCK_TYPE } from "./windowViewReducer";
 
-interface WindowViewBlockTypeProps extends React.ComponentProps<"select"> {
-  includeAt: boolean;
-  type: EditorV3TextBlockType;
-  setType: (type: EditorV3TextBlockType) => void;
+interface WindowViewBlockTypeProps {
+  lineIndex: number;
+  blockIndex: number;
 }
 
-export const WindowViewBlockType = ({
-  type,
-  setType,
-  includeAt,
-  ...rest
-}: WindowViewBlockTypeProps) => {
+export const WindowViewBlockType = ({ lineIndex, blockIndex }: WindowViewBlockTypeProps) => {
+  const wvc = useContext(WindowViewContext);
+  const thisLine = wvc?.lines[lineIndex];
+  const thisBlock = thisLine?.textBlocks[blockIndex];
   const selectTypeId = useId();
 
-  return (
-    <div
-      className={baseStyles.holder}
-      style={{ flexShrink: 1, width: "auto" }}
-    >
-      <label
-        id={`label-${selectTypeId}`}
-        className={baseStyles.label}
-        htmlFor={selectTypeId}
-      >
-        Type
-      </label>
-      <select
-        {...rest}
-        aria-labelledby={`label-${selectTypeId}`}
-        id={selectTypeId}
-        className={baseStyles.baseSelect}
-        value={type}
-        onChange={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          setType(e.currentTarget.value as EditorV3TextBlockType);
-        }}
-      >
-        <option value="text">Text</option>
-        <option value="select">Select</option>
-        {includeAt && (
-          <option
-            value="at"
-            disabled
-          >
-            At
-          </option>
-        )}
-      </select>
-    </div>
+  const availableOptions = useMemo(() => {
+    const ret: { label: string; value: string; disabled?: boolean }[] = [];
+    if (wvc) {
+      ret.push(
+        ...[
+          {
+            label: "Text",
+            value: "text",
+          },
+          {
+            label: "Select",
+            value: "select",
+          },
+        ],
+      );
+      if (wvc.includeAt)
+        ret.push({
+          label: "At",
+          value: "at",
+          disabled: true,
+        });
+    }
+    return ret;
+  }, [wvc]);
+
+  return !wvc || !thisBlock ? (
+    <></>
+  ) : (
+    <BaseSelect
+      id={selectTypeId}
+      label="Type"
+      value={thisBlock.type}
+      availableOptions={availableOptions}
+      disabled={!wvc.editable}
+      change={(ret) => {
+        wvc.dispatch({
+          operation: UPDATE_BLOCK_TYPE,
+          lineIndex,
+          blockIndex,
+          blockType: ret as EditorV3TextBlockType,
+        });
+      }}
+    />
   );
 };
 

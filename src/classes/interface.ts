@@ -18,7 +18,7 @@ export enum EditorV3Align {
  */
 export interface EditorV3Style extends React.CSSProperties {
   isLocked?: boolean;
-  isNotAvailabe?: boolean;
+  isNotAvailable?: boolean;
 }
 export interface EditorV3Styles extends Record<string, EditorV3Style> {
   [styleName: string]: EditorV3Style;

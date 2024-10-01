@@ -18,6 +18,9 @@ export const ItemInput = ({ dataPoint, ...rest }: ItemInputProps) => {
   const thisOptionValues = objectEditorContext?.objectTemplate.find(
     (item) => item.name === thisOption,
   )?.options;
+  const thisOptionLabel =
+    objectEditorContext?.objectTemplate.find((item) => item.name === thisOption)?.label ??
+    thisOption;
   const thisValueRaw = get(objectEditorContext?.object, dataPoint) as
     | string
     | number
@@ -43,24 +46,24 @@ export const ItemInput = ({ dataPoint, ...rest }: ItemInputProps) => {
           id={`id-${dataPoint}`}
           checked={(thisValueRaw ?? false) as boolean}
           change={handleChange}
-          label={thisOption}
+          label={thisOptionLabel}
           {...rest}
         />
       ) : thisOptionType === "select" && thisOptionValues ? (
         <BaseSelect
           id={`id-${dataPoint}`}
-          value={thisValueRaw}
+          value={thisValueRaw as string | number | undefined}
           availableOptions={thisOptionValues}
           change={handleChange}
-          label={thisOption}
+          label={thisOptionLabel}
           {...rest}
         />
       ) : (
         <BaseInput
           id={`id-${dataPoint}`}
-          value={thisValueRaw}
+          value={thisValueRaw as string | number | undefined}
           change={handleChange}
-          label={thisOption}
+          label={thisOptionLabel}
           {...rest}
         />
       )}

@@ -2,20 +2,44 @@
   position: relative;
   width: 100%;
   height: 100%;
+  min-height: fit-content;
   display: flex;
   flex-direction: column;
   justify-content: center;
   overflow: hidden;
-}
-
-.aiev3-resize {
-  width: 100%;
-  height: 100%;
+  box-sizing: content-box;
 }
 
 .aiev3:focus,
 .aiev3:hover {
   overflow: visible;
+}
+
+.aiev3-resize {
+  width: 100%;
+  height: 100%;
+  min-height: 1.5em;
+  overflow: auto;
+  position: relative;
+}
+
+.aiev3-resize::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.aiev3-resize::-webkit-scrollbar-track {
+  border-radius: 100px;
+}
+
+.aiev3-resize::-webkit-scrollbar-thumb {
+  background: grey;
+  border: none;
+  border-radius: 100px;
+}
+
+.aiev3-resize::-webkit-scrollbar-thumb:hover {
+  background: darkslategrey;
 }
 
 .aiev3-resize-border {
@@ -26,13 +50,12 @@
 .aiev3-editing {
   padding: 2px;
   outline: 0;
-  align-content: start;
   vertical-align: top;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 0;
   min-height: calc(100% - 5px);
-  height: fit-content;
+  height: auto;
 }
 
 .aiev3-resize-border .aiev3-editing {
@@ -40,14 +63,23 @@
   width: calc(100% - 4px);
 }
 
-.aiev3.editing .aiev3-editing {
+.aiev3.editing .aiev3-resize {
   background-color: white;
 }
 
-.aiev3-line {
+.aiev3-line,
+.aiev3-markdown-line {
+  display: flex;
   width: 100%;
+  min-width: fit-content;
+  padding-top: 1px;
+  padding-bottom: 1px;
   flex-wrap: wrap;
   max-width: 100%;
+  flex-shrink: 0;
+  white-space: nowrap;
+  align-items: center;
+  min-height: 1.5em;
 }
 
 .aiev3-line.decimal {
@@ -99,31 +131,9 @@
   grid-column: 2;
 }
 
-/* Potential theme export from https://fluentuipr.z22.web.core.windows.net/heads/master/theming-designer/index.html
-const myTheme = createTheme({
-  palette: {
-    themePrimary: '#bd500d',
-    themeLighterAlt: '#fcf7f3',
-    themeLighter: '#f4ded0',
-    themeLight: '#ebc3aa',
-    themeTertiary: '#d78d5f',
-    themeSecondary: '#c56124',
-    themeDarkAlt: '#aa480c',
-    themeDark: '#8f3d0a',
-    themeDarker: '#6a2d07',
-    neutralLighterAlt: '#ece5de',
-    neutralLighter: '#e8e2da',
-    neutralLight: '#ded8d1',
-    neutralQuaternaryAlt: '#cfcac3',
-    neutralQuaternary: '#c6c0ba',
-    neutralTertiaryAlt: '#beb9b3',
-    neutralTertiary: '#02000b',
-    neutralSecondary: '#02010f',
-    neutralSecondaryAlt: '#02010f',
-    neutralPrimaryAlt: '#030113',
-    neutralPrimary: '#050121',
-    neutralDark: '#04011a',
-    black: '#04011e',
-    white: '#f2ece4',
-  }});
-*/
+.aiev3-tb {
+  height: 1.4em;
+  min-height: 1.4em;
+  line-height: 1.4em;
+  white-space: nowrap;
+}

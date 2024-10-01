@@ -4,20 +4,6 @@ import { EditorV3AtBlock } from "./EditorV3AtBlock";
 import { EditorV3DropListItem } from "./interface";
 
 describe("EditorV3AtBlock", () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-    // Define offsetParent for HTMLElement
-    Object.defineProperty(HTMLElement.prototype, "offsetParent", {
-      get() {
-        return this.parentNode;
-      },
-    });
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
   test("should return a DocumentFragment with the correct structure", () => {
     const text = "Hello, world!";
     const style = "bold";
@@ -109,53 +95,42 @@ describe("EditorV3AtBlock", () => {
 
 describe("should return a DocumentFragment with a dropdown", () => {
   const atListFunction = (typedString: string) =>
-    new Promise<EditorV3DropListItem<{ email: string }>[]>((resolve) => {
-      const available: EditorV3DropListItem<{ email: string }>[] = [
-        { text: "@one", data: { email: "one" } },
-        { text: "@two", data: { email: "two" } },
-        { text: "@three", data: { email: "three" } },
-        { text: "@four", data: { email: "four" } },
-        { text: "@five", data: { email: "five" } },
-        { text: "@six", data: { email: "six" } },
-        { text: "@seven", data: { email: "seven" } },
-        { text: "@eight", data: { email: "eight" } },
-        { text: "@nine", data: { email: "nine" } },
-        { text: "@ten", data: { email: "ten" } },
-        { text: "@eleven", data: { email: "eleven" } },
-        { text: "@twelve", data: { email: "twelve" } },
-        { text: "@thirteen", data: { email: "thirteen" } },
-        { text: "@fourteen", data: { email: "fourteen" } },
-        { text: "@fifteen", data: { email: "fifteen" } },
-        { text: "@sixteen", data: { email: "sixteen" } },
-        { text: "@seventeen", data: { email: "seventeen" } },
-        { text: "@eighteen", data: { email: "eighteen" } },
-        { text: "@nineteen", data: { email: "nineteen" } },
-        { text: "@twenty", data: { email: "twenty" } },
-      ];
-      resolve(
-        available.filter((item) => item.text.toLowerCase().includes(typedString.toLowerCase())),
-      );
-    });
-
-  beforeEach(() => {
-    jest.useFakeTimers();
-    // Define offsetParent for HTMLElement
-    Object.defineProperty(HTMLElement.prototype, "offsetParent", {
-      get() {
-        return this.parentNode;
-      },
-    });
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
-  });
+    new Promise<EditorV3DropListItem<{ email: string }>[]>((resolve) =>
+      window.setTimeout(() => {
+        const available: EditorV3DropListItem<{ email: string }>[] = [
+          { text: "@one", data: { email: "one" } },
+          { text: "@two", data: { email: "two" } },
+          { text: "@three", data: { email: "three" } },
+          { text: "@four", data: { email: "four" } },
+          { text: "@five", data: { email: "five" } },
+          { text: "@six", data: { email: "six" } },
+          { text: "@seven", data: { email: "seven" } },
+          { text: "@eight", data: { email: "eight" } },
+          { text: "@nine", data: { email: "nine" } },
+          { text: "@ten", data: { email: "ten" } },
+          { text: "@eleven", data: { email: "eleven" } },
+          { text: "@twelve", data: { email: "twelve" } },
+          { text: "@thirteen", data: { email: "thirteen" } },
+          { text: "@fourteen", data: { email: "fourteen" } },
+          { text: "@fifteen", data: { email: "fifteen" } },
+          { text: "@sixteen", data: { email: "sixteen" } },
+          { text: "@seventeen", data: { email: "seventeen" } },
+          { text: "@eighteen", data: { email: "eighteen" } },
+          { text: "@nineteen", data: { email: "nineteen" } },
+          { text: "@twenty", data: { email: "twenty" } },
+        ];
+        resolve(
+          available.filter((item) => item.text.toLowerCase().includes(typedString.toLowerCase())),
+        );
+      }, 1000),
+    );
 
   test("Ensure previous dropdowns are removed", async () => {
     const text = "@";
     const block = new EditorV3AtBlock({ text, atListFunction });
     block.setActive(true);
     const editor = document.createElement("div");
+    document.body.appendChild(editor);
     editor.className = "aiev3";
     const editable = document.createElement("div");
     editable.className = "aiev3-editable";
@@ -177,14 +152,15 @@ describe("should return a DocumentFragment with a dropdown", () => {
       jest.runAllTimers();
     });
     expect(editor.querySelector(".aiev3-dropdown-list")?.textContent).not.toEqual("Old item");
-    expect(editor.innerHTML).toMatchSnapshot();
+    expect(document.body.innerHTML).toMatchSnapshot();
     // Check dropdown click
-    const items = editor.querySelectorAll(".aiev3-drop-item");
+    const items = document.body.querySelectorAll(".aiev3-drop-item");
     expect(items).toBeDefined();
     expect(items.length).toBe(10);
     fireEvent.mouseDown(items![0]);
+    await act(async () => jest.runAllTimers());
     expect(editor.querySelector(".aiev3-drop-item")).toBeNull();
-    expect(editor.innerHTML).toMatchSnapshot();
+    expect(document.body.innerHTML).toMatchSnapshot();
   });
 
   test("Render dropdown for no objects", async () => {
@@ -197,11 +173,15 @@ describe("should return a DocumentFragment with a dropdown", () => {
       block.toHtml({ currentEl: div });
       // Run pending timer from the function to display the dropdown list
       jest.runAllTimers();
-      expect(div.querySelector(".aiev3-dropdown-list")).not.toBeNull();
-      expect(div.querySelector(".aiev3-dropdown-list")!.textContent).toEqual("Loading...");
+      expect(document.body.querySelector(".aiev3-dropdown-list")).not.toBeNull();
+      expect(document.body.querySelector(".aiev3-dropdown-list")!.textContent).toEqual(
+        "Loading...",
+      );
     });
-    expect(div.querySelector(".aiev3-dropdown-list")).not.toBeNull();
-    expect(div.querySelector(".aiev3-dropdown-list")!.textContent).toEqual("No items found");
+    expect(document.body.querySelector(".aiev3-dropdown-list")).not.toBeNull();
+    expect(document.body.querySelector(".aiev3-dropdown-list")!.textContent).toEqual(
+      "No items found",
+    );
   });
 
   test("Render dropdown for all objects", async () => {
@@ -209,18 +189,22 @@ describe("should return a DocumentFragment with a dropdown", () => {
     const block = new EditorV3AtBlock({ text, atListFunction });
     block.setActive(true);
     const div = document.createElement("div");
+    document.body.appendChild(div);
 
+    block.toHtml({ currentEl: div });
     await act(async () => {
-      block.toHtml({ currentEl: div });
-      // Run pending timer from the function to display the dropdown list
-      jest.runAllTimers();
-      expect(div.querySelector(".aiev3-dropdown-list")).not.toBeNull();
-      expect(div.querySelector(".aiev3-dropdown-list")!.textContent).toEqual("Loading...");
+      jest.advanceTimersByTime(100);
     });
-    const dropDown = div.querySelector(".aiev3-dropdown-list");
+    // Run pending timer from the function to display the dropdown list
+    expect(document.body.querySelector(".aiev3-dropdown-list")).not.toBeNull();
+    expect(document.body.querySelector(".aiev3-dropdown-list")!.textContent).toEqual("Loading...");
+    await act(async () => {
+      jest.runAllTimers();
+    });
+    const dropDown = document.body.querySelector(".aiev3-dropdown-list");
     expect(dropDown).not.toBeNull();
     expect(dropDown!.textContent).not.toEqual("Loading...");
-    expect(div.innerHTML).toMatchSnapshot();
+    expect(document.body.innerHTML).toMatchSnapshot();
 
     // Check dropdown click
     const items = dropDown?.querySelectorAll("li.aiev3-drop-item");
@@ -228,7 +212,8 @@ describe("should return a DocumentFragment with a dropdown", () => {
     expect(items?.length).toBe(10);
     const expectedText = items![0].textContent;
     fireEvent.mouseDown(items![0]);
-    expect(div.querySelector(".aiev3-drop-item")).toBeNull();
+    await act(async () => jest.runAllTimers());
+    expect(document.body.querySelector(".aiev3-drop-item")).toBeNull();
     // Check span contents
     const span = div.querySelector(".aiev3-tb.at-block") as HTMLSpanElement;
     expect(span.textContent).toBe(expectedText);
@@ -282,13 +267,17 @@ describe("should return a DocumentFragment with a dropdown", () => {
       block.toHtml({ currentEl: div });
       // Run pending timer from the function to display the dropdown list
       jest.runAllTimers();
-      expect(div.querySelector(".aiev3-dropdown-list")).not.toBeNull();
-      expect(div.querySelector(".aiev3-dropdown-list")!.textContent).toEqual("Loading...");
+      expect(document.body.querySelector(".aiev3-dropdown-list")).not.toBeNull();
+      expect(document.body.querySelector(".aiev3-dropdown-list")!.textContent).toEqual(
+        "Loading...",
+      );
       // Resolve the promise in errorCall
       expect(errorCall).toHaveBeenCalled();
     });
-    expect(div.querySelector(".aiev3-dropdown-list")).not.toBeNull();
-    expect(div.querySelector(".aiev3-dropdown-list")!.textContent).toEqual("Error fetching list");
+    expect(document.body.querySelector(".aiev3-dropdown-list")).not.toBeNull();
+    expect(document.body.querySelector(".aiev3-dropdown-list")!.textContent).toEqual(
+      "Error fetching list",
+    );
   });
 
   test("Use data and linkRenderer", async () => {
@@ -316,6 +305,7 @@ describe("should return a DocumentFragment with a dropdown", () => {
     const block = new EditorV3AtBlock({ text, atListFunction, maxAtListLength: 20 });
     block.setActive(true);
     const editor = document.createElement("div");
+    document.body.appendChild(editor);
     editor.className = "aiev3";
     const editable = document.createElement("div");
     editable.className = "aiev3-editable";
@@ -330,16 +320,17 @@ describe("should return a DocumentFragment with a dropdown", () => {
       // Run pending timer from the function to display the dropdown list
       jest.runAllTimers();
     });
-    expect(line.innerHTML).toMatchSnapshot();
+    expect(document.body.innerHTML).toMatchSnapshot();
 
     // Check dropdown click
-    const items = line.querySelectorAll(".aiev3-drop-item");
+    const items = document.body.querySelectorAll(".aiev3-drop-item");
     expect(items).toBeDefined();
     expect(items.length).toBe(20);
     fireEvent.mouseDown(items![0]);
+    await act(async () => jest.runAllTimers());
     expect(line.querySelector(".aiev3-drop-item")).toBeNull();
     expect(line.textContent).toBe("aa");
-    expect(line.innerHTML).toMatchSnapshot();
+    expect(document.body.innerHTML).toMatchSnapshot();
 
     // Check data
     const readBack = new EditorV3AtBlock(line.children[0] as HTMLSpanElement);
@@ -376,10 +367,30 @@ describe("EditorV3AtBlock errors", () => {
 
 describe("EditorV3AtBlock markdown output", () => {
   test("should return the correct markdown output", async () => {
-    const testBlock = new EditorV3AtBlock({ text: "@Hello", style: "shiny", label: "label" });
+    const testBlock = new EditorV3AtBlock({
+      text: "@Hello",
+      style: "shiny",
+      label: "label",
+      atData: {
+        email: "aa@0.com",
+      },
+    });
     const result = testBlock.toMarkdown();
-    expect(testBlock.toMarkdown()).toEqual("@[shiny::label::@Hello@]");
+    // eslint-disable-next-line quotes
+    expect(testBlock.toMarkdown()).toEqual('@[shiny::label::@Hello**{"email":"aa@0.com"}@]');
     const eatOwnTail = new EditorV3AtBlock(result);
     expect(eatOwnTail.data).toEqual(testBlock.data);
+  });
+
+  test("should have no data from bad JSON in tyhe markdown", async () => {
+    // eslint-disable-next-line quotes
+    const testMarkdown = '@[shiny::label::@Hello**{"email":wooo!}@]';
+    const testBlock = new EditorV3AtBlock(testMarkdown);
+    expect(testBlock.data).toEqual({
+      text: "@Hello",
+      type: "at",
+      style: "shiny",
+      label: "label",
+    });
   });
 });

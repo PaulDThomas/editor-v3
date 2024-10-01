@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 import baseStyles from "../BaseInputs.module.css";
 
-interface BaseInputProps extends React.HTMLAttributes<HTMLInputElement> {
+interface BaseInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
-  value: string | number | boolean | undefined;
+  value: string | number | undefined;
   change: (ret: string | number | boolean | undefined) => void;
   label?: string;
 }
 
 export const BaseInput = ({ id, value, change, label, ...rest }: BaseInputProps): JSX.Element => {
-  const [inputValue, setInputValue] = useState<string>(value?.toString() ?? "None");
+  const [inputValue, setInputValue] = useState<string>(value?.toString() ?? "");
   useEffect(() => {
-    setInputValue(value?.toString() ?? "None");
+    setInputValue(value?.toString() ?? "");
   }, [value]);
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);

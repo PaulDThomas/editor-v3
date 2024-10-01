@@ -11,6 +11,7 @@ import {
 } from "./interface";
 import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import { renderDropdown } from "./toHtml/renderDropdown";
+import { stopDragOnto } from "./toHtml/stopDragOnto";
 
 export interface IEditorV3SelectBlockOptionalParams extends IEditorV3TextBlockOptionalParams {
   availableOptions?: EditorV3DropListItem<Record<string, string>>[];
@@ -145,9 +146,9 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
   public toHtml(renderProps: EditorV3RenderProps, style?: EditorV3Style): DocumentFragment {
     // Create holder
     const ret = new DocumentFragment();
-    if (renderProps.currentEl) renderProps.currentEl.append(ret);
     const span = document.createElement("span");
     ret.appendChild(span);
+    if (renderProps.currentEl) renderProps.currentEl.append(ret);
     span.classList.add("aiev3-tb", "select-block");
     span.dataset.type = "select";
 
@@ -161,28 +162,36 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
     this.applyStyle(span, style);
     // Add label
     if (this.label) span.title = this.label;
-    // Delete any existing dropdown on render
-    const editor = renderProps.editableEl?.closest(".aiev3") as HTMLDivElement | null;
-    if (editor) {
-      const existingDropdowns = editor.querySelectorAll("ul.aiev3-dropdown-list");
-      existingDropdowns.forEach((dropdown) => dropdown.remove());
-    }
 
     // Add locked status
     span.classList.add("is-locked");
     span.dataset.isLocked = "true";
-    span.contentEditable = "false";
+    stopDragOnto(span);
     // Add other data items from the at item
     span.dataset.availableOptions = JSON.stringify(this.availableOptions);
 
+    // Add caret
+    const caret = document.createElement("span");
+    caret.classList.add("select-block-caret", "skip-read");
+    span.prepend(caret);
+
+    // Remove any existing dropdowns
+    const previousDropdown = document.querySelectorAll(".aiev3-dropdown-list");
+    previousDropdown.forEach((dropdown) => dropdown.remove());
+
     // Throttle dropdown render
     let renderTimeout: number | null = null;
-    if (!renderTimeout && this.isSelected && this.availableOptions.length > 0) {
+    if (
+      !renderTimeout &&
+      this.isSelected &&
+      this.availableOptions.length > 0 &&
+      renderProps.caretPosition?.isCollapsed === false
+    ) {
       span.classList.add("show-dropdown");
       renderTimeout = window.setTimeout(() => {
-        renderDropdown(
-          span,
-          async () => {
+        renderDropdown(span, this.text, {
+          ...renderProps,
+          atListFunction: async () => {
             return (
               this.availableOptions.map((option) => {
                 const listItem = document.createElement("li");
@@ -199,9 +208,8 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
               }) ?? []
             );
           },
-          Math.max(1, this.availableOptions.length),
-          this.text,
-        );
+          maxAtListLength: Math.max(1, this.availableOptions.length),
+        });
       }, 100);
     }
     if (this.isActive) {

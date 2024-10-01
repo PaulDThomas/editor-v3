@@ -2,6 +2,7 @@ import { createContext } from "react";
 
 export interface ObjectEditorItemOptions {
   name: string;
+  label?: string;
   type: "select" | "string" | "boolean" | "number";
   options?: { label: string; value: string | number | boolean | undefined }[];
   dataPath?: string;

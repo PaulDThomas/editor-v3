@@ -2,6 +2,7 @@ import { cloneDeep } from "lodash";
 import { defaultContentProps } from "./defaultContentProps";
 import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import { EditorV3RenderProps, EditorV3Style, EditorV3WordPosition } from "./interface";
+import { stopDragOnto } from "./toHtml/stopDragOnto";
 
 export type EditorV3TextBlockType = "text" | "at" | "select";
 export interface IEditorV3TextBlockOptionalParams {
@@ -270,7 +271,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
           if (this.isLocked && style?.isLocked) {
             span.classList.add("is-locked");
             span.dataset.isLocked = "true";
-            span.contentEditable = "false";
+            stopDragOnto(span);
           }
           if (this.isActive) span.classList.add("is-active");
           // Apply style

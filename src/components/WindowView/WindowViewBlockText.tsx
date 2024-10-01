@@ -1,53 +1,52 @@
-import { useEffect, useId, useState } from "react";
-import baseStyles from "../BaseInputs.module.css";
+import { useContext, useId } from "react";
+import { BaseInput } from "../ObjectEditor/BaseInput";
+import { WindowViewContext } from "./WindowView";
+import { UPDATE_BLOCK_LABEL, UPDATE_BLOCK_TEXT } from "./windowViewReducer";
 
-interface WindowViewBlockTextProps extends React.ComponentProps<"input"> {
-  label: string;
-  disabled: boolean;
-  text?: string;
-  setText: (label: string) => void;
-  grow?: boolean;
-  shrink?: boolean;
+interface WindowViewBlockTextProps {
+  lineIndex: number;
+  blockIndex: number;
+  label?: boolean;
 }
 
 export const WindowViewBlockText = ({
-  label,
-  disabled,
-  text,
-  setText,
-  grow = false,
-  shrink = false,
-  ...rest
+  lineIndex,
+  blockIndex,
+  label = false,
 }: WindowViewBlockTextProps) => {
+  const wvc = useContext(WindowViewContext);
+  const thisLine = wvc?.lines[lineIndex];
+  const thisBlock = thisLine?.textBlocks[blockIndex];
   const thisId = useId();
-  const [currentText, setCurrentText] = useState<string>(text ?? "");
-  useEffect(() => {
-    setCurrentText(text ?? "");
-  }, [text]);
 
-  return (
-    <div
-      className={baseStyles.holder}
-      style={{ flexGrow: grow ? 1 : undefined, flexShrink: shrink ? 1 : undefined, width: "auto" }}
-    >
-      <label
-        id={`label-${thisId}`}
-        className={baseStyles.label}
-        htmlFor={thisId}
-      >
-        {label}
-      </label>
-      <input
-        {...rest}
-        aria-labelledby={`label-${thisId}`}
-        id={thisId}
-        disabled={disabled}
-        className={baseStyles.baseInput}
-        value={currentText}
-        onChange={(e) => setCurrentText(e.currentTarget.value)}
-        onBlur={() => setText(currentText)}
-      />
-    </div>
+  return !wvc || !thisBlock ? (
+    <></>
+  ) : (
+    <BaseInput
+      id={thisId}
+      label={label ? "Label" : "Text"}
+      value={label ? thisBlock.label : thisBlock.text}
+      disabled={!wvc.editable}
+      change={(ret) => {
+        if (wvc && typeof ret === "string") {
+          if (label) {
+            wvc.dispatch({
+              operation: UPDATE_BLOCK_LABEL,
+              lineIndex,
+              blockIndex,
+              blockLabel: ret,
+            });
+          } else {
+            wvc.dispatch({
+              operation: UPDATE_BLOCK_TEXT,
+              lineIndex,
+              blockIndex,
+              blockText: ret,
+            });
+          }
+        }
+      }}
+    />
   );
 };
 

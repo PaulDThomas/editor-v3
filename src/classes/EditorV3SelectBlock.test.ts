@@ -1,22 +1,9 @@
-import { act, fireEvent } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import { EditorV3DropListItem } from "./interface";
 import { EditorV3SelectBlock } from "./EditorV3SelectBlock";
+import { act } from "react";
 
 describe("EditorV3SelectBlock", () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-    // Define offsetParent for HTMLElement
-    Object.defineProperty(HTMLElement.prototype, "offsetParent", {
-      get() {
-        return this.parentNode;
-      },
-    });
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
   test("should return a DocumentFragment with the correct structure", () => {
     const text = "-- Select --";
     const style = "bold";
@@ -40,6 +27,7 @@ describe("EditorV3SelectBlock", () => {
     ]);
     block.setActive(true);
     block.showDropdown();
+    expect(block.text).toEqual(text);
     const result = block.toHtml({});
 
     // Check if the DocumentFragment contains a single span element
@@ -239,18 +227,6 @@ describe("EditorV3SelectBlock", () => {
 });
 
 describe("should return a DocumentFragment with a dropdown", () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-    // Define offsetParent for HTMLElement
-    Object.defineProperty(HTMLElement.prototype, "offsetParent", {
-      get() {
-        return this.parentNode;
-      },
-    });
-  });
-  afterEach(() => {
-    jest.useRealTimers();
-  });
   test("Ensure previous dropdowns are removed", async () => {
     const text = "-- Select --";
     const style = "bold";
@@ -266,6 +242,7 @@ describe("should return a DocumentFragment with a dropdown", () => {
     const block = new EditorV3SelectBlock({ text, style, availableOptions });
     block.showDropdown();
     const editor = document.createElement("div");
+    document.body.appendChild(editor);
     editor.className = "aiev3";
     const editable = document.createElement("div");
     editable.className = "aiev3-editable";
@@ -274,24 +251,29 @@ describe("should return a DocumentFragment with a dropdown", () => {
     const line = document.createElement("div");
     line.className = "aiev3-line";
     editable.appendChild(line);
+    // Add an old dropdown
     const oldDropdown = document.createElement("ul");
     oldDropdown.className = "aiev3-dropdown-list";
-    editor.appendChild(oldDropdown);
     oldDropdown.innerHTML = "<li class='aiev3-drop-item'>Old item</li>";
-    expect(editor.querySelector(".aiev3-dropdown-list")?.textContent).toEqual("Old item");
+    document.body.appendChild(oldDropdown);
 
     await act(async () => {
-      block.toHtml({ editableEl: editable, currentEl: line });
+      block.toHtml({
+        editableEl: editable,
+        currentEl: line,
+        caretPosition: { isCollapsed: false, startLine: 0, startChar: 0, endLine: 0, endChar: 10 },
+      });
       // Run pending timer from the function to display the dropdown list
       jest.runAllTimers();
     });
     expect(editor.querySelector(".aiev3-dropdown-list")?.textContent).not.toEqual("Old item");
-    expect(editor.innerHTML).toMatchSnapshot();
+    expect(document.body.innerHTML).toMatchSnapshot();
     // Check dropdown click
-    const items = editor.querySelectorAll(".aiev3-drop-item");
+    const items = document.body.querySelectorAll(".aiev3-drop-item");
     expect(items).toBeDefined();
     expect(items.length).toBe(2);
     fireEvent.mouseDown(items![1].childNodes[0] as HTMLElement);
+    await act(async () => jest.runAllTimers());
     expect(editor.querySelector(".aiev3-drop-item")).toBeNull();
     expect(editor.innerHTML).toMatchSnapshot();
   });
@@ -311,6 +293,7 @@ describe("should return a DocumentFragment with a dropdown", () => {
     const block = new EditorV3SelectBlock({ text, style, availableOptions });
     block.showDropdown();
     const editor = document.createElement("div");
+    document.body.appendChild(editor);
     editor.className = "aiev3";
     const editable = document.createElement("div");
     editable.className = "aiev3-editable";
@@ -321,21 +304,30 @@ describe("should return a DocumentFragment with a dropdown", () => {
     editable.appendChild(line);
 
     await act(async () => {
-      block.toHtml({ editableEl: editable, currentEl: line });
+      block.toHtml({
+        editableEl: editable,
+        currentEl: line,
+        caretPosition: { isCollapsed: false, startLine: 0, startChar: 0, endLine: 0, endChar: 10 },
+      });
       // Run pending timer from the function to display the dropdown list
       jest.runAllTimers();
     });
-    expect(editor.innerHTML).toMatchSnapshot();
+    expect(document.body.innerHTML).toMatchSnapshot();
+    expect(document.body.querySelector(".select-block") as HTMLSpanElement).toHaveClass(
+      "editorv3style-bold",
+    );
+
     // Check dropdown click
-    const items = editor.querySelectorAll(".aiev3-drop-item");
+    const items = document.body.querySelectorAll(".aiev3-drop-item");
     expect(items).toBeDefined();
     expect(items.length).toBe(2);
     fireEvent.mouseDown(items![0].childNodes[0] as HTMLElement);
-    expect(editor.querySelector(".aiev3-drop-item")).toBeNull();
-    expect(editor.querySelector(".select-block") as HTMLSpanElement).not.toHaveClass(
+    await act(async () => jest.runAllTimers());
+    expect(document.body.querySelector(".aiev3-drop-item")).toBeNull();
+    expect(document.body.querySelector(".select-block") as HTMLSpanElement).not.toHaveClass(
       "editorv3style-bold",
     );
-    expect(editor.innerHTML).toMatchSnapshot();
+    expect(document.body.innerHTML).toMatchSnapshot();
   });
 });
 
@@ -371,7 +363,7 @@ describe("EditorV3SelectBlock markdown output", () => {
     ];
     const testBlock = new EditorV3SelectBlock({ text, style, availableOptions });
     const result = testBlock.toMarkdown();
-    expect(testBlock.toMarkdown()).toEqual("[[bold::-- Select --**Hello||shiny::World]]");
+    expect(testBlock.toMarkdown()).toEqual("(¬(bold::-- Select --**Hello||shiny::World)¬)");
     const eatOwnTail = new EditorV3SelectBlock(result);
     expect(eatOwnTail.data).toEqual(testBlock.data);
   });

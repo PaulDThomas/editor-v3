@@ -21,11 +21,25 @@ export const App = (): JSX.Element => {
         ],
       },
       { textBlocks: [{ text: "56.78", style: "blue" }] },
+      {
+        textBlocks: [
+          {
+            text: "Optional long line-that includes hyphen-s--s, it does needs to be really really long though",
+            style: "green",
+          },
+        ],
+      },
+      {
+        textBlocks: [{ text: "Another line to test" }],
+      },
+      {
+        textBlocks: [{ text: "Notes line", style: "blue" }],
+      },
     ],
     contentProps: {
       textAlignment: EditorV3Align.left,
       styles: {
-        blue: { color: "blue", fontWeight: 700 },
+        blue: { color: "blue", fontWeight: 700, fontSize: "22pt" },
       },
     },
   };
@@ -36,26 +50,26 @@ export const App = (): JSX.Element => {
   // Secont input content
   const testObject: IEditorV3 = {
     lines: [
-      {
-        textBlocks: [
-          { text: "P ", type: "text" },
-          { text: "Me", type: "at" },
-          { text: "E", type: "text" },
-        ],
-      },
-      {
-        textBlocks: [
-          {
-            text: "Select",
-            type: "select",
-            availableOptions: [
-              { text: "one", data: { text: "one", style: "Notes" } },
-              { text: "two", data: { text: "two" } },
-              { text: "three", data: { text: "three", style: "Optional" } },
-            ],
-          },
-        ],
-      },
+      // {
+      //   textBlocks: [
+      //     { text: "P ", type: "text" },
+      //     { text: "Me", type: "at" },
+      //     { text: "E", type: "text" },
+      //   ],
+      // },
+      // {
+      //   textBlocks: [
+      //     {
+      //       text: "Select",
+      //       type: "select",
+      //       availableOptions: [
+      //         { text: "one", data: { text: "one", style: "Notes" } },
+      //         { text: "two", data: { text: "two" } },
+      //         { text: "three", data: { text: "three", style: "Optional" } },
+      //       ],
+      //     },
+      //   ],
+      // },
     ],
   };
 
@@ -71,8 +85,17 @@ export const App = (): JSX.Element => {
       {
         textBlocks: [
           { text: "two words", style: "defaultStyle" },
-          { text: "2nd locked line", style: "green" },
-          { text: "2nd locked line", style: "green" },
+          { text: "1st locked block", style: "green" },
+          { text: " [[2nd locked block]] ", style: "green" },
+          {
+            text: "[[select-block]]",
+            type: "select",
+            availableOptions: [
+              { text: "green", data: { text: "green", style: "green" } },
+              { text: "red", data: { text: "red", style: "red" } },
+              { text: "black", data: { text: "black" } },
+            ],
+          },
           { text: "lots of locks", style: "red" },
         ],
       },
@@ -91,9 +114,10 @@ export const App = (): JSX.Element => {
       // fontSize: "18pt",
       // fontWeight: 1000,
       isLocked: true,
+      isNotAvailable: true,
     },
-    blue: { color: "blue", fontWeight: 700 },
-    red: { color: "red", isNotAvailabe: true },
+    blue: { color: "blue", fontWeight: 700, fontSize: "22pt" },
+    red: { color: "red", isNotAvailable: true },
   });
 
   return (
@@ -106,7 +130,6 @@ export const App = (): JSX.Element => {
               <EditorV3
                 id={"e1"}
                 input={editorV3_1}
-                resize
                 setText={setText}
                 setObject={(ret) => {
                   console.log(ret);
@@ -119,8 +142,9 @@ export const App = (): JSX.Element => {
                 customStyleMap={styleMap}
                 style={{
                   width: "500px",
-                  height: "400px",
+                  height: "100px",
                 }}
+                resize
                 allowWindowView
                 atListFunction={loadAvailableItems}
                 debounceMilliseconds={1000}
@@ -164,6 +188,7 @@ export const App = (): JSX.Element => {
               resize
               allowMarkdown
               allowWindowView
+              errorText={"Some\nerror\nmessage"}
               style={{
                 width: "400px",
                 minHeight: "100px",
@@ -189,6 +214,7 @@ export const App = (): JSX.Element => {
                   ...styleMap,
                   red: { color: "red", isLocked: true },
                 }}
+                resize="vertical"
                 spellCheck
                 style={{
                   width: "600px",

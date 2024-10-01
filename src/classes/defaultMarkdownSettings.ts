@@ -17,12 +17,12 @@ export interface IMarkdownSettings {
 }
 
 export const defaultMarkdownSettings = {
-  styleStartTag: "<<",
-  styleNameEndTag: "::",
-  styleEndTag: ">>",
   defaultStyle: "defaultStyle",
-  dropDownStartTag: "[[",
-  dropDownEndTag: "]]",
+  styleStartTag: "(~(",
+  styleNameEndTag: "::",
+  styleEndTag: ")~)",
+  dropDownStartTag: "(¬(",
+  dropDownEndTag: ")¬)",
   dropDownValueSeparator: "||",
   dropDownSelectedValueTag: "**",
   calcStartTag: "[![",

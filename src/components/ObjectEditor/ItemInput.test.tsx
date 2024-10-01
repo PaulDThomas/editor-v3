@@ -12,7 +12,7 @@ describe("ItemInput tests", () => {
       isLocked: true,
     },
     blue: { color: "blue", fontWeight: 700 },
-    red: { color: "red", isNotAvailabe: true, fontSize: "LARGE" },
+    red: { color: "red", isNotAvailable: true, fontSize: "LARGE" },
   };
   const mockObjectTemplate: ObjectEditorItemOptions[] = [
     { name: "color", type: "string" },
@@ -34,7 +34,7 @@ describe("ItemInput tests", () => {
     { name: "fontWeight", type: "number" },
     { name: "isLocked", type: "boolean" },
   ];
-  const user = userEvent.setup();
+  const user = userEvent.setup({ delay: null });
 
   test("Blank render", () => {
     render(
