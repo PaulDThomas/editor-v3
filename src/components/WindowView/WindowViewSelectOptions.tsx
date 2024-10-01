@@ -77,6 +77,7 @@ export const WindowViewSelectOptions = ({
           customStyleMap={wvc.contentProps.styles}
           input={input}
           setObject={setObject}
+          debounceMilliseconds={500}
         />
       )}
     </div>

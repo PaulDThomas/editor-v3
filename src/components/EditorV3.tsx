@@ -131,6 +131,7 @@ export const EditorV3 = ({
       : { lines: input.split("\n").map((l) => ({ textBlocks: [{ text: l }] })) },
   );
 
+  // #region Handling update
   const returnData = useCallback(
     (ret: EditorV3State) => {
       // Block return when there is an active at-block, or if the editor has never been focused
@@ -243,7 +244,9 @@ export const EditorV3 = ({
     redrawElement,
     setContent,
   ]);
+  // #endregion Handling update
 
+  // #region Input utilities
   // Set up menu items
   const menuItems = useMemo((): MenuItem[] => {
     if (state) {
@@ -392,7 +395,9 @@ export const EditorV3 = ({
       forceReturn({ content: newContent, focus: false, editable });
     }
   }, [state, contentProps, forceReturn, editable]);
+  // #endregion Input utilities
 
+  // #region Handle key/mouse events
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
       if (divRef.current && state && !state.content.showMarkdown) {
@@ -516,7 +521,9 @@ export const EditorV3 = ({
     },
     [contentProps, setContent],
   );
+  // #endregion Handle key/mouse events
 
+  // #region Handle clipboard events
   const handleCopy = useCallback(
     (e: React.ClipboardEvent<HTMLDivElement>) => {
       if (divRef.current) {
@@ -539,6 +546,13 @@ export const EditorV3 = ({
     [contentProps, setContent],
   );
 
+  const handleBlock = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }, []);
+  // #endregion Handle clipboard events
+
+  // #region Style recalculation
   const styleRecalc = useMemo(() => {
     const s = { ...style };
     switch (resize) {
@@ -556,6 +570,7 @@ export const EditorV3 = ({
     }
     return s;
   }, [resize, showWindowView, style]);
+  // #endregion Style recalculation
 
   return (
     <>
@@ -620,11 +635,17 @@ export const EditorV3 = ({
               }
               spellCheck={spellCheck}
               ref={divRef}
-              onCopyCapture={handleCopy}
-              onCutCapture={handleCopy}
               onKeyDownCapture={handleKeyDown}
               onKeyUpCapture={handleKeyUp}
+              onCutCapture={handleCopy}
+              onCopyCapture={handleCopy}
               onPasteCapture={handlePaste}
+              onDragStart={handleBlock}
+              onDragOver={handleBlock}
+              onDrop={handleBlock}
+              onDragEnter={handleBlock}
+              onDragLeave={handleBlock}
+              onDragEnd={handleBlock}
             />
           </div>
         </ContextMenuHandler>

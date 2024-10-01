@@ -1,6 +1,6 @@
-import { renderHook, act, render, screen, fireEvent } from "@testing-library/react";
+import { renderHook, render, screen, fireEvent } from "@testing-library/react";
 import { useDebounceStack } from "./useDebounceStack";
-import { Dispatch, useEffect, useState } from "react";
+import { act, Dispatch, useEffect, useState } from "react";
 import userEvent from "@testing-library/user-event";
 
 describe("useDebounce", () => {

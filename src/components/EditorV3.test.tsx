@@ -546,6 +546,29 @@ describe("Cut and paste", () => {
     fireEvent.blur(editor2);
     expect(mockSetText2).toHaveBeenCalledWith("Initialtext");
   });
+
+  test("Stop drag and drop", async () => {
+    await act(async () =>
+      render(
+        <div data-testid="container">
+          <EditorV3
+            id="test-editor"
+            input={"Initial\ntext\n"}
+            setText={jest.fn()}
+            style={{ width: "200px" }}
+            allowNewLine
+            textAlignment={EditorV3Align.center}
+          />
+        </div>,
+      ),
+    );
+    // Get components
+    const editor = (await screen.findByTestId("container")).children[0] as HTMLDivElement;
+    // Click to select all
+    await user.click(editor.querySelector("span") as HTMLSpanElement);
+    fireEvent.dragStart(editor.querySelector("span") as HTMLSpanElement);
+    expect(editor.querySelector("span")?.hasAttribute("draggable")).toBeFalsy();
+  });
 });
 
 describe("Edge events", () => {

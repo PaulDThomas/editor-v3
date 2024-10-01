@@ -1,6 +1,7 @@
-import { act, fireEvent } from "@testing-library/react";
+import { fireEvent } from "@testing-library/react";
 import { EditorV3DropListItem } from "./interface";
 import { EditorV3SelectBlock } from "./EditorV3SelectBlock";
+import { act } from "react";
 
 describe("EditorV3SelectBlock", () => {
   test("should return a DocumentFragment with the correct structure", () => {
