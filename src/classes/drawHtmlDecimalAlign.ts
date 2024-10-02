@@ -1,11 +1,10 @@
-import { EditorV3BlockClass, EditorV3RenderProps, EditorV3Styles } from "./interface";
+import { EditorV3BlockClass, EditorV3ContentProps, EditorV3RenderProps } from "./interface";
 
 export const drawHtmlDecimalAlign = (
   renderProps: EditorV3RenderProps,
-  decimalAlignPercent: number,
+  contentProps: EditorV3ContentProps,
   lhsContent: EditorV3BlockClass[],
   rhsContent: EditorV3BlockClass[],
-  styles?: EditorV3Styles,
 ) => {
   if (renderProps.currentEl) {
     const prePoint = document.createElement("span");
@@ -16,7 +15,7 @@ export const drawHtmlDecimalAlign = (
         prePoint.append(
           tb.toHtml(
             { ...renderProps, currentEl: prePoint },
-            tb.style ? styles?.[tb.style] : undefined,
+            tb.style ? contentProps.styles?.[tb.style] : undefined,
           ),
         ),
       );
@@ -28,12 +27,16 @@ export const drawHtmlDecimalAlign = (
     renderProps.currentEl.append(postPoint);
     if (rhsContent.length)
       rhsContent.forEach((tb) => {
-        const tbStyle = tb.style ? styles?.[tb.style] : undefined;
-        postPoint.append(tb.toHtml({ ...renderProps, currentEl: postPoint }, tbStyle));
+        postPoint.append(
+          tb.toHtml(
+            { ...renderProps, currentEl: postPoint },
+            tb.style ? contentProps.styles?.[tb.style] : undefined,
+          ),
+        );
       });
     else postPoint.textContent = "\u2009";
 
     // Set grid column widths
-    renderProps.currentEl.style.gridTemplateColumns = `${decimalAlignPercent}% ${100 - decimalAlignPercent}%`;
+    renderProps.currentEl.style.gridTemplateColumns = `${contentProps.decimalAlignPercent}% ${100 - contentProps.decimalAlignPercent}%`;
   }
 };

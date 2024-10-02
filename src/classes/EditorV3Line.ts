@@ -24,6 +24,7 @@ export class EditorV3Line implements IEditorV3Line {
   private _defaultContentProps: EditorV3ContentProps = cloneDeep(defaultContentProps);
   public contentProps: EditorV3ContentProps;
 
+  // #region Renderers
   /**
    * Render current line as HTML
    * @param renderProps Current render properties
@@ -37,10 +38,9 @@ export class EditorV3Line implements IEditorV3Line {
       const decimalPosition = this.lineText.match(/\./)?.index ?? Infinity;
       drawHtmlDecimalAlign(
         renderProps,
-        this.contentProps.decimalAlignPercent,
-        this.upToPos(decimalPosition),
-        this.fromPos(decimalPosition),
-        this.contentProps.styles,
+        this.contentProps,
+        this.upToPos(decimalPosition, true),
+        this.fromPos(decimalPosition, true),
       );
     } else {
       this.textBlocks.forEach((tb) =>
@@ -48,12 +48,6 @@ export class EditorV3Line implements IEditorV3Line {
           tb.toHtml(renderProps, tb.style ? this.contentProps.styles?.[tb.style] : undefined),
         ),
       );
-    }
-    // Need to add a space to the end of the line to allow for the cursor to be placed at the end
-    if (this.textBlocks.length > 0 && this.textBlocks[this.textBlocks.length - 1].isLocked) {
-      const endLineEl = document.createElement("span");
-      endLineEl.textContent = "\u200b";
-      h.append(endLineEl);
     }
     if (renderProps.editableEl) renderProps.editableEl.append(h);
     return h;
@@ -78,7 +72,9 @@ export class EditorV3Line implements IEditorV3Line {
     if (renderProps.editableEl) renderProps.editableEl.append(h);
     return h;
   }
+  // #endregion Renderers
 
+  // #region Getters
   /**
    * Get the line as a text string
    */
@@ -123,6 +119,7 @@ export class EditorV3Line implements IEditorV3Line {
     const textBlocks = this.textBlocks.map((tb) => tb.data);
     return Object.keys(contentProps).length === 0 ? { textBlocks } : { contentProps, textBlocks };
   }
+  // #endregion Getters
 
   // Constructor
   constructor(
@@ -319,58 +316,64 @@ export class EditorV3Line implements IEditorV3Line {
     }
   }
 
+  // #region Subset methods
   /**
    * Get the text blocks from a position to another
    * @param startPos Start position
    * @param endPosOpt End position, if not provided uses the end of the line
+   * @param splitLocked Split locked blocks
    * @returns Text blocks from startPos to endPos
    */
-  public subBlocks(startPos: number, endPosOpt?: number): EditorV3BlockClass[] {
+  public subBlocks(
+    startPos: number,
+    endPosOpt?: number,
+    splitLocked = false,
+  ): EditorV3BlockClass[] {
     const ret: EditorV3BlockClass[] = [];
-    const endPos = endPosOpt ?? this.lineLength;
+    const endPos = endPosOpt ?? this.lineLength + 1;
     // Return empty styled block for start/end same
     if (startPos >= endPos || endPos <= 0) {
       return ret;
     }
-    let _counted = 0;
     for (let _i = 0; _i < this.textBlocks.length; _i++) {
       const block: EditorV3BlockClass = this.textBlocks[_i];
-      // Block containing startPos
-      if (
-        _counted <= startPos &&
-        _counted + block.text.length >= startPos &&
-        block.text.slice(startPos - _counted, endPos - _counted) !== "" &&
-        (block.lineStartPosition === startPos || !block.isLocked)
+      // Block after start and before end
+      if (startPos <= block.lineStartPosition && block.lineEndPosition < endPos) {
+        ret.push(cloneDeep(block));
+      }
+      // Block containing startPos and is not locked/being split
+      else if (
+        block.lineStartPosition < startPos &&
+        block.lineEndPosition > startPos &&
+        (!block.isLocked || splitLocked)
       ) {
-        if (block.isLocked) {
-          ret.push(block);
-        } else {
-          const slicedBlock = textBlockFactory({
-            ...block.data,
-            text: block.text.slice(startPos - _counted, endPos - _counted),
-          });
-          ret.push(slicedBlock);
-        }
+        const slicedBlock = textBlockFactory({
+          ...block.data,
+          text: block.text.slice(
+            startPos - block.lineStartPosition,
+            endPos - block.lineStartPosition,
+          ),
+        });
+        ret.push(slicedBlock);
       }
       // Block after start containing end
-      else if (_counted > startPos && endPos && _counted + block.text.length >= endPos) {
-        if (block.isLocked) {
-          ret.push(block);
+      else if (
+        block.lineStartPosition >= startPos &&
+        block.lineStartPosition < endPos &&
+        block.lineEndPosition >= endPos
+      ) {
+        if (block.isLocked && !splitLocked) {
+          ret.push(cloneDeep(block));
         } else {
           const slicedBlock = textBlockFactory({
             ...block,
-            text: block.text.slice(0, endPos - _counted),
+            text: block.text.slice(0, endPos - block.lineStartPosition),
           });
           ret.push(slicedBlock);
         }
       }
-      // Block after start and before end
-      else if (_counted > startPos && _counted + block.text.length < endPos) {
-        ret.push(block);
-      }
-      _counted += block.text.length;
       // Stop if the end is reached
-      if (_counted >= endPos) break;
+      if (block.lineStartPosition >= endPos) break;
     }
     this._setBlockStartPositions(ret, startPos);
     return ret;
@@ -379,21 +382,25 @@ export class EditorV3Line implements IEditorV3Line {
   /**
    * Get the text blocks from the start of the line to a position
    * @param pos Position to get blocks to
+   * @param splitLocked Split locked blocks
    * @returns Blocks from start to pos
    */
-  public upToPos(pos: number): EditorV3BlockClass[] {
-    return this.subBlocks(0, pos);
+  public upToPos(pos: number, splitLocked = false): EditorV3BlockClass[] {
+    return this.subBlocks(0, pos, splitLocked);
   }
 
   /**
    * Get the text blocks from a position to the end of the line
    * @param pos Position to get blocks from
+   * @param splitLocked Split locked blocks
    * @returns Blocks from pos to end
    */
-  public fromPos(pos: number): EditorV3BlockClass[] {
-    return this.subBlocks(pos);
+  public fromPos(pos: number, splitLocked = false): EditorV3BlockClass[] {
+    return this.subBlocks(pos, undefined, splitLocked);
   }
+  // #endregion Subset methods
 
+  // #region Insert and remove methods
   /**
    * Split the line into two
    * @param pos Position to split at
@@ -440,6 +447,7 @@ export class EditorV3Line implements IEditorV3Line {
     }
     return ret;
   }
+  // #endregion Insert and remove methods
 
   /**
    * Delete a character from the line
@@ -451,6 +459,7 @@ export class EditorV3Line implements IEditorV3Line {
     return this;
   }
 
+  // #region Update style methods
   /**
    * Apply a style to a section of the line
    * @param styleName Style to apply
@@ -494,7 +503,9 @@ export class EditorV3Line implements IEditorV3Line {
     }
     return this;
   }
+  // #endregion Update style methods
 
+  // #region Private methods
   /**
    * Merge blocks with the same style, that are not locked
    */
@@ -554,4 +565,5 @@ export class EditorV3Line implements IEditorV3Line {
       }
     });
   }
+  // #endregion Private methods
 }

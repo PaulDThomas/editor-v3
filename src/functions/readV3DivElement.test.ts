@@ -7,17 +7,16 @@ describe("readV3DivElement", () => {
   test("Read decimal aligned div element", async () => {
     const divElement = document.createElement("div");
     divElement.classList.add("aiev3-line", "decimal");
+    divElement.style.gridTemplateColumns = "40% 60%";
 
     const lhsSpan = document.createElement("span");
     lhsSpan.classList.add("aiev3-span-point", "lhs");
-    lhsSpan.style.minWidth = "40%";
     const lhsText = document.createTextNode("123.");
     lhsSpan.appendChild(lhsText);
     divElement.appendChild(lhsSpan);
 
     const rhsSpan = document.createElement("span");
     rhsSpan.classList.add("aiev3-span-point", "rhs");
-    rhsSpan.style.minWidth = "60%";
     const rhsText = document.createTextNode("45");
     rhsSpan.appendChild(rhsText);
     divElement.appendChild(rhsSpan);

@@ -295,7 +295,7 @@ describe("Check EditorV3Line functions", () => {
     expect(line2.fromPos(10).map((tb) => tb.data)).toEqual([]);
   });
 
-  test("subBlocks", () => {
+  test("subBlocks by hand", () => {
     const line2 = new EditorV3Line(
       [
         textBlockFactory({ text: "hello" }, { style: "world" }),
@@ -364,7 +364,14 @@ describe("Check EditorV3Line functions", () => {
       { text: " locked", type: "select", availableOptions: [], isLocked: true },
       { text: " slow", type: "text", label: "end" },
     ]);
+    expect(line2.subBlocks(6, 18, true).map((tb) => tb.data)).toEqual([
+      { text: "locked", type: "select", availableOptions: [], isLocked: true },
+      { text: " slow", type: "text", label: "end" },
+    ]);
     expect(line2.subBlocks(6, 18).map((tb) => tb.data)).toEqual([
+      { text: " slow", type: "text", label: "end" },
+    ]);
+    expect(line2.subBlocks(12, 18, true).map((tb) => tb.data)).toEqual([
       { text: " slow", type: "text", label: "end" },
     ]);
     expect(line2.subBlocks(12, 18).map((tb) => tb.data)).toEqual([
@@ -383,6 +390,100 @@ describe("Check EditorV3Line functions", () => {
       { text: "w", type: "text", label: "end" },
     ]);
     expect(line2.subBlocks(17, 17).map((tb) => tb.data)).toEqual([]);
+  });
+
+  test("subblock by text with split", () => {
+    const line = new EditorV3Line([
+      new EditorV3TextBlock({ text: "11111", style: "text" }),
+      new EditorV3SelectBlock({
+        text: "222222",
+        style: "select",
+        availableOptions: [
+          {
+            text: "one",
+            data: { style: "pink" },
+          },
+          {
+            text: "two",
+            data: { noStyle: "true " },
+          },
+        ],
+      }),
+      new EditorV3AtBlock({
+        text: "3333333",
+        label: "end",
+        style: "at",
+        isLocked: true,
+        atData: { email: "some@one", id: "great" },
+      }),
+    ]);
+    const lineText: { start: number; end: number; text: string }[] = [];
+    const subblocksText: { start: number; end: number; text: string }[] = [];
+    const subblocksStyleType = new Set<string>();
+    for (let start = 0; start < line.lineLength; start++) {
+      for (let end = start + 1; end <= line.lineLength; end++) {
+        lineText.push({ start, end, text: line.lineText.slice(start, end) });
+        const res = line.subBlocks(start, end, true);
+        subblocksText.push({
+          start,
+          end,
+          text: res.map((tb) => tb.text).join(""),
+        });
+        res.map((tb) => `${tb.type}-${tb.style}`).forEach((s) => subblocksStyleType.add(s));
+      }
+    }
+    expect(subblocksText).toEqual(lineText);
+    expect(subblocksStyleType).toEqual(new Set(["text-text", "select-select", "at-at"]));
+  });
+
+  test("subblock by text with no split", () => {
+    const line = new EditorV3Line([
+      new EditorV3TextBlock({ text: "11111", style: "text" }),
+      new EditorV3SelectBlock({
+        text: "222222",
+        style: "select",
+        availableOptions: [
+          {
+            text: "one",
+            data: { style: "pink" },
+          },
+          {
+            text: "two",
+            data: { noStyle: "true " },
+          },
+        ],
+      }),
+      new EditorV3AtBlock({
+        text: "3333333",
+        label: "end",
+        style: "at",
+        isLocked: true,
+        atData: { email: "some@one", id: "great" },
+      }),
+    ]);
+    const lineText: { start: number; end: number; text: string }[] = [];
+    const subblocksText: { start: number; end: number; text: string }[] = [];
+    const subblocksStyleType = new Set<string>();
+    for (let start = 0; start < line.lineLength; start++) {
+      for (let end = start + 1; end <= line.lineLength; end++) {
+        const lockedStart = start < 6 ? start : start < 12 ? 11 : line.lineLength;
+        const lockedEnd = end < 6 ? end : end < 12 ? 11 : line.lineLength;
+        lineText.push({
+          start: start,
+          end: end,
+          text: line.lineText.slice(lockedStart, lockedEnd),
+        });
+        const res = line.subBlocks(start, end, false);
+        subblocksText.push({
+          start,
+          end,
+          text: res.map((tb) => tb.text).join(""),
+        });
+        res.map((tb) => `${tb.type}-${tb.style}`).forEach((s) => subblocksStyleType.add(s));
+      }
+    }
+    expect(subblocksText).toEqual(lineText);
+    expect(subblocksStyleType).toEqual(new Set(["text-text", "select-select", "at-at"]));
   });
 
   test("splitLine", async () => {
@@ -583,38 +684,6 @@ describe("Check EditorV3Line functions", () => {
 
     const result2 = new EditorV3Line(mdText);
     expect(result2.textBlocks.map((tb) => tb.data)).toEqual(result.textBlocks.map((tb) => tb.data));
-  });
-});
-
-describe("Write space after at block", () => {
-  test("Ensure empty block after at block and set active", async () => {
-    const line = new EditorV3Line([
-      textBlockFactory({ text: "@Hello", type: "at" }, { isLocked: true }),
-    ]);
-    expect(line.data).toEqual({
-      textBlocks: [{ text: "@Hello", type: "at", isLocked: true }],
-    });
-    const div = document.createElement("div");
-    div.appendChild(line.toHtml({}));
-    expect(div.innerHTML).toEqual(
-      '<div class="aiev3-line left">' +
-        '<span class="aiev3-tb at-block is-locked" data-type="at" data-is-locked="true">@Hello</span>' +
-        "<span>\u200b</span>" +
-        "</div>",
-    );
-    // Set active
-    const block = line.setActiveBlock({
-      startLine: 0,
-      startChar: 1,
-      endLine: 0,
-      endChar: 1,
-      isCollapsed: true,
-    });
-    if (block) block.isLocked = undefined;
-    if (block instanceof EditorV3AtBlock) block.isLocked = undefined;
-    expect(line.data).toEqual({
-      textBlocks: [{ text: "@Hello", type: "at" }],
-    });
   });
 });
 
