@@ -282,7 +282,7 @@ export class EditorV3Content implements IEditorV3 {
         if (!Array.isArray(jsonInput.lines)) throw "No lines";
         this._copyImport(jsonInput, props);
       }
-      // Interface input
+      // Interface JSON input
       else if (arg !== undefined) {
         this._copyImport(arg, props);
       } else {

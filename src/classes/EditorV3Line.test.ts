@@ -10,12 +10,7 @@ import { textBlockFactory } from "./textBlockFactory";
 describe("Check basic EditorV3Line", () => {
   test("Load string", async () => {
     const testLine = new EditorV3Line([textBlockFactory({ text: "Hello world" })]);
-    expect(testLine.toHtml({}).outerHTML).toEqual(
-      '<div class="aiev3-line left">' +
-        '<span class="aiev3-tb">Hello&nbsp;</span>' +
-        '<span class="aiev3-tb">world</span>' +
-        "</div>",
-    );
+    expect(testLine.toHtml({}).outerHTML).toMatchSnapshot();
     expect(testLine.lineText).toEqual("Hello world");
     expect(testLine.contentProps.textAlignment).toEqual(EditorV3Align.left);
     expect(testLine.contentProps.decimalAlignPercent).toEqual(60);
@@ -27,16 +22,7 @@ describe("Check basic EditorV3Line", () => {
       textAlignment: EditorV3Align.center,
       decimalAlignPercent: 22,
     });
-    expect(testLine.toHtml({}).outerHTML).toEqual(
-      '<div class="aiev3-line center">' +
-        '<span class="aiev3-tb">&nbsp;</span>' +
-        '<span class="aiev3-tb">&nbsp;</span>' +
-        '<span class="aiev3-tb">Hello&nbsp;</span>' +
-        '<span class="aiev3-tb">&nbsp;</span>' +
-        '<span class="aiev3-tb">world&nbsp;</span>' +
-        '<span class="aiev3-tb">&nbsp;</span>' +
-        "</div>",
-    );
+    expect(testLine.toHtml({}).outerHTML).toMatchSnapshot();
     expect(testLine.lineText).toEqual("  Hello  world  ");
     expect(testLine.contentProps.textAlignment).toEqual(EditorV3Align.center);
     expect(testLine.contentProps.decimalAlignPercent).toEqual(22);
@@ -50,15 +36,7 @@ describe("Check basic EditorV3Line", () => {
       ],
       defaultContentProps,
     );
-    expect(testLine.toHtml({}).outerHTML).toEqual(
-      '<div class="aiev3-line left">' +
-        '<span class="aiev3-tb">Hello&nbsp;world,&nbsp;</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How&nbsp;</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">is&nbsp;</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">it&nbsp;</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">going?</span>' +
-        "</div>",
-    );
+    expect(testLine.toHtml({}).outerHTML).toMatchSnapshot();
     expect(testLine.lineText).toEqual("Hello\u00a0world, How is it going?");
     expect(testLine.lineLength).toEqual(29);
     expect(testLine.contentProps).toEqual(defaultContentProps);
@@ -112,18 +90,7 @@ describe("Check basic EditorV3Line", () => {
       ],
       { ...defaultContentProps, textAlignment: EditorV3Align.decimal },
     );
-    expect(testLine.toHtml({}).outerHTML).toEqual(
-      '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">Hello&nbsp;world</span></span>' +
-        '<span class="aiev3-span-point rhs">' +
-        '<span class="aiev3-tb">.&nbsp;</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">How&nbsp;</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">is&nbsp;</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">it&nbsp;</span>' +
-        '<span class="aiev3-tb editorv3style-shiny" data-style-name="shiny">going?</span>' +
-        "</span>" +
-        "</div>",
-    );
+    expect(testLine.toHtml({}).outerHTML).toMatchSnapshot();
     expect(testLine.lineText).toEqual("Hello\u00a0world. How is it going?");
     expect(testLine.lineMarkdown).toEqual("Hello\u00a0world. (~(shiny::How is it going?)~)");
     expect(testLine.contentProps.textAlignment).toEqual(EditorV3Align.decimal);
@@ -134,22 +101,12 @@ describe("Check basic EditorV3Line", () => {
       ...defaultContentProps,
       textAlignment: EditorV3Align.decimal,
     });
-    expect(newDecimalTestLine.toHtml({}).outerHTML).toEqual(
-      '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">q</span></span>' +
-        '<span class="aiev3-span-point rhs">\u2009</span>' +
-        "</div>",
-    );
+    expect(newDecimalTestLine.toHtml({}).outerHTML).toMatchSnapshot();
     const testLine = new EditorV3Line([textBlockFactory({ text: "12.34" })], {
       ...defaultContentProps,
       textAlignment: EditorV3Align.decimal,
     });
-    expect(testLine.toHtml({}).outerHTML).toEqual(
-      '<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;">' +
-        '<span class="aiev3-span-point lhs"><span class="aiev3-tb">12</span></span>' +
-        '<span class="aiev3-span-point rhs"><span class="aiev3-tb">.34</span></span>' +
-        "</div>",
-    );
+    expect(testLine.toHtml({}).outerHTML).toMatchSnapshot();
     expect(testLine.lineText).toEqual("12.34");
     expect(testLine.contentProps.textAlignment).toEqual(EditorV3Align.decimal);
     expect(testLine.contentProps.decimalAlignPercent).toEqual(60);
@@ -164,21 +121,16 @@ describe("Check basic EditorV3Line", () => {
       textAlignment: EditorV3Align.right,
     });
 
-    expect(testLine.toHtml({}).outerHTML).toEqual(
-      '<div class="aiev3-line right"><span class="aiev3-tb">12.34</span></div>',
-    );
+    expect(testLine.toHtml({}).outerHTML).toMatchSnapshot();
     expect(testLine.lineText).toEqual("12.34");
     expect(testLine.contentProps.textAlignment).toEqual(EditorV3Align.right);
   });
 
   test("Self equivalence for non-decimal", async () => {
-    const firstLine = new EditorV3Line(
-      [textBlockFactory({ text: "12.34" }), textBlockFactory({ text: " Hello " })],
-      {
-        ...defaultContentProps,
-        textAlignment: EditorV3Align.right,
-      },
-    );
+    const firstLine = new EditorV3Line([textBlockFactory({ text: "12.34 Hello " })], {
+      ...defaultContentProps,
+      textAlignment: EditorV3Align.right,
+    });
     expect(new EditorV3Line(firstLine.toHtml({}))).toEqual(firstLine);
     expect(new EditorV3Line(firstLine.data)).toEqual(firstLine);
   });
@@ -989,14 +941,10 @@ describe("Lock style blocks", () => {
     ]);
   });
   test("Lock style is applied", async () => {
-    const line = new EditorV3Line(
-      [
-        new EditorV3TextBlock({ text: "Who is " }),
-        new EditorV3TextBlock({ text: "Jackie" }),
-        new EditorV3TextBlock({ text: "Jack" }),
-      ],
-      { ...defaultContentProps, styles: { red: { color: "red", isLocked: true } } },
-    );
+    const line = new EditorV3Line([new EditorV3TextBlock({ text: "Who is JackieJack" })], {
+      ...defaultContentProps,
+      styles: { red: { color: "red", isLocked: true } },
+    });
     line.applyStyle("red", 4, 13);
     expect(line.data.textBlocks).toEqual([
       { text: "Who ", type: "text" },

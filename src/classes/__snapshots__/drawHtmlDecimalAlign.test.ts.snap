@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Test draw decimal align function Draw with point 1`] = `"<div style="grid-template-columns: 40% 60%;"><span class="aiev3-span-point lhs"><span class="aiev3-tb" data-line-start-position="0">12.</span></span><span class="aiev3-span-point rhs"><span class="aiev3-tb" data-line-start-position="0">34</span></span></div>"`;
+
+exports[`Test draw decimal align function Draw without left 1`] = `"<div style="grid-template-columns: 75% 25%;"><span class="aiev3-span-point lhs"> </span><span class="aiev3-span-point rhs"><span class="aiev3-tb" data-line-start-position="0">34</span></span></div>"`;
+
+exports[`Test draw decimal align function Draw without right 1`] = `"<div style="grid-template-columns: 40% 60%;"><span class="aiev3-span-point lhs"><span class="aiev3-tb" data-line-start-position="0">1234</span></span><span class="aiev3-span-point rhs"> </span></div>"`;

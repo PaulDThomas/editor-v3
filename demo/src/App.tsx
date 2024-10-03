@@ -132,7 +132,6 @@ export const App = (): JSX.Element => {
                 input={editorV3_1}
                 setText={setText}
                 setObject={(ret) => {
-                  console.log(ret);
                   setEditorV3_1(ret);
                 }}
                 textAlignment={align}
@@ -176,8 +175,8 @@ export const App = (): JSX.Element => {
               label={"JSON input"}
               id={"e2"}
               input={testObject}
-              setObject={(ret) => {
-                console.log(ret);
+              setObject={() => {
+                // console.log(ret);
               }}
               allowNewLine={allowNewLine}
               editable={editable}

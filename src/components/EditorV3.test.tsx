@@ -452,14 +452,7 @@ describe("Cut and paste", () => {
     await user.keyboard("{Control>}{Home}{/Control}{Home}{Shift>}{ArrowRight}{ArrowRight}{/Shift}");
     const thingCut = await user.cut();
     expect(thingCut?.getData("text/plain")).toEqual("34");
-    expect(thingCut?.getData("text/html")).toEqual(
-      `<div class="aiev3-line center">
-        <span class="aiev3-tb">34</span>
-      </div>`
-        .replaceAll(/[\r\n\t]/g, "")
-        .replaceAll(/>\s{2,}</g, "><")
-        .trim(),
-    );
+    expect(thingCut?.getData("text/html")).toMatchSnapshot();
     expect(JSON.parse(thingCut?.getData("data/aiev3") ?? "{}")).toEqual([
       {
         textBlocks: [{ text: "34", type: "text" }],
@@ -608,7 +601,7 @@ describe("Edge events", () => {
       lines: [
         {
           textBlocks: [
-            { text: "Locked block", type: "text", style: "green", isLocked: true },
+            { text: "Locked Block", type: "text", style: "green", isLocked: true },
             { text: "Another locked block", type: "text", style: "green", isLocked: true },
           ],
         },
@@ -639,10 +632,14 @@ describe("Edge events", () => {
         />
       </>,
     );
-    expect(screen.queryByText("Locked block")).toBeInTheDocument();
-    expect(screen.queryByText("Locked block")).toHaveClass("editorv3style-green");
-    expect(screen.queryByText("Another locked block")).toBeInTheDocument();
-    await user.click(screen.queryByText(/locked/) as HTMLElement);
+    const lockedSpan = screen.queryByText(/Locked/) as HTMLElement;
+    const blockSpan = screen.queryByText(/Block/);
+    expect(lockedSpan).toBeInTheDocument();
+    expect(blockSpan).toBeInTheDocument();
+    expect(lockedSpan).toHaveClass("editorv3style-green");
+    expect(lockedSpan.dataset.lineStartPosition).toEqual(blockSpan?.dataset.lineStartPosition);
+    expect(screen.queryByText(/Another/)).toBeInTheDocument();
+    await user.click(lockedSpan);
     await user.keyboard("{Home}{ArrowRight}x");
     const x = screen.queryByText("x") as HTMLSpanElement;
     expect(x).toBeInTheDocument();
@@ -734,7 +731,8 @@ describe("Select all", () => {
     await user.click(editable);
     // Try and type into everything selected
     await user.keyboard("x");
-    expect(screen.queryByText("Locked block")).toBeInTheDocument();
+    expect(screen.queryByText(/Locked/)).toBeInTheDocument();
+    expect(screen.queryByText(/block/)).toBeInTheDocument();
     // Try and type after removing whole selection
     await user.keyboard("{Home}x");
     fireEvent.blur(editable);
@@ -1006,6 +1004,95 @@ describe("Add at block and escape out", () => {
 });
 
 describe("Move left to start over at block", () => {
+  test("Don't merge blocks infront", async () => {
+    const user = userEvent.setup({ delay: null });
+    const mockSetObject = jest.fn();
+    const TestEditor = () => {
+      const [input, setInput] = useState<IEditorV3>({
+        lines: [
+          {
+            textBlocks: [
+              {
+                text: "@initial",
+                type: "at",
+                isLocked: true,
+              },
+              {
+                text: " thing ",
+                type: "text",
+              },
+              {
+                text: "@here",
+                type: "at",
+              },
+            ],
+          },
+        ],
+      });
+      return (
+        <EditorV3
+          data-testid="test-editor"
+          id="test-editor"
+          input={input}
+          setObject={(ret) => {
+            setInput(ret);
+            mockSetObject(ret);
+          }}
+          atListFunction={async (typedString: string) => {
+            const atList = [{ text: "@Hello" }, { text: "@Lovely" }, { text: "@People" }];
+            return atList.filter((at) => at.text.toLowerCase().includes(typedString.toLowerCase()));
+          }}
+        />
+      );
+    };
+    await act(async () => render(<TestEditor />));
+    const editor = screen.queryByTestId("test-editor") as HTMLDivElement;
+    expect(editor).toBeInTheDocument();
+    const editable = editor.querySelector(".aiev3-editing") as HTMLDivElement;
+    expect(editable).toBeInTheDocument();
+    expect(screen.queryByTestId("test-editor")).toMatchSnapshot();
+    await user.click(editable);
+    await user.keyboard("{Home}@ {Escape}");
+    fireEvent.blur(editor);
+    expect(mockSetObject).toHaveBeenCalledTimes(1);
+    expect(mockSetObject).toHaveBeenLastCalledWith({
+      lines: [
+        {
+          textBlocks: [
+            {
+              isLocked: true,
+              label: undefined,
+              style: undefined,
+              text: "@ ",
+              type: "at",
+            },
+            {
+              isLocked: true,
+              label: undefined,
+              style: undefined,
+              text: "@initial",
+              type: "at",
+            },
+            {
+              isLocked: undefined,
+              label: undefined,
+              style: undefined,
+              text: " thing ",
+              type: "text",
+            },
+            {
+              isLocked: true,
+              label: undefined,
+              style: undefined,
+              text: "@here",
+              type: "at",
+            },
+          ],
+        },
+      ],
+    });
+  });
+
   test("Arrow left", async () => {
     const user = userEvent.setup({ delay: null });
     const mockSetObject = jest.fn();

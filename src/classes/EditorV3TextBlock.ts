@@ -2,7 +2,6 @@ import { cloneDeep } from "lodash";
 import { defaultContentProps } from "./defaultContentProps";
 import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import { EditorV3RenderProps, EditorV3Style, EditorV3WordPosition } from "./interface";
-import { stopDragOnto } from "./toHtml/stopDragOnto";
 
 export type EditorV3TextBlockType = "text" | "at" | "select";
 export interface IEditorV3TextBlockOptionalParams {
@@ -34,7 +33,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
   }
 
   get mergeKey(): string {
-    return `${this.type}:${this.style ?? ""}:${this.label ?? ""}`;
+    return `${this.isLocked ? this.lineStartPosition : "-"}:${this.type}:${this.style ?? ""}:${this.label ?? ""}`;
   }
 
   // Read only variables
@@ -125,6 +124,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
       this.style = spanData.style;
       this.type = (spanData.type ?? "text") as EditorV3TextBlockType;
       this.isLocked = spanData.isLocked;
+      this.lineStartPosition = spanData.lineStartPosition ?? 0;
     }
     // Object processing
     else {
@@ -152,6 +152,10 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
       .replaceAll(/[\u2009-\u200f]/g, "");
     const spanData: IEditorV3TextBlock = {
       text,
+      lineStartPosition:
+        arg instanceof HTMLSpanElement && arg.dataset.lineStartPosition
+          ? parseInt(arg.dataset.lineStartPosition)
+          : 0,
       label: arg instanceof HTMLSpanElement && arg.title !== "" ? arg.title : undefined,
       style: arg instanceof HTMLSpanElement ? arg.dataset.styleName : undefined,
       type: (arg instanceof HTMLSpanElement ? arg.dataset.type : "text") as EditorV3TextBlockType,
@@ -254,15 +258,15 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
     if (this.type !== "text") {
       throw new Error("Use correct class for non-text blocks");
     } else {
-      const words =
-        renderProps.doNotSplitWordSpans || this.isLocked || style?.isLocked
-          ? [text.replaceAll("\u200c", "")]
-          : text.split("\u200c");
+      const words = renderProps.doNotSplitWordSpans
+        ? [text.replaceAll("\u200c", "")]
+        : text.split("\u200c");
       words
         .filter((w) => w !== "")
         .forEach((word) => {
           const span = document.createElement("span");
           span.classList.add("aiev3-tb");
+          span.dataset.lineStartPosition = this.lineStartPosition.toString();
           const textNode = document.createTextNode(word);
           span.appendChild(textNode);
           // Add label
@@ -271,7 +275,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
           if (this.isLocked && style?.isLocked) {
             span.classList.add("is-locked");
             span.dataset.isLocked = "true";
-            stopDragOnto(span);
+            span.contentEditable = "false";
           }
           if (this.isActive) span.classList.add("is-active");
           // Apply style
