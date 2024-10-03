@@ -1,3 +1,4 @@
+import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import {
   EditorV3TextBlock,
   IEditorV3TextBlock,
@@ -9,9 +10,7 @@ import {
   EditorV3Style,
   EditorV3WordPosition,
 } from "./interface";
-import { IMarkdownSettings } from "./defaultMarkdownSettings";
 import { renderDropdown } from "./toHtml/renderDropdown";
-import { stopDragOnto } from "./toHtml/stopDragOnto";
 
 export interface IEditorV3SelectBlockOptionalParams extends IEditorV3TextBlockOptionalParams {
   availableOptions?: EditorV3DropListItem<Record<string, string>>[];
@@ -150,6 +149,7 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
     ret.appendChild(span);
     if (renderProps.currentEl) renderProps.currentEl.append(ret);
     span.classList.add("aiev3-tb", "select-block");
+    span.dataset.lineStartPosition = this.lineStartPosition.toString();
     span.dataset.type = "select";
 
     // Add Text node
@@ -166,7 +166,7 @@ export class EditorV3SelectBlock extends EditorV3TextBlock implements IEditorV3S
     // Add locked status
     span.classList.add("is-locked");
     span.dataset.isLocked = "true";
-    stopDragOnto(span);
+    span.contentEditable = "false";
     // Add other data items from the at item
     span.dataset.availableOptions = JSON.stringify(this.availableOptions);
 

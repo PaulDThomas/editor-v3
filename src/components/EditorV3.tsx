@@ -353,7 +353,9 @@ export const EditorV3 = ({
       };
     }
   }, [handleRefreshEvent]);
+  // #endregion Input utilities
 
+  // #region Handle focus/blur
   // Focus and blur events are container not contenteditable level events!
   const handleFocus = useCallback(
     (e: React.FocusEvent | React.MouseEvent) => {
@@ -395,7 +397,7 @@ export const EditorV3 = ({
       forceReturn({ content: newContent, focus: false, editable });
     }
   }, [state, contentProps, forceReturn, editable]);
-  // #endregion Input utilities
+  // #endregion Handle focus/blur
 
   // #region Handle key/mouse events
   const handleKeyDown = useCallback(

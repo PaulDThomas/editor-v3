@@ -3,7 +3,7 @@ import { readV3DivElement } from "../functions/readV3DivElement";
 import { EditorV3AtBlock } from "./EditorV3AtBlock";
 import { EditorV3PositionClass } from "./EditorV3Position";
 import { EditorV3SelectBlock } from "./EditorV3SelectBlock";
-import { EditorV3TextBlock, EditorV3TextBlockType } from "./EditorV3TextBlock";
+import { EditorV3TextBlock } from "./EditorV3TextBlock";
 import { defaultContentProps } from "./defaultContentProps";
 import { drawHtmlDecimalAlign } from "./drawHtmlDecimalAlign";
 import {
@@ -32,22 +32,30 @@ export class EditorV3Line implements IEditorV3Line {
    */
   public toHtml(renderProps: EditorV3RenderProps): HTMLDivElement {
     const h = document.createElement("div");
+    this._setBlockStartPositions();
     renderProps.currentEl = h;
     h.className = `aiev3-line ${this.contentProps.textAlignment}`;
     if (this.contentProps.textAlignment === EditorV3Align.decimal) {
       const decimalPosition = this.lineText.match(/\./)?.index ?? Infinity;
-      drawHtmlDecimalAlign(
-        renderProps,
-        this.contentProps,
-        this.upToPos(decimalPosition, true),
-        this.fromPos(decimalPosition, true),
-      );
+      const upTo = this.upToPos(decimalPosition, true);
+      const from = this.fromPos(decimalPosition, true);
+      drawHtmlDecimalAlign(renderProps, this.contentProps, upTo, from);
     } else {
       this.textBlocks.forEach((tb) =>
         h.append(
           tb.toHtml(renderProps, tb.style ? this.contentProps.styles?.[tb.style] : undefined),
         ),
       );
+    }
+    // Need to add a space to the end of the line to allow for the cursor to be placed at the end
+    if (
+      this.textBlocks.length > 0 &&
+      this.textBlocks[this.textBlocks.length - 1].isLocked &&
+      this.contentProps.textAlignment !== EditorV3Align.decimal
+    ) {
+      const endLineEl = document.createElement("span");
+      endLineEl.textContent = "\u200b";
+      h.append(endLineEl);
     }
     if (renderProps.editableEl) renderProps.editableEl.append(h);
     return h;
@@ -121,6 +129,7 @@ export class EditorV3Line implements IEditorV3Line {
   }
   // #endregion Getters
 
+  // #region Constructors
   // Constructor
   constructor(
     arg?: IEditorV3Line | HTMLDivElement | EditorV3BlockClass[] | string,
@@ -144,6 +153,8 @@ export class EditorV3Line implements IEditorV3Line {
       this.textBlocks = ret.textBlocks;
       this.contentProps.textAlignment = ret.textAlignment;
       this.contentProps.decimalAlignPercent = ret.decimalAlignPercent;
+      // Only need to merge after HMTL read?
+      this._mergeBlocks();
     }
     // Markdown text
     else if (typeof arg === "string") {
@@ -170,7 +181,7 @@ export class EditorV3Line implements IEditorV3Line {
 
     // Fix any problems
     this._lockTextBlocksByStyle();
-    this._mergeBlocks();
+    this._setBlockStartPositions();
   }
 
   /**
@@ -274,7 +285,9 @@ export class EditorV3Line implements IEditorV3Line {
       }
     }
   }
+  // #endregion Constructors
 
+  // #region Get/Set block methods
   /**
    * Gets the block at a position
    * @param pos The position to get the block at
@@ -315,6 +328,7 @@ export class EditorV3Line implements IEditorV3Line {
       return nextBlock;
     }
   }
+  // #endregion Get/Set block methods
 
   // #region Subset methods
   /**
@@ -349,6 +363,8 @@ export class EditorV3Line implements IEditorV3Line {
       ) {
         const slicedBlock = textBlockFactory({
           ...block.data,
+          // Split locked occurs on decimals, so lineStartPosition is needed
+          lineStartPosition: splitLocked ? block.lineStartPosition : undefined,
           text: block.text.slice(
             startPos - block.lineStartPosition,
             endPos - block.lineStartPosition,
@@ -375,7 +391,7 @@ export class EditorV3Line implements IEditorV3Line {
       // Stop if the end is reached
       if (block.lineStartPosition >= endPos) break;
     }
-    this._setBlockStartPositions(ret, startPos);
+    !splitLocked && this._setBlockStartPositions(ret, startPos);
     return ret;
   }
 
@@ -428,6 +444,7 @@ export class EditorV3Line implements IEditorV3Line {
     const post = this.fromPos(pos);
     this.textBlocks = [...pre, ...newTextBlocks, ...post];
     this._mergeBlocks();
+    this._setBlockStartPositions();
   }
 
   /**
@@ -444,10 +461,10 @@ export class EditorV3Line implements IEditorV3Line {
       const post = this.fromPos(endPos);
       this.textBlocks = [...pre, ...post];
       this._mergeBlocks();
+      this._setBlockStartPositions();
     }
     return ret;
   }
-  // #endregion Insert and remove methods
 
   /**
    * Delete a character from the line
@@ -458,6 +475,7 @@ export class EditorV3Line implements IEditorV3Line {
     this.removeSection(pos, pos + 1);
     return this;
   }
+  // #endregion Insert and remove methods
 
   // #region Update style methods
   /**
@@ -469,16 +487,16 @@ export class EditorV3Line implements IEditorV3Line {
    */
   public applyStyle(styleName: string, startPos: number, endPos: number) {
     if (startPos < endPos) {
-      this.textBlocks = [
-        ...this.upToPos(startPos),
-        ...this.subBlocks(startPos, endPos).map((tb) => {
-          tb.style = styleName;
-          if (this.contentProps.styles?.[styleName]?.isLocked) tb.isLocked = true;
-          return tb;
-        }),
-        ...this.fromPos(endPos),
-      ];
+      const upTo = this.upToPos(startPos);
+      const mid = this.subBlocks(startPos, endPos).map((tb) => {
+        tb.style = styleName;
+        if (this.contentProps.styles?.[styleName]?.isLocked) tb.isLocked = true;
+        return tb;
+      });
+      const from = this.fromPos(endPos);
+      this.textBlocks = [...upTo, ...mid, ...from];
       this._mergeBlocks();
+      this._setBlockStartPositions();
     }
     return this;
   }
@@ -500,6 +518,7 @@ export class EditorV3Line implements IEditorV3Line {
         ...this.fromPos(endPos),
       ];
       this._mergeBlocks();
+      this._setBlockStartPositions();
     }
     return this;
   }
@@ -514,17 +533,10 @@ export class EditorV3Line implements IEditorV3Line {
       const mergedBlocks: EditorV3BlockClass[] = [];
       let lastTypeStyle: string | null = null;
       for (let _i = 0; _i < this.textBlocks.length; _i++) {
-        if (
-          !this.textBlocks[_i].isLocked &&
-          !this.contentProps.styles?.[this.textBlocks[_i].style ?? ""]?.isLocked &&
-          this.textBlocks[_i].mergeKey === lastTypeStyle &&
-          mergedBlocks.length > 0
-        ) {
+        if (this.textBlocks[_i].mergeKey === lastTypeStyle && mergedBlocks.length > 0) {
           mergedBlocks[mergedBlocks.length - 1] = textBlockFactory({
+            ...mergedBlocks[mergedBlocks.length - 1].data,
             text: mergedBlocks[mergedBlocks.length - 1].text + this.textBlocks[_i].text,
-            label: mergedBlocks[mergedBlocks.length - 1].label ?? this.textBlocks[_i].label,
-            type: lastTypeStyle.split(":")[0] as EditorV3TextBlockType,
-            style: lastTypeStyle.split(":")[1] !== "" ? lastTypeStyle.split(":")[1] : undefined,
           });
         } else {
           mergedBlocks.push(this.textBlocks[_i]);
@@ -533,7 +545,6 @@ export class EditorV3Line implements IEditorV3Line {
       }
       this.textBlocks = mergedBlocks.filter((tb) => tb.text !== "");
     }
-    this._setBlockStartPositions();
   }
 
   /**

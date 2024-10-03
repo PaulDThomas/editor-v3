@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Check basic EditorV3Line Load decimal text 1`] = `"<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;"><span class="aiev3-span-point lhs"><span class="aiev3-tb" data-line-start-position="0">q</span></span><span class="aiev3-span-point rhs"> </span></div>"`;
+
+exports[`Check basic EditorV3Line Load decimal text 2`] = `"<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;"><span class="aiev3-span-point lhs"><span class="aiev3-tb" data-line-start-position="0">12</span></span><span class="aiev3-span-point rhs"><span class="aiev3-tb" data-line-start-position="0">.34</span></span></div>"`;
+
+exports[`Check basic EditorV3Line Load decimal textBlocks 1`] = `"<div class="aiev3-line decimal" style="grid-template-columns: 60% 40%;"><span class="aiev3-span-point lhs"><span class="aiev3-tb" data-line-start-position="0">Hello&nbsp;world</span></span><span class="aiev3-span-point rhs"><span class="aiev3-tb" data-line-start-position="0">.&nbsp;</span><span class="aiev3-tb editorv3style-shiny" data-line-start-position="13" data-style-name="shiny">How&nbsp;</span><span class="aiev3-tb editorv3style-shiny" data-line-start-position="13" data-style-name="shiny">is&nbsp;</span><span class="aiev3-tb editorv3style-shiny" data-line-start-position="13" data-style-name="shiny">it&nbsp;</span><span class="aiev3-tb editorv3style-shiny" data-line-start-position="13" data-style-name="shiny">going?</span></span></div>"`;
+
+exports[`Check basic EditorV3Line Load normal div 1`] = `"<div class="aiev3-line right"><span class="aiev3-tb" data-line-start-position="0">12.34</span></div>"`;
+
+exports[`Check basic EditorV3Line Load string 1`] = `"<div class="aiev3-line left"><span class="aiev3-tb" data-line-start-position="0">Hello&nbsp;</span><span class="aiev3-tb" data-line-start-position="0">world</span></div>"`;
+
+exports[`Check basic EditorV3Line Load string with line breaks, tabs 1`] = `"<div class="aiev3-line center"><span class="aiev3-tb" data-line-start-position="0">&nbsp;</span><span class="aiev3-tb" data-line-start-position="0">&nbsp;</span><span class="aiev3-tb" data-line-start-position="0">Hello&nbsp;</span><span class="aiev3-tb" data-line-start-position="0">&nbsp;</span><span class="aiev3-tb" data-line-start-position="0">world&nbsp;</span><span class="aiev3-tb" data-line-start-position="0">&nbsp;</span></div>"`;
+
+exports[`Check basic EditorV3Line Load textBlocks, test getStyleAt 1`] = `"<div class="aiev3-line left"><span class="aiev3-tb" data-line-start-position="0">Hello&nbsp;world,&nbsp;</span><span class="aiev3-tb editorv3style-shiny" data-line-start-position="13" data-style-name="shiny">How&nbsp;</span><span class="aiev3-tb editorv3style-shiny" data-line-start-position="13" data-style-name="shiny">is&nbsp;</span><span class="aiev3-tb editorv3style-shiny" data-line-start-position="13" data-style-name="shiny">it&nbsp;</span><span class="aiev3-tb editorv3style-shiny" data-line-start-position="13" data-style-name="shiny">going?</span></div>"`;

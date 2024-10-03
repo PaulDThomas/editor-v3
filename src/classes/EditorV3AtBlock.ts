@@ -11,7 +11,6 @@ import {
   EditorV3WordPosition,
 } from "./interface";
 import { renderDropdown } from "./toHtml/renderDropdown";
-import { stopDragOnto } from "./toHtml/stopDragOnto";
 
 export interface IEditorV3AtBlockOptionalParams extends IEditorV3TextBlockOptionalParams {
   atListFunction?: (typedString: string) => Promise<EditorV3DropListItem<Record<string, string>>[]>;
@@ -139,6 +138,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     const span = document.createElement("span");
     ret.appendChild(span);
     span.classList.add("aiev3-tb", "at-block");
+    span.dataset.lineStartPosition = this.lineStartPosition.toString();
     span.dataset.type = "at";
 
     // Add Text node
@@ -160,7 +160,7 @@ export class EditorV3AtBlock extends EditorV3TextBlock implements IEditorV3AtBlo
     if (this.isLocked || !this.isActive) {
       span.classList.add("is-locked");
       span.dataset.isLocked = "true";
-      stopDragOnto(span);
+      span.contentEditable = "false";
       // Add any other data items from the at item
       this.atData &&
         Object.keys(this.atData).forEach((key) => {
