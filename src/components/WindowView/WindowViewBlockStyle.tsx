@@ -16,8 +16,8 @@ export const WindowViewBlockStyle = ({ lineIndex, blockIndex }: WindowViewBlockS
   const selectStyleId = useId();
 
   const availableOptions = useMemo(() => {
-    const ret: { label: string; value: string; disabled?: boolean }[] = [
-      { label: "None", value: "" },
+    const ret: { label: string; value: string | undefined; disabled?: boolean }[] = [
+      { label: "None", value: undefined },
     ];
     if (wvc && wvc.contentProps.styles) {
       ret.push(
