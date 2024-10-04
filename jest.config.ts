@@ -23,7 +23,8 @@ const config = {
 
   // Added by Paul
   collectCoverage: true,
-  coverageProvider: "v8",
+  coverageProvider: "babel",
+  coverageReporters: ["lcov", "text"],
   collectCoverageFrom: [
     "src/**/*.{js,jsx}",
     "src/**/*.{ts,tsx}",
