@@ -320,14 +320,13 @@ export class EditorV3Content implements IEditorV3 {
     if (props.maxAtListLength !== undefined) this._maxAtListLength = props.maxAtListLength;
   }
 
-  /* c8 ignore start */
+  /* istanbul ignore next */
   private _debugText(from: string): void {
     console.debug(
       from + "\n",
       this.lines.map((l) => l.textBlocks.map((tb) => tb.text).join("|")).join("\n"),
     );
   }
-  /* c8 ignore end */
 
   private _copyImport(read: IEditorV3, props?: EditorV3ContentPropsInput): void {
     const consolidatedProps = { ...read.contentProps, ...props };

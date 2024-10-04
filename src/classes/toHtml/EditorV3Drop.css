@@ -29,7 +29,7 @@ ul.aiev3-dropdown-list {
   font-size: 12px;
   color: #000;
   font-weight: 400;
-  z-index: 10;
+  z-index: 10001;
 }
 
 ul.aiev3-dropdown-list li:first-child {
