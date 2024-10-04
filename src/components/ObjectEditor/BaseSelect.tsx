@@ -21,15 +21,15 @@ export const BaseSelect = ({
   label,
   ...rest
 }: BaseSelectProps): JSX.Element => {
-  const [thisValueString, setThisValueString] = useState(value?.toString() ?? "None");
+  const [thisValueString, setThisValueString] = useState(`${value}`);
   useEffect(() => {
     const ix = availableOptions.findIndex((o) => o.value === value);
-    setThisValueString(`${ix !== -1 ? `${ix}-` : ""}${value?.toString() ?? "None"}`);
+    setThisValueString(`${ix !== -1 ? `${ix}-` : ""}${value}`);
   }, [availableOptions, value]);
 
   const availableOptionsStrings = availableOptions.map((item, ix) => ({
     label: item.label,
-    value: `${ix}-${item.value?.toString() ?? "None"}`,
+    value: `${ix}-${item.value?.toString() ?? "undefined"}`,
     disabled: item.disabled,
   }));
 

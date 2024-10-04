@@ -485,7 +485,7 @@ export const EditorV3 = ({
             }
           }
           // Handle cursor null after pressing enter - jest does not cover this, browser specific
-          /* c8 ignore start */
+          /* istanbul ignore next */
           else if (
             e.key === "Enter" &&
             newContent.caretPosition === null &&
@@ -493,7 +493,6 @@ export const EditorV3 = ({
           ) {
             newContent.caretPosition = lastCaretPosition;
           }
-          /* c8 ignore end */
           setContent(newContent, `Handle key up: ${e.key}`);
         }
       }
