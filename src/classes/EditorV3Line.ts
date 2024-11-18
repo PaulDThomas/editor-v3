@@ -166,7 +166,7 @@ export class EditorV3Line implements IEditorV3Line {
     }
     // Block array
     else if (Array.isArray(arg)) {
-      this.textBlocks = arg;
+      this.textBlocks = arg.map((tb) => textBlockFactory(tb));
     }
     // JSON object/undefined
     else {

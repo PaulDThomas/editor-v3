@@ -1,7 +1,7 @@
 import { ContextWindow } from "@asup/context-menu";
-import { cloneDeep, isEqual } from "lodash";
-import { createContext, useCallback } from "react";
-import { EditorV3Content, EditorV3Line } from "../../classes";
+import { isEqual } from "lodash";
+import { createContext } from "react";
+import { EditorV3Content } from "../../classes";
 import { EditorV3ContentProps, IEditorV3Line } from "../../classes/interface";
 import { useDebounceStack } from "../../hooks";
 import { EditorV3State } from "../EditorV3";
@@ -63,28 +63,6 @@ export const WindowView = ({
     null,
   );
 
-  const addLine = useCallback(
-    (ix: number) => {
-      if (currentValue) {
-        const newLines = cloneDeep(currentValue);
-        newLines.splice(ix, 0, new EditorV3Line({ textBlocks: [{ type: "text", text: "" }] }));
-        setCurrentValue(newLines);
-      }
-    },
-    [currentValue, setCurrentValue],
-  );
-
-  const removeLine = useCallback(
-    (ix: number) => {
-      if (currentValue) {
-        const newLines = cloneDeep(currentValue);
-        newLines.splice(ix, 1);
-        setCurrentValue(newLines);
-      }
-    },
-    [currentValue, setCurrentValue],
-  );
-
   return !currentValue ? (
     <></>
   ) : (
@@ -131,20 +109,20 @@ export const WindowView = ({
       >
         <div className={styles.windowViewBody}>
           {state.editable && (state.content.contentProps ?? {}).allowNewLine && (
-            <AddLine onClick={() => addLine(0)} />
+            <AddLine index={0} />
           )}
           {currentValue.map((line, ix) => (
             <div
               key={ix}
               className={iconStyles.relativeDiv}
             >
-              {state.editable && <RemoveLine onClick={() => removeLine(ix)} />}
+              {state.editable && <RemoveLine index={ix} />}
               <WindowViewLine
                 key={ix}
                 lineIndex={ix}
               />
               {state.editable && (state.content.contentProps ?? {}).allowNewLine && (
-                <AddLine onClick={() => addLine(ix + 1)} />
+                <AddLine index={ix + 1} />
               )}
             </div>
           ))}

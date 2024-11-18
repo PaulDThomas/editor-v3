@@ -653,7 +653,7 @@ describe("Check active block", () => {
         endLine: 0,
         endChar: 0,
       }),
-    ).toEqual(tb);
+    ).toEqual({ ...tb, isActive: true });
     expect(
       line.setActiveBlock({
         isCollapsed: true,
@@ -662,7 +662,7 @@ describe("Check active block", () => {
         endLine: 0,
         endChar: 1,
       }),
-    ).toEqual(tb);
+    ).toEqual({ ...tb, isActive: true });
     expect(
       line.setActiveBlock({
         isCollapsed: true,
@@ -671,7 +671,7 @@ describe("Check active block", () => {
         endLine: 0,
         endChar: 2,
       }),
-    ).toEqual(tb);
+    ).toEqual({ ...tb, isActive: true });
     expect(
       line.setActiveBlock({
         isCollapsed: true,
@@ -680,7 +680,7 @@ describe("Check active block", () => {
         endLine: 0,
         endChar: 3,
       }),
-    ).toEqual(tb);
+    ).toEqual({ ...tb, isActive: true });
     expect(
       line.setActiveBlock({
         isCollapsed: true,
@@ -689,7 +689,7 @@ describe("Check active block", () => {
         endLine: 0,
         endChar: 4,
       }),
-    ).toEqual(ta);
+    ).toEqual({ ...ta, lineStartPosition: 4, isActive: true });
     expect(
       line.setActiveBlock({
         isCollapsed: true,
@@ -698,7 +698,7 @@ describe("Check active block", () => {
         endLine: 0,
         endChar: 5,
       }),
-    ).toEqual(ta);
+    ).toEqual({ ...ta, lineStartPosition: 4, isActive: true });
     expect(
       line.setActiveBlock({
         isCollapsed: true,
@@ -707,7 +707,7 @@ describe("Check active block", () => {
         endLine: 0,
         endChar: 6,
       }),
-    ).toEqual(ta);
+    ).toEqual({ ...ta, lineStartPosition: 4, isActive: true });
     expect(
       line.setActiveBlock({
         isCollapsed: true,
@@ -716,7 +716,7 @@ describe("Check active block", () => {
         endLine: 0,
         endChar: 7,
       }),
-    ).toEqual(ta);
+    ).toEqual({ ...ta, lineStartPosition: 4, isActive: true });
     expect(
       line.setActiveBlock({
         isCollapsed: true,
@@ -725,7 +725,7 @@ describe("Check active block", () => {
         endLine: 0,
         endChar: 8,
       }),
-    ).toEqual(ta);
+    ).toEqual({ ...ta, lineStartPosition: 4, isActive: true });
     expect(
       line.setActiveBlock({
         isCollapsed: true,
@@ -733,8 +733,8 @@ describe("Check active block", () => {
         startChar: 9,
         endLine: 0,
         endChar: 9,
-      }),
-    ).toEqual(ts);
+      })?.data,
+    ).toEqual(ts.data);
     expect(
       line.setActiveBlock({
         isCollapsed: true,
@@ -742,8 +742,8 @@ describe("Check active block", () => {
         startChar: 10,
         endLine: 0,
         endChar: 10,
-      }),
-    ).toEqual(ts);
+      })?.data,
+    ).toEqual(ts.data);
     expect(
       line.setActiveBlock({
         isCollapsed: true,
@@ -751,8 +751,8 @@ describe("Check active block", () => {
         startChar: 11,
         endLine: 0,
         endChar: 11,
-      }),
-    ).toEqual(ts);
+      })?.data,
+    ).toEqual(ts.data);
     expect(
       line.setActiveBlock({
         isCollapsed: true,
@@ -760,8 +760,8 @@ describe("Check active block", () => {
         startChar: 12,
         endLine: 0,
         endChar: 12,
-      }),
-    ).toEqual(ts);
+      })?.data,
+    ).toEqual(ts.data);
     expect(
       line.setActiveBlock({
         isCollapsed: true,
@@ -769,8 +769,8 @@ describe("Check active block", () => {
         startChar: 13,
         endLine: 0,
         endChar: 13,
-      }),
-    ).toEqual(ts);
+      })?.data,
+    ).toEqual(ts.data);
     expect(
       line.setActiveBlock({
         isCollapsed: true,
