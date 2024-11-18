@@ -50,26 +50,26 @@ export const App = (): JSX.Element => {
   // Secont input content
   const testObject: IEditorV3 = {
     lines: [
-      // {
-      //   textBlocks: [
-      //     { text: "P ", type: "text" },
-      //     { text: "Me", type: "at" },
-      //     { text: "E", type: "text" },
-      //   ],
-      // },
-      // {
-      //   textBlocks: [
-      //     {
-      //       text: "Select",
-      //       type: "select",
-      //       availableOptions: [
-      //         { text: "one", data: { text: "one", style: "Notes" } },
-      //         { text: "two", data: { text: "two" } },
-      //         { text: "three", data: { text: "three", style: "Optional" } },
-      //       ],
-      //     },
-      //   ],
-      // },
+      {
+        textBlocks: [
+          { text: "P ", type: "text" },
+          { text: "Me", type: "at" },
+          { text: "E", type: "text" },
+        ],
+      },
+      {
+        textBlocks: [
+          {
+            text: "Select",
+            type: "select",
+            availableOptions: [
+              { text: "one", data: { text: "one", style: "Notes" } },
+              { text: "two", data: { text: "two" } },
+              { text: "three", data: { text: "three", style: "Optional" } },
+            ],
+          },
+        ],
+      },
     ],
   };
 

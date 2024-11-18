@@ -187,8 +187,8 @@
   border-radius: 4px;
   margin-top: 16px;
   min-height: 26px;
-  height: calc(100% - 20px);
+  height: calc(100% - 16px);
   padding: 1px;
-  width: calc(100% - 4px);
-  box-sizing: content-box;
+  width: 100%;
+  box-sizing: border-box;
 }

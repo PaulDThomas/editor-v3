@@ -1,7 +1,7 @@
 ul.aiev3-dropdown-list {
   position: absolute;
   width: max-content;
-  max-width: 200px;
+  max-width: 600px;
   display: block;
   list-style-type: none;
   margin-block-start: 2px;
@@ -54,6 +54,8 @@ li.aiev3-drop-no-items {
 
 li.aiev3-drop-item {
   cursor: pointer;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 li.aiev3-drop-item:hover {
