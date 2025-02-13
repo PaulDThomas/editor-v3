@@ -75,7 +75,7 @@ export class EditorV3Line implements IEditorV3Line {
         tb.toMarkdown(renderProps.markdownSettings ?? this.contentProps.markdownSettings),
       )
       .join("");
-    if (h.textContent === "") h.textContent = "\u2009";
+    if (h.textContent === "") h.textContent = "\u200b";
 
     if (renderProps.editableEl) renderProps.editableEl.append(h);
     return h;
@@ -191,7 +191,7 @@ export class EditorV3Line implements IEditorV3Line {
    */
   private fromMarkdown(markdown: string) {
     if (this.contentProps.markdownSettings) {
-      let remainingMarkdown = markdown.replace(/\u2009/g, "");
+      let remainingMarkdown = markdown.replace(/[\u2009-\u200f]/g, "");
       let safety = 0;
       while (remainingMarkdown.length > 0 && safety < 100) {
         safety++;

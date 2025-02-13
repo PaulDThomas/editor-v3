@@ -53,7 +53,7 @@ describe("Text block factory tests", () => {
     const tempDiv = document.createElement("div");
     tempDiv.appendChild(testBlock.toHtml({}));
     expect(tempDiv.innerHTML).toEqual(
-      '<span class="aiev3-tb" data-line-start-position="0">\u2009</span>',
+      '<span class="aiev3-tb" data-line-start-position="0">\u200b</span>',
     );
   });
 

@@ -19,7 +19,7 @@ export const drawHtmlDecimalAlign = (
           ),
         ),
       );
-    else prePoint.textContent = "\u2009";
+    else prePoint.textContent = "\u200b";
 
     // Set up space after (excluding) decimal
     const postPoint = document.createElement("span");
@@ -34,7 +34,7 @@ export const drawHtmlDecimalAlign = (
           ),
         );
       });
-    else postPoint.textContent = "\u2009";
+    else postPoint.textContent = "\u200b";
 
     // Set grid column widths
     renderProps.currentEl.style.gridTemplateColumns = `${contentProps.decimalAlignPercent}% ${100 - contentProps.decimalAlignPercent}%`;

@@ -48,14 +48,14 @@ export const readV3DivElement = (
                   el instanceof HTMLSpanElement || el instanceof Text ? el : { text: "" },
                 ),
               ),
-            ].filter((tb) => tb.text !== "" && tb.text !== "\u2009")
+            ].filter((tb) => tb.text !== "" && tb.text !== "\u200b")
           : [
               ...[...arg.childNodes].map((el) =>
                 textBlockFactory(
                   el instanceof HTMLSpanElement || el instanceof Text ? el : { text: "" },
                 ),
               ),
-            ].filter((tb) => tb.text !== "" && tb.text !== "\u2009");
+            ].filter((tb) => tb.text !== "" && tb.text !== "\u200b");
     }
     // Standard alignment
     else {
@@ -63,7 +63,7 @@ export const readV3DivElement = (
         ...[...arg.childNodes].map((el) =>
           textBlockFactory(el instanceof HTMLSpanElement || el instanceof Text ? el : { text: "" }),
         ),
-      ].filter((tb) => tb.text !== "");
+      ].filter((tb) => tb.text !== "" && tb.text !== "\u200b");
       ret.textAlignment = ["left", "center", "right"].includes(arg.classList[1])
         ? (arg.classList[1] as EditorV3Align)
         : EditorV3Align.left;
