@@ -29,7 +29,7 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
   public isLocked: true | undefined;
   public lineStartPosition: number = 0;
   get lineEndPosition() {
-    return this.lineStartPosition + this.text.replaceAll("\u200c", "").length;
+    return this.lineStartPosition + this.text.replaceAll(/[\u2009-\u200f]/g, "").length;
   }
 
   get mergeKey(): string {
@@ -253,13 +253,13 @@ export class EditorV3TextBlock implements IEditorV3TextBlock {
 
   // Content returns
   public toHtml(renderProps: EditorV3RenderProps, style?: EditorV3Style): DocumentFragment {
-    const text = this.text === "" ? "\u2009" : this.text.replaceAll(" ", "\u00a0\u200c");
+    const text = this.text === "" ? "\u200b" : this.text.replaceAll(" ", "\u00a0\u200c");
     const ret = new DocumentFragment();
     if (this.type !== "text") {
       throw new Error("Use correct class for non-text blocks");
     } else {
       const words = renderProps.doNotSplitWordSpans
-        ? [text.replaceAll("\u200c", "")]
+        ? [text.replaceAll(/[\u2009-\u200f]/g, "")]
         : text.split("\u200c");
       words
         .filter((w) => w !== "")

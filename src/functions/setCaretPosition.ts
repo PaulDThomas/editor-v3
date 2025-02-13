@@ -29,7 +29,7 @@ export function setCaretPosition(el: Node, pos: EditorV3PositionClass): EditorV3
           range.startContainer.parentElement instanceof HTMLSpanElement &&
           range.startContainer.parentElement.classList.contains("is-locked")
         ) {
-          const emptyTextBlock = new EditorV3TextBlock({ text: "\u200d" });
+          const emptyTextBlock = new EditorV3TextBlock({ text: "\u200b" });
           const newSpan = emptyTextBlock.toHtml({}).childNodes[0] as HTMLSpanElement;
           // Add newTextNode before the locked span
           range.startContainer.parentElement.before(newSpan);
@@ -47,7 +47,7 @@ export function setCaretPosition(el: Node, pos: EditorV3PositionClass): EditorV3
           range.startContainer.previousSibling.classList.contains("is-locked") &&
           range.startContainer.textContent === ""
         ) {
-          range.startContainer.textContent = "\u2009";
+          range.startContainer.textContent = "\u200b";
         }
         if (
           range.endOffset === 0 &&
@@ -59,7 +59,7 @@ export function setCaretPosition(el: Node, pos: EditorV3PositionClass): EditorV3
           range.endContainer.previousSibling.classList.contains("is-locked") &&
           range.endContainer.textContent === ""
         ) {
-          range.endContainer.textContent = "\u2009";
+          range.endContainer.textContent = "\u200b";
         }
 
         // Backwards selection

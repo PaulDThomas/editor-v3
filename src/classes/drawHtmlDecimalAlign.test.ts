@@ -43,8 +43,8 @@ describe("Test draw decimal align function", () => {
     );
     expect(div.outerHTML).toEqual(
       `<div style="grid-template-columns: 35% 65%;">
-        <span class="aiev3-span-point lhs">\u2009</span>
-        <span class="aiev3-span-point rhs">\u2009</span>
+        <span class="aiev3-span-point lhs">\u200b</span>
+        <span class="aiev3-span-point rhs">\u200b</span>
       </div>`
         .replaceAll(/[\r\n\t]/g, "")
         .replaceAll(/>\s{2,}</g, "><")
