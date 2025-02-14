@@ -1,6 +1,6 @@
 {
   "name": "@asup/editor-v3",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "REACT Typescript Editor component",
   "author": "Paul Thomas <@PaulDThomas>",
   "private": false,
@@ -39,7 +39,7 @@
   "scripts": {
     "prepare": "husky",
     "start": "rmdir /q/s .\\.parcel-cache && parcel demo/index.html --dist-dir demo/dist",
-    "test": "jest --maxWorkers=25%",
+    "test": "jest --maxWorkers=25% --collect-coverage=true",
     "test-watch": "jest --watch --maxWorkers=4",
     "build": "parcel build src/main.ts"
   },
