@@ -1,3 +1,4 @@
+import { BaseEditorV3 } from "./BaseEditorv3";
 import { EditorV3 } from "./EditorV3";
 import { BaseCheckbox } from "./ObjectEditor/BaseCheckbox";
 import { BaseInput } from "./ObjectEditor/BaseInput";
@@ -9,6 +10,7 @@ import { StylesEditor } from "./StylesEditor";
 
 export {
   BaseCheckbox,
+  BaseEditorV3,
   BaseInput,
   BaseSelect,
   EditorV3,

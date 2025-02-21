@@ -154,11 +154,26 @@ describe("readV3DivElement", () => {
     div.classList.add("aiev3-line", "left");
     div.innerHTML =
       // eslint-disable-next-line quotes
-      `<span class="aiev3-tb is-active">0&nbsp;</span><span class="aiev3-tb is-active">&nbsp;</span>` +
+      `<span class="aiev3-tb is-active">0&nbsp;</span><span class="aiev3-tb">&nbsp;</span>` +
       // eslint-disable-next-line quotes
-      `<span class="aiev3-tb is-active">&nbsp;</span><span class="aiev3-tb is-active">world</span>`;
+      `<span class="aiev3-tb">&nbsp;</span><span class="aiev3-tb">world</span>`;
     const ret = readV3DivElement(div);
     expect(ret.textBlocks.map((tb) => tb.text).join("")).toEqual("0   world");
     expect(ret.textBlocks.length).toBe(4);
+  });
+
+  test("Remove skipped text blocks", () => {
+    const div = document.createElement("div");
+    div.classList.add("aiev3-line", "left");
+    div.innerHTML =
+      // eslint-disable-next-line quotes
+      `<span class="aiev3-tb">0&nbsp;</span><span class="aiev3-tb">&nbsp;</span>` +
+      // eslint-disable-next-line quotes
+      `<span class="aiev3-tb skip-read">xxx</span><span class="aiev3-tb">world</span>` +
+      // eslint-disable-next-line quotes
+      `<span class="aiev3-tb"> </span><span class="aiev3-tb"> </span>`;
+    const ret = readV3DivElement(div);
+    expect(ret.textBlocks.map((tb) => tb.text).join("")).toEqual("0  world  ");
+    expect(ret.textBlocks.length).toBe(5);
   });
 });

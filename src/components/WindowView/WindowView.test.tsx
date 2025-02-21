@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { EditorV3Content } from "../../classes";
 import { defaultContentProps } from "../../classes/defaultContentProps";
 import { WindowView } from "./WindowView";
+import * as dbs from "../../hooks/useDebounceStack";
 
 jest.mock("./WindowViewSelectOptions");
 
@@ -175,6 +176,7 @@ describe("Add and remove lines", () => {
         />
       </ContextWindowStack>,
     );
+    screen.debug();
     const removeLine = screen.queryAllByLabelText("Remove line")[1] as Element;
     expect(removeLine).toBeInTheDocument();
     await user.click(removeLine);
@@ -185,5 +187,44 @@ describe("Add and remove lines", () => {
     expect(calls.content.lines.length).toEqual(2);
     expect(calls.content.lines[0].lineText).toEqual("test");
     expect(calls.content.lines[1].lineText).toEqual("world");
+  });
+
+  test("Check undo/redo", async () => {
+    const mockUndo = jest.fn();
+    const mockRedo = jest.fn();
+    jest.spyOn(dbs, "useDebounceStack").mockImplementation((currentValue, setCurrentValue) => ({
+      currentValue,
+      setCurrentValue,
+      undo: mockUndo,
+      redo: mockRedo,
+      forceUpdate: jest.fn(),
+      stack: null,
+      index: 0,
+    }));
+    const mockSetState = jest.fn();
+    const mockSetShow = jest.fn();
+    const content = new EditorV3Content("test\nhello\nworld", {
+      ...defaultContentProps,
+      allowNewLine: true,
+    });
+    render(
+      <ContextWindowStack>
+        <WindowView
+          id="test-window"
+          showWindowView={true}
+          setShowWindowView={mockSetShow}
+          state={{
+            content,
+            focus: false,
+            editable: true,
+          }}
+          setState={mockSetState}
+        />
+      </ContextWindowStack>,
+    );
+    await user.click(screen.getByLabelText("Undo"));
+    expect(mockUndo).toHaveBeenCalledTimes(1);
+    await user.click(screen.getByLabelText("Redo"));
+    expect(mockRedo).toHaveBeenCalledTimes(1);
   });
 });

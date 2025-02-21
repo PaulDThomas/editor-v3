@@ -22,7 +22,7 @@ const config = {
   moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json", "node"],
 
   // Added by Paul
-  collectCoverage: true,
+  collectCoverage: false,
   coverageProvider: "babel",
   coverageReporters: ["lcov", "text"],
   collectCoverageFrom: [

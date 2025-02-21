@@ -4,11 +4,17 @@ import baseStyles from "../BaseInputs.module.css";
 interface BaseInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   id: string;
   value: string | number | undefined;
-  change: (ret: string | number | boolean | undefined) => void;
+  onNewValue?: (ret: string | number) => void;
   label?: string;
 }
 
-export const BaseInput = ({ id, value, change, label, ...rest }: BaseInputProps): JSX.Element => {
+export const BaseInput = ({
+  id,
+  value,
+  onNewValue,
+  label,
+  ...rest
+}: BaseInputProps): JSX.Element => {
   const [inputValue, setInputValue] = useState<string>(value?.toString() ?? "");
   useEffect(() => {
     setInputValue(value?.toString() ?? "");
@@ -17,9 +23,11 @@ export const BaseInput = ({ id, value, change, label, ...rest }: BaseInputProps)
     setInputValue(e.target.value);
   };
   const handleInputBlur = useCallback(() => {
-    const newValue = typeof value === "number" ? parseFloat(inputValue) : inputValue;
-    change(newValue);
-  }, [change, inputValue, value]);
+    if (onNewValue) {
+      const newValue = typeof value === "number" ? parseFloat(inputValue) : inputValue;
+      onNewValue(newValue);
+    }
+  }, [onNewValue, inputValue, value]);
 
   return (
     <div className={baseStyles.holder}>

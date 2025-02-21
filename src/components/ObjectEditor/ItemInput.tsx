@@ -62,7 +62,7 @@ export const ItemInput = ({ dataPoint, ...rest }: ItemInputProps) => {
         <BaseInput
           id={`id-${dataPoint}`}
           value={thisValueRaw as string | number | undefined}
-          change={handleChange}
+          onNewValue={handleChange}
           label={thisOptionLabel}
           {...rest}
         />

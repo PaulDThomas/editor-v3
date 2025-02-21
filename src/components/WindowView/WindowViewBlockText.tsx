@@ -27,7 +27,7 @@ export const WindowViewBlockText = ({
       label={label ? "Label" : "Text"}
       value={label ? thisBlock.label : thisBlock.text}
       disabled={!wvc.editable}
-      change={(ret) => {
+      onNewValue={(ret) => {
         if (wvc && typeof ret === "string") {
           if (label) {
             wvc.dispatch({
