@@ -424,7 +424,8 @@ export const EditorV3 = ({
           !(
             // Ignore key down on metakeys
             ["Control", "Shift", "Alt"].includes(e.key)
-          )
+          ) &&
+          !(e.ctrlKey && (e.code === "KeyC" || e.code === "KeyX" || e.code === "KeyV"))
         ) {
           // Get current information and update content buffer for positions
           const newContent = new EditorV3Content(divRef.current, contentProps);

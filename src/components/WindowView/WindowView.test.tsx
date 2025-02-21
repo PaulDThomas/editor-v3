@@ -176,7 +176,6 @@ describe("Add and remove lines", () => {
         />
       </ContextWindowStack>,
     );
-    screen.debug();
     const removeLine = screen.queryAllByLabelText("Remove line")[1] as Element;
     expect(removeLine).toBeInTheDocument();
     await user.click(removeLine);
